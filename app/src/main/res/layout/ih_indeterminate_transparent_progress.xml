@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_gravity="center"
+    android:background="@android:color/transparent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center_horizontal"
+        android:orientation="vertical" 
+        >
+
+        <com.instachat.android.widget.IgLoadingSpinner
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true" 
+            />
+
+        <TextView
+            android:id="@+id/progressMessage"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/darker_gray"
+            android:gravity="center_horizontal"
+            android:visibility="visible"
+            android:maxLines="2"
+            android:layout_margin="5dip"
+            android:ellipsize="end"
+            android:text="asdf sadfas asdfas asdf asfd sadf dsaf sa fdsafd sd asdf asd fasd fasfd "
+            />
+    </LinearLayout>
+
+</RelativeLayout>
