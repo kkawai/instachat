@@ -20,7 +20,6 @@ public class ErrorHandler implements java.lang.Thread.UncaughtExceptionHandler {
 	private Context context;
 
 	public ErrorHandler(Context context) {
-		MLog.enable(TAG);
 		this.context = context;
 		defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
 	}

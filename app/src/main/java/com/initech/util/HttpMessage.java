@@ -52,7 +52,6 @@ public final class HttpMessage {
 	 */
 
 	public HttpMessage(final String url) {
-		MLog.enable(TAG);
 		try {
 			this.url = new URL(url);
 			if (url.startsWith("https://")) {

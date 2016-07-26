@@ -10,25 +10,6 @@ public class MLog {
     private MLog() {
     }
 
-    public static void setGlobalEnabled(final boolean f) {
-        globalEnabled = f;
-        if (!f) {
-            Logger.getLogger("com.instachat").setLevel(Level.OFF);
-        } else {
-            Logger.getLogger("com.instachat").setLevel(Level.INFO);
-        }
-    }
-
-    public static boolean getGlobalEnabled() {
-        return globalEnabled;
-    }
-
-    public static void enable(String tag) {
-    }
-
-    public static void disable(String tag) {
-    }
-
     private static boolean isEnabled(String tag) {
         return globalEnabled;
     }

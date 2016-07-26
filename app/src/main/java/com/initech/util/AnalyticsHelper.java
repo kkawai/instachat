@@ -21,7 +21,6 @@ public class AnalyticsHelper {
 
 			@Override
 			public void run() {
-				MLog.enable(TAG);
 				if (currentContext != null) {
 					onEndSession(currentContext);
 				}
@@ -50,7 +49,6 @@ public class AnalyticsHelper {
 				// session, get out.
 				if (currentContext == null || currentContext != context)
 					return;
-				MLog.enable(TAG);
 				MLog.i(TAG, "Event: end session");
 				FlurryAgent.onEndSession(currentContext);
 				if (errorHandler != null) {
@@ -69,7 +67,6 @@ public class AnalyticsHelper {
 
 			@Override
 			public void run() {
-				MLog.enable(TAG);
 				MLog.i(TAG, "Event: ", name);
 				FlurryAgent.logEvent(name);
 			}
@@ -83,7 +80,6 @@ public class AnalyticsHelper {
 
 			@Override
 			public void run() {
-				MLog.enable(TAG);
 				MLog.i(TAG, "Event: ", name, isTimed);
 				FlurryAgent.logEvent(name, isTimed);
 			}
@@ -97,7 +93,6 @@ public class AnalyticsHelper {
 
 			@Override
 			public void run() {
-				MLog.enable(TAG);
 				MLog.i(TAG, "Event: ", name, " : ", params);
 				FlurryAgent.logEvent(name, params);
 			}
@@ -111,7 +106,6 @@ public class AnalyticsHelper {
 
 			@Override
 			public void run() {
-				MLog.enable(TAG);
 				MLog.i(TAG, "Timed Event: ", name);
 				FlurryAgent.endTimedEvent(name);
 			}

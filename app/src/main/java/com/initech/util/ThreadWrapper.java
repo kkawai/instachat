@@ -15,7 +15,6 @@ public class ThreadWrapper {
 	}
 	
 	public static void executeInWorkerThread(final Runnable task) {
-		MLog.enable(TAG);
 		if (Looper.myLooper() == Looper.getMainLooper()) {
 			// UI thread
 			Thread worker = new Thread() {
@@ -39,7 +38,6 @@ public class ThreadWrapper {
 	}
 
 	public static void executeInUiThread(final Runnable task) {
-		MLog.enable(TAG);
 		if (Looper.myLooper() != Looper.getMainLooper()) {
 			// Worker thread
 			mHandler.post(new Runnable() {

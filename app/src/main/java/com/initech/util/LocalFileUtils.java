@@ -22,9 +22,6 @@ import java.net.URL;
 public final class LocalFileUtils {
 
 	private static final String TAG = LocalFileUtils.class.getSimpleName();
-	static {
-		MLog.enable(TAG);
-	}
 
 	private LocalFileUtils() {
 	}
