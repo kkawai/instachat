@@ -8,7 +8,14 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.initech.api.NetworkApi;
+import com.initech.model.User;
 import com.initech.util.EmailUtil;
+import com.initech.util.MLog;
+
+import org.json.JSONObject;
 
 /**
  * Created by kevin on 7/18/2016.
@@ -66,7 +73,36 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void doCreateAccount() {
-        Toast.makeText(this, "Create account now!", Toast.LENGTH_SHORT).show();
+        final TextInputLayout emailLayout = (TextInputLayout) findViewById(R.id.input_email_layout);
+        final String email = emailLayout.getEditText().getText().toString();
+        final TextInputLayout passwordLayout = (TextInputLayout) findViewById(R.id.input_password_layout);
+        final String password = passwordLayout.getEditText().getText().toString();
+        final User user = new User();
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setInstagramId(email);
+        NetworkApi.saveUser(this, user, new Response.Listener<String>() {
+            @Override
+            public void onResponse(final String string) {
+                try {
+                    final JSONObject response = new JSONObject(string);
+                    if (response.getString("status").equals("OK")) {
+                        user.copyFrom(response.getJSONObject("data"));
+                        MLog.i("test","savedUser: "+string);
+                        Toast.makeText(SignUpActivity.this, "Account created!  USER id: "+user.getId(), Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(SignUpActivity.this, "Error creating account (1): "+response.getString("status"), Toast.LENGTH_SHORT).show();
+                    }
+                }catch (final Exception e) {
+                    Toast.makeText(SignUpActivity.this, "Error creating account (2).  Please try again: "+e, Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(final VolleyError error) {
+                Toast.makeText(SignUpActivity.this, "Error creating account (3).  Please try again: "+error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void hideKeyboard() {

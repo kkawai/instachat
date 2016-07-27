@@ -4,10 +4,8 @@ import android.app.Application;
 import android.content.res.Configuration;
 
 import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.initech.util.HttpMessage;
-import com.initech.util.MLog;
 import com.initech.util.ThreadWrapper;
 
 /**
@@ -19,6 +17,8 @@ public class MyApp extends Application {
     private static MyApp sInstance;
     private static boolean isAdmSupported;
     private RequestQueue mRequestQueue;
+    public static double lat;
+    public static double lon;
 
     @Override
     public void onCreate() {
@@ -46,6 +46,10 @@ public class MyApp extends Application {
         } catch (final ClassNotFoundException e) {
             isAdmSupported = false;
         }
+    }
+
+    public RequestQueue getRequestQueue() {
+        return mRequestQueue;
     }
 
     public boolean isAdmSupported() {
