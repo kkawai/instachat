@@ -78,37 +78,6 @@ public final class NetworkApi {
         MyApp.getInstance().getRequestQueue().add(request);
     }
 
-    public static User saveIHUser(final User user) throws Exception {
-
-        try {
-            user.setLat(MyApp.lat);
-            user.setLon(MyApp.lon);
-        } catch (final Exception e) {
-            // TODO: log
-        }
-
-        MLog.i(TAG, "Sending info to server for user: ", user.getInstagramId() + " : " + user.getUsername());
-        final HttpMessage httpMessage = new HttpMessage(Constants.API_BASE_URL + "/saveuser");
-        final JSONObject response = new JSONObject(httpMessage.post("user", user.toJSON().toString()));
-        if (response.getString("status").equals("OK")) {
-
-			/*
-			 * First, PRESERVE any user data that we know is only stored at IH
-			 * such as gender
-			 */
-            final String iid = user.getInstagramId();
-            final String gender = user.getGender();
-            user.copyFrom(response.getJSONObject("data"));
-            user.setInstagramId(iid);
-            user.setGender(gender);
-            return user;
-        } else {
-            // failed to save
-            MLog.e(TAG, "Error from server: ", response);
-            return null;
-        }
-    }
-
     public static void saveUser(final Object tag, final User user, final Response.Listener<String> responder, Response.ErrorListener errorListener) {
 
         try {
@@ -120,7 +89,7 @@ public final class NetworkApi {
 
         final HashMap<String,String> params = new HashMap<>(1);
         params.put("user", user.toJSON().toString());
-        final ApiPostRequest request = new ApiPostRequest(params, Constants.API_BASE_URL + "/saveuser", responder, errorListener);
+        final ApiPostRequest request = new ApiPostRequest(params, Constants.API_BASE_URL + "/saveuser2", responder, errorListener);
         request.setTag(tag);
         MyApp.getInstance().getRequestQueue().add(request);
     }

@@ -9,10 +9,12 @@
     <string name="invite_menu_label">Invite</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
+    <string name="hint_username">Display Name</string>
     <string name="hint_email">Email</string>
     <string name="hint_password">Password</string>
     <string name="invalid_email">Invalid Email</string>
     <string name="invalid_password">Invalid Password</string>
+    <string name="invalid_username">Invalid Display Name</string>
     <string name="create_account">Create Account</string>
     <string name="fresh_config">Fresh Config</string>
     <string name="cause_crash">Cause Crash</string>

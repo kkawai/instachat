@@ -13,6 +13,6 @@ public final class EmailUtil {
     }
 
     public static boolean isValidPassword(final String password) {
-        return password.trim().length() > 5;
+        return password.trim().length() > 4;
     }
 }

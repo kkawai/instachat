@@ -50,6 +50,10 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             final TextInputLayout passwordLayout = (TextInputLayout) findViewById(R.id.input_password_layout);
             passwordLayout.setError("");
         }
+        if (v.getId() == R.id.input_username && hasFocus) {
+            final TextInputLayout usernameLayout = (TextInputLayout) findViewById(R.id.input_username_layout);
+            usernameLayout.setError("");
+        }
     }
 
     private void createAccount() {
@@ -60,35 +64,50 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         emailLayout.getEditText().setOnFocusChangeListener(this);
         final TextInputLayout passwordLayout = (TextInputLayout) findViewById(R.id.input_password_layout);
         final String password = passwordLayout.getEditText().getText().toString();
+        final TextInputLayout usernameLayout = (TextInputLayout) findViewById(R.id.input_username_layout);
+        final String username = usernameLayout.getEditText().getText().toString();
+
         passwordLayout.getEditText().setOnFocusChangeListener(this);
         if (!EmailUtil.isValidEmail(email)) {
             emailLayout.setError(getString(R.string.invalid_email));
+        } else if (!isValidUsername(username)) {
+            usernameLayout.setError(getString(R.string.invalid_username));
         } else if (!EmailUtil.isValidPassword(password)) {
             passwordLayout.setError(getString(R.string.invalid_password));
         } else {
             emailLayout.setError("");
+            usernameLayout.setError("");
             passwordLayout.setError("");
             doCreateAccount();
         }
     }
 
+    private boolean isValidUsername(final String username) {
+        if (username == null || username.trim().length() <= 1 || username.trim().length() > 50) {
+            return false;
+        }
+        return true;
+    }
+
     private void doCreateAccount() {
         final TextInputLayout emailLayout = (TextInputLayout) findViewById(R.id.input_email_layout);
-        final String email = emailLayout.getEditText().getText().toString();
+        final String email = emailLayout.getEditText().getText().toString().trim();
         final TextInputLayout passwordLayout = (TextInputLayout) findViewById(R.id.input_password_layout);
-        final String password = passwordLayout.getEditText().getText().toString();
+        final String password = passwordLayout.getEditText().getText().toString().trim();
+        final String username = ((TextInputLayout) findViewById(R.id.input_username_layout)).getEditText().getText().toString().trim();
         final User user = new User();
         user.setEmail(email);
         user.setPassword(password);
+        user.setUsername(username);
         user.setInstagramId(email);
         NetworkApi.saveUser(this, user, new Response.Listener<String>() {
             @Override
             public void onResponse(final String string) {
                 try {
                     final JSONObject response = new JSONObject(string);
+                    MLog.i("test","savedUser: "+string);
                     if (response.getString("status").equals("OK")) {
-                        user.copyFrom(response.getJSONObject("data"));
-                        MLog.i("test","savedUser: "+string);
+                        user.copyFrom(response.getJSONObject("data"), null);
                         Toast.makeText(SignUpActivity.this, "Account created!  USER id: "+user.getId(), Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(SignUpActivity.this, "Error creating account (1): "+response.getString("status"), Toast.LENGTH_SHORT).show();

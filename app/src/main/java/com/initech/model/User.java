@@ -478,13 +478,6 @@ public class User extends DomainObject {
         return sb.toString();
     }
 
-    /**
-     * @param inUser
-     */
-    public void copyFrom(final User inUser) {
-        super.copyFrom(inUser);
-    }
-
     private static String stripWhiteSpace(String s) {
         StringBuilder sb = new StringBuilder(s.length());
 
