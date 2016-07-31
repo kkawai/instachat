@@ -1,19 +1,22 @@
 package com.google.firebase.codelab.friendlychat;
 
-import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.initech.MyApp;
 import com.initech.api.NetworkApi;
 import com.initech.model.User;
+import com.initech.util.DeviceUtil;
 import com.initech.util.EmailUtil;
 import com.initech.util.MLog;
+import com.initech.util.Preferences;
+import com.initech.util.StringUtil;
 
 import org.json.JSONObject;
 
@@ -41,7 +44,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(final View v) {
         switch (v.getId()) {
             case R.id.create_account_button:
-                createAccount();
+                validateAccount();
                 break;
             default:
                 return;
@@ -61,8 +64,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    private void createAccount() {
-        hideKeyboard();
+    private void validateAccount() {
+        DeviceUtil.hideKeyboard(this);
 
         email = emailLayout.getEditText().getText().toString().trim();
         emailLayout.getEditText().setOnFocusChangeListener(this);
@@ -75,23 +78,16 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         if (!EmailUtil.isValidEmail(email)) {
             emailLayout.setError(getString(R.string.invalid_email));
-        } else if (!isValidUsername(username)) {
+        } else if (!StringUtil.isValidUsername(username)) {
             usernameLayout.setError(getString(R.string.invalid_username));
-        } else if (!EmailUtil.isValidPassword(password)) {
+        } else if (!StringUtil.isValidPassword(password)) {
             passwordLayout.setError(getString(R.string.invalid_password));
         } else {
             emailLayout.setError("");
             usernameLayout.setError("");
             passwordLayout.setError("");
-            doCreateAccount();
+            remotelyValidateEmail();
         }
-    }
-
-    private boolean isValidUsername(final String username) {
-        if (username == null || username.trim().length() <= 1 || username.trim().length() > 50) {
-            return false;
-        }
-        return true;
     }
 
     private void remotelyValidateEmail() {
@@ -101,11 +97,23 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     public void onResponse(final JSONObject response) {
                         //status:OK
                         //exists:true|false
+                        try {
+                            if (!response.getString("status").equalsIgnoreCase("OK")) {
+                                showErrorToast("1");
+                            } else if (response.getString("status").equalsIgnoreCase("OK") && response.getJSONObject("data").getBoolean("exists")) {
+                                emailLayout.setError(errorMessage(R.string.email_exists,email));
+                            } else {
+                                remotelyValidateUsername();
+                            }
+                        }catch(final Exception e) {
+                            showErrorToast("2");
+                        }
+
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(final VolleyError error) {
-
+                        showErrorToast("3");
                     }
                 });
     }
@@ -117,16 +125,36 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     public void onResponse(final JSONObject response) {
                         //status:OK
                         //exists:true|false
+                        try {
+                            if (!response.getString("status").equalsIgnoreCase("OK")) {
+                                showErrorToast("1");
+                            } else if (response.getString("status").equalsIgnoreCase("OK") && response.getJSONObject("data").getBoolean("exists")) {
+                                usernameLayout.setError(errorMessage(R.string.username_exists,username));
+                            } else {
+                                createAccount();
+                            }
+                        }catch(final Exception e) {
+                            showErrorToast("2");
+                        }
+
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(final VolleyError error) {
-
+                        showErrorToast("3");
                     }
                 });
     }
 
-    private void doCreateAccount() {
+    private String errorMessage(final int stringResId, final String str) {
+        return getString(stringResId,str);
+    }
+
+    private void showErrorToast(final String distinctScreenCode) {
+        Toast.makeText(this, getString(R.string.general_api_error,distinctScreenCode),Toast.LENGTH_SHORT).show();
+    }
+
+    private void createAccount() {
         final User user = new User();
         user.setEmail(email);
         user.setPassword(password);
@@ -140,7 +168,10 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     MLog.i("test", "savedUser: " + string);
                     if (response.getString("status").equals("OK")) {
                         user.copyFrom(response.getJSONObject("data"), null);
-                        Toast.makeText(SignUpActivity.this, "Account created!  USER id: " + user.getId(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(SignUpActivity.this, "Account created!  USER id: " + user.getId(), Toast.LENGTH_SHORT).show();
+                        Preferences.getInstance(SignUpActivity.this).saveUser(user);
+                        startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                        finish();
                     } else {
                         Toast.makeText(SignUpActivity.this, "Error creating account (1): " + response.getString("status"), Toast.LENGTH_SHORT).show();
                     }
@@ -156,11 +187,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         });
     }
 
-    private void hideKeyboard() {
-        final View view = getCurrentFocus();
-        if (view != null) {
-            ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
-                    hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
+    @Override
+    protected void onDestroy() {
+        MyApp.getInstance().getRequestQueue().cancelAll(this);
+        super.onDestroy();
     }
 }

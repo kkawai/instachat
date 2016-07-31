@@ -8,15 +8,19 @@
     <string name="contacts_permission_rationale">Access to account information is required to sign in.</string>
     <string name="invite_menu_label">Invite</string>
     <string name="sign_in">Sign In</string>
+    <string name="sign_in_with_google">Sign In with Google</string>
     <string name="sign_up">Sign Up</string>
-    <string name="hint_username">Display Name</string>
+    <string name="hint_username">Username</string>
     <string name="hint_email">Email</string>
     <string name="hint_password">Password</string>
     <string name="invalid_email">Invalid Email</string>
     <string name="invalid_password">Invalid Password</string>
-    <string name="invalid_username">Invalid Display Name</string>
+    <string name="invalid_username">Invalid Username Name</string>
     <string name="create_account">Create Account</string>
     <string name="fresh_config">Fresh Config</string>
     <string name="cause_crash">Cause Crash</string>
+    <string name="general_api_error">Could not do it.  Please try again.  %s</string>
+    <string name="email_exists">Please choose a different email.  %s is already registered.</string>
+    <string name="username_exists">Please choose a username name.  %s is already taken.</string>
     <string name="banner_ad_unit_id" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
 </resources>

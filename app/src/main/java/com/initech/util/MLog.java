@@ -26,6 +26,12 @@ public class MLog {
         }
     }
 
+    public static void d(String tag, Object... vals) {
+        if (isEnabled(tag)) {
+            Logger.getLogger(tag).log(Level.FINE, buildString(vals));
+        }
+    }
+
     public static void e(String tag, Object... vals) {
         if (isEnabled(tag)) {
             Logger.getLogger(tag).log(Level.SEVERE, buildString(vals));

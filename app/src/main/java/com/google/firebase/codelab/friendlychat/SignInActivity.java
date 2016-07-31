@@ -18,11 +18,14 @@ package com.google.firebase.codelab.friendlychat;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -37,13 +40,24 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.initech.MyApp;
+import com.initech.api.NetworkApi;
+import com.initech.util.DeviceUtil;
+import com.initech.util.MLog;
+import com.initech.util.StringUtil;
 
-public class SignInActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
+import org.json.JSONObject;
+
+public class SignInActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,
+        View.OnClickListener, View.OnFocusChangeListener {
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
     private static final int RC_SIGN_UP = 9002;
     private SignInButton mSignInButton;
+    private TextInputLayout passwordLayout, usernameLayout;
+    private String username, password;
+
 
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth mFirebaseAuth;
@@ -52,9 +66,17 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+        passwordLayout = (TextInputLayout) findViewById(R.id.input_password_layout);
+        usernameLayout = (TextInputLayout) findViewById(R.id.input_username_layout);
+        findViewById(R.id.sign_in_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+                validateAccount();
+            }
+        });
 
         // Assign fields
-        mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        mSignInButton = (SignInButton) findViewById(R.id.sign_in_with_google_button);
 
         // Set click listeners
         mSignInButton.setOnClickListener(this);
@@ -65,6 +87,45 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
 
         // Initialize FirebaseAuth
         mFirebaseAuth = FirebaseAuth.getInstance();
+    }
+
+    private void validateAccount() {
+        DeviceUtil.hideKeyboard(this);
+
+        password = passwordLayout.getEditText().getText().toString().trim();
+        passwordLayout.getEditText().setOnFocusChangeListener(this);
+
+        username = usernameLayout.getEditText().getText().toString().trim();
+        usernameLayout.getEditText().setOnFocusChangeListener(this);
+
+        if (!StringUtil.isValidUsername(username)) {
+            usernameLayout.setError(getString(R.string.invalid_username));
+        } else if (!StringUtil.isValidPassword(password)) {
+            passwordLayout.setError(getString(R.string.invalid_password));
+        } else {
+            usernameLayout.setError("");
+            passwordLayout.setError("");
+            signInWithUsernamePassword(username,password);
+        }
+    }
+
+    private void signInWithUsernamePassword(final String username, final String password) {
+        NetworkApi.getIHUserByUsername(this, username, password, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(final JSONObject response) {
+                try {
+
+                }catch(final Exception e) {
+
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
     }
 
     private void handleFirebaseAuthResult(AuthResult authResult) {
@@ -93,13 +154,11 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     }
 
     private void signIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        startActivityForResult(Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient), RC_SIGN_IN);
     }
 
     private void signUp() {
-        final Intent intent = new Intent(this,SignUpActivity.class);
-        startActivityForResult(intent, RC_SIGN_UP);
+        startActivityForResult(new Intent(this, SignUpActivity.class), RC_SIGN_UP);
     }
 
     @Override
@@ -115,7 +174,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                 firebaseAuthWithGoogle(account);
             } else {
                 // Google Sign In failed
-                Log.e(TAG, "Google Sign In failed: " + result.toString());
+                MLog.e(TAG, "Google Sign In failed: " + result.toString());
             }
         }
     }
@@ -146,8 +205,32 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+        MLog.d(TAG, "onConnectionFailed:" + connectionResult);
         Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onFocusChange(final View v, final boolean hasFocus) {
+        if (v.getId() == R.id.input_password && hasFocus) {
+            passwordLayout.setError("");
+        }
+        if (v.getId() == R.id.input_username && hasFocus) {
+            usernameLayout.setError("");
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        MyApp.getInstance().getRequestQueue().cancelAll(this);
+        super.onDestroy();
+    }
+
+    private String errorMessage(final int stringResId, final String str) {
+        return getString(stringResId,str);
+    }
+
+    private void showErrorToast(final String distinctScreenCode) {
+        Toast.makeText(this, getString(R.string.general_api_error,distinctScreenCode),Toast.LENGTH_SHORT).show();
     }
 
 }
