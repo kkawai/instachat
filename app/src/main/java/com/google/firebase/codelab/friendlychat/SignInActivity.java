@@ -223,6 +223,22 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                     if (response.getString("status").equalsIgnoreCase("OK")) {
                         final User user = new User();
                         user.copyFrom(response.getJSONObject("data"), null);
+                        if (StringUtil.isEmpty(user.getProfilePicUrl())) {
+                            if (acct.getPhotoUrl() != null) {
+                                user.setProfilePicUrl(acct.getPhotoUrl().toString());
+                                NetworkApi.saveUser(SignInActivity.this, user, new Response.Listener<String>() {
+                                    @Override
+                                    public void onResponse(final String response) {
+                                        //dont care
+                                    }
+                                }, new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        //dont care
+                                    }
+                                });
+                            }
+                        }
                         Preferences.getInstance(SignInActivity.this).saveUser(user);
                         signIntoFirebase(user.getEmail(),user.getPassword());
                     } else { //user does not exist
