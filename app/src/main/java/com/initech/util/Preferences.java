@@ -135,7 +135,15 @@ public final class Preferences {
     }
 
     public String getUserId() {
-        return this.mPrefs.getString(PREFERENCE_USER_ID, (String) null);
+        return this.mPrefs.getString(PREFERENCE_USER_ID, null);
+    }
+
+    public String getUsername() {
+        return this.mPrefs.getString(PREFERENCE_USER_NAME, null);
+    }
+
+    public String getEmail() {
+        return this.mPrefs.getString(PREFERENCE_EMAIL, null);
     }
 
     public User getUser() {

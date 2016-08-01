@@ -38,15 +38,15 @@ public final class NetworkApi {
         }
     }
 
-    public static void getIHUserV2(final Object cancelTag, final String iid, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+    public static void getUserByEmail(final Object cancelTag, final String email, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
 
-        final String url = Constants.API_BASE_URL + "/getuser?iid=" + iid;
+        final String url = Constants.API_BASE_URL + "/getubyem?em=" + Base64.encodeWebSafe(email.getBytes(),false);
         final Request request = new ApiGetRequest(url, listener, errorListener);
         request.setShouldCache(false).setRetryPolicy(DEFAULT_RETRY_POLICY).setTag(cancelTag);
         MyApp.getInstance().getRequestQueue().add(request);
     }
 
-    public static void getIHUserByUsername(final Object cancelTag, final String username, final String pw, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+    public static void getUserByUsernamePassword(final Object cancelTag, final String username, final String pw, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
 
         final String url = Constants.API_BASE_URL + "/getu?un=" + username+"&pd="+ Base64.encodeWebSafe(pw.getBytes(),false);
         final Request request = new ApiGetRequest(url, listener, errorListener);
@@ -54,7 +54,7 @@ public final class NetworkApi {
         MyApp.getInstance().getRequestQueue().add(request);
     }
 
-    public static void getIHUserByEmail(final Object cancelTag, final String email, final String pw, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+    public static void getUserByEmailPassword(final Object cancelTag, final String email, final String pw, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
 
         final String url = Constants.API_BASE_URL + "/getu?em=" + email+"&pd="+ Base64.encodeWebSafe(pw.getBytes(),false);
         final Request request = new ApiGetRequest(url, listener, errorListener);

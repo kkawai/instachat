@@ -1,12 +1,12 @@
 /**
  * Copyright Google Inc. All Rights Reserved.
- * <p>
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -42,8 +41,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.initech.MyApp;
 import com.initech.api.NetworkApi;
+import com.initech.model.User;
 import com.initech.util.DeviceUtil;
+import com.initech.util.EmailUtil;
 import com.initech.util.MLog;
+import com.initech.util.Preferences;
 import com.initech.util.StringUtil;
 
 import org.json.JSONObject;
@@ -54,9 +56,9 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
     private static final int RC_SIGN_UP = 9002;
-    private SignInButton mSignInButton;
-    private TextInputLayout passwordLayout, usernameLayout;
-    private String username, password;
+    private SignInButton signInWithGoogleButton;
+    private TextInputLayout passwordLayout, emailLayout;
+    private String email, password;
 
 
     private GoogleApiClient mGoogleApiClient;
@@ -67,19 +69,14 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
         passwordLayout = (TextInputLayout) findViewById(R.id.input_password_layout);
-        usernameLayout = (TextInputLayout) findViewById(R.id.input_username_layout);
-        findViewById(R.id.sign_in_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View view) {
-                validateAccount();
-            }
-        });
+        emailLayout = (TextInputLayout) findViewById(R.id.input_email_layout);
+        findViewById(R.id.sign_in_with_email_button).setOnClickListener(this);
 
         // Assign fields
-        mSignInButton = (SignInButton) findViewById(R.id.sign_in_with_google_button);
+        signInWithGoogleButton = (SignInButton) findViewById(R.id.sign_in_with_google_button);
 
         // Set click listeners
-        mSignInButton.setOnClickListener(this);
+        signInWithGoogleButton.setOnClickListener(this);
         findViewById(R.id.sign_up_button).setOnClickListener(this);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
@@ -92,38 +89,64 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     private void validateAccount() {
         DeviceUtil.hideKeyboard(this);
 
+        email = emailLayout.getEditText().getText().toString().trim();
+        emailLayout.getEditText().setOnFocusChangeListener(this);
         password = passwordLayout.getEditText().getText().toString().trim();
         passwordLayout.getEditText().setOnFocusChangeListener(this);
 
-        username = usernameLayout.getEditText().getText().toString().trim();
-        usernameLayout.getEditText().setOnFocusChangeListener(this);
-
-        if (!StringUtil.isValidUsername(username)) {
-            usernameLayout.setError(getString(R.string.invalid_username));
+        if (!EmailUtil.isValidEmail(email)) {
+            emailLayout.setError(getString(R.string.invalid_email));
         } else if (!StringUtil.isValidPassword(password)) {
             passwordLayout.setError(getString(R.string.invalid_password));
         } else {
-            usernameLayout.setError("");
+            emailLayout.setError("");
             passwordLayout.setError("");
-            signInWithUsernamePassword(username,password);
+            signInWithEmailPassword(email, password);
         }
     }
 
-    private void signInWithUsernamePassword(final String username, final String password) {
-        NetworkApi.getIHUserByUsername(this, username, password, new Response.Listener<JSONObject>() {
+    private void signInWithEmailPassword(final String email, final String password) {
+        NetworkApi.getUserByEmailPassword(this, email, password, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(final JSONObject response) {
                 try {
-
-                }catch(final Exception e) {
-
+                    final String status = response.getString("status");
+                    if (status.equalsIgnoreCase("OK")) {
+                        final JSONObject data = response.getJSONObject("data");
+                        final User user = new User();
+                        user.copyFrom(data, null);
+                        Preferences.getInstance(SignInActivity.this).saveUser(user);
+                        signIntoFirebase(email,password);
+                    } else {
+                        showErrorToast(R.string.email_password_not_found);
+                    }
+                } catch (final Exception e) {
+                    MLog.e(TAG, e);
+                    showErrorToast("1");
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onErrorResponse(final VolleyError error) {
+                MLog.e(TAG, "signInWithEmailPassword() failed: " + error);
+                showErrorToast("2");
+            }
+        });
+    }
 
+    private void signIntoFirebase(final String email, final String password) {
+        mFirebaseAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                MLog.d(TAG, "signIntoFirebase:onComplete:" + task.isSuccessful());
+                if (!task.isSuccessful()) {
+                    MLog.w(TAG, "signIntoFirebase", task.getException());
+                    showErrorToast("Firebase Account Creation Error");
+                } else {
+                    startActivity(new Intent(SignInActivity.this, MainActivity.class));
+                    finish();
+                }
             }
         });
     }
@@ -142,8 +165,11 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     @Override
     public void onClick(final View v) {
         switch (v.getId()) {
-            case R.id.sign_in_button:
-                signIn();
+            case R.id.sign_in_with_email_button:
+                validateAccount();
+                break;
+            case R.id.sign_in_with_google_button:
+                signInWithGoogle();
                 break;
             case R.id.sign_up_button:
                 signUp();
@@ -153,7 +179,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         }
     }
 
-    private void signIn() {
+    private void signInWithGoogle() {
         startActivityForResult(Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient), RC_SIGN_IN);
     }
 
@@ -167,36 +193,56 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            final GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
                 // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = result.getSignInAccount();
+                final GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
             } else {
                 // Google Sign In failed
                 MLog.e(TAG, "Google Sign In failed: " + result.toString());
+                showErrorToast("Google Sign In Failed");
             }
         }
     }
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d(TAG, "firebaseAuthWithGooogle:" + acct.getId());
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mFirebaseAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+    /**
+     * Successfully signing in via google means that we must
+     * check if the user exists in our system.
+     * If exists already, then just enter MainActivity.
+     * If not exists, we must complete registration,
+     * by asking user to enter password.
+     *
+     * @param acct
+     */
+    private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
+        NetworkApi.getUserByEmail(this, acct.getEmail(), new Response.Listener<JSONObject>() {
             @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-
-                // If sign in fails, display a message to the user. If sign in succeeds
-                // the auth state listener will be notified and logic to handle the
-                // signed in user can be handled in the listener.
-                if (!task.isSuccessful()) {
-                    Log.w(TAG, "signInWithCredential", task.getException());
-                    Toast.makeText(SignInActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
-                } else {
-                    startActivity(new Intent(SignInActivity.this, MainActivity.class));
-                    finish();
+            public void onResponse(final JSONObject response) {
+                try {
+                    if (response.getString("status").equalsIgnoreCase("OK")) {
+                        final User user = new User();
+                        user.copyFrom(response.getJSONObject("data"), null);
+                        Preferences.getInstance(SignInActivity.this).saveUser(user);
+                        signIntoFirebase(user.getEmail(),user.getPassword());
+                    } else { //user does not exist
+                        final Intent intent = new Intent(SignInActivity.this,SignUpActivity.class);
+                        if (acct.getPhotoUrl() != null)
+                            intent.putExtra("photo",acct.getPhotoUrl().toString());
+                        intent.putExtra("email",acct.getEmail());
+                        MLog.i(TAG, "user photo: "+acct.getPhotoUrl() + " displayname " + acct.getDisplayName());
+                        startActivity(intent);
+                    }
+                } catch (final Exception e) {
+                    MLog.e(TAG, "checkUserExists() failed", e);
+                    showErrorToast("1");
                 }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(final VolleyError error) {
+                MLog.e(TAG, "checkUserExists() error response: " + error);
+                showErrorToast("2");
             }
         });
     }
@@ -215,7 +261,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
             passwordLayout.setError("");
         }
         if (v.getId() == R.id.input_username && hasFocus) {
-            usernameLayout.setError("");
+            emailLayout.setError("");
         }
     }
 
@@ -226,11 +272,15 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     }
 
     private String errorMessage(final int stringResId, final String str) {
-        return getString(stringResId,str);
+        return getString(stringResId, str);
     }
 
     private void showErrorToast(final String distinctScreenCode) {
-        Toast.makeText(this, getString(R.string.general_api_error,distinctScreenCode),Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.general_api_error, distinctScreenCode), Toast.LENGTH_SHORT).show();
+    }
+
+    private void showErrorToast(final int stringResId) {
+        Toast.makeText(this, stringResId, Toast.LENGTH_SHORT).show();
     }
 
 }

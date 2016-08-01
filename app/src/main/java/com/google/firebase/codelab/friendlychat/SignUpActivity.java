@@ -2,13 +2,19 @@ package com.google.firebase.codelab.friendlychat;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.initech.MyApp;
 import com.initech.api.NetworkApi;
 import com.initech.model.User;
@@ -24,11 +30,13 @@ import org.json.JSONObject;
  * Created by kevin on 7/18/2016.
  */
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener, View.OnFocusChangeListener {
-
+    private static final String TAG = "SignUpActivity";
     private TextInputLayout emailLayout;
     private TextInputLayout passwordLayout;
     private TextInputLayout usernameLayout;
     private String email, username, password;
+    private FirebaseAuth mFirebaseAuth;
+    private String photoUrlFromGoogle;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -38,6 +46,12 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         emailLayout = (TextInputLayout) findViewById(R.id.input_email_layout);
         passwordLayout = (TextInputLayout) findViewById(R.id.input_password_layout);
         usernameLayout = (TextInputLayout) findViewById(R.id.input_username_layout);
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        photoUrlFromGoogle = getIntent() != null ? getIntent().getStringExtra("photo") : null;
+        final String emailFromGoogle = getIntent() != null ? getIntent().getStringExtra("email") : null;
+        if (emailFromGoogle != null)
+            emailLayout.getEditText().setText(emailFromGoogle);
+        MLog.i(TAG,"photo url: "+photoUrlFromGoogle);
     }
 
     @Override
@@ -160,6 +174,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         user.setPassword(password);
         user.setUsername(username);
         user.setInstagramId(email);
+        if (photoUrlFromGoogle != null)
+            user.setProfilePicUrl(photoUrlFromGoogle);
         NetworkApi.saveUser(this, user, new Response.Listener<String>() {
             @Override
             public void onResponse(final String string) {
@@ -168,10 +184,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     MLog.i("test", "savedUser: " + string);
                     if (response.getString("status").equals("OK")) {
                         user.copyFrom(response.getJSONObject("data"), null);
-                        //Toast.makeText(SignUpActivity.this, "Account created!  USER id: " + user.getId(), Toast.LENGTH_SHORT).show();
                         Preferences.getInstance(SignUpActivity.this).saveUser(user);
-                        startActivity(new Intent(SignUpActivity.this, MainActivity.class));
-                        finish();
+                        createFirebaseAccount();
                     } else {
                         Toast.makeText(SignUpActivity.this, "Error creating account (1): " + response.getString("status"), Toast.LENGTH_SHORT).show();
                     }
@@ -183,6 +197,26 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onErrorResponse(final VolleyError error) {
                 Toast.makeText(SignUpActivity.this, "Error creating account (3).  Please try again: " + error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void createFirebaseAccount() {
+        mFirebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                MLog.d(TAG, "createUserWithEmailAndPassword:onComplete:" + task.isSuccessful());
+
+                // If sign in fails, display a message to the user. If sign in succeeds
+                // the auth state listener will be notified and logic to handle the
+                // signed in user can be handled in the listener.
+                if (!task.isSuccessful()) {
+                    MLog.w(TAG, "createFirebaseAccount", task.getException());
+                    showErrorToast("Firebase Account Create Error");
+                } else {
+                    startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                    finish();
+                }
             }
         });
     }

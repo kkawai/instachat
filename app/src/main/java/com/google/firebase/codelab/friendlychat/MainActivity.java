@@ -58,6 +58,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+import com.initech.model.User;
+import com.initech.util.Preferences;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -97,12 +99,13 @@ public class MainActivity extends AppCompatActivity implements
     private ProgressBar mProgressBar;
     private DatabaseReference mFirebaseDatabaseReference;
     private FirebaseAuth mFirebaseAuth;
-    private FirebaseUser mFirebaseUser;
+    //private FirebaseUser mFirebaseUser;
     private FirebaseAnalytics mFirebaseAnalytics;
     private EditText mMessageEditText;
     private AdView mAdView;
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
-    private GoogleApiClient mGoogleApiClient;
+    //private GoogleApiClient mGoogleApiClient;
+    private User mUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,22 +117,29 @@ public class MainActivity extends AppCompatActivity implements
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseUser = mFirebaseAuth.getCurrentUser();
-
-        if (mFirebaseUser == null) {
+        //mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        mUser = Preferences.getInstance(this).getUser();
+        if (mUser == null) {
             // Not signed in, launch the Sign In activity
             startActivity(new Intent(this, SignInActivity.class));
             finish();
             return;
         } else {
-            mUsername = mFirebaseUser.getDisplayName();
-            mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
+            final String photo = Preferences.getInstance(this).getUser().getProfilePicUrl();
+            if (photo != null) {
+                mPhotoUrl = photo;
+            }
+            mUsername = Preferences.getInstance(this).getUsername();
+            //mUsername = mFirebaseUser.getDisplayName();
+            //mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
         }
 
+        /*
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API)
                 .build();
+                */
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mMessageRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
@@ -297,8 +307,9 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             case R.id.sign_out_menu:
                 mFirebaseAuth.signOut();
-                Auth.GoogleSignInApi.signOut(mGoogleApiClient);
-                mFirebaseUser = null;
+                //Auth.GoogleSignInApi.signOut(mGoogleApiClient);
+                //mFirebaseUser = null;
+                Preferences.getInstance(this).saveUser(null);
                 mUsername = ANONYMOUS;
                 mPhotoUrl = null;
                 startActivity(new Intent(this, SignInActivity.class));
