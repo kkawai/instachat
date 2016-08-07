@@ -28,20 +28,21 @@
                 android:gravity="center_vertical"
                 android:orientation="vertical">
 
-                <TextView
+                <com.initech.view.CustomFontTextView
                     android:id="@+id/messageTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="0"
-                    app:font="@{`Alegreya-Regular`}"
+                    app:font="JandaSafeandSound.ttf"
                     android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-                <TextView
+                <com.initech.view.CustomFontTextView
                     android:id="@+id/messengerTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="0"
-                    app:font="@{`Alegreya-Italic`}"
+                    android:textColor="@color/colorAccent"
+                    app:font="Alegreya-Italic.ttf"
                     android:textAppearance="?android:attr/textAppearanceSmall"/>
             </LinearLayout>
 
