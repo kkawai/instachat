@@ -151,7 +151,7 @@ public class StringUtil {
         if (username == null || username.trim().length() <= Constants.MIN_USERNAME_LENGTH || username.trim().length() > Constants.MAX_USERNAME_LENGTH) {
             return false;
         }
-        return true;
+        return username.matches("[A-Za-z0-9_]+");
     }
 
     public static boolean isValidPassword(final String password) {

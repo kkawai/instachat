@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FF9800</color>
-    <color name="colorPrimaryDark">#E65100</color>
-    <color name="colorAccent">#2E7D32</color>
+    <color name="colorPrimary">#87cefa</color> <!-- action title bar -->
+    <color name="colorPrimaryDark">#6495ed</color> <!-- drawer -->
+    <color name="colorAccent">#a8a8a8</color>
     <color name="colorTitle">#ffffff</color>
 </resources>

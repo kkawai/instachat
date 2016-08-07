@@ -16,6 +16,7 @@
 package com.google.firebase.codelab.friendlychat;
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
@@ -67,7 +68,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_in);
+        DataBindingUtil.setContentView(this, R.layout.activity_sign_in);
         passwordLayout = (TextInputLayout) findViewById(R.id.input_password_layout);
         emailLayout = (TextInputLayout) findViewById(R.id.input_email_layout);
         findViewById(R.id.sign_in_with_email_button).setOnClickListener(this);
@@ -94,15 +95,16 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         password = passwordLayout.getEditText().getText().toString().trim();
         passwordLayout.getEditText().setOnFocusChangeListener(this);
 
-        if (!EmailUtil.isValidEmail(email)) {
+        if (email.contains("@") && !EmailUtil.isValidEmail(email)) {
             emailLayout.setError(getString(R.string.invalid_email));
-        } else if (!StringUtil.isValidPassword(password)) {
-            passwordLayout.setError(getString(R.string.invalid_password));
-        } else {
-            emailLayout.setError("");
-            passwordLayout.setError("");
-            signInWithEmailPassword(email, password);
+            return;
+        } else if (!email.contains("@") && !StringUtil.isValidUsername(email)) {
+            emailLayout.setError(getString(R.string.invalid_username));
+            return;
         }
+        emailLayout.setError("");
+        passwordLayout.setError("");
+        signInWithEmailPassword(email, password);
     }
 
     private void signInWithEmailPassword(final String email, final String password) {
@@ -116,7 +118,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                         final User user = new User();
                         user.copyFrom(data, null);
                         Preferences.getInstance(SignInActivity.this).saveUser(user);
-                        signIntoFirebase(email,password);
+                        signIntoFirebase(user.getEmail(), password);
                     } else {
                         showErrorToast(R.string.email_password_not_found);
                     }
@@ -136,7 +138,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     }
 
     private void signIntoFirebase(final String email, final String password) {
-        mFirebaseAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        mFirebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 MLog.d(TAG, "signIntoFirebase:onComplete:" + task.isSuccessful());
@@ -240,13 +242,13 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                             }
                         }
                         Preferences.getInstance(SignInActivity.this).saveUser(user);
-                        signIntoFirebase(user.getEmail(),user.getPassword());
+                        signIntoFirebase(user.getEmail(), user.getPassword());
                     } else { //user does not exist
-                        final Intent intent = new Intent(SignInActivity.this,SignUpActivity.class);
+                        final Intent intent = new Intent(SignInActivity.this, SignUpActivity.class);
                         if (acct.getPhotoUrl() != null)
-                            intent.putExtra("photo",acct.getPhotoUrl().toString());
-                        intent.putExtra("email",acct.getEmail());
-                        MLog.i(TAG, "user photo: "+acct.getPhotoUrl() + " displayname " + acct.getDisplayName());
+                            intent.putExtra("photo", acct.getPhotoUrl().toString());
+                        intent.putExtra("email", acct.getEmail());
+                        MLog.i(TAG, "user photo: " + acct.getPhotoUrl() + " displayname " + acct.getDisplayName());
                         startActivity(intent);
                     }
                 } catch (final Exception e) {

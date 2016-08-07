@@ -31,6 +31,10 @@ android {
         exclude 'META-INF/LICENSE-FIREBASE.txt'
         exclude 'META-INF/NOTICE'
     }
+
+    dataBinding {
+        enabled = true
+    }
 }
 
 dependencies {
