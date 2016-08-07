@@ -2,6 +2,6 @@
 <resources>
     <color name="colorPrimary">#87cefa</color> <!-- action title bar -->
     <color name="colorPrimaryDark">#6495ed</color> <!-- drawer -->
-    <color name="colorAccent">#a8a8a8</color>
+    <color name="colorAccent">#a8a8a8</color> <!-- button colors -->
     <color name="colorTitle">#ffffff</color>
 </resources>

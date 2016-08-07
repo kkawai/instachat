@@ -102,6 +102,12 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
             emailLayout.setError(getString(R.string.invalid_username));
             return;
         }
+
+        if (!StringUtil.isValidPassword(password)) {
+            passwordLayout.setError(getString(R.string.invalid_password));
+            return;
+        }
+
         emailLayout.setError("");
         passwordLayout.setError("");
         signInWithEmailPassword(email, password);

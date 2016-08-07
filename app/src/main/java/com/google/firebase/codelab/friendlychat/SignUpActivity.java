@@ -1,6 +1,7 @@
 package com.google.firebase.codelab.friendlychat;
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
@@ -41,7 +42,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_up);
+        DataBindingUtil.setContentView(this, R.layout.activity_sign_up);
         findViewById(R.id.create_account_button).setOnClickListener(this);
         emailLayout = (TextInputLayout) findViewById(R.id.input_email_layout);
         passwordLayout = (TextInputLayout) findViewById(R.id.input_password_layout);
