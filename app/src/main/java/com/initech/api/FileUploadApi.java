@@ -5,7 +5,6 @@ import com.amazonaws.event.ProgressEvent;
 import com.amazonaws.event.ProgressListener;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.android.volley.Network;
 import com.initech.Constants;
 import com.initech.util.HttpMessage;
 
@@ -18,147 +17,146 @@ import java.util.Map;
 
 public final class FileUploadApi {
 
-	private static final String TAG = FileUploadApi.class.getSimpleName();
-	private static final int CHUNK_SIZE = 32000;
+    private static final String TAG = FileUploadApi.class.getSimpleName();
+    private static final int CHUNK_SIZE = 32000;
 
-	/**
-	 * Posts a potentially large file to an intermediary server, which then
-	 * posts it to S3.
-	 *
-	 * BLOCKING! Must call within thread.
-	 * 
-	 * 
-	 * @param file
-	 * @param transmissionStatus
-      * @throws Exception
-              */
-      public String postFileToS3(final File file, final String filename, final String targetBucket, final FileTransmissionStatus transmissionStatus)
-      throws Exception {
+    /**
+     * Posts a potentially large file to an intermediary server, which then
+     * posts it to S3.
+     * <p>
+     * BLOCKING! Must call within thread.
+     *
+     * @param file
+     * @param transmissionStatus
+     * @throws Exception
+     */
+    public String postFileToS3(final File file, final String filename, final String targetBucket, final FileTransmissionStatus transmissionStatus)
+            throws Exception {
 
-         try {
-			final JSONObject remoteSettings = NetworkApi.getRemoteSettings();
-			final String a = remoteSettings.getString("a");
-			final String s = remoteSettings.getString("s");
-			//MLog.i(TAG, "amz s: "+ InstagramApp.sAmzSecKey + " a: " + InstagramApp.sAmzAccKey);
-			final AmazonS3Client s3Client = new AmazonS3Client(new BasicAWSCredentials(a,s));
-			final PutObjectRequest request = new PutObjectRequest(targetBucket, filename, file);
+        try {
+            final JSONObject remoteSettings = NetworkApi.getRemoteSettings();
+            final String a = remoteSettings.getString("a");
+            final String s = remoteSettings.getString("s");
+            //MLog.i(TAG, "amz s: "+ InstagramApp.sAmzSecKey + " a: " + InstagramApp.sAmzAccKey);
+            final AmazonS3Client s3Client = new AmazonS3Client(new BasicAWSCredentials(a, s));
+            final PutObjectRequest request = new PutObjectRequest(targetBucket, filename, file);
 
-			if (transmissionStatus != null) {
+            if (transmissionStatus != null) {
 
-				transmissionStatus.initialize();
-				transmissionStatus.setTotalSize((int) file.length());
+                transmissionStatus.initialize();
+                transmissionStatus.setTotalSize((int) file.length());
 
-				request.setGeneralProgressListener(new ProgressListener() {
+                request.setGeneralProgressListener(new ProgressListener() {
 
-					@Override
-					public void progressChanged(final ProgressEvent progressEvent) {
+                    @Override
+                    public void progressChanged(final ProgressEvent progressEvent) {
 
-						transmissionStatus.increment((int) progressEvent.getBytesTransferred());
-						transmissionStatus.updateProgress();
-					}
-				});
-			}
-			s3Client.putObject(request);
-			return filename;
-			
-		} catch (final Throwable t) {
-			return postFileToS3Old(file, filename, targetBucket, transmissionStatus);
-		}
+                        transmissionStatus.increment((int) progressEvent.getBytesTransferred());
+                        transmissionStatus.updateProgress();
+                    }
+                });
+            }
+            s3Client.putObject(request);
+            return filename;
 
-	}
+        } catch (final Throwable t) {
+            return postFileToS3Old(file, filename, targetBucket, transmissionStatus);
+        }
 
-	private String postFileToS3Old(final File file, final String filename, final String targetBucket, FileTransmissionStatus fileTransmissionStatus)
-			throws Exception {
+    }
 
-		RandomAccessFile fis = null;
-		String key = null;
+    private String postFileToS3Old(final File file, final String filename, final String targetBucket, FileTransmissionStatus fileTransmissionStatus)
+            throws Exception {
 
-		try {
+        RandomAccessFile fis = null;
+        String key = null;
 
-			final Map<String, String> request = new HashMap<String, String>(20);
+        try {
 
-			if (fileTransmissionStatus == null) {
-				fileTransmissionStatus = new FileTransmissionStatus();
-			}
-			fileTransmissionStatus.initialize();
-			fileTransmissionStatus.setTotalSize((int) file.length());			
+            final Map<String, String> request = new HashMap<String, String>(20);
 
-			final byte[] bytes = new byte[CHUNK_SIZE];
+            if (fileTransmissionStatus == null) {
+                fileTransmissionStatus = new FileTransmissionStatus();
+            }
+            fileTransmissionStatus.initialize();
+            fileTransmissionStatus.setTotalSize((int) file.length());
 
-			fis = new RandomAccessFile(file, "r");
-			int total = 0;
-			while (total < fis.length()) {
+            final byte[] bytes = new byte[CHUNK_SIZE];
 
-				request.clear();
+            fis = new RandomAccessFile(file, "r");
+            int total = 0;
+            while (total < fis.length()) {
 
-				final boolean first = fileTransmissionStatus.getCurrentProgress() == 0;
+                request.clear();
 
-				fis.seek(fileTransmissionStatus.getCurrentProgress());
-				final int read = fis.read(bytes, 0, CHUNK_SIZE);
-				total = total + read;
-				boolean done = false;
+                final boolean first = fileTransmissionStatus.getCurrentProgress() == 0;
 
-				byte[] filepart = null;
+                fis.seek(fileTransmissionStatus.getCurrentProgress());
+                final int read = fis.read(bytes, 0, CHUNK_SIZE);
+                total = total + read;
+                boolean done = false;
 
-				if (total == fis.length()) {
-					done = true;
-				}
+                byte[] filepart = null;
 
-				if (read < CHUNK_SIZE) {
+                if (total == fis.length()) {
+                    done = true;
+                }
 
-					filepart = copyByteArray(bytes, read);
+                if (read < CHUNK_SIZE) {
 
-				} else {
+                    filepart = copyByteArray(bytes, read);
 
-					filepart = bytes;
-				}
+                } else {
 
-				fileTransmissionStatus.increment(read);
+                    filepart = bytes;
+                }
 
-				if (done) {
-					request.put("done", "1");
-				}
-				if (first) {
-					request.put("first", "1");
-				}
-				request.put("filename", filename);
+                fileTransmissionStatus.increment(read);
 
-				request.put("bucket", targetBucket);
+                if (done) {
+                    request.put("done", "1");
+                }
+                if (first) {
+                    request.put("first", "1");
+                }
+                request.put("filename", filename);
 
-				if (done) {
-					fis.close();
-				}
+                request.put("bucket", targetBucket);
 
-				final JSONObject response = new JSONObject(post(Constants.API_BASE_URL + "/sfile", request, "filepart", filepart));
+                if (done) {
+                    fis.close();
+                }
 
-				response.getString("status").equals("OK");
+                final JSONObject response = new JSONObject(post(Constants.API_BASE_URL + "/sfile", request, "filepart", filepart));
 
-				fileTransmissionStatus.updateProgress();
+                response.getString("status").equals("OK");
 
-				if (done) {
-					key = response.getJSONObject("data").getString("key");
-					break;
-				}
-			} // while
+                fileTransmissionStatus.updateProgress();
 
-		} finally {
-			if (fis != null) {
-				fis.close();
-			}
-		}
-		return key;
-	}
+                if (done) {
+                    key = response.getJSONObject("data").getString("key");
+                    break;
+                }
+            } // while
 
-	private String post(final String url, final Map<String, String> formParams, final String bytesName, final byte[] bytes) throws Exception {
-		return new HttpMessage(url).postBytes(formParams, bytesName, bytes);
-	}
+        } finally {
+            if (fis != null) {
+                fis.close();
+            }
+        }
+        return key;
+    }
 
-	private byte[] copyByteArray(final byte[] bytes, final int size) {
+    private String post(final String url, final Map<String, String> formParams, final String bytesName, final byte[] bytes) throws Exception {
+        return new HttpMessage(url).postBytes(formParams, bytesName, bytes);
+    }
 
-		final byte[] newbytes = new byte[size];
-		for (int i = 0; i < size; i++) {
-			newbytes[i] = bytes[i];
-		}
-		return newbytes;
-	}
+    private byte[] copyByteArray(final byte[] bytes, final int size) {
+
+        final byte[] newbytes = new byte[size];
+        for (int i = 0; i < size; i++) {
+            newbytes[i] = bytes[i];
+        }
+        return newbytes;
+    }
 }

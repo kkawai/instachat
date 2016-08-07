@@ -238,23 +238,13 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                         user.copyFrom(response.getJSONObject("data"), null);
 
                         /*
-                         * Found user in our system.  Set google account
-                         * photo url to our system as well.
+                         * Found user in our system.  Copy google photo
+                         * to our system, update user with new url.
                          */
                         if (StringUtil.isEmpty(user.getProfilePicUrl())) {
                             if (acct.getPhotoUrl() != null) {
                                 user.setProfilePicUrl(acct.getPhotoUrl().toString());
-                                NetworkApi.saveUser(SignInActivity.this, user, new Response.Listener<String>() {
-                                    @Override
-                                    public void onResponse(final String response) {
-                                        //dont care
-                                    }
-                                }, new Response.ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(VolleyError error) {
-                                        //dont care
-                                    }
-                                });
+                                NetworkApi.uploadMyPhotoToS3(user);
                             }
                         }
                         Preferences.getInstance(SignInActivity.this).saveUser(user);

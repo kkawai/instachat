@@ -1,18 +1,33 @@
 package com.initech.api;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.net.Uri;
+
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
+import com.bumptech.glide.Glide;
+import com.google.common.io.Files;
 import com.initech.Constants;
 import com.initech.MyApp;
 import com.initech.model.User;
 import com.initech.util.Base64;
 import com.initech.util.HttpMessage;
+import com.initech.util.ImageUtils;
+import com.initech.util.LocalFileUtils;
 import com.initech.util.MLog;
+import com.initech.util.Preferences;
+import com.initech.util.ThreadWrapper;
 
+import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 
 /**
@@ -92,5 +107,34 @@ public final class NetworkApi {
         final ApiPostRequest request = new ApiPostRequest(params, Constants.API_BASE_URL + "/saveuser2", responder, errorListener);
         request.setTag(tag);
         MyApp.getInstance().getRequestQueue().add(request);
+    }
+
+    public static void uploadMyPhotoToS3(final User user) {
+
+        ThreadWrapper.executeInWorkerThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final File file = new File(MyApp.getInstance().getCacheDir().getPath() + "/me.jpg");
+                    LocalFileUtils.downloadFile(user.getProfilePicUrl(),file,null,null);
+                    new FileUploadApi().postFileToS3(file, "dp_"+user.getId(), Constants.AMAZON_BUCKET_DP_IC, null);
+                    user.setProfilePicUrl("http://"+Constants.AMAZON_BUCKET_DP_IC+".s3.amazonaws.com/dp_"+user.getId());
+                    saveUser(null, user, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Preferences.getInstance(MyApp.getInstance()).saveUser(user);
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                        }
+                    });
+                } catch (final Exception e) {
+                    MLog.e(TAG,"Failed to upload photo to s3", e);
+                }
+            }
+        });
+
     }
 }

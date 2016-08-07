@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements
             final String photo = Preferences.getInstance(this).getUser().getProfilePicUrl();
             if (photo != null) {
                 mPhotoUrl = photo;
+                MLog.i(TAG,"photo url: "+photo);
             }
             mUsername = Preferences.getInstance(this).getUsername();
             //mUsername = mFirebaseUser.getDisplayName();
