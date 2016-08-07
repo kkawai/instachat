@@ -35,11 +35,9 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
 import com.initech.MyApp;
 import com.initech.api.NetworkApi;
 import com.initech.model.User;
@@ -85,6 +83,12 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
 
         // Initialize FirebaseAuth
         mFirebaseAuth = FirebaseAuth.getInstance();
+
+        String lastSignIn = Preferences.getInstance(this).getLastSignIn();
+        MLog.i(TAG,"lastSignIn ",lastSignIn);
+        if (lastSignIn != null) {
+            emailLayout.getEditText().setText(lastSignIn);
+        }
     }
 
     private void validateAccount() {
@@ -110,10 +114,10 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
 
         emailLayout.setError("");
         passwordLayout.setError("");
-        signInWithEmailPassword(email, password);
+        signInWithEmailOrUsernamePassword(email, password);
     }
 
-    private void signInWithEmailPassword(final String email, final String password) {
+    private void signInWithEmailOrUsernamePassword(final String email, final String password) {
         NetworkApi.getUserByEmailPassword(this, email, password, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(final JSONObject response) {
@@ -124,6 +128,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                         final User user = new User();
                         user.copyFrom(data, null);
                         Preferences.getInstance(SignInActivity.this).saveUser(user);
+                        Preferences.getInstance(SignInActivity.this).saveLastSignIn(email);
                         signIntoFirebase(user.getEmail(), password);
                     } else {
                         showErrorToast(R.string.email_password_not_found);
@@ -137,7 +142,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(final VolleyError error) {
-                MLog.e(TAG, "signInWithEmailPassword() failed: " + error);
+                MLog.e(TAG, "signInWithEmailOrUsernamePassword() failed: " + error);
                 showErrorToast("2");
             }
         });
@@ -231,6 +236,11 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                     if (response.getString("status").equalsIgnoreCase("OK")) {
                         final User user = new User();
                         user.copyFrom(response.getJSONObject("data"), null);
+
+                        /*
+                         * Found user in our system.  Set google account
+                         * photo url to our system as well.
+                         */
                         if (StringUtil.isEmpty(user.getProfilePicUrl())) {
                             if (acct.getPhotoUrl() != null) {
                                 user.setProfilePicUrl(acct.getPhotoUrl().toString());
@@ -248,6 +258,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                             }
                         }
                         Preferences.getInstance(SignInActivity.this).saveUser(user);
+                        Preferences.getInstance(SignInActivity.this).saveLastSignIn(user.getUsername());
                         signIntoFirebase(user.getEmail(), user.getPassword());
                     } else { //user does not exist
                         final Intent intent = new Intent(SignInActivity.this, SignUpActivity.class);

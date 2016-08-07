@@ -186,6 +186,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     if (response.getString("status").equals("OK")) {
                         user.copyFrom(response.getJSONObject("data"), null);
                         Preferences.getInstance(SignUpActivity.this).saveUser(user);
+                        Preferences.getInstance(SignUpActivity.this).saveLastSignIn(username);
                         createFirebaseAccount();
                     } else {
                         Toast.makeText(SignUpActivity.this, "Error creating account (1): " + response.getString("status"), Toast.LENGTH_SHORT).show();

@@ -34,7 +34,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0"
                     app:font="JandaSafeandSound.ttf"
-                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+                    android:textSize="15sp"/>
 
                 <com.initech.view.CustomFontTextView
                     android:id="@+id/messengerTextView"

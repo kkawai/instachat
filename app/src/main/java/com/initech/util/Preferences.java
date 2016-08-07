@@ -25,6 +25,7 @@ public final class Preferences {
     private static final String PREFERENCE_USER_NAME = "user_name";
     private static final String PREFERENCE_EMAIL = "email";
     private static final String PREFERENCE_USER = "user";
+    private static final String PREFERENCE_LAST_SIGN_IN = "last_sign_in";
     private static final String INSTAGRAM_ACCESS_TOKEN = "accessToken";
     private static final String INSTAGRAM_STORE = "INSTAGRAM_STORE";
 
@@ -131,7 +132,7 @@ public final class Preferences {
     }
 
     public void clearUser(Editor editor) {
-        editor.remove(PREFERENCE_USER);
+        editor.remove(PREFERENCE_USER).apply();
     }
 
     public String getUserId() {
@@ -160,6 +161,15 @@ public final class Preferences {
             // e.printStackTrace();
         }
         return null;
+    }
+
+    public void saveLastSignIn(final String lastSignIn) {
+        MLog.i(TAG,"lastSignIn "+lastSignIn);
+        mPrefs.edit().putString(PREFERENCE_LAST_SIGN_IN, lastSignIn).apply();
+    }
+
+    public String getLastSignIn() {
+        return mPrefs.getString(PREFERENCE_LAST_SIGN_IN,null);
     }
 
     public void saveUser(final User user) {
