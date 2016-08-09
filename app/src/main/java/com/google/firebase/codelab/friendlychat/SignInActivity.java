@@ -41,6 +41,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.initech.MyApp;
 import com.initech.api.NetworkApi;
 import com.initech.model.User;
+import com.initech.util.ActivityUtil;
 import com.initech.util.DeviceUtil;
 import com.initech.util.EmailUtil;
 import com.initech.util.MLog;
@@ -66,6 +67,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityUtil.hideStatusBar(getWindow());
         DataBindingUtil.setContentView(this, R.layout.activity_sign_in);
         passwordLayout = (TextInputLayout) findViewById(R.id.input_password_layout);
         emailLayout = (TextInputLayout) findViewById(R.id.input_email_layout);

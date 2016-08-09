@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.initech.MyApp;
 import com.initech.api.NetworkApi;
 import com.initech.model.User;
+import com.initech.util.ActivityUtil;
 import com.initech.util.DeviceUtil;
 import com.initech.util.EmailUtil;
 import com.initech.util.MLog;
@@ -42,6 +43,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityUtil.hideStatusBar(getWindow());
         DataBindingUtil.setContentView(this, R.layout.activity_sign_up);
         findViewById(R.id.create_account_button).setOnClickListener(this);
         emailLayout = (TextInputLayout) findViewById(R.id.input_email_layout);
