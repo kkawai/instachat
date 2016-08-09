@@ -3,6 +3,7 @@ package com.initech.util;
 import com.initech.Constants;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -156,5 +157,14 @@ public class StringUtil {
 
     public static boolean isValidPassword(final String password) {
         return password.trim().length() >= Constants.MIN_PASSWORD_LENGTH && password.trim().length() <= Constants.MAX_PASSWORD_LENGTH;
+    }
+
+    public static String getHour(final long time) {
+        final String timeStr = StringUtil.HOUR_FORMAT.format(new Date(time));
+        if (timeStr.charAt(0) == '0') {
+            return timeStr.substring(1);
+        } else {
+            return timeStr;
+        }
     }
 }

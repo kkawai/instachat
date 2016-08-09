@@ -63,7 +63,9 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.initech.model.User;
 import com.initech.util.MLog;
 import com.initech.util.Preferences;
+import com.initech.util.StringUtil;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
         public TextView messageTextView;
         public TextView messengerTextView;
+        public TextView messageTimeTextView;
         public CircleImageView messengerImageView;
 
         public MessageViewHolder(View v) {
@@ -82,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements
             messageTextView = (TextView) itemView.findViewById(R.id.messageTextView);
             messengerTextView = (TextView) itemView.findViewById(R.id.messengerTextView);
             messengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);
+            messageTimeTextView = (TextView) itemView.findViewById(R.id.messageTimeTextView);
         }
     }
 
@@ -177,6 +181,12 @@ public class MainActivity extends AppCompatActivity implements
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
                 viewHolder.messageTextView.setText(friendlyMessage.getText());
                 viewHolder.messengerTextView.setText(friendlyMessage.getName());
+                if (friendlyMessage.getTime() != 0) {
+                    viewHolder.messageTimeTextView.setVisibility(View.VISIBLE);
+                    viewHolder.messageTimeTextView.setText(StringUtil.getHour(friendlyMessage.getTime()));
+                } else {
+                    viewHolder.messageTimeTextView.setVisibility(View.INVISIBLE);
+                }
                 if (friendlyMessage.getPhotoUrl() == null) {
                     viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(MainActivity.this,
                             R.drawable.ic_account_circle_black_36dp));
@@ -264,8 +274,9 @@ public class MainActivity extends AppCompatActivity implements
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                System.currentTimeMillis();
                 FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText().toString(), mUsername,
-                        mPhotoUrl);
+                        mPhotoUrl, System.currentTimeMillis());
                 mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
                 mMessageEditText.setText("");
                 mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
