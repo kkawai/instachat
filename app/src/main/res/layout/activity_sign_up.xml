@@ -18,9 +18,9 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="40dp"
             android:text="@string/new_account"
-            android:textSize="30sp"
+            android:textSize="45sp"
             android:textStyle="bold"
-            app:font="@{`Milkshake`}"/>
+            app:font="@{`SignPainter-HouseScript`}"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -75,11 +75,14 @@
             </android.support.design.widget.TextInputLayout>
 
             <Button
+                android:layout_marginTop="20dp"
                 android:id="@+id/create_account_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="280dp"
+                android:layout_height="75dp"
                 android:layout_gravity="center_horizontal"
                 android:text="@string/create_account"
+                android:textAllCaps="true"
+                android:textSize="24sp"
                 />
 
         </LinearLayout>

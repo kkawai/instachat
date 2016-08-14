@@ -56,7 +56,6 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
     private static final int RC_SIGN_UP = 9002;
-    private SignInButton signInWithGoogleButton;
     private TextInputLayout passwordLayout, emailLayout;
     private String email, password;
 
@@ -74,10 +73,9 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         findViewById(R.id.sign_in_with_email_button).setOnClickListener(this);
 
         // Assign fields
-        signInWithGoogleButton = (SignInButton) findViewById(R.id.sign_in_with_google_button);
+        findViewById(R.id.sign_in_with_google_textview).setOnClickListener(this);
 
         // Set click listeners
-        signInWithGoogleButton.setOnClickListener(this);
         findViewById(R.id.sign_up_button).setOnClickListener(this);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
@@ -183,7 +181,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
             case R.id.sign_in_with_email_button:
                 validateAccount();
                 break;
-            case R.id.sign_in_with_google_button:
+            case R.id.sign_in_with_google_textview:
                 signInWithGoogle();
                 break;
             case R.id.sign_up_button:

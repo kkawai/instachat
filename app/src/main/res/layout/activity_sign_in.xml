@@ -16,9 +16,9 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="40dp"
             android:text="@string/sign_in"
-            android:textSize="30sp"
+            android:textSize="45sp"
             android:textStyle="bold"
-            app:font="@{`Milkshake`}"
+            app:font="@{`SignPainter-HouseScript`}"
             />
 
         <LinearLayout
@@ -57,28 +57,45 @@
 
             </android.support.design.widget.TextInputLayout>
 
-            <Button
-                android:id="@+id/sign_in_with_email_button"
-                android:layout_width="@dimen/sign_in_button_widths"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/sign_in"
-                />
-
             <TextView
+                android:id="@+id/forgot_password"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="16dp"
-                android:text="@string/sign_in_with_google"
+                android:layout_margin="13dp"
+                android:text="@string/forgot_password"
+                android:textColor="#0095c4"
                 />
 
+            <Button
+                android:layout_marginTop="18dp"
+                android:id="@+id/sign_in_with_email_button"
+                android:layout_width="280dp"
+                android:layout_height="75dp"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/sign_in"
+                android:textAllCaps="true"
+                android:textSize="24sp"
+                />
+
+            <TextView
+                android:id="@+id/sign_in_with_google_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:text="@string/login_with_google"
+                android:textColor="#0095c4"
+                />
+
+            <!--
             <com.google.android.gms.common.SignInButton
                 android:id="@+id/sign_in_with_google_button"
                 android:layout_width="@dimen/sign_in_button_widths"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:visibility="visible"/>
+                android:text="@string/login_with_google"
+                android:visibility="visible"/>  -->
 
             <Button
                 android:id="@+id/sign_up_button"
@@ -87,6 +104,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="16dp"
                 android:text="@string/new_account"
+                android:visibility="invisible"
                 />
 
         </LinearLayout>
