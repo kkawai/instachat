@@ -126,5 +126,6 @@ public final class Constants {
 	public static final String FILE_PROVIDER_IMAGES_SUBDIR = "/images"; //look at file_provider_paths.xml
 
 	public static final String KEY_TEXT = "key_text";
+	public static final String KEY_STARTING_POS = "key_starting_pos";
 
 }

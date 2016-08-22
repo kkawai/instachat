@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ath.fuel.FuelInjector;
-import com.ath.fuel.Lazy;
+import com.initech.Constants;
 import com.initech.util.MLog;
 
 /**
@@ -19,7 +19,9 @@ import com.initech.util.MLog;
 public class FullScreenTextFragment extends Fragment {
 
     public static final String TAG = "FullScreenTextFragment";
-    private final Lazy<PagerAdapterHelper> mPagerAdapterHelper = Lazy.attain(this, PagerAdapterHelper.class);
+    private FriendlyMessageContainer mFriendlyMessageContainer;
+    private FragmentStatePagerAdapter mPagerAdapter;
+    private int mLastPos;
 
     @Nullable
     @Override
@@ -33,14 +35,62 @@ public class FullScreenTextFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         final ViewPager viewPager = (ViewPager)getView().findViewById(R.id.view_pager);
         FuelInjector.ignite(getActivity(),this);
-        mPagerAdapterHelper.get().getPagerAdapter(new PagerAdapterHelper.PagerAdapterHelperCallback() {
+        mPagerAdapter = new FragmentStatePagerAdapter(getChildFragmentManager()) {
             @Override
-            public void onPagerAdapterHelperResult(FragmentStatePagerAdapter pagerAdapter) {
-                viewPager.setAdapter(pagerAdapter);
-                MLog.i(TAG,"onActivityCreated() viewPager.setAdapter():"+pagerAdapter + " count: "+pagerAdapter.getCount());
-                viewPager.setCurrentItem(pagerAdapter.getCount()-1,true);
+            public Fragment getItem(final int position) {
+                final Fragment fragment = new FullscreenTextSubFragment();
+                final Bundle args = new Bundle();
+                args.putString(Constants.KEY_TEXT,mFriendlyMessageContainer.getFriendlyMessage(position).getText());
+                fragment.setArguments(args);
+                return fragment;
+            }
+
+            @Override
+            public int getCount() {
+                return mFriendlyMessageContainer.getFriendlyMessageCount();
+            }
+        };
+        viewPager.setAdapter(mPagerAdapter);
+        viewPager.setCurrentItem(getStartingPos(),true);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                mLastPos = position;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
             }
         });
     }
 
+    private int getStartingPos() {
+        final int startingPos = getArguments().getInt(Constants.KEY_STARTING_POS,-1);
+        if (startingPos > -1 && startingPos <= mFriendlyMessageContainer.getFriendlyMessageCount()-1) {
+            return startingPos;
+        } else {
+            return mFriendlyMessageContainer.getFriendlyMessageCount()-1;
+        }
+    }
+
+    public void setFriendlyMessageContainer(final FriendlyMessageContainer messageContainer) {
+        mFriendlyMessageContainer = messageContainer;
+    }
+
+    public void notifyDataSetChanged() {
+        mPagerAdapter.notifyDataSetChanged();
+        MLog.i(TAG,"notifyDataSetChanged()");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mFriendlyMessageContainer.setCurrentPosition(mLastPos);
+    }
 }

@@ -23,7 +23,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -77,7 +76,7 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener, FriendlyMessageContainer {
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
         public TextView messageTextView;
@@ -108,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
     private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
-    private FragmentStatePagerAdapter mPagerAdapter;
     private ProgressBar mProgressBar;
     private DatabaseReference mFirebaseDatabaseReference;
     private FirebaseAuth mFirebaseAuth;
@@ -150,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements
             final String photo = Preferences.getInstance(this).getUser().getProfilePicUrl();
             if (photo != null) {
                 mPhotoUrl = photo;
-                MLog.i(TAG,"photo url: "+photo);
+                MLog.i(TAG, "photo url: " + photo);
             }
             mUsername = Preferences.getInstance(this).getUsername();
             //mUsername = mFirebaseUser.getDisplayName();
@@ -171,10 +169,10 @@ public class MainActivity extends AppCompatActivity implements
 
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mFirebaseAdapter = new FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder>(
-                        FriendlyMessage.class,
-                        R.layout.item_message,
-                        MessageViewHolder.class,
-                        mFirebaseDatabaseReference.child(MESSAGES_CHILD)) {
+                FriendlyMessage.class,
+                R.layout.item_message,
+                MessageViewHolder.class,
+                mFirebaseDatabaseReference.child(MESSAGES_CHILD)) {
 
             @Override
             public MessageViewHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
@@ -183,9 +181,18 @@ public class MainActivity extends AppCompatActivity implements
                     @Override
                     public void onClick(final View v) {
                         final FriendlyMessage msg = mFirebaseAdapter.getItem(holder.getAdapterPosition());
-                        Toast.makeText(v.getContext(),"clicked on profile: "+msg.getName() + " said: " + msg.getText(),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(v.getContext(), "clicked on profile: " + msg.getName() + " said: " + msg.getText(), Toast.LENGTH_SHORT).show();
                     }
                 });
+                final View.OnClickListener onClickListener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        openFullScreenTextView(holder.getAdapterPosition());
+                    }
+                };
+                holder.messageTimeTextView.setOnClickListener(onClickListener);
+                holder.messageTextView.setOnClickListener(onClickListener);
+                holder.messengerTextView.setOnClickListener(onClickListener);
                 return holder;
             }
 
@@ -224,33 +231,11 @@ public class MainActivity extends AppCompatActivity implements
                         (positionStart >= (friendlyMessageCount - 1) && lastVisiblePosition == (positionStart - 1))) {
                     mMessageRecyclerView.scrollToPosition(positionStart);
                 }
-                mPagerAdapter.notifyDataSetChanged();
+                notifyPagerAdapterDataSetChanged();
             }
         });
 
-        mPagerAdapter = new FragmentStatePagerAdapter(getSupportFragmentManager()) {
-            @Override
-            public Fragment getItem(final int position) {
-                final Fragment fragment = new FullscreenTextSubFragment();
-                final Bundle args = new Bundle();
-                args.putString(Constants.KEY_TEXT,mFirebaseAdapter.getItem(position).getText());
-                fragment.setArguments(args);
-                return fragment;
-            }
-
-            @Override
-            public int getCount() {
-                return mFirebaseAdapter.getItemCount();
-            }
-        };
-
-        FuelInjector.ignite(this,this);
-        mPagerAdapterHelper.get().setListener(new PagerAdapterHelper.PagerAdapterHelperListener() {
-            @Override
-            public void onPagerAdapterRequested(PagerAdapterHelper.PagerAdapterHelperCallback callback) {
-                callback.onPagerAdapterHelperResult(mPagerAdapter);
-            }
-        });
+        FuelInjector.ignite(this, this);
 
         mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
         mMessageRecyclerView.setAdapter(mFirebaseAdapter);
@@ -271,8 +256,8 @@ public class MainActivity extends AppCompatActivity implements
         // Define Firebase Remote Config Settings.
         FirebaseRemoteConfigSettings firebaseRemoteConfigSettings =
                 new FirebaseRemoteConfigSettings.Builder()
-                .setDeveloperModeEnabled(true)
-                .build();
+                        .setDeveloperModeEnabled(true)
+                        .build();
 
         // Define default config values. Defaults are used when fetched config values are not
         // available. Eg: if an error occurred fetching values from the server.
@@ -381,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements
                 fetchConfig();
                 return true;
             case R.id.full_screen_texts_menu:
-                openFullScreenTextView();
+                openFullScreenTextView(-1);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -519,12 +504,39 @@ public class MainActivity extends AppCompatActivity implements
         super.onBackPressed();
     }
 
-    private void openFullScreenTextView() {
+    private void openFullScreenTextView(final int startingPos) {
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(FullScreenTextFragment.TAG);
         if (fragment != null) {
             return;
         }
         fragment = new FullScreenTextFragment();
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_content,fragment,FullScreenTextFragment.TAG).commit();
+        final Bundle args = new Bundle();
+        args.putInt(Constants.KEY_STARTING_POS, startingPos);
+        fragment.setArguments(args);
+        ((FullScreenTextFragment) fragment).setFriendlyMessageContainer(this);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_content, fragment, FullScreenTextFragment.TAG).commit();
+    }
+
+    private void notifyPagerAdapterDataSetChanged() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FullScreenTextFragment.TAG);
+        if (fragment == null) {
+            return;
+        }
+        ((FullScreenTextFragment) fragment).notifyDataSetChanged();
+    }
+
+    @Override
+    public FriendlyMessage getFriendlyMessage(int position) {
+        return mFirebaseAdapter.getItem(position);
+    }
+
+    @Override
+    public int getFriendlyMessageCount() {
+        return mFirebaseAdapter.getItemCount();
+    }
+
+    @Override
+    public void setCurrentPosition(int position) {
+        mMessageRecyclerView.scrollToPosition(position+1);
     }
 }
