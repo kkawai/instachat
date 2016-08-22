@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId "com.google.firebase.codelab.friendlychat"
-        minSdkVersion 9
+        minSdkVersion 14
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
@@ -75,6 +75,9 @@ dependencies {
     compile 'com.amazon.android:mobile-ads:5.+'
 
     compile 'com.android.volley:volley:1.0.0'
+
+    compile 'com.github.AndroidDeveloperLB:AutoFitTextView:3'
+    compile 'com.ath.fuel:Fuel:1.0.1'
 
 }
 

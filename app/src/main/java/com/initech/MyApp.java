@@ -5,6 +5,8 @@ import android.content.res.Configuration;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.ath.fuel.FuelInjector;
+import com.ath.fuel.FuelModule;
 import com.initech.util.HttpMessage;
 import com.initech.util.ThreadWrapper;
 
@@ -23,6 +25,8 @@ public class MyApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        FuelInjector.setDebug(false);
+        FuelInjector.initializeModule(new FuelModule(this){});
         sInstance = this;
         ThreadWrapper.init();
         HttpMessage.initializeSSL();

@@ -15,4 +15,7 @@
     <item
         android:id="@+id/crash_menu"
         android:title="@string/cause_crash"/>
+    <item
+        android:id="@+id/full_screen_texts_menu"
+        android:title="Full-Screen Chat"/>
 </menu>

@@ -125,4 +125,6 @@ public final class Constants {
 	public static final String FILE_PROVIDER = "com.instachat.android.fileprovider";
 	public static final String FILE_PROVIDER_IMAGES_SUBDIR = "/images"; //look at file_provider_paths.xml
 
+	public static final String KEY_TEXT = "key_text";
+
 }

@@ -22,6 +22,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -34,6 +36,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -45,6 +48,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ath.fuel.FuelInjector;
+import com.ath.fuel.Lazy;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.ads.AdView;
@@ -60,12 +65,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+import com.initech.Constants;
 import com.initech.model.User;
 import com.initech.util.MLog;
 import com.initech.util.Preferences;
 import com.initech.util.StringUtil;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -103,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
     private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
+    private FragmentStatePagerAdapter mPagerAdapter;
     private ProgressBar mProgressBar;
     private DatabaseReference mFirebaseDatabaseReference;
     private FirebaseAuth mFirebaseAuth;
@@ -114,10 +120,17 @@ public class MainActivity extends AppCompatActivity implements
     //private GoogleApiClient mGoogleApiClient;
     private User mUser;
     private DrawerLayout mDrawerLayout;
+    private final Lazy<PagerAdapterHelper> mPagerAdapterHelper = Lazy.attain(this, PagerAdapterHelper.class);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (savedInstanceState != null) { // Android support FragmentManager v4 erroneously remembers every Fragment, even when "retain instance" is
+            // false; remove the saved Fragments so we don't get into a dueling layout issue between the new Fragments we're trying to make and the
+            // old ones being restored.
+            savedInstanceState.remove("android:support:fragments");
+        }
         super.onCreate(savedInstanceState);
+
         DataBindingUtil.setContentView(this, R.layout.activity_main);
         setupDrawer();
         setupToolbar();
@@ -211,6 +224,31 @@ public class MainActivity extends AppCompatActivity implements
                         (positionStart >= (friendlyMessageCount - 1) && lastVisiblePosition == (positionStart - 1))) {
                     mMessageRecyclerView.scrollToPosition(positionStart);
                 }
+                mPagerAdapter.notifyDataSetChanged();
+            }
+        });
+
+        mPagerAdapter = new FragmentStatePagerAdapter(getSupportFragmentManager()) {
+            @Override
+            public Fragment getItem(final int position) {
+                final Fragment fragment = new FullscreenTextSubFragment();
+                final Bundle args = new Bundle();
+                args.putString(Constants.KEY_TEXT,mFirebaseAdapter.getItem(position).getText());
+                fragment.setArguments(args);
+                return fragment;
+            }
+
+            @Override
+            public int getCount() {
+                return mFirebaseAdapter.getItemCount();
+            }
+        };
+
+        FuelInjector.ignite(this,this);
+        mPagerAdapterHelper.get().setListener(new PagerAdapterHelper.PagerAdapterHelperListener() {
+            @Override
+            public void onPagerAdapterRequested(PagerAdapterHelper.PagerAdapterHelperCallback callback) {
+                callback.onPagerAdapterHelperResult(mPagerAdapter);
             }
         });
 
@@ -306,6 +344,7 @@ public class MainActivity extends AppCompatActivity implements
             mAdView.destroy();
         }
         super.onDestroy();
+        mPagerAdapterHelper.get().setListener(null);
     }
 
     @Override
@@ -340,6 +379,9 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             case R.id.fresh_config_menu:
                 fetchConfig();
+                return true;
+            case R.id.full_screen_texts_menu:
+                openFullScreenTextView();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -463,4 +505,26 @@ public class MainActivity extends AppCompatActivity implements
                 });
     }
 
+    @Override
+    public void onBackPressed() {
+        if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(Gravity.LEFT);
+            return;
+        }
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FullScreenTextFragment.TAG);
+        if (fragment != null) {
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    private void openFullScreenTextView() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FullScreenTextFragment.TAG);
+        if (fragment != null) {
+            return;
+        }
+        fragment = new FullScreenTextFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_content,fragment,FullScreenTextFragment.TAG).commit();
+    }
 }
