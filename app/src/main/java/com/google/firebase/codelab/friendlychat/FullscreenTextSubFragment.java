@@ -21,6 +21,7 @@ import com.lb.auto_fit_textview.AutoResizeTextView;
 public class FullscreenTextSubFragment extends Fragment {
 
     public static final String TAG = "FullscreenTextSubFragment";
+    private FriendlyMessage mFriendlyMessage;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -31,11 +32,12 @@ public class FullscreenTextSubFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        mFriendlyMessage = getArguments().getParcelable(Constants.KEY_FRIENDLY_MESSAGE);
         final AutoResizeTextView textView = (AutoResizeTextView)getView().findViewById(R.id.textView);
-        textView.setText(getArguments().getString(Constants.KEY_TEXT));
+        textView.setText(mFriendlyMessage.getText());
         textView.setMaxLines(Integer.MAX_VALUE);
         textView.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()),getResources().getDisplayMetrics()));
-        MLog.i(TAG,"onActivityCreated(): "+getArguments().getString(Constants.KEY_TEXT) + " textView.height: "+textView.getHeight());
+        MLog.i(TAG,"onActivityCreated(): "+mFriendlyMessage.getText() + " textView.height: "+textView.getHeight());
     }
 
     @Override

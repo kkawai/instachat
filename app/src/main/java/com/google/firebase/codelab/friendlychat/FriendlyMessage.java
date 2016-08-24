@@ -15,7 +15,10 @@
  */
 package com.google.firebase.codelab.friendlychat;
 
-public class FriendlyMessage {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class FriendlyMessage implements Parcelable{
 
     private String id;
     private String text;
@@ -31,6 +34,43 @@ public class FriendlyMessage {
         this.name = name;
         this.photoUrl = photoUrl;
         this.time = time;
+    }
+
+    public static final Parcelable.Creator<FriendlyMessage> CREATOR = new Parcelable.Creator<FriendlyMessage>() {
+        public FriendlyMessage createFromParcel(final Parcel source) {
+            return new FriendlyMessage(source);
+        }
+        public FriendlyMessage[] newArray(final int size) {
+            return new FriendlyMessage[size];
+        }
+    };
+
+    public FriendlyMessage(final Parcel parcel) {
+        final String[] array = new String[4];
+        parcel.readStringArray(array);
+        int i=0;
+        id = array[i++];
+        text = array[i++];
+        name = array[i++];
+        photoUrl = array[i++];
+        time = parcel.readLong();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(final Parcel parcel, final int flags) {
+        final String[] array = new String[4];
+        int i=0;
+        array[i++] = id;
+        array[i++] = text;
+        array[i++] = name;
+        array[i++] = photoUrl;
+        parcel.writeStringArray(array);
+        parcel.writeLong(time);
     }
 
     public String getId() {

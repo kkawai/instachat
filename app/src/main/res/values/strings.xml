@@ -10,6 +10,7 @@
     <string name="sign_in">Log In</string>
     <string name="forgot_password">Forgot your password?</string>
     <string name="login_with_google">Log in with Google</string>
+    <string name="delete_message_question">Delete message?</string>
     <string name="sign_in_with_google">Sign In with Google</string>
     <string name="sign_up">Sign Up</string>
     <string name="new_account">New Account</string>

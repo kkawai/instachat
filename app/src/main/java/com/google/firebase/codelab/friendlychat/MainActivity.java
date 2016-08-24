@@ -15,6 +15,7 @@
  */
 package com.google.firebase.codelab.friendlychat;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
@@ -55,11 +56,14 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -69,6 +73,7 @@ import com.initech.model.User;
 import com.initech.util.MLog;
 import com.initech.util.Preferences;
 import com.initech.util.StringUtil;
+import com.initech.view.ThemedAlertDialog;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -168,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements
         mLinearLayoutManager.setStackFromEnd(true);
 
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
-        mFirebaseAdapter = new FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder>(
+        mFirebaseAdapter = new MyFirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder>(
                 FriendlyMessage.class,
                 R.layout.item_message,
                 MessageViewHolder.class,
@@ -193,6 +198,31 @@ public class MainActivity extends AppCompatActivity implements
                 holder.messageTimeTextView.setOnClickListener(onClickListener);
                 holder.messageTextView.setOnClickListener(onClickListener);
                 holder.messengerTextView.setOnClickListener(onClickListener);
+
+                View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        new ThemedAlertDialog.Builder(view.getContext())
+                                .setMessage(getString(R.string.delete_message_question) + " ("+limitString(mFirebaseAdapter.getItem(holder.getAdapterPosition()).getText(),15)+")")
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(final DialogInterface dialog, final int which) {
+                                        final FriendlyMessage msg = mFirebaseAdapter.getItem(holder.getAdapterPosition());
+                                        DatabaseReference ref = mFirebaseDatabaseReference.child(MESSAGES_CHILD+"/"+msg.getId());
+                                        if (ref != null)
+                                            ref.removeValue();
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.no, null)
+                                .setCancelable(true).setOnCancelListener(null)
+                                .create().show();
+                        return false;
+                    }
+                };
+
+                holder.messageTimeTextView.setOnLongClickListener(onLongClickListener);
+                holder.messageTextView.setOnLongClickListener(onLongClickListener);
+                holder.messengerTextView.setOnLongClickListener(onLongClickListener);
                 return holder;
             }
 
@@ -216,6 +246,13 @@ public class MainActivity extends AppCompatActivity implements
                             .into(viewHolder.messengerImageView);
                 }
             }
+
+            @Override
+            protected FriendlyMessage parseSnapshot(DataSnapshot snapshot) {
+                FriendlyMessage friendlyMessage = super.parseSnapshot(snapshot);
+                friendlyMessage.setId(snapshot.getKey());
+                return friendlyMessage;
+            }
         };
 
         mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
@@ -231,6 +268,12 @@ public class MainActivity extends AppCompatActivity implements
                         (positionStart >= (friendlyMessageCount - 1) && lastVisiblePosition == (positionStart - 1))) {
                     mMessageRecyclerView.scrollToPosition(positionStart);
                 }
+                notifyPagerAdapterDataSetChanged();
+            }
+
+            @Override
+            public void onItemRangeRemoved(int positionStart, int itemCount) {
+                super.onItemRangeRemoved(positionStart, itemCount);
                 notifyPagerAdapterDataSetChanged();
             }
         });
@@ -297,10 +340,13 @@ public class MainActivity extends AppCompatActivity implements
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.currentTimeMillis();
                 FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText().toString(), mUsername,
                         mPhotoUrl, System.currentTimeMillis());
-                mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
+                mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                    }
+                });
                 mMessageEditText.setText("");
                 mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
             }
@@ -321,6 +367,13 @@ public class MainActivity extends AppCompatActivity implements
         if (mAdView != null) {
             mAdView.resume();
         }
+    }
+
+    private String limitString(final String s, final int limit) {
+        if (s == null || s.length() <= limit) {
+            return s;
+        }
+        return s.substring(0,limit) + "...";
     }
 
     @Override

@@ -40,7 +40,7 @@ public class FullScreenTextFragment extends Fragment {
             public Fragment getItem(final int position) {
                 final Fragment fragment = new FullscreenTextSubFragment();
                 final Bundle args = new Bundle();
-                args.putString(Constants.KEY_TEXT,mFriendlyMessageContainer.getFriendlyMessage(position).getText());
+                args.putParcelable(Constants.KEY_FRIENDLY_MESSAGE,mFriendlyMessageContainer.getFriendlyMessage(position));
                 fragment.setArguments(args);
                 return fragment;
             }
@@ -51,7 +51,8 @@ public class FullScreenTextFragment extends Fragment {
             }
         };
         viewPager.setAdapter(mPagerAdapter);
-        viewPager.setCurrentItem(getStartingPos(),true);
+        mLastPos = getStartingPos();
+        viewPager.setCurrentItem(mLastPos,true);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
