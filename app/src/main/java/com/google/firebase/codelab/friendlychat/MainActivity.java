@@ -376,12 +376,8 @@ public class MainActivity extends AppCompatActivity implements
                     return;
                 }
                 FriendlyMessage friendlyMessage = new FriendlyMessage(text, mUsername,
-                        userid(), null, System.currentTimeMillis());
-                mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                    }
-                });
+                        userid(), null, null, System.currentTimeMillis());
+                mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
                 mMessageEditText.setText("");
                 mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
             }
@@ -540,16 +536,13 @@ public class MainActivity extends AppCompatActivity implements
                 // Sending failed or it was canceled, show failure message to the user
                 Log.d(TAG, "Failed to send invitation.");
             }
-        }
-        if (requestCode == RC_TAKE_PICTURE) {
+        } else if (requestCode == RC_TAKE_PICTURE) {
             if (resultCode == RESULT_OK) {
                 if (mFileUri != null) {
                     reducePhotoSize();
                 } else {
                     Log.w(TAG, "File URI is null");
                 }
-            } else {
-                Toast.makeText(this, "Taking picture failed.", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -719,12 +712,13 @@ public class MainActivity extends AppCompatActivity implements
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         // Upload succeeded
-                        MLog.d(TAG, "uploadFromUri:onSuccess");
 
                         // Get the public download URL
                         mDownloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+                        final String photoId = mFileUri.getLastPathSegment();
                         FriendlyMessage friendlyMessage = new FriendlyMessage(null, mUsername,
-                                userid(), mDownloadUrl.toString(), System.currentTimeMillis());
+                                userid(), mDownloadUrl.toString(), photoId, System.currentTimeMillis());
+                        MLog.d(TAG, "uploadFromUri:onSuccess photoId: "+photoId);
                         mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
 
                         // [START_EXCLUDE]
@@ -825,6 +819,13 @@ public class MainActivity extends AppCompatActivity implements
                                     @Override
                                     public void onClick(final DialogInterface dialog, final int which) {
                                         final FriendlyMessage msg = mFirebaseAdapter.getItem(holder.getAdapterPosition());
+                                        MLog.d(TAG," msg.getImageUrl(): "+msg.getImageUrl() + " " + msg.getImageId());
+                                        if (msg.getImageUrl() != null && msg.getImageId() != null) {
+                                            final StorageReference photoRef = mStorageRef.child("photos")
+                                                    .child(msg.getImageId());
+                                            photoRef.delete();
+                                            MLog.d(TAG,"deleted photo "+msg.getImageId());
+                                        }
                                         DatabaseReference ref = mFirebaseDatabaseReference.child(MESSAGES_CHILD + "/" + msg.getId());
                                         if (ref != null)
                                             ref.removeValue();

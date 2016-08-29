@@ -31,17 +31,19 @@ public class FriendlyMessage implements Parcelable{
     private String name;
     private int userid;
     private String imageUrl;
+    private String imageId;
     private long time;
 
     public FriendlyMessage() {
     }
 
-    public FriendlyMessage(String text, String name, int userid, String imageUrl, long time) {
+    public FriendlyMessage(String text, String name, int userid, String imageUrl, String imageId, long time) {
         this.text = text;
         this.name = name;
         this.time = time;
         this.userid = userid;
         this.imageUrl = imageUrl;
+        this.imageId = imageId;
     }
 
     public static final Parcelable.Creator<FriendlyMessage> CREATOR = new Parcelable.Creator<FriendlyMessage>() {
@@ -61,6 +63,7 @@ public class FriendlyMessage implements Parcelable{
             userid = o.getInt("userid");
             time = o.getLong("time");
             imageUrl = o.optString("imageUrl");
+            imageId = o.optString("imageId");
             text = o.optString("text");
             id = o.getString("id");
         }catch(final Exception e) {
@@ -85,6 +88,9 @@ public class FriendlyMessage implements Parcelable{
             o.put("userid", userid);
             if (imageUrl != null)
                 o.put("imageUrl",imageUrl);
+            if (imageId != null) {
+                o.put("imageId",imageId);
+            }
             parcel.writeString(o.toString());
         }catch (Exception e) {
             MLog.e(TAG,"",e);
@@ -137,5 +143,9 @@ public class FriendlyMessage implements Parcelable{
 
     public void setTime(long time) {
         this.time = time;
+    }
+
+    public String getImageId() {
+        return imageId;
     }
 }
