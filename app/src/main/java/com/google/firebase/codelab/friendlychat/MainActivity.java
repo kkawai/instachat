@@ -15,7 +15,6 @@
  */
 package com.google.firebase.codelab.friendlychat;
 
-import android.*;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -23,6 +22,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -53,6 +53,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -82,9 +83,11 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.initech.Constants;
 import com.initech.model.User;
+import com.initech.util.ImageUtils;
 import com.initech.util.MLog;
 import com.initech.util.Preferences;
 import com.initech.util.StringUtil;
+import com.initech.util.ThreadWrapper;
 import com.initech.view.ThemedAlertDialog;
 
 import java.io.File;
@@ -103,10 +106,13 @@ public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener, FriendlyMessageContainer,
         EasyPermissions.PermissionCallbacks {
 
+    private static final int MAX_PIC_SIZE_BYTES = 512000;
+
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
         public TextView messageTextView;
         public TextView messengerTextView;
         public TextView messageTimeTextView;
+        public ImageView messagePhotoView;
         public CircleImageView messengerImageView;
 
         public MessageViewHolder(View v) {
@@ -115,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements
             messengerTextView = (TextView) itemView.findViewById(R.id.messengerTextView);
             messengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);
             messageTimeTextView = (TextView) itemView.findViewById(R.id.messageTimeTextView);
+            messagePhotoView = (ImageView)itemView.findViewById(R.id.messagePhotoView);
         }
     }
 
@@ -147,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements
     private static final int RC_TAKE_PICTURE = 101;
     private static final int RC_STORAGE_PERMS = 102;
 
+    private static final String KEY_FILE_PATH = "key_file_path";
     private static final String KEY_FILE_URI = "key_file_uri";
     private static final String KEY_DOWNLOAD_URL = "key_download_url";
 
@@ -155,6 +163,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private Uri mDownloadUrl = null;
     private Uri mFileUri = null;
+    private File mFile = null;
 
     // [START declare_ref]
     private StorageReference mStorageRef;
@@ -162,8 +171,12 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onSaveInstanceState(Bundle out) {
         super.onSaveInstanceState(out);
-        out.putParcelable(KEY_FILE_URI, mFileUri);
-        out.putParcelable(KEY_DOWNLOAD_URL, mDownloadUrl);
+        if (mFileUri != null)
+            out.putParcelable(KEY_FILE_URI, mFileUri);
+        if (mDownloadUrl != null)
+            out.putParcelable(KEY_DOWNLOAD_URL, mDownloadUrl);
+        if (mFile != null)
+            out.putString(KEY_FILE_PATH, mFile.getAbsolutePath());
     }
 
     @Override
@@ -185,6 +198,9 @@ public class MainActivity extends AppCompatActivity implements
         if (savedInstanceState != null) {
             mFileUri = savedInstanceState.getParcelable(KEY_FILE_URI);
             mDownloadUrl = savedInstanceState.getParcelable(KEY_DOWNLOAD_URL);
+            if (savedInstanceState.containsKey(KEY_FILE_PATH)) {
+                mFile = new File(savedInstanceState.getString(KEY_FILE_PATH));
+            }
         }
 
         // Initialize Firebase Auth
@@ -355,8 +371,12 @@ public class MainActivity extends AppCompatActivity implements
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText().toString(), mUsername,
-                        mPhotoUrl, System.currentTimeMillis());
+                final String text = mMessageEditText.getText().toString();
+                if (StringUtil.isEmpty(text)) {
+                    return;
+                }
+                FriendlyMessage friendlyMessage = new FriendlyMessage(text, mUsername,
+                        userid(), null, System.currentTimeMillis());
                 mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -524,7 +544,7 @@ public class MainActivity extends AppCompatActivity implements
         if (requestCode == RC_TAKE_PICTURE) {
             if (resultCode == RESULT_OK) {
                 if (mFileUri != null) {
-                    uploadFromUri(mFileUri);
+                    reducePhotoSize();
                 } else {
                     Log.w(TAG, "File URI is null");
                 }
@@ -532,6 +552,36 @@ public class MainActivity extends AppCompatActivity implements
                 Toast.makeText(this, "Taking picture failed.", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void reducePhotoSize() {
+        ThreadWrapper.executeInWorkerThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final Bitmap bitmap = ImageUtils.getBitmap(MainActivity.this,mFileUri,MAX_PIC_SIZE_BYTES);
+                    ImageUtils.writeBitmapToFile(bitmap, mFile);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            uploadFromUri(mFileUri);
+                        }
+                    });
+                }catch(final Exception e) {
+                    showPhotoReduceError();
+                }
+            }
+        });
+    }
+
+    private void showPhotoReduceError() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this,"Could not read photo",Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     /**
@@ -673,6 +723,9 @@ public class MainActivity extends AppCompatActivity implements
 
                         // Get the public download URL
                         mDownloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+                        FriendlyMessage friendlyMessage = new FriendlyMessage(null, mUsername,
+                                userid(), mDownloadUrl.toString(), System.currentTimeMillis());
+                        mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
 
                         // [START_EXCLUDE]
                         hideProgressDialog();
@@ -712,22 +765,22 @@ public class MainActivity extends AppCompatActivity implements
 
         // Choose file storage location, must be listed in res/xml/file_paths.xml
         File dir = new File(Environment.getExternalStorageDirectory() + "/photos");
-        File file = new File(dir, UUID.randomUUID().toString() + ".jpg");
+        mFile = new File(dir, UUID.randomUUID().toString() + ".jpg");
         try {
             // Create directory if it does not exist.
             if (!dir.exists()) {
                 dir.mkdir();
             }
-            boolean created = file.createNewFile();
-            Log.d(TAG, "file.createNewFile:" + file.getAbsolutePath() + ":" + created);
+            boolean created = mFile.createNewFile();
+            Log.d(TAG, "file.createNewFile:" + mFile.getAbsolutePath() + ":" + created);
         } catch (IOException e) {
-            Log.e(TAG, "file.createNewFile" + file.getAbsolutePath() + ":FAILED", e);
+            Log.e(TAG, "file.createNewFile" + mFile.getAbsolutePath() + ":FAILED", e);
         }
 
         // Create content:// URI for file, required since Android N
         // See: https://developer.android.com/reference/android/support/v4/content/FileProvider.html
         mFileUri = FileProvider.getUriForFile(this,
-                "com.google.firebase.quickstart.firebasestorage.fileprovider", file);
+                "com.google.firebase.quickstart.firebasestorage.fileprovider", mFile);
 
         // Create and launch the intent
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -792,8 +845,10 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             protected void populateViewHolder(MessageViewHolder viewHolder, FriendlyMessage friendlyMessage, int position) {
+
                 mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-                viewHolder.messageTextView.setText(friendlyMessage.getText());
+                if (friendlyMessage.getText() != null)
+                    viewHolder.messageTextView.setText(friendlyMessage.getText());
                 viewHolder.messengerTextView.setText(friendlyMessage.getName());
                 if (friendlyMessage.getTime() != 0) {
                     viewHolder.messageTimeTextView.setVisibility(View.VISIBLE);
@@ -801,14 +856,27 @@ public class MainActivity extends AppCompatActivity implements
                 } else {
                     viewHolder.messageTimeTextView.setVisibility(View.INVISIBLE);
                 }
-                if (friendlyMessage.getPhotoUrl() == null) {
-                    viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(MainActivity.this,
-                            R.drawable.ic_account_circle_black_36dp));
-                } else {
+//                if (friendlyMessage.getPhotoUrl() == null) {
+//                    viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(MainActivity.this,
+//                            R.drawable.ic_account_circle_black_36dp));
+//                } else {
+//
+//                }
+                if (friendlyMessage.getImageUrl() != null) {
                     Glide.with(MainActivity.this)
-                            .load(friendlyMessage.getPhotoUrl())
-                            .into(viewHolder.messengerImageView);
+                            .load(friendlyMessage.getImageUrl())
+                            .crossFade()
+                            .into(viewHolder.messagePhotoView);
+                    viewHolder.messagePhotoView.setVisibility(View.VISIBLE);
+                } else {
+                    viewHolder.messagePhotoView.setVisibility(View.GONE);
                 }
+
+                Glide.with(MainActivity.this)
+                        .load(Constants.DP_URL(userid()))
+                        .error(R.drawable.ic_account_circle_black_36dp)
+                        .into(viewHolder.messengerImageView);
+
             }
 
             @Override
@@ -840,5 +908,9 @@ public class MainActivity extends AppCompatActivity implements
                 notifyPagerAdapterDataSetChanged();
             }
         });
+    }
+
+    private Integer userid() {
+        return Preferences.getInstance(MainActivity.this).getUserId();
     }
 }

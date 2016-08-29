@@ -135,8 +135,8 @@ public final class Preferences {
         editor.remove(PREFERENCE_USER).apply();
     }
 
-    public String getUserId() {
-        return this.mPrefs.getString(PREFERENCE_USER_ID, null);
+    public Integer getUserId() {
+        return this.mPrefs.getInt(PREFERENCE_USER_ID,0);
     }
 
     public String getUsername() {

@@ -58,6 +58,14 @@
                 android:textSize="15sp"
                 android:textColor="@android:color/black"
                 app:font="Lato-Regular.ttf"/>
+
+            <ImageView
+                android:id="@+id/messagePhotoView"
+                android:layout_width="320dp"
+                android:layout_height="320dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY"
+                />
         </LinearLayout>
 
     </LinearLayout>

@@ -126,5 +126,8 @@ public final class Constants {
 
     public static final String KEY_FRIENDLY_MESSAGE = "key_text";
     public static final String KEY_STARTING_POS = "key_starting_pos";
+    public static String DP_URL(int userid) {
+        return "http://dp.ic.s3.amazonaws.com/dp_"+userid;
+    }
 
 }

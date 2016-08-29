@@ -18,22 +18,30 @@ package com.google.firebase.codelab.friendlychat;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.initech.util.MLog;
+
+import org.json.JSONObject;
+
 public class FriendlyMessage implements Parcelable{
+
+    private static final String TAG = "FriendlyMessage";
 
     private String id;
     private String text;
     private String name;
-    private String photoUrl;
+    private int userid;
+    private String imageUrl;
     private long time;
 
     public FriendlyMessage() {
     }
 
-    public FriendlyMessage(String text, String name, String photoUrl, long time) {
+    public FriendlyMessage(String text, String name, int userid, String imageUrl, long time) {
         this.text = text;
         this.name = name;
-        this.photoUrl = photoUrl;
         this.time = time;
+        this.userid = userid;
+        this.imageUrl = imageUrl;
     }
 
     public static final Parcelable.Creator<FriendlyMessage> CREATOR = new Parcelable.Creator<FriendlyMessage>() {
@@ -46,14 +54,18 @@ public class FriendlyMessage implements Parcelable{
     };
 
     public FriendlyMessage(final Parcel parcel) {
-        final String[] array = new String[4];
-        parcel.readStringArray(array);
-        int i=0;
-        id = array[i++];
-        text = array[i++];
-        name = array[i++];
-        photoUrl = array[i++];
-        time = parcel.readLong();
+        String s = parcel.readString();
+        try {
+            final JSONObject o = new JSONObject(s);
+            name = o.getString("name");
+            userid = o.getInt("userid");
+            time = o.getLong("time");
+            imageUrl = o.optString("imageUrl");
+            text = o.optString("text");
+            id = o.getString("id");
+        }catch(final Exception e) {
+            MLog.e(TAG,"",e);
+        }
     }
 
     @Override
@@ -63,14 +75,20 @@ public class FriendlyMessage implements Parcelable{
 
     @Override
     public void writeToParcel(final Parcel parcel, final int flags) {
-        final String[] array = new String[4];
-        int i=0;
-        array[i++] = id;
-        array[i++] = text;
-        array[i++] = name;
-        array[i++] = photoUrl;
-        parcel.writeStringArray(array);
-        parcel.writeLong(time);
+        JSONObject o = new JSONObject();
+        try {
+            o.put("id",id);
+            if (text != null)
+                o.put("text",text);
+            o.put("name",name);
+            o.put("time", time);
+            o.put("userid", userid);
+            if (imageUrl != null)
+                o.put("imageUrl",imageUrl);
+            parcel.writeString(o.toString());
+        }catch (Exception e) {
+            MLog.e(TAG,"",e);
+        }
     }
 
     public String getId() {
@@ -97,12 +115,20 @@ public class FriendlyMessage implements Parcelable{
         this.name = name;
     }
 
-    public String getPhotoUrl() {
-        return photoUrl;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setPhotoUrl(String photoUrl) {
-        this.photoUrl = photoUrl;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public void setUserid(int userid) {
+        this.userid = userid;
+    }
+
+    public int getUserid() {
+        return userid;
     }
 
     public long getTime() {
