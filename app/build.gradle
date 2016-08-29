@@ -79,6 +79,7 @@ dependencies {
 
     compile 'com.github.AndroidDeveloperLB:AutoFitTextView:3'
     compile 'com.ath.fuel:Fuel:1.0.1'
+    compile 'pub.devrel:easypermissions:0.1.9'
 
 }
 

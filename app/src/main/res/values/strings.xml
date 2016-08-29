@@ -13,6 +13,8 @@
     <string name="delete_message_question">Delete message?</string>
     <string name="sign_in_with_google">Sign In with Google</string>
     <string name="sign_up">Sign Up</string>
+    <string name="success">Success!</string>
+    <string name="rationale_storage">This sample reads images from your camera to demonstrate uploading.</string>
     <string name="new_account">New Account</string>
     <string name="hint_username">Username</string>
     <string name="hint_email">Email</string>

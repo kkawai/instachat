@@ -5,6 +5,12 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
+    <!--
+    This permission is not required for Firebase Storage and is only used to read
+    files from the camera and upload them to Firebase Storage as a demonstration.
+-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:name="com.initech.MyApp"
         android:allowBackup="true"
@@ -49,6 +55,24 @@
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </service>
+
+        <service
+            android:name=".MyDownloadService"
+            android:exported="false"/>
+
+        <!--
+  Android N SDK has new restrictions around sharing file:// URIs
+  https://developer.android.com/reference/android/support/v4/content/FileProvider.html#ProviderDefinition
+-->
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.google.firebase.quickstart.firebasestorage.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 

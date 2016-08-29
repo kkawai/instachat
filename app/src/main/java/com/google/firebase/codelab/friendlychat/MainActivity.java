@@ -15,19 +15,29 @@
  */
 package com.google.firebase.codelab.friendlychat;
 
+import android.*;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -67,6 +77,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.initech.Constants;
 import com.initech.model.User;
 import com.initech.util.MLog;
@@ -74,13 +87,21 @@ import com.initech.util.Preferences;
 import com.initech.util.StringUtil;
 import com.initech.view.ThemedAlertDialog;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity implements
-        GoogleApiClient.OnConnectionFailedListener, FriendlyMessageContainer {
+        GoogleApiClient.OnConnectionFailedListener, FriendlyMessageContainer,
+        EasyPermissions.PermissionCallbacks {
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
         public TextView messageTextView;
@@ -107,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements
     private String mPhotoUrl;
     private SharedPreferences mSharedPreferences;
 
-    private View mSendButton;
+    private View mSendButton, mAttachButton;
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
     private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
@@ -123,6 +144,27 @@ public class MainActivity extends AppCompatActivity implements
     private User mUser;
     private DrawerLayout mDrawerLayout;
     private final Lazy<PagerAdapterHelper> mPagerAdapterHelper = Lazy.attain(this, PagerAdapterHelper.class);
+    private static final int RC_TAKE_PICTURE = 101;
+    private static final int RC_STORAGE_PERMS = 102;
+
+    private static final String KEY_FILE_URI = "key_file_uri";
+    private static final String KEY_DOWNLOAD_URL = "key_download_url";
+
+    private BroadcastReceiver mDownloadReceiver;
+    private ProgressDialog mProgressDialog;
+
+    private Uri mDownloadUrl = null;
+    private Uri mFileUri = null;
+
+    // [START declare_ref]
+    private StorageReference mStorageRef;
+
+    @Override
+    public void onSaveInstanceState(Bundle out) {
+        super.onSaveInstanceState(out);
+        out.putParcelable(KEY_FILE_URI, mFileUri);
+        out.putParcelable(KEY_DOWNLOAD_URL, mDownloadUrl);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,9 +181,15 @@ public class MainActivity extends AppCompatActivity implements
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mUsername = ANONYMOUS;
 
+        // Restore instance state
+        if (savedInstanceState != null) {
+            mFileUri = savedInstanceState.getParcelable(KEY_FILE_URI);
+            mDownloadUrl = savedInstanceState.getParcelable(KEY_DOWNLOAD_URL);
+        }
+
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
-        //mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        mStorageRef = FirebaseStorage.getInstance().getReference();
         mUser = Preferences.getInstance(this).getUser();
         if (mUser == null) {
             // Not signed in, launch the Sign In activity
@@ -155,16 +203,7 @@ public class MainActivity extends AppCompatActivity implements
                 MLog.i(TAG, "photo url: " + photo);
             }
             mUsername = Preferences.getInstance(this).getUsername();
-            //mUsername = mFirebaseUser.getDisplayName();
-            //mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
         }
-
-        /*
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API)
-                .build();
-                */
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mMessageRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
@@ -172,110 +211,8 @@ public class MainActivity extends AppCompatActivity implements
         mLinearLayoutManager.setStackFromEnd(true);
 
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
-        mFirebaseAdapter = new MyFirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder>(
-                FriendlyMessage.class,
-                R.layout.item_message,
-                MessageViewHolder.class,
-                mFirebaseDatabaseReference.child(MESSAGES_CHILD)) {
 
-            @Override
-            public MessageViewHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
-                final MessageViewHolder holder = super.onCreateViewHolder(parent, viewType);
-                holder.messengerImageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        final FriendlyMessage msg = mFirebaseAdapter.getItem(holder.getAdapterPosition());
-                        Toast.makeText(v.getContext(), "clicked on profile: " + msg.getName() + " said: " + msg.getText(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-                final View.OnClickListener onClickListener = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        openFullScreenTextView(holder.getAdapterPosition());
-                    }
-                };
-                holder.messageTimeTextView.setOnClickListener(onClickListener);
-                holder.messageTextView.setOnClickListener(onClickListener);
-                holder.messengerTextView.setOnClickListener(onClickListener);
-
-                View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View view) {
-                        new ThemedAlertDialog.Builder(view.getContext())
-                                .setMessage(getString(R.string.delete_message_question) + " ("+limitString(mFirebaseAdapter.getItem(holder.getAdapterPosition()).getText(),15)+")")
-                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(final DialogInterface dialog, final int which) {
-                                        final FriendlyMessage msg = mFirebaseAdapter.getItem(holder.getAdapterPosition());
-                                        DatabaseReference ref = mFirebaseDatabaseReference.child(MESSAGES_CHILD+"/"+msg.getId());
-                                        if (ref != null)
-                                            ref.removeValue();
-                                    }
-                                })
-                                .setNegativeButton(android.R.string.no, null)
-                                .setCancelable(true).setOnCancelListener(null)
-                                .create().show();
-                        return false;
-                    }
-                };
-
-                holder.messageTimeTextView.setOnLongClickListener(onLongClickListener);
-                holder.messageTextView.setOnLongClickListener(onLongClickListener);
-                holder.messengerTextView.setOnLongClickListener(onLongClickListener);
-                return holder;
-            }
-
-            @Override
-            protected void populateViewHolder(MessageViewHolder viewHolder, FriendlyMessage friendlyMessage, int position) {
-                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-                viewHolder.messageTextView.setText(friendlyMessage.getText());
-                viewHolder.messengerTextView.setText(friendlyMessage.getName());
-                if (friendlyMessage.getTime() != 0) {
-                    viewHolder.messageTimeTextView.setVisibility(View.VISIBLE);
-                    viewHolder.messageTimeTextView.setText(StringUtil.getHour(friendlyMessage.getTime()));
-                } else {
-                    viewHolder.messageTimeTextView.setVisibility(View.INVISIBLE);
-                }
-                if (friendlyMessage.getPhotoUrl() == null) {
-                    viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(MainActivity.this,
-                            R.drawable.ic_account_circle_black_36dp));
-                } else {
-                    Glide.with(MainActivity.this)
-                            .load(friendlyMessage.getPhotoUrl())
-                            .into(viewHolder.messengerImageView);
-                }
-            }
-
-            @Override
-            protected FriendlyMessage parseSnapshot(DataSnapshot snapshot) {
-                FriendlyMessage friendlyMessage = super.parseSnapshot(snapshot);
-                friendlyMessage.setId(snapshot.getKey());
-                return friendlyMessage;
-            }
-        };
-
-        mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-
-                super.onItemRangeInserted(positionStart, itemCount);
-                int friendlyMessageCount = mFirebaseAdapter.getItemCount();
-                int lastVisiblePosition = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
-                // If the recycler view is initially being loaded or the user is at the bottom of the list, scroll
-                // to the bottom of the list to show the newly added message.
-                if (lastVisiblePosition == -1 ||
-                        (positionStart >= (friendlyMessageCount - 1) && lastVisiblePosition == (positionStart - 1))) {
-                    mMessageRecyclerView.scrollToPosition(positionStart);
-                }
-                notifyPagerAdapterDataSetChanged();
-            }
-
-            @Override
-            public void onItemRangeRemoved(int positionStart, int itemCount) {
-                super.onItemRangeRemoved(positionStart, itemCount);
-                notifyPagerAdapterDataSetChanged();
-            }
-        });
+        initFirebaseAdapter();
 
         FuelInjector.ignite(this, this);
 
@@ -335,7 +272,86 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
+        initDownloadReceiver();
+        initButtons();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Register download receiver
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(mDownloadReceiver, MyDownloadService.getIntentFilter());
+    }
+
+    private void beginDownload() {
+        // Get path
+        String path = "photos/" + mFileUri.getLastPathSegment();
+
+        // Kick off download service
+        Intent intent = new Intent(this, MyDownloadService.class);
+        intent.setAction(MyDownloadService.ACTION_DOWNLOAD);
+        intent.putExtra(MyDownloadService.EXTRA_DOWNLOAD_PATH, path);
+        startService(intent);
+
+        // Show loading spinner
+        showProgressDialog();
+    }
+
+    private void showMessageDialog(String title, String message) {
+        AlertDialog ad = new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .create();
+        ad.show();
+    }
+
+    private void showProgressDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage("Loading...");
+            mProgressDialog.setIndeterminate(true);
+        }
+
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+        }
+    }
+
+    private void initDownloadReceiver() {
+        mDownloadReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "downloadReceiver:onReceive:" + intent);
+                hideProgressDialog();
+
+                if (MyDownloadService.ACTION_COMPLETED.equals(intent.getAction())) {
+                    String path = intent.getStringExtra(MyDownloadService.EXTRA_DOWNLOAD_PATH);
+                    long numBytes = intent.getLongExtra(MyDownloadService.EXTRA_BYTES_DOWNLOADED, 0);
+
+                    // Alert success
+                    showMessageDialog(getString(R.string.success), String.format(Locale.getDefault(),
+                            "%d bytes downloaded from %s", numBytes, path));
+                }
+
+                if (MyDownloadService.ACTION_ERROR.equals(intent.getAction())) {
+                    String path = intent.getStringExtra(MyDownloadService.EXTRA_DOWNLOAD_PATH);
+
+                    // Alert failure
+                    showMessageDialog("Error", String.format(Locale.getDefault(),
+                            "Failed to download from %s", path));
+                }
+            }
+        };
+    }
+
+    private void initButtons() {
         mSendButton = findViewById(R.id.sendButton);
+        mAttachButton = findViewById(R.id.attachButton);
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -348,6 +364,12 @@ public class MainActivity extends AppCompatActivity implements
                 });
                 mMessageEditText.setText("");
                 mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
+            }
+        });
+        mAttachButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchCamera();
             }
         });
     }
@@ -372,7 +394,15 @@ public class MainActivity extends AppCompatActivity implements
         if (s == null || s.length() <= limit) {
             return s;
         }
-        return s.substring(0,limit) + "...";
+        return s.substring(0, limit) + "...";
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // Unregister download receiver
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadReceiver);
     }
 
     @Override
@@ -419,6 +449,9 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             case R.id.full_screen_texts_menu:
                 openFullScreenTextView(-1);
+                return true;
+            case R.id.download:
+                beginDownload();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -486,6 +519,17 @@ public class MainActivity extends AppCompatActivity implements
 
                 // Sending failed or it was canceled, show failure message to the user
                 Log.d(TAG, "Failed to send invitation.");
+            }
+        }
+        if (requestCode == RC_TAKE_PICTURE) {
+            if (resultCode == RESULT_OK) {
+                if (mFileUri != null) {
+                    uploadFromUri(mFileUri);
+                } else {
+                    Log.w(TAG, "File URI is null");
+                }
+            } else {
+                Toast.makeText(this, "Taking picture failed.", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -589,6 +633,212 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void setCurrentPosition(int position) {
-        mMessageRecyclerView.scrollToPosition(position+1);
+        mMessageRecyclerView.scrollToPosition(position + 1);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+    }
+
+    private void uploadFromUri(Uri fileUri) {
+        MLog.d(TAG, "uploadFromUri:src:" + fileUri.toString());
+
+        // [START get_child_ref]
+        // Get a reference to store file at photos/<FILENAME>.jpg
+        final StorageReference photoRef = mStorageRef.child("photos")
+                .child(fileUri.getLastPathSegment());
+        // [END get_child_ref]
+
+        // Upload file to Firebase Storage
+        // [START_EXCLUDE]
+        showProgressDialog();
+        // [END_EXCLUDE]
+        MLog.d(TAG, "uploadFromUri:dst:" + photoRef.getPath());
+        photoRef.putFile(fileUri)
+                .addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // Upload succeeded
+                        MLog.d(TAG, "uploadFromUri:onSuccess");
+
+                        // Get the public download URL
+                        mDownloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
+
+                        // [START_EXCLUDE]
+                        hideProgressDialog();
+                        //updateUI(mAuth.getCurrentUser());
+                        // [END_EXCLUDE]
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Upload failed
+                        MLog.w(TAG, "uploadFromUri:onFailure", exception);
+
+                        mDownloadUrl = null;
+
+                        // [START_EXCLUDE]
+                        hideProgressDialog();
+                        Toast.makeText(MainActivity.this, "Error: upload failed",
+                                Toast.LENGTH_SHORT).show();
+                        //updateUI(mAuth.getCurrentUser());
+                        // [END_EXCLUDE]
+                    }
+                });
+    }
+
+    @AfterPermissionGranted(RC_STORAGE_PERMS)
+    private void launchCamera() {
+        Log.d(TAG, "launchCamera");
+
+        // Check that we have permission to read images from external storage.
+        String perm = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        if (!EasyPermissions.hasPermissions(this, perm)) {
+            EasyPermissions.requestPermissions(this, getString(R.string.rationale_storage),
+                    RC_STORAGE_PERMS, perm);
+            return;
+        }
+
+        // Choose file storage location, must be listed in res/xml/file_paths.xml
+        File dir = new File(Environment.getExternalStorageDirectory() + "/photos");
+        File file = new File(dir, UUID.randomUUID().toString() + ".jpg");
+        try {
+            // Create directory if it does not exist.
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+            boolean created = file.createNewFile();
+            Log.d(TAG, "file.createNewFile:" + file.getAbsolutePath() + ":" + created);
+        } catch (IOException e) {
+            Log.e(TAG, "file.createNewFile" + file.getAbsolutePath() + ":FAILED", e);
+        }
+
+        // Create content:// URI for file, required since Android N
+        // See: https://developer.android.com/reference/android/support/v4/content/FileProvider.html
+        mFileUri = FileProvider.getUriForFile(this,
+                "com.google.firebase.quickstart.firebasestorage.fileprovider", file);
+
+        // Create and launch the intent
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mFileUri);
+
+        startActivityForResult(takePictureIntent, RC_TAKE_PICTURE);
+    }
+
+    private void initFirebaseAdapter() {
+        mFirebaseAdapter = new MyFirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder>(
+                FriendlyMessage.class,
+                R.layout.item_message,
+                MessageViewHolder.class,
+                mFirebaseDatabaseReference.child(MESSAGES_CHILD)) {
+
+            @Override
+            public MessageViewHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
+                final MessageViewHolder holder = super.onCreateViewHolder(parent, viewType);
+                holder.messengerImageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+                        final FriendlyMessage msg = mFirebaseAdapter.getItem(holder.getAdapterPosition());
+                        Toast.makeText(v.getContext(), "clicked on profile: " + msg.getName() + " said: " + msg.getText(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                final View.OnClickListener onClickListener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        openFullScreenTextView(holder.getAdapterPosition());
+                    }
+                };
+                holder.messageTimeTextView.setOnClickListener(onClickListener);
+                holder.messageTextView.setOnClickListener(onClickListener);
+                holder.messengerTextView.setOnClickListener(onClickListener);
+
+                View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        new ThemedAlertDialog.Builder(view.getContext())
+                                .setMessage(getString(R.string.delete_message_question) + " (" + limitString(mFirebaseAdapter.getItem(holder.getAdapterPosition()).getText(), 15) + ")")
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(final DialogInterface dialog, final int which) {
+                                        final FriendlyMessage msg = mFirebaseAdapter.getItem(holder.getAdapterPosition());
+                                        DatabaseReference ref = mFirebaseDatabaseReference.child(MESSAGES_CHILD + "/" + msg.getId());
+                                        if (ref != null)
+                                            ref.removeValue();
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.no, null)
+                                .setCancelable(true).setOnCancelListener(null)
+                                .create().show();
+                        return false;
+                    }
+                };
+
+                holder.messageTimeTextView.setOnLongClickListener(onLongClickListener);
+                holder.messageTextView.setOnLongClickListener(onLongClickListener);
+                holder.messengerTextView.setOnLongClickListener(onLongClickListener);
+                return holder;
+            }
+
+            @Override
+            protected void populateViewHolder(MessageViewHolder viewHolder, FriendlyMessage friendlyMessage, int position) {
+                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+                viewHolder.messageTextView.setText(friendlyMessage.getText());
+                viewHolder.messengerTextView.setText(friendlyMessage.getName());
+                if (friendlyMessage.getTime() != 0) {
+                    viewHolder.messageTimeTextView.setVisibility(View.VISIBLE);
+                    viewHolder.messageTimeTextView.setText(StringUtil.getHour(friendlyMessage.getTime()));
+                } else {
+                    viewHolder.messageTimeTextView.setVisibility(View.INVISIBLE);
+                }
+                if (friendlyMessage.getPhotoUrl() == null) {
+                    viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(MainActivity.this,
+                            R.drawable.ic_account_circle_black_36dp));
+                } else {
+                    Glide.with(MainActivity.this)
+                            .load(friendlyMessage.getPhotoUrl())
+                            .into(viewHolder.messengerImageView);
+                }
+            }
+
+            @Override
+            protected FriendlyMessage parseSnapshot(DataSnapshot snapshot) {
+                FriendlyMessage friendlyMessage = super.parseSnapshot(snapshot);
+                friendlyMessage.setId(snapshot.getKey());
+                return friendlyMessage;
+            }
+        };
+        mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+
+                super.onItemRangeInserted(positionStart, itemCount);
+                int friendlyMessageCount = mFirebaseAdapter.getItemCount();
+                int lastVisiblePosition = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
+                // If the recycler view is initially being loaded or the user is at the bottom of the list, scroll
+                // to the bottom of the list to show the newly added message.
+                if (lastVisiblePosition == -1 ||
+                        (positionStart >= (friendlyMessageCount - 1) && lastVisiblePosition == (positionStart - 1))) {
+                    mMessageRecyclerView.scrollToPosition(positionStart);
+                }
+                notifyPagerAdapterDataSetChanged();
+            }
+
+            @Override
+            public void onItemRangeRemoved(int positionStart, int itemCount) {
+                super.onItemRangeRemoved(positionStart, itemCount);
+                notifyPagerAdapterDataSetChanged();
+            }
+        });
     }
 }
