@@ -1,6 +1,7 @@
 package com.initech.util;
 
 import android.content.Context;
+import android.net.Uri;
 
 import com.initech.Constants;
 import com.initech.MyApp;
@@ -18,6 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 
 public final class LocalFileUtils {
 
@@ -69,6 +71,35 @@ public final class LocalFileUtils {
         }
         in.close();
         out.close();
+    }
+
+    public static void copyFile(final Context context, final Uri srcUri, final File destFile) {
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            byte[] imageData = new byte[1024];
+            in = context.getContentResolver().openInputStream(srcUri);
+            out = new FileOutputStream(destFile);  // I'm assuming you already have the File object for where you're writing to
+
+            int bytesRead;
+            while ((bytesRead = in.read(imageData)) > 0) {
+                out.write(Arrays.copyOfRange(imageData, 0, Math.max(0, bytesRead)));
+            }
+
+        } catch (Exception e) {
+            MLog.e(TAG, "failed to write image", e);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                }catch(IOException e){}
+            }
+            if (out != null) {
+                try {
+                    out.close();
+                }catch(IOException e){}
+            }
+        }
     }
 
     /**

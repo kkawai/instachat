@@ -32,4 +32,6 @@
     <string name="email_password_not_found">Account not found.  Try again.</string>
     <string name="wrong_password">Wrong password.  Try again.</string>
     <string name="banner_ad_unit_id" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="menu_choose_photo">Choose Photo</string>
+    <string name="menu_take_photo">Take Photo</string>
 </resources>

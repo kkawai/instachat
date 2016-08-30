@@ -1,12 +1,12 @@
 /**
  * Copyright Google Inc. All Rights Reserved.
- * <p/>
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,12 +26,12 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
@@ -62,14 +62,15 @@ import com.ath.fuel.FuelInjector;
 import com.ath.fuel.Lazy;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.github.rubensousa.bottomsheetbuilder.BottomSheetBuilder;
+import com.github.rubensousa.bottomsheetbuilder.BottomSheetMenuDialog;
+import com.github.rubensousa.bottomsheetbuilder.adapter.BottomSheetItemClickListener;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.crash.FirebaseCrash;
@@ -84,8 +85,10 @@ import com.google.firebase.storage.UploadTask;
 import com.initech.Constants;
 import com.initech.model.User;
 import com.initech.util.ImageUtils;
+import com.initech.util.LocalFileUtils;
 import com.initech.util.MLog;
 import com.initech.util.Preferences;
+import com.initech.util.ScreenUtil;
 import com.initech.util.StringUtil;
 import com.initech.util.ThreadWrapper;
 import com.initech.view.ThemedAlertDialog;
@@ -121,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements
             messengerTextView = (TextView) itemView.findViewById(R.id.messengerTextView);
             messengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);
             messageTimeTextView = (TextView) itemView.findViewById(R.id.messageTimeTextView);
-            messagePhotoView = (ImageView)itemView.findViewById(R.id.messagePhotoView);
+            messagePhotoView = (ImageView) itemView.findViewById(R.id.messagePhotoView);
         }
     }
 
@@ -151,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements
     private User mUser;
     private DrawerLayout mDrawerLayout;
     private final Lazy<PagerAdapterHelper> mPagerAdapterHelper = Lazy.attain(this, PagerAdapterHelper.class);
+    private static final int RC_CHOOSE_PICTURE = 103;
     private static final int RC_TAKE_PICTURE = 101;
     private static final int RC_STORAGE_PERMS = 102;
 
@@ -385,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements
         mAttachButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                launchCamera();
+                showFileOptions();
             }
         });
     }
@@ -539,20 +543,29 @@ public class MainActivity extends AppCompatActivity implements
         } else if (requestCode == RC_TAKE_PICTURE) {
             if (resultCode == RESULT_OK) {
                 if (mFileUri != null) {
-                    reducePhotoSize();
-                } else {
-                    Log.w(TAG, "File URI is null");
+                    reducePhotoSize(null);
+                }
+            }
+        } else if (requestCode == RC_CHOOSE_PICTURE) {
+            if (resultCode == RESULT_OK) {
+                if (mFileUri != null) {
+                    reducePhotoSize(data.getData());
                 }
             }
         }
     }
 
-    private void reducePhotoSize() {
+    private void reducePhotoSize(final Uri uri) {
         ThreadWrapper.executeInWorkerThread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    final Bitmap bitmap = ImageUtils.getBitmap(MainActivity.this,mFileUri,MAX_PIC_SIZE_BYTES);
+
+                    if (uri != null) {
+                        LocalFileUtils.copyFile(MainActivity.this, uri, mFile);
+                    }
+
+                    final Bitmap bitmap = ImageUtils.getBitmap(MainActivity.this, mFileUri, MAX_PIC_SIZE_BYTES);
                     ImageUtils.writeBitmapToFile(bitmap, mFile);
                     runOnUiThread(new Runnable() {
                         @Override
@@ -560,7 +573,8 @@ public class MainActivity extends AppCompatActivity implements
                             uploadFromUri(mFileUri);
                         }
                     });
-                }catch(final Exception e) {
+                } catch (final Exception e) {
+                    MLog.e(TAG, "reducePhotoSize() failed", e);
                     showPhotoReduceError();
                 }
             }
@@ -571,7 +585,7 @@ public class MainActivity extends AppCompatActivity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(MainActivity.this,"Could not read photo",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Could not read photo", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -718,7 +732,7 @@ public class MainActivity extends AppCompatActivity implements
                         final String photoId = mFileUri.getLastPathSegment();
                         FriendlyMessage friendlyMessage = new FriendlyMessage(null, mUsername,
                                 userid(), mDownloadUrl.toString(), photoId, System.currentTimeMillis());
-                        MLog.d(TAG, "uploadFromUri:onSuccess photoId: "+photoId);
+                        MLog.d(TAG, "uploadFromUri:onSuccess photoId: " + photoId);
                         mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
 
                         // [START_EXCLUDE]
@@ -746,15 +760,24 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @AfterPermissionGranted(RC_STORAGE_PERMS)
-    private void launchCamera() {
+    private void launchCamera(boolean isChoose) {
         Log.d(TAG, "launchCamera");
 
         // Check that we have permission to read images from external storage.
-        String perm = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-        if (!EasyPermissions.hasPermissions(this, perm)) {
-            EasyPermissions.requestPermissions(this, getString(R.string.rationale_storage),
-                    RC_STORAGE_PERMS, perm);
-            return;
+        if (!isChoose) {
+            String perm = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+            if (!EasyPermissions.hasPermissions(this, perm)) {
+                EasyPermissions.requestPermissions(this, getString(R.string.rationale_storage),
+                        RC_STORAGE_PERMS, perm);
+                return;
+            }
+        } else {
+            String perm = android.Manifest.permission.READ_EXTERNAL_STORAGE;
+            if (!EasyPermissions.hasPermissions(this, perm)) {
+                EasyPermissions.requestPermissions(this, getString(R.string.rationale_storage),
+                        RC_STORAGE_PERMS, perm);
+                return;
+            }
         }
 
         // Choose file storage location, must be listed in res/xml/file_paths.xml
@@ -776,11 +799,16 @@ public class MainActivity extends AppCompatActivity implements
         mFileUri = FileProvider.getUriForFile(this,
                 "com.google.firebase.quickstart.firebasestorage.fileprovider", mFile);
 
-        // Create and launch the intent
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mFileUri);
-
-        startActivityForResult(takePictureIntent, RC_TAKE_PICTURE);
+        if (!isChoose) {
+            // Create and launch the intent
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mFileUri);
+            startActivityForResult(takePictureIntent, RC_TAKE_PICTURE);
+        } else {
+            final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), RC_CHOOSE_PICTURE);
+        }
     }
 
     private void initFirebaseAdapter() {
@@ -819,12 +847,12 @@ public class MainActivity extends AppCompatActivity implements
                                     @Override
                                     public void onClick(final DialogInterface dialog, final int which) {
                                         final FriendlyMessage msg = mFirebaseAdapter.getItem(holder.getAdapterPosition());
-                                        MLog.d(TAG," msg.getImageUrl(): "+msg.getImageUrl() + " " + msg.getImageId());
+                                        MLog.d(TAG, " msg.getImageUrl(): " + msg.getImageUrl() + " " + msg.getImageId());
                                         if (msg.getImageUrl() != null && msg.getImageId() != null) {
                                             final StorageReference photoRef = mStorageRef.child("photos")
                                                     .child(msg.getImageId());
                                             photoRef.delete();
-                                            MLog.d(TAG,"deleted photo "+msg.getImageId());
+                                            MLog.d(TAG, "deleted photo " + msg.getImageId());
                                         }
                                         DatabaseReference ref = mFirebaseDatabaseReference.child(MESSAGES_CHILD + "/" + msg.getId());
                                         if (ref != null)
@@ -913,5 +941,47 @@ public class MainActivity extends AppCompatActivity implements
 
     private Integer userid() {
         return Preferences.getInstance(MainActivity.this).getUserId();
+    }
+
+    private void showFileOptions() {
+
+        /**
+         * if the keyboard is open, close it first before showing
+         * the bottom dialog otherwise there is flicker.
+         * The delay is bad, but it works for now.
+         */
+        if (mMessageEditText.hasFocus()) {
+            ScreenUtil.hideVirtualKeyboard(mMessageEditText);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (isFinishing())
+                        return;
+                    showBottomDialog();
+                }
+            }, 175);
+        } else {
+            showBottomDialog();
+        }
+
+    }
+
+    private void showBottomDialog() {
+        final BottomSheetMenuDialog dialog = new BottomSheetBuilder(this, R.style.AppTheme_BottomSheetDialog)
+                .setMode(BottomSheetBuilder.MODE_LIST)
+                .setMenu(R.menu.file_upload_options)
+                .setItemClickListener(new BottomSheetItemClickListener() {
+                    @Override
+                    public void onBottomSheetItemClick(final MenuItem item) {
+                        if (item.getItemId() == R.id.menu_take_photo) {
+                            launchCamera(false);
+                        } else if (item.getItemId() == R.id.menu_choose_photo) {
+                            launchCamera(true);
+                        }
+                    }
+                })
+                .createDialog();
+
+        dialog.show();
     }
 }

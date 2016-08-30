@@ -10,6 +10,7 @@
     files from the camera and upload them to Firebase Storage as a demonstration.
 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name="com.initech.MyApp"

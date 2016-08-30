@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_choose_photo"
+        android:title="@string/menu_choose_photo"
+        android:icon="@drawable/ic_photo_library_black_36dp"/>
+    <item
+        android:id="@+id/menu_take_photo"
+        android:title="@string/menu_take_photo"
+        android:icon="@drawable/ic_photo_camera_black_36dp"/>
+</menu>
