@@ -130,4 +130,8 @@ public final class Constants {
         return "http://dp.ic.s3.amazonaws.com/dp_"+userid;
     }
 
+    /**
+     * Firebase database constants
+     */
+    public static final String MESSAGES_CHILD = "messages";
 }

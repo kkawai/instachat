@@ -64,7 +64,7 @@
                 android:layout_width="320dp"
                 android:layout_height="320dp"
                 android:adjustViewBounds="true"
-                android:scaleType="fitXY"
+                android:scaleType="centerCrop"
                 />
         </LinearLayout>
 
