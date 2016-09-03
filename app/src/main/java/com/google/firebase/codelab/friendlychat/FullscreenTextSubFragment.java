@@ -8,12 +8,11 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.initech.Constants;
 import com.initech.util.MLog;
 import com.initech.util.ScreenUtil;
-import com.lb.auto_fit_textview.AutoResizeTextView;
+import com.initech.view.AutoResizeTextView;
 
 /**
  * Created by kevin on 8/21/2016.
@@ -22,10 +21,11 @@ public class FullscreenTextSubFragment extends Fragment {
 
     public static final String TAG = "FullscreenTextSubFragment";
     private FriendlyMessage mFriendlyMessage;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_fullscreen_item,container,false);
+        final View view = inflater.inflate(R.layout.fragment_fullscreen_item, container, false);
         return view;
     }
 
@@ -33,17 +33,17 @@ public class FullscreenTextSubFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mFriendlyMessage = getArguments().getParcelable(Constants.KEY_FRIENDLY_MESSAGE);
-        final AutoResizeTextView textView = (AutoResizeTextView)getView().findViewById(R.id.textView);
+        final AutoResizeTextView textView = (AutoResizeTextView) getView().findViewById(R.id.textView);
         textView.setText(mFriendlyMessage.getText());
         textView.setMaxLines(Integer.MAX_VALUE);
-        textView.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()),getResources().getDisplayMetrics()));
-        MLog.i(TAG,"onActivityCreated(): "+mFriendlyMessage.getText() + " textView.height: "+textView.getHeight());
+        textView.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()), getResources().getDisplayMetrics()));
+        MLog.i(TAG, "onActivityCreated(): " + mFriendlyMessage.getText() + " textView.height: " + textView.getHeight());
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        final AutoResizeTextView textView = (AutoResizeTextView)getView().findViewById(R.id.textView);
-        textView.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()),getResources().getDisplayMetrics()));
+        final AutoResizeTextView textView = (AutoResizeTextView) getView().findViewById(R.id.textView);
+        textView.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()), getResources().getDisplayMetrics()));
     }
 }

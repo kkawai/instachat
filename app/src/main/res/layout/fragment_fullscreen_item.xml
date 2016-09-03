@@ -5,7 +5,7 @@
               android:layout_height="match_parent"
               android:background="@android:color/white">
 
-    <com.lb.auto_fit_textview.AutoResizeTextView
+    <com.initech.view.AutoResizeTextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
