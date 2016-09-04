@@ -72,6 +72,7 @@ public class PhotoUploadHelper {
 
     public void cleanup() {
         mActivity = null;
+        mListener = null;
     }
 
     @AfterPermissionGranted(RC_STORAGE_PERMS)
