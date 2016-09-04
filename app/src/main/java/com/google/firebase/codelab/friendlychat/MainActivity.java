@@ -44,14 +44,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ath.fuel.FuelInjector;
-import com.ath.fuel.Lazy;
-import com.bumptech.glide.Glide;
 import com.github.rubensousa.bottomsheetbuilder.BottomSheetBuilder;
 import com.github.rubensousa.bottomsheetbuilder.BottomSheetMenuDialog;
 import com.github.rubensousa.bottomsheetbuilder.adapter.BottomSheetItemClickListener;
@@ -73,6 +69,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.initech.Constants;
+import com.initech.MyApp;
 import com.initech.model.User;
 import com.initech.util.MLog;
 import com.initech.util.Preferences;
@@ -95,7 +92,6 @@ public class MainActivity extends BaseActivity implements
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 140;
     public static final String ANONYMOUS = "anonymous";
     private static final String MESSAGE_SENT_EVENT = "message_sent";
-    private String mUsername;
     private SharedPreferences mSharedPreferences;
 
     private View mSendButton, mAttachButton;
@@ -111,7 +107,6 @@ public class MainActivity extends BaseActivity implements
     private AdView mAdView;
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
     //private GoogleApiClient mGoogleApiClient;
-    private User mUser;
     private DrawerLayout mDrawerLayout;
 
     private BroadcastReceiver mDownloadReceiver;
@@ -120,6 +115,7 @@ public class MainActivity extends BaseActivity implements
     // [START declare_ref]
     private StorageReference mStorageRef;
     private PhotoUploadHelper mPhotoUploadHelper;
+    private DrawerHelper mDrawerHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,25 +130,18 @@ public class MainActivity extends BaseActivity implements
         setupDrawer();
         setupToolbar();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mUsername = ANONYMOUS;
 
         // Restore instance state
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference();
-        mUser = Preferences.getInstance(this).getUser();
-        if (mUser == null) {
+        User me = Preferences.getInstance(this).getUser();
+        if (me == null) {
             // Not signed in, launch the Sign In activity
             startActivity(new Intent(this, SignInActivity.class));
             finish();
             return;
-        } else {
-            final String photo = Preferences.getInstance(this).getUser().getProfilePicUrl();
-            if (photo != null) {
-                MLog.i(TAG, "photo url: " + photo);
-            }
-            mUsername = Preferences.getInstance(this).getUsername();
         }
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -312,7 +301,7 @@ public class MainActivity extends BaseActivity implements
                 if (StringUtil.isEmpty(text)) {
                     return;
                 }
-                FriendlyMessage friendlyMessage = new FriendlyMessage(text, mUsername,
+                FriendlyMessage friendlyMessage = new FriendlyMessage(text, username(),
                         userid(), null, null, System.currentTimeMillis());
                 mFirebaseDatabaseReference.child(Constants.MESSAGES_CHILD).push().setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -361,9 +350,11 @@ public class MainActivity extends BaseActivity implements
     public void onDestroy() {
         mPhotoUploadHelper.cleanup();
         mFirebaseAdapter.cleanup();
+        mDrawerHelper.cleanup();
         if (mAdView != null) {
             mAdView.destroy();
         }
+        MyApp.getInstance().getRequestQueue().cancelAll(this);
         super.onDestroy();
     }
 
@@ -392,7 +383,6 @@ public class MainActivity extends BaseActivity implements
                 //Auth.GoogleSignInApi.signOut(mGoogleApiClient);
                 //mFirebaseUser = null;
                 Preferences.getInstance(this).saveUser(null);
-                mUsername = ANONYMOUS;
                 startActivity(new Intent(this, SignInActivity.class));
                 finish();
                 return true;
@@ -530,20 +520,8 @@ public class MainActivity extends BaseActivity implements
                         return true;
                     }
                 });
-        View headerLayout = navigationView.getHeaderView(0); // 0-index header
-        final TextView email = (TextView)headerLayout.findViewById(R.id.nav_email);
-        final TextView username = (TextView)headerLayout.findViewById(R.id.nav_username);
-        final ImageView navpic = (ImageView)headerLayout.findViewById(R.id.nav_pic);
-        if (email != null) {
-            email.setText(Preferences.getInstance(this).getEmail());
-            username.setText(Preferences.getInstance(this).getUsername());
-            Glide.with(this)
-                    .load(Constants.DP_URL(Preferences.getInstance(this).getUserId()))
-                    .error(R.drawable.ic_account_circle_black_36dp)
-                    .crossFade()
-                    .into(navpic);
-        }
-
+        mDrawerHelper = new DrawerHelper(this,mDrawerLayout);
+        mDrawerHelper.setup(navigationView);
     }
 
     @Override
@@ -668,6 +646,10 @@ public class MainActivity extends BaseActivity implements
         return Preferences.getInstance(MainActivity.this).getUserId();
     }
 
+    private String username() {
+        return Preferences.getInstance(MainActivity.this).getUsername();
+    }
+
     private void showFileOptions() {
 
         /**
@@ -744,7 +726,7 @@ public class MainActivity extends BaseActivity implements
 
         // Get the public download URL
         final String photoId = imageUrl.getLastPathSegment();
-        FriendlyMessage friendlyMessage = new FriendlyMessage(null, mUsername,
+        FriendlyMessage friendlyMessage = new FriendlyMessage(null, username(),
                 userid(), imageUrl.toString(), photoId, System.currentTimeMillis());
         MLog.d(TAG, "uploadFromUri:onSuccess photoId: " + photoId);
         mFirebaseDatabaseReference.child(Constants.MESSAGES_CHILD).push().setValue(friendlyMessage);
@@ -762,4 +744,6 @@ public class MainActivity extends BaseActivity implements
         Toast.makeText(MainActivity.this, R.string.error_send_photo,
                 Toast.LENGTH_SHORT).show();
     }
+
+
 }
