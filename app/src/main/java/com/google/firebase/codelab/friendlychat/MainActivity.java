@@ -62,8 +62,10 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.crash.FirebaseCrash;
@@ -355,7 +357,13 @@ public class MainActivity extends BaseActivity implements
                 }
                 FriendlyMessage friendlyMessage = new FriendlyMessage(text, mUsername,
                         userid(), null, null, System.currentTimeMillis());
-                mFirebaseDatabaseReference.child(Constants.MESSAGES_CHILD).push().setValue(friendlyMessage);
+                mFirebaseDatabaseReference.child(Constants.MESSAGES_CHILD).push().setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        //AppBarLayout appBarLayout = ((AppBarLayout)findViewById(R.id.appbar));
+                        //appBarLayout.setExpanded(false,true);
+                    }
+                });
 
                 mMessageEditText.setText("");
                 mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
@@ -697,6 +705,8 @@ public class MainActivity extends BaseActivity implements
                 .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                        if (isActivityDestroyed())
+                            return;
                         mProgressDialog.setMax((int)taskSnapshot.getTotalByteCount()/1024);
                         mProgressDialog.setProgress((int)taskSnapshot.getBytesTransferred()/1024);
                     }
@@ -704,6 +714,8 @@ public class MainActivity extends BaseActivity implements
                 .addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        if (isActivityDestroyed())
+                            return;
                         // Upload succeeded
 
                         // Get the public download URL
@@ -723,6 +735,8 @@ public class MainActivity extends BaseActivity implements
                 .addOnFailureListener(this, new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
+                        if (isActivityDestroyed())
+                            return;
                         // Upload failed
                         MLog.w(TAG, "uploadFromUri:onFailure", exception);
 
@@ -800,7 +814,7 @@ public class MainActivity extends BaseActivity implements
         mFirebaseAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {
             @Override
             public void onViewHolderPopulated() {
-                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+                mProgressBar.setVisibility(ProgressBar.GONE);
             }
         });
         mFirebaseAdapter.setMessageTextClickedListener(new MessageTextClickedListener() {
@@ -818,8 +832,7 @@ public class MainActivity extends BaseActivity implements
                 int lastVisiblePosition = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
                 // If the recycler view is initially being loaded or the user is at the bottom of the list, scroll
                 // to the bottom of the list to show the newly added message.
-                if (lastVisiblePosition == -1 ||
-                        (positionStart >= (friendlyMessageCount - 1) && lastVisiblePosition == (positionStart - 1))) {
+                if (lastVisiblePosition == -1 || positionStart >= (friendlyMessageCount - 1) && lastVisiblePosition == (positionStart - 1)) {
                     mMessageRecyclerView.scrollToPosition(positionStart);
                 }
                 notifyPagerAdapterDataSetChanged();
@@ -831,6 +844,16 @@ public class MainActivity extends BaseActivity implements
                 notifyPagerAdapterDataSetChanged();
             }
         });
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isActivityDestroyed())
+                    return;
+                if (mProgressBar.getVisibility() == View.VISIBLE) {
+                    mProgressBar.setVisibility(View.GONE);
+                }
+            }
+        },5000);
     }
 
     private Integer userid() {
@@ -849,7 +872,7 @@ public class MainActivity extends BaseActivity implements
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    if (isFinishing())
+                    if (isActivityDestroyed())
                         return;
                     showBottomDialog();
                 }

@@ -74,14 +74,14 @@
                 <android.support.design.widget.FloatingActionButton
                     android:enabled="false"
                     android:id="@+id/attachButton"
-                    android:layout_width="50dip"
-                    android:layout_height="50dip"
-                    android:src="@drawable/ic_add_black_24dp"
+                    android:layout_width="@dimen/send_button_size"
+                    android:layout_height="@dimen/send_button_size"
+                    android:src="@drawable/ic_photo_camera_black_24dp"
                     android:layout_gravity="bottom"
                     android:background="@null"
                     app:rippleColor="@color/colorPrimaryDark"
-                    app:fabSize="auto"
-                    app:useCompatPadding="true"/>
+                    app:useCompatPadding="true"
+                    />
 
                 <EditText
                     android:id="@+id/messageEditText"
@@ -90,7 +90,8 @@
                     android:layout_gravity="center_vertical"
                     android:inputType="textShortMessage|textAutoCorrect|textCapSentences|textMultiLine"
                     android:imeOptions="actionSend|flagNoEnterAction"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1"
+                    android:hint="@string/message_hint"/>
 
                 <!-- at.markushi.ui.CircleButton
                 <at.markushi.ui.CircleButton
@@ -106,14 +107,14 @@
                 <android.support.design.widget.FloatingActionButton
                     android:enabled="false"
                     android:id="@+id/sendButton"
-                    android:layout_width="50dip"
-                    android:layout_height="50dip"
+                    android:layout_width="@dimen/send_button_size"
+                    android:layout_height="@dimen/send_button_size"
                     android:src="@drawable/ic_send_black_24dp"
                     android:layout_gravity="bottom"
                     android:background="@null"
                     app:rippleColor="@color/colorPrimaryDark"
-                    app:fabSize="auto"
-                    app:useCompatPadding="true"/>
+                    app:useCompatPadding="true"
+                    />
 
             </LinearLayout>
 
@@ -125,7 +126,7 @@
 
             <ProgressBar
                 android:id="@+id/progressBar"
-                style="?android:attr/progressBarStyleLarge"
+                style="?android:attr/progressBarStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"

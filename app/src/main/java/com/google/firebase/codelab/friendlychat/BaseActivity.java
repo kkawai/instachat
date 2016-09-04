@@ -25,7 +25,7 @@ public class BaseActivity extends AppCompatActivity {
 
     boolean isActivityDestroyed() {
         if (Build.VERSION.SDK_INT >= 17)
-            return isDestroyed();
+            return isDestroyed() || isFinishing();
         return mIsDestroyed || isFinishing();
     }
 }
