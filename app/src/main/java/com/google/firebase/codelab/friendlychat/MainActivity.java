@@ -17,21 +17,16 @@ package com.google.firebase.codelab.friendlychat;
 
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -74,35 +69,23 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.initech.Constants;
 import com.initech.model.User;
-import com.initech.util.ImageUtils;
-import com.initech.util.LocalFileUtils;
 import com.initech.util.MLog;
 import com.initech.util.Preferences;
 import com.initech.util.ScreenUtil;
 import com.initech.util.StringUtil;
-import com.initech.util.ThreadWrapper;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 
-import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends BaseActivity implements
         GoogleApiClient.OnConnectionFailedListener, FriendlyMessageContainer,
-        EasyPermissions.PermissionCallbacks {
-
-    private static final int MAX_PIC_SIZE_BYTES = 512000;
+        EasyPermissions.PermissionCallbacks, PhotoUploadHelper.PhotoUploadListener {
 
     private static final String TAG = "MainActivity";
 
@@ -111,7 +94,6 @@ public class MainActivity extends BaseActivity implements
     public static final String ANONYMOUS = "anonymous";
     private static final String MESSAGE_SENT_EVENT = "message_sent";
     private String mUsername;
-    private String mPhotoUrl;
     private SharedPreferences mSharedPreferences;
 
     private View mSendButton, mAttachButton;
@@ -130,34 +112,13 @@ public class MainActivity extends BaseActivity implements
     private User mUser;
     private DrawerLayout mDrawerLayout;
     private final Lazy<PagerAdapterHelper> mPagerAdapterHelper = Lazy.attain(this, PagerAdapterHelper.class);
-    private static final int RC_CHOOSE_PICTURE = 103;
-    private static final int RC_TAKE_PICTURE = 101;
-    private static final int RC_STORAGE_PERMS = 102;
-
-    private static final String KEY_FILE_PATH = "key_file_path";
-    private static final String KEY_FILE_URI = "key_file_uri";
-    private static final String KEY_DOWNLOAD_URL = "key_download_url";
 
     private BroadcastReceiver mDownloadReceiver;
     private ProgressDialog mProgressDialog;
 
-    private Uri mDownloadUrl = null;
-    private Uri mFileUri = null;
-    private File mFile = null;
-
     // [START declare_ref]
     private StorageReference mStorageRef;
-
-    @Override
-    public void onSaveInstanceState(Bundle out) {
-        super.onSaveInstanceState(out);
-        if (mFileUri != null)
-            out.putParcelable(KEY_FILE_URI, mFileUri);
-        if (mDownloadUrl != null)
-            out.putParcelable(KEY_DOWNLOAD_URL, mDownloadUrl);
-        if (mFile != null)
-            out.putString(KEY_FILE_PATH, mFile.getAbsolutePath());
-    }
+    private PhotoUploadHelper mPhotoUploadHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,6 +129,7 @@ public class MainActivity extends BaseActivity implements
         }
         super.onCreate(savedInstanceState);
 
+
         DataBindingUtil.setContentView(this, R.layout.activity_main);
         setupDrawer();
         setupToolbar();
@@ -175,13 +137,6 @@ public class MainActivity extends BaseActivity implements
         mUsername = ANONYMOUS;
 
         // Restore instance state
-        if (savedInstanceState != null) {
-            mFileUri = savedInstanceState.getParcelable(KEY_FILE_URI);
-            mDownloadUrl = savedInstanceState.getParcelable(KEY_DOWNLOAD_URL);
-            if (savedInstanceState.containsKey(KEY_FILE_PATH)) {
-                mFile = new File(savedInstanceState.getString(KEY_FILE_PATH));
-            }
-        }
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -195,7 +150,6 @@ public class MainActivity extends BaseActivity implements
         } else {
             final String photo = Preferences.getInstance(this).getUser().getProfilePicUrl();
             if (photo != null) {
-                mPhotoUrl = photo;
                 MLog.i(TAG, "photo url: " + photo);
             }
             mUsername = Preferences.getInstance(this).getUsername();
@@ -268,19 +222,22 @@ public class MainActivity extends BaseActivity implements
             }
         });
 
-        initDownloadReceiver();
+        //initDownloadReceiver();
         initButtons();
+        mPhotoUploadHelper = new PhotoUploadHelper(this);
+        mPhotoUploadHelper.setPhotoUploadListener(this);
+        mPhotoUploadHelper.setStorageRefString("photos");
     }
 
     @Override
     public void onStart() {
         super.onStart();
         // Register download receiver
-        LocalBroadcastManager.getInstance(this)
-                .registerReceiver(mDownloadReceiver, MyDownloadService.getIntentFilter());
+        //LocalBroadcastManager.getInstance(this)
+        //        .registerReceiver(mDownloadReceiver, MyDownloadService.getIntentFilter());
     }
 
-    private void beginDownload() {
+    /*private void beginDownload() {
         // Get path
         String path = "photos/" + mFileUri.getLastPathSegment();
 
@@ -292,7 +249,7 @@ public class MainActivity extends BaseActivity implements
 
         // Show loading spinner
         showProgressDialog();
-    }
+    }*/
 
     private void showMessageDialog(String title, String message) {
         AlertDialog ad = new AlertDialog.Builder(this)
@@ -318,7 +275,7 @@ public class MainActivity extends BaseActivity implements
         }
     }
 
-    private void initDownloadReceiver() {
+    /*private void initDownloadReceiver() {
         mDownloadReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -343,7 +300,7 @@ public class MainActivity extends BaseActivity implements
                 }
             }
         };
-    }
+    }*/
 
     private void initButtons() {
         mSendButton = findViewById(R.id.sendButton);
@@ -398,7 +355,7 @@ public class MainActivity extends BaseActivity implements
         super.onStop();
 
         // Unregister download receiver
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadReceiver);
+        //LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadReceiver);
     }
 
     @Override
@@ -408,6 +365,7 @@ public class MainActivity extends BaseActivity implements
         }
         super.onDestroy();
         mPagerAdapterHelper.get().setListener(null);
+        mPhotoUploadHelper.cleanup();
     }
 
     @Override
@@ -436,7 +394,6 @@ public class MainActivity extends BaseActivity implements
                 //mFirebaseUser = null;
                 Preferences.getInstance(this).saveUser(null);
                 mUsername = ANONYMOUS;
-                mPhotoUrl = null;
                 startActivity(new Intent(this, SignInActivity.class));
                 finish();
                 return true;
@@ -447,7 +404,7 @@ public class MainActivity extends BaseActivity implements
                 openFullScreenTextView(-1);
                 return true;
             case R.id.download:
-                beginDownload();
+                //beginDownload();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -496,8 +453,8 @@ public class MainActivity extends BaseActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
-
+        MLog.d(TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
+        mPhotoUploadHelper.onActivityResult(requestCode,resultCode,data);
         if (requestCode == REQUEST_INVITE) {
             if (resultCode == RESULT_OK) {
                 // Use Firebase Measurement to log that invitation was sent.
@@ -506,7 +463,7 @@ public class MainActivity extends BaseActivity implements
 
                 // Check how many invitations were sent and log.
                 String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
-                Log.d(TAG, "Invitations sent: " + ids.length);
+                MLog.d(TAG, "Invitations sent: " + ids.length);
             } else {
                 // Use Firebase Measurement to log that invitation was not sent
                 Bundle payload = new Bundle();
@@ -514,49 +471,10 @@ public class MainActivity extends BaseActivity implements
                 mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SHARE, payload);
 
                 // Sending failed or it was canceled, show failure message to the user
-                Log.d(TAG, "Failed to send invitation.");
-            }
-        } else if (requestCode == RC_TAKE_PICTURE) {
-            if (resultCode == RESULT_OK) {
-                if (mFileUri != null) {
-                    reducePhotoSize(null);
-                }
-            }
-        } else if (requestCode == RC_CHOOSE_PICTURE) {
-            if (resultCode == RESULT_OK) {
-                if (mFileUri != null) {
-                    reducePhotoSize(data.getData());
-                }
+                MLog.d(TAG, "Failed to send invitation.");
             }
         }
-    }
 
-    private void reducePhotoSize(final Uri uri) {
-        ThreadWrapper.executeInWorkerThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-
-                    if (uri != null) {
-                        LocalFileUtils.copyFile(MainActivity.this, uri, mFile);
-                    }
-
-                    final Bitmap bitmap = ImageUtils.getBitmap(MainActivity.this, mFileUri, MAX_PIC_SIZE_BYTES);
-                    ImageUtils.writeBitmapToFile(bitmap, mFile);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (isActivityDestroyed())
-                                return;
-                            uploadFromUri(mFileUri);
-                        }
-                    });
-                } catch (final Exception e) {
-                    MLog.e(TAG, "reducePhotoSize() failed", e);
-                    showPhotoReduceError();
-                }
-            }
-        });
     }
 
     private void showPhotoReduceError() {
@@ -568,7 +486,6 @@ public class MainActivity extends BaseActivity implements
                 Toast.makeText(MainActivity.this, "Could not read photo", Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     /**
@@ -578,12 +495,12 @@ public class MainActivity extends BaseActivity implements
     private void applyRetrievedLengthLimit() {
         Long friendly_msg_length = mFirebaseRemoteConfig.getLong("friendly_msg_length");
         mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(friendly_msg_length.intValue())});
-        Log.d(TAG, "FML is: " + friendly_msg_length);
+        MLog.d(TAG, "FML is: " + friendly_msg_length);
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+        MLog.d(TAG, "onConnectionFailed:" + connectionResult);
     }
 
     private void setupToolbar() {
@@ -687,123 +604,6 @@ public class MainActivity extends BaseActivity implements
     public void onPermissionsDenied(int requestCode, List<String> perms) {
     }
 
-    private void uploadFromUri(Uri fileUri) {
-        MLog.d(TAG, "uploadFromUri:src:" + fileUri.toString());
-
-        // [START get_child_ref]
-        // Get a reference to store file at photos/<FILENAME>.jpg
-        final StorageReference photoRef = mStorageRef.child("photos")
-                .child(fileUri.getLastPathSegment());
-        // [END get_child_ref]
-
-        // Upload file to Firebase Storage
-        // [START_EXCLUDE]
-        showProgressDialog();
-        // [END_EXCLUDE]
-        MLog.d(TAG, "uploadFromUri:dst:" + photoRef.getPath());
-        photoRef.putFile(fileUri)
-                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                        if (isActivityDestroyed())
-                            return;
-                        mProgressDialog.setMax((int)taskSnapshot.getTotalByteCount()/1024);
-                        mProgressDialog.setProgress((int)taskSnapshot.getBytesTransferred()/1024);
-                    }
-                })
-                .addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        if (isActivityDestroyed())
-                            return;
-                        // Upload succeeded
-
-                        // Get the public download URL
-                        mDownloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
-                        final String photoId = mFileUri.getLastPathSegment();
-                        FriendlyMessage friendlyMessage = new FriendlyMessage(null, mUsername,
-                                userid(), mDownloadUrl.toString(), photoId, System.currentTimeMillis());
-                        MLog.d(TAG, "uploadFromUri:onSuccess photoId: " + photoId);
-                        mFirebaseDatabaseReference.child(Constants.MESSAGES_CHILD).push().setValue(friendlyMessage);
-
-                        // [START_EXCLUDE]
-                        hideProgressDialog();
-                        //updateUI(mAuth.getCurrentUser());
-                        // [END_EXCLUDE]
-                    }
-                })
-                .addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        if (isActivityDestroyed())
-                            return;
-                        // Upload failed
-                        MLog.w(TAG, "uploadFromUri:onFailure", exception);
-
-                        mDownloadUrl = null;
-
-                        // [START_EXCLUDE]
-                        hideProgressDialog();
-                        Toast.makeText(MainActivity.this, "Error: upload failed",
-                                Toast.LENGTH_SHORT).show();
-                        //updateUI(mAuth.getCurrentUser());
-                        // [END_EXCLUDE]
-                    }
-                });
-    }
-
-    @AfterPermissionGranted(RC_STORAGE_PERMS)
-    private void launchCamera(boolean isChoose) {
-        Log.d(TAG, "launchCamera");
-
-        // Check that we have permission to read images from external storage.
-        if (!isChoose) {
-            String perm = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-            if (!EasyPermissions.hasPermissions(this, perm)) {
-                EasyPermissions.requestPermissions(this, getString(R.string.rationale_storage),
-                        RC_STORAGE_PERMS, perm);
-                return;
-            }
-        } else {
-            String perm = android.Manifest.permission.READ_EXTERNAL_STORAGE;
-            if (!EasyPermissions.hasPermissions(this, perm)) {
-                EasyPermissions.requestPermissions(this, getString(R.string.rationale_storage),
-                        RC_STORAGE_PERMS, perm);
-                return;
-            }
-        }
-
-        // Choose file storage location, must be listed in res/xml/file_paths.xml
-        File dir = new File(Environment.getExternalStorageDirectory() + "/photos");
-        mFile = new File(dir, UUID.randomUUID().toString() + ".jpg");
-        try {
-            // Create directory if it does not exist.
-            if (!dir.exists()) {
-                dir.mkdir();
-            }
-            boolean created = mFile.createNewFile();
-            Log.d(TAG, "file.createNewFile:" + mFile.getAbsolutePath() + ":" + created);
-        } catch (IOException e) {
-            Log.e(TAG, "file.createNewFile" + mFile.getAbsolutePath() + ":FAILED", e);
-        }
-
-        // Create content:// URI for file, required since Android N
-        // See: https://developer.android.com/reference/android/support/v4/content/FileProvider.html
-        mFileUri = FileProvider.getUriForFile(this,
-                "com.google.firebase.quickstart.firebasestorage.fileprovider", mFile);
-
-        if (!isChoose) {
-            // Create and launch the intent
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mFileUri);
-            startActivityForResult(takePictureIntent, RC_TAKE_PICTURE);
-        } else {
-            final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("image/*");
-            startActivityForResult(Intent.createChooser(intent, "Select Picture"), RC_CHOOSE_PICTURE);
-        }
-    }
-
     private void initFirebaseAdapter() {
         mFirebaseAdapter = new MyFirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder>(
                 FriendlyMessage.class,
@@ -844,6 +644,8 @@ public class MainActivity extends BaseActivity implements
                 notifyPagerAdapterDataSetChanged();
             }
         });
+        //don't show initial indeterminate progress more than 5 seconds
+        //no matter how long it takes to pull messages from firebase
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -880,7 +682,6 @@ public class MainActivity extends BaseActivity implements
         } else {
             showBottomDialog();
         }
-
     }
 
     private void showBottomDialog() {
@@ -891,14 +692,68 @@ public class MainActivity extends BaseActivity implements
                     @Override
                     public void onBottomSheetItemClick(final MenuItem item) {
                         if (item.getItemId() == R.id.menu_take_photo) {
-                            launchCamera(false);
+                            mPhotoUploadHelper.launchCamera(false);
                         } else if (item.getItemId() == R.id.menu_choose_photo) {
-                            launchCamera(true);
+                            mPhotoUploadHelper.launchCamera(true);
                         }
                     }
                 })
                 .createDialog();
 
         dialog.show();
+    }
+
+    @Override
+    public void onErrorReducingPhotoSize() {
+        if (isActivityDestroyed())
+            return;
+        showPhotoReduceError();
+    }
+
+    @Override
+    public void onPhotoUploadStarted() {
+        if (isActivityDestroyed())
+            return;
+        showProgressDialog();
+    }
+
+    @Override
+    public void onPhotoUploadProgress(int max, int current) {
+        if (isActivityDestroyed())
+            return;
+        if (mProgressDialog != null) {
+            try {
+                mProgressDialog.setMax(max);
+                mProgressDialog.setProgress(current);
+            }catch(Exception e) {
+                MLog.e(TAG,"set photo upload progress failed ",e);
+            }
+        }
+    }
+
+    @Override
+    public void onPhotoUploadSuccess(Uri imageUrl) {
+        if (isActivityDestroyed())
+            return;
+
+        // Get the public download URL
+        final String photoId = imageUrl.getLastPathSegment();
+        FriendlyMessage friendlyMessage = new FriendlyMessage(null, mUsername,
+                userid(), imageUrl.toString(), photoId, System.currentTimeMillis());
+        MLog.d(TAG, "uploadFromUri:onSuccess photoId: " + photoId);
+        mFirebaseDatabaseReference.child(Constants.MESSAGES_CHILD).push().setValue(friendlyMessage);
+
+        hideProgressDialog();
+    }
+
+    @Override
+    public void onPhotoUploadError(Exception exception) {
+        if (isActivityDestroyed())
+            return;
+        MLog.e(TAG, "onPhotoUploadError() ", exception);
+
+        hideProgressDialog();
+        Toast.makeText(MainActivity.this, R.string.error_send_photo,
+                Toast.LENGTH_SHORT).show();
     }
 }

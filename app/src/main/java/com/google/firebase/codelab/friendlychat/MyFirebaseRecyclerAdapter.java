@@ -2,6 +2,7 @@ package com.google.firebase.codelab.friendlychat;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -25,7 +26,7 @@ import java.lang.ref.WeakReference;
 /**
  * Created by kevin on 8/23/2016.
  */
-public class MyFirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> extends FirebaseRecyclerAdapter<com.google.firebase.codelab.friendlychat.FriendlyMessage, com.google.firebase.codelab.friendlychat.MessageViewHolder> {
+public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> extends FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> {
 
     public static final String TAG = "MyFirebaseRecyclerAdapter";
 
