@@ -44,11 +44,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ath.fuel.FuelInjector;
 import com.ath.fuel.Lazy;
+import com.bumptech.glide.Glide;
 import com.github.rubensousa.bottomsheetbuilder.BottomSheetBuilder;
 import com.github.rubensousa.bottomsheetbuilder.BottomSheetMenuDialog;
 import com.github.rubensousa.bottomsheetbuilder.adapter.BottomSheetItemClickListener;
@@ -110,7 +113,6 @@ public class MainActivity extends BaseActivity implements
     //private GoogleApiClient mGoogleApiClient;
     private User mUser;
     private DrawerLayout mDrawerLayout;
-    private final Lazy<PagerAdapterHelper> mPagerAdapterHelper = Lazy.attain(this, PagerAdapterHelper.class);
 
     private BroadcastReceiver mDownloadReceiver;
     private ProgressDialog mProgressDialog;
@@ -127,7 +129,6 @@ public class MainActivity extends BaseActivity implements
             savedInstanceState.remove("android:support:fragments");
         }
         super.onCreate(savedInstanceState);
-
 
         DataBindingUtil.setContentView(this, R.layout.activity_main);
         setupDrawer();
@@ -352,19 +353,18 @@ public class MainActivity extends BaseActivity implements
     @Override
     public void onStop() {
         super.onStop();
-
         // Unregister download receiver
         //LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadReceiver);
     }
 
     @Override
     public void onDestroy() {
+        mPhotoUploadHelper.cleanup();
+        mFirebaseAdapter.cleanup();
         if (mAdView != null) {
             mAdView.destroy();
         }
         super.onDestroy();
-        mPagerAdapterHelper.get().setListener(null);
-        mPhotoUploadHelper.cleanup();
     }
 
     @Override
@@ -512,13 +512,6 @@ public class MainActivity extends BaseActivity implements
     }
 
     private void setupDrawer() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        final ActionBar ab = getSupportActionBar();
-        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
-        ab.setDisplayHomeAsUpEnabled(true);
-
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -537,6 +530,20 @@ public class MainActivity extends BaseActivity implements
                         return true;
                     }
                 });
+        View headerLayout = navigationView.getHeaderView(0); // 0-index header
+        final TextView email = (TextView)headerLayout.findViewById(R.id.nav_email);
+        final TextView username = (TextView)headerLayout.findViewById(R.id.nav_username);
+        final ImageView navpic = (ImageView)headerLayout.findViewById(R.id.nav_pic);
+        if (email != null) {
+            email.setText(Preferences.getInstance(this).getEmail());
+            username.setText(Preferences.getInstance(this).getUsername());
+            Glide.with(this)
+                    .load(Constants.DP_URL(Preferences.getInstance(this).getUserId()))
+                    .error(R.drawable.ic_account_circle_black_36dp)
+                    .crossFade()
+                    .into(navpic);
+        }
+
     }
 
     @Override

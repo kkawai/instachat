@@ -5,4 +5,6 @@
     <dimen name="sign_in_button_widths">200dp</dimen>
 
     <dimen name="send_button_size">48dp</dimen>
+    <dimen name="nav_header_profile_pic_size">72dp</dimen>
+    <dimen name="message_thumb_pic_size">36dp</dimen>
 </resources>

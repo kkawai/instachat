@@ -155,4 +155,9 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
         }
         return s.substring(0, limit) + "...";
     }
+
+    public void cleanup() {
+        if (mActivity != null)
+            mActivity.clear();
+    }
 }
