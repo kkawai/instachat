@@ -66,8 +66,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.initech.Constants;
 import com.initech.MyApp;
 import com.initech.model.User;
@@ -90,7 +88,6 @@ public class MainActivity extends BaseActivity implements
 
     private static final int REQUEST_INVITE = 1;
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 140;
-    public static final String ANONYMOUS = "anonymous";
     private static final String MESSAGE_SENT_EVENT = "message_sent";
     private SharedPreferences mSharedPreferences;
 
@@ -113,7 +110,6 @@ public class MainActivity extends BaseActivity implements
     private ProgressDialog mProgressDialog;
 
     // [START declare_ref]
-    private StorageReference mStorageRef;
     private PhotoUploadHelper mPhotoUploadHelper;
     private DrawerHelper mDrawerHelper;
 
@@ -135,7 +131,6 @@ public class MainActivity extends BaseActivity implements
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
-        mStorageRef = FirebaseStorage.getInstance().getReference();
         User me = Preferences.getInstance(this).getUser();
         if (me == null) {
             // Not signed in, launch the Sign In activity
@@ -215,7 +210,7 @@ public class MainActivity extends BaseActivity implements
         initButtons();
         mPhotoUploadHelper = new PhotoUploadHelper(this);
         mPhotoUploadHelper.setPhotoUploadListener(this);
-        mPhotoUploadHelper.setStorageRefString("photos");
+        mPhotoUploadHelper.setStorageRefString(Constants.PHOTOS_CHILD);
     }
 
     @Override
@@ -720,14 +715,13 @@ public class MainActivity extends BaseActivity implements
     }
 
     @Override
-    public void onPhotoUploadSuccess(Uri imageUrl) {
+    public void onPhotoUploadSuccess(String photoId, String photoUrl) {
         if (isActivityDestroyed())
             return;
 
         // Get the public download URL
-        final String photoId = imageUrl.getLastPathSegment();
-        FriendlyMessage friendlyMessage = new FriendlyMessage(null, username(),
-                userid(), imageUrl.toString(), photoId, System.currentTimeMillis());
+        FriendlyMessage friendlyMessage = new FriendlyMessage("", username(),
+                userid(), photoUrl, photoId, System.currentTimeMillis());
         MLog.d(TAG, "uploadFromUri:onSuccess photoId: " + photoId);
         mFirebaseDatabaseReference.child(Constants.MESSAGES_CHILD).push().setValue(friendlyMessage);
 

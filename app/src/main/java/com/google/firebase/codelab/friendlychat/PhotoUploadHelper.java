@@ -58,7 +58,7 @@ public class PhotoUploadHelper {
         void onErrorReducingPhotoSize();
         void onPhotoUploadStarted();
         void onPhotoUploadProgress(int max, int current);
-        void onPhotoUploadSuccess(Uri imageUrl);
+        void onPhotoUploadSuccess(String photoId, String photoUrl);
         void onPhotoUploadError(Exception exception);
     }
 
@@ -177,7 +177,7 @@ public class PhotoUploadHelper {
         MLog.d(TAG, "uploadFromUri:src:" + fileUri.toString());
 
         final StorageReference photoRef = mStorageRef.child(mStorageRefString)
-                .child(fileUri.getLastPathSegment());
+                .child(mFileUri.getLastPathSegment());
 
         mListener.onPhotoUploadStarted();
 
@@ -197,7 +197,7 @@ public class PhotoUploadHelper {
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         if (isActivityDestroyed())
                             return;
-                        mListener.onPhotoUploadSuccess(taskSnapshot.getMetadata().getDownloadUrl());
+                        mListener.onPhotoUploadSuccess(mFileUri.getLastPathSegment(),taskSnapshot.getDownloadUrl().toString());
                     }
                 })
                 .addOnFailureListener(mActivity, new OnFailureListener() {

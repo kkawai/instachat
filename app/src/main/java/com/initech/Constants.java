@@ -133,7 +133,9 @@ public final class Constants {
     /**
      * Firebase database constants
      */
+    public static final String PHOTOS_CHILD = "photos";
     public static final String MESSAGES_CHILD = "messages";
     public static final int MAX_PIC_SIZE_BYTES = 512000;
     public static final int MAX_THUMBNAIL_SIZE_BYTES = 250000;
+
 }

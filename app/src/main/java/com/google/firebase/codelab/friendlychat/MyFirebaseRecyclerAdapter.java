@@ -76,14 +76,14 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
             @Override
             public boolean onLongClick(View view) {
                 new ThemedAlertDialog.Builder(view.getContext())
-                        .setMessage(MyApp.getInstance().getString(R.string.delete_message_question) + " (" + limitString(getItem(holder.getAdapterPosition()).getText(), 15) + ")")
+                        .setMessage(MyApp.getInstance().getString(R.string.delete_message_question) + limitString(getItem(holder.getAdapterPosition()).getText(), 15))
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(final DialogInterface dialog, final int which) {
                                 final com.google.firebase.codelab.friendlychat.FriendlyMessage msg = getItem(holder.getAdapterPosition());
                                 MLog.d(TAG, " msg.getImageUrl(): " + msg.getImageUrl() + " " + msg.getImageId());
                                 if (msg.getImageUrl() != null && msg.getImageId() != null) {
-                                    final StorageReference photoRef = mStorageRef.child("photos")
+                                    final StorageReference photoRef = mStorageRef.child(Constants.PHOTOS_CHILD)
                                             .child(msg.getImageId());
                                     photoRef.delete();
                                     MLog.d(TAG, "deleted photo " + msg.getImageId());
@@ -110,8 +110,10 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
     protected void populateViewHolder(com.google.firebase.codelab.friendlychat.MessageViewHolder viewHolder, com.google.firebase.codelab.friendlychat.FriendlyMessage friendlyMessage, int position) {
 
         mAdapterPopulateHolderListener.onViewHolderPopulated();
-        if (friendlyMessage.getText() != null)
+        if (StringUtil.isNotEmpty(friendlyMessage.getText()))
             viewHolder.messageTextView.setText(friendlyMessage.getText());
+        else
+            viewHolder.messageTextView.setText("");
         viewHolder.messengerTextView.setText(friendlyMessage.getName());
         if (friendlyMessage.getTime() != 0) {
             viewHolder.messageTimeTextView.setVisibility(View.VISIBLE);
@@ -150,10 +152,13 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
     }
 
     private String limitString(final String s, final int limit) {
-        if (s == null || s.length() <= limit) {
-            return s;
+        if (StringUtil.isEmpty(s)) {
+            return "";
         }
-        return s.substring(0, limit) + "...";
+        if (s.length() <= limit) {
+            return " ("+s+")";
+        }
+        return " ("+ s.substring(0, limit) + "...)";
     }
 
     public void cleanup() {
