@@ -109,6 +109,14 @@ public final class NetworkApi {
         MyApp.getInstance().getRequestQueue().add(request);
     }
 
+    public static void forgotPassword(final Object tag, final String usernameOrEmail, final Response.Listener<String> responder, Response.ErrorListener errorListener) {
+        final HashMap<String,String> params = new HashMap<>(1);
+        params.put("emun", usernameOrEmail);
+        final ApiPostRequest request = new ApiPostRequest(params, Constants.API_BASE_URL + "/fgp", responder, errorListener);
+        request.setTag(tag);
+        MyApp.getInstance().getRequestQueue().add(request);
+    }
+
     public static void uploadMyPhotoToS3(final User user) {
 
         ThreadWrapper.executeInWorkerThread(new Runnable() {

@@ -41,6 +41,10 @@
             android:name=".SignUpActivity"
             android:screenOrientation="portrait"/>
 
+        <activity
+            android:name=".ForgotPasswordActivity"
+            android:screenOrientation="portrait"/>
+
         <service
             android:name=".MyFirebaseMessagingService"
             android:exported="false">

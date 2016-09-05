@@ -71,6 +71,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         passwordLayout = (TextInputLayout) findViewById(R.id.input_password_layout);
         emailLayout = (TextInputLayout) findViewById(R.id.input_email_layout);
         findViewById(R.id.sign_in_with_email_button).setOnClickListener(this);
+        findViewById(R.id.forgot_password).setOnClickListener(this);
 
         // Assign fields
         findViewById(R.id.sign_in_with_google_textview).setOnClickListener(this);
@@ -186,6 +187,9 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                 break;
             case R.id.sign_up_button:
                 signUp();
+                break;
+            case R.id.forgot_password:
+                startActivity(new Intent(this,ForgotPasswordActivity.class));
                 break;
             default:
                 return;

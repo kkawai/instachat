@@ -63,7 +63,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="13dp"
-                android:text="@string/forgot_password"
+                android:text="@string/forgot_your_password"
                 android:textColor="#0095c4"
                 />
 

@@ -8,7 +8,11 @@
     <string name="contacts_permission_rationale">Access to account information is required to sign in.</string>
     <string name="invite_menu_label">Invite</string>
     <string name="sign_in">Log In</string>
-    <string name="forgot_password">Forgot your password?</string>
+    <string name="forgot_your_password">Forgot your password?</string>
+    <string name="forgot_password">Forgot Password</string>
+    <string name="please_enter_username_or_email">Please enter username or email address</string>
+    <string name="information_emailed">Information has been emailed</string>
+    <string name="find">Find</string>
     <string name="login_with_google">Log in with Google</string>
     <string name="delete_message_question">Delete message?</string>
     <string name="sign_in_with_google">Sign In with Google</string>
