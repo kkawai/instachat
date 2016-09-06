@@ -6,23 +6,20 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.initech.Constants;
+import com.initech.api.FileUploadApi;
+import com.initech.api.NetworkApi;
 import com.initech.api.UploadListener;
+import com.initech.model.User;
 import com.initech.util.ImageUtils;
 import com.initech.util.LocalFileUtils;
 import com.initech.util.MLog;
+import com.initech.util.Preferences;
 import com.initech.util.ThreadWrapper;
 
 import java.io.File;
@@ -36,27 +33,18 @@ import pub.devrel.easypermissions.EasyPermissions;
  * Created by kevin on 9/4/2016.
  * Helps upload a single file to a destination
  */
-public class PhotoUploadHelper {
-    private static final String TAG = "PhotoUploadHelper";
-    private static final int RC_CHOOSE_PICTURE = 103;
-    private static final int RC_TAKE_PICTURE = 101;
-    private static final int RC_STORAGE_PERMS = 102;
+public class ProfilePicUploadHelper {
+    private static final String TAG = "ProfilePicUploadHelper";
+    private static final int RC_CHOOSE_PICTURE = 203;
+    private static final int RC_TAKE_PICTURE = 201;
+    private static final int RC_STORAGE_PERMS = 202;
     private Uri mFileUri = null;
     private File mFile = null;
     private Activity mActivity;
     private UploadListener mListener;
-    private StorageReference mStorageRef;
-    private DatabaseReference mFirebaseDatabaseReference;
-    private String mStorageRefString;
 
-    PhotoUploadHelper(Activity context) {
+    ProfilePicUploadHelper(Activity context) {
         mActivity = context;
-        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
-        mStorageRef = FirebaseStorage.getInstance().getReference();
-    }
-
-    public void setStorageRefString(String ref) {
-        mStorageRefString = ref;
     }
 
     public void setPhotoUploadListener(UploadListener listener) {
@@ -91,7 +79,7 @@ public class PhotoUploadHelper {
 
         // Choose file storage location, must be listed in res/xml/file_paths.xml
         File dir = new File(Environment.getExternalStorageDirectory() + "/photos");
-        mFile = new File(dir, UUID.randomUUID().toString() + ".jpg");
+        mFile = new File(dir, "me.jpg");
         try {
             // Create directory if it does not exist.
             if (!dir.exists()) {
@@ -146,18 +134,9 @@ public class PhotoUploadHelper {
                         LocalFileUtils.copyFile(mActivity, uri, mFile);
                     }
 
-                    final Bitmap bitmap = ImageUtils.getBitmap(mActivity, mFileUri, Constants.MAX_PIC_SIZE_BYTES);
+                    final Bitmap bitmap = ImageUtils.getBitmap(mActivity, mFileUri, Constants.MAX_PROFILE_PIC_SIZE_BYTES);
                     ImageUtils.writeBitmapToFile(bitmap, mFile);
-                    if (isActivityDestroyed())
-                        return;
-                    mActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (isActivityDestroyed())
-                                return;
-                            uploadFromUri(mFileUri);
-                        }
-                    });
+                    uploadFromUri(mFile);
                 } catch (final Exception e) {
                     MLog.e(TAG, "reducePhotoSize() failed", e);
                     mListener.onErrorReducingPhotoSize();
@@ -166,41 +145,33 @@ public class PhotoUploadHelper {
         });
     }
 
-    private void uploadFromUri(Uri fileUri) {
-        MLog.d(TAG, "uploadFromUri:src:" + fileUri.toString());
-
-        final StorageReference photoRef = mStorageRef.child(mStorageRefString)
-                .child(mFileUri.getLastPathSegment());
-
-        mListener.onPhotoUploadStarted();
-
-        MLog.d(TAG, "uploadFromUri:dst:" + photoRef.getPath());
-        photoRef.putFile(fileUri)
-                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                        if (isActivityDestroyed())
-                            return;
-                        mListener.onPhotoUploadProgress((int)taskSnapshot.getTotalByteCount()/1024,
-                                (int)taskSnapshot.getBytesTransferred()/1024);
-                    }
-                })
-                .addOnSuccessListener(mActivity, new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        if (isActivityDestroyed())
-                            return;
-                        mListener.onPhotoUploadSuccess(mFileUri.getLastPathSegment(),taskSnapshot.getDownloadUrl().toString());
-                    }
-                })
-                .addOnFailureListener(mActivity, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        if (isActivityDestroyed())
-                            return;
-                        mListener.onPhotoUploadError(exception);
-                    }
-                });
+    private void uploadFromUri(final File file) {
+        try {
+            if (isActivityDestroyed())
+                return;
+            final String dpid = UUID.randomUUID().toString();
+            final String dp = "dp_"+Preferences.getInstance(mActivity).getUserId()+"_"+dpid;
+            new FileUploadApi().postFileToS3(file, dp, Constants.AMAZON_BUCKET_DP_IC, mListener);
+            if (isActivityDestroyed())
+                return;
+            final User user = Preferences.getInstance(mActivity).getUser();
+            user.setProfilePicUrl(dpid);
+            Preferences.getInstance(mActivity).saveUser(user);
+            NetworkApi.saveUser(null, user, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    MLog.d(TAG, "saveUser() success via uploadFromUri(): "+response);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    MLog.e(TAG, "saveUser() failed via uploadFromUri() ", error);
+                }
+            });
+        } catch (Exception e) {
+            MLog.e(TAG, "postFileToS3() failed", e);
+            mListener.onPhotoUploadError(e);
+        }
     }
 
     private boolean isActivityDestroyed() {

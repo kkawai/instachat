@@ -1,5 +1,7 @@
 package com.initech.api;
 
+import android.support.v4.util.Pair;
+
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.event.ProgressEvent;
 import com.amazonaws.event.ProgressListener;
@@ -7,6 +9,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.initech.Constants;
 import com.initech.util.HttpMessage;
+import com.initech.util.ThreadWrapper;
 
 import org.json.JSONObject;
 
@@ -14,58 +17,95 @@ import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class FileUploadApi {
 
     private static final String TAG = FileUploadApi.class.getSimpleName();
-    private static final int CHUNK_SIZE = 32000;
+    private static final int CHUNK_SIZE = 8024;
 
     /**
      * Posts a potentially large file to an intermediary server, which then
      * posts it to S3.
-     * <p>
+     * <p/>
      * BLOCKING! Must call within thread.
      *
      * @param file
-     * @param transmissionStatus
+     * @param uploadListener
      * @throws Exception
      */
-    public String postFileToS3(final File file, final String filename, final String targetBucket, final FileTransmissionStatus transmissionStatus)
+    public String postFileToS3(final File file, final String filename, final String targetBucket, UploadListener uploadListener)
             throws Exception {
 
-        try {
-            final JSONObject remoteSettings = NetworkApi.getRemoteSettings();
-            final String a = remoteSettings.getString("a");
-            final String s = remoteSettings.getString("s");
-            //MLog.i(TAG, "amz s: "+ InstagramApp.sAmzSecKey + " a: " + InstagramApp.sAmzAccKey);
-            final AmazonS3Client s3Client = new AmazonS3Client(new BasicAWSCredentials(a, s));
-            final PutObjectRequest request = new PutObjectRequest(targetBucket, filename, file);
+        final UploadListener listener = uploadListener != null ? uploadListener : new UploadListener() {
+            @Override
+            public void onErrorReducingPhotoSize() {
 
-            if (transmissionStatus != null) {
-
-                transmissionStatus.initialize();
-                transmissionStatus.setTotalSize((int) file.length());
-
-                request.setGeneralProgressListener(new ProgressListener() {
-
-                    @Override
-                    public void progressChanged(final ProgressEvent progressEvent) {
-
-                        transmissionStatus.increment((int) progressEvent.getBytesTransferred());
-                        transmissionStatus.updateProgress();
-                    }
-                });
             }
+
+            @Override
+            public void onPhotoUploadStarted() {
+
+            }
+
+            @Override
+            public void onPhotoUploadProgress(int max, int current) {
+
+            }
+
+            @Override
+            public void onPhotoUploadSuccess(String photoId, String photoUrl) {
+
+            }
+
+            @Override
+            public void onPhotoUploadError(Exception exception) {
+
+            }
+        };
+
+        ThreadWrapper.executeInUiThread(new Runnable() {
+            @Override
+            public void run() {
+                listener.onPhotoUploadStarted();
+            }
+        });
+
+        try {
+            final Pair<String,String> pair = NetworkApi.pair();
+            //MLog.i(TAG, "amz s: "+ InstagramApp.sAmzSecKey + " a: " + InstagramApp.sAmzAccKey);
+            final AmazonS3Client s3Client = new AmazonS3Client(new BasicAWSCredentials(pair.first, pair.second));
+            final PutObjectRequest request = new PutObjectRequest(targetBucket, filename, file);
+            final AtomicInteger counter = new AtomicInteger(0);
+            request.setGeneralProgressListener(new ProgressListener() {
+
+                @Override
+                public void progressChanged(final ProgressEvent progressEvent) {
+                    ThreadWrapper.executeInUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            counter.set(counter.intValue()+(int)progressEvent.getBytesTransferred());
+                            listener.onPhotoUploadProgress((int) file.length()/1024, counter.intValue()/1024);
+                        }
+                    });
+                }
+            });
             s3Client.putObject(request);
+            ThreadWrapper.executeInUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    listener.onPhotoUploadSuccess(filename, null);
+                }
+            });
             return filename;
 
         } catch (final Throwable t) {
-            return postFileToS3Old(file, filename, targetBucket, transmissionStatus);
+            return postFileToS3Fallback(file, filename, targetBucket, listener);
         }
 
     }
 
-    private String postFileToS3Old(final File file, final String filename, final String targetBucket, FileTransmissionStatus fileTransmissionStatus)
+    private String postFileToS3Fallback(final File file, final String filename, final String targetBucket, final UploadListener listener)
             throws Exception {
 
         RandomAccessFile fis = null;
@@ -75,12 +115,6 @@ public final class FileUploadApi {
 
             final Map<String, String> request = new HashMap<String, String>(20);
 
-            if (fileTransmissionStatus == null) {
-                fileTransmissionStatus = new FileTransmissionStatus();
-            }
-            fileTransmissionStatus.initialize();
-            fileTransmissionStatus.setTotalSize((int) file.length());
-
             final byte[] bytes = new byte[CHUNK_SIZE];
 
             fis = new RandomAccessFile(file, "r");
@@ -89,17 +123,17 @@ public final class FileUploadApi {
 
                 request.clear();
 
-                final boolean first = fileTransmissionStatus.getCurrentProgress() == 0;
+                final boolean first = total == 0;
 
-                fis.seek(fileTransmissionStatus.getCurrentProgress());
+                fis.seek(total);
                 final int read = fis.read(bytes, 0, CHUNK_SIZE);
                 total = total + read;
-                boolean done = false;
+                boolean isReadAllBytes = false;
 
                 byte[] filepart = null;
 
                 if (total == fis.length()) {
-                    done = true;
+                    isReadAllBytes = true;
                 }
 
                 if (read < CHUNK_SIZE) {
@@ -111,9 +145,7 @@ public final class FileUploadApi {
                     filepart = bytes;
                 }
 
-                fileTransmissionStatus.increment(read);
-
-                if (done) {
+                if (isReadAllBytes) {
                     request.put("done", "1");
                 }
                 if (first) {
@@ -123,18 +155,30 @@ public final class FileUploadApi {
 
                 request.put("bucket", targetBucket);
 
-                if (done) {
+                if (isReadAllBytes) {
                     fis.close();
                 }
 
                 final JSONObject response = new JSONObject(post(Constants.API_BASE_URL + "/sfile", request, "filepart", filepart));
 
+                final int finalTotal = total;
+                ThreadWrapper.executeInUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        listener.onPhotoUploadProgress((int) file.length()/1024, finalTotal/1024);
+                    }
+                });
+
                 response.getString("status").equals("OK");
 
-                fileTransmissionStatus.updateProgress();
-
-                if (done) {
+                if (isReadAllBytes) {
                     key = response.getJSONObject("data").getString("key");
+                    ThreadWrapper.executeInUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.onPhotoUploadSuccess(filename, null);
+                        }
+                    });
                     break;
                 }
             } // while

@@ -1,5 +1,7 @@
 package com.initech.util;
 
+import android.util.Log;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,7 +30,8 @@ public class MLog {
 
     public static void d(String tag, Object... vals) {
         if (isEnabled(tag)) {
-            Logger.getLogger(tag).log(Level.FINE, buildString(vals));
+            //Logger.getLogger(tag).log(Level.FINE, buildString(vals));
+            Log.d(tag,buildString(vals));
         }
     }
 

@@ -17,7 +17,6 @@ import com.google.firebase.storage.StorageReference;
 import com.initech.Constants;
 import com.initech.MyApp;
 import com.initech.util.MLog;
-import com.initech.util.Preferences;
 import com.initech.util.StringUtil;
 import com.initech.view.ThemedAlertDialog;
 
@@ -138,7 +137,7 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
         }
 
         Glide.with(mActivity.get())
-                .load(Constants.DP_URL(Preferences.getInstance(mActivity.get()).getUserId()))
+                .load(Constants.DP_URL(friendlyMessage.getUserid(),friendlyMessage.getDpid()))
                 .error(R.drawable.ic_account_circle_black_36dp)
                 .into(viewHolder.messengerImageView);
 

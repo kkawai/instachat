@@ -1,39 +1,33 @@
 package com.initech.api;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.net.Uri;
+import android.support.v4.util.Pair;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
-import com.bumptech.glide.Glide;
-import com.google.common.io.Files;
 import com.initech.Constants;
 import com.initech.MyApp;
 import com.initech.model.User;
 import com.initech.util.Base64;
 import com.initech.util.HttpMessage;
-import com.initech.util.ImageUtils;
 import com.initech.util.LocalFileUtils;
 import com.initech.util.MLog;
 import com.initech.util.Preferences;
 import com.initech.util.ThreadWrapper;
 
-import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * Created by kevin on 7/22/2016.
  */
 public final class NetworkApi {
+
+    private static Pair<String,String> sPair=null;
 
     private static final String TAG = "NetworkApi";
 
@@ -44,9 +38,18 @@ public final class NetworkApi {
             DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 
+    public static Pair pair() {
+        if (sPair == null) {
+            getRemoteSettings();
+        }
+        return sPair;
+    }
+
     public static JSONObject getRemoteSettings() {
         try {
-            return new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/settings").getString()).getJSONObject("data");
+            final JSONObject r = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/settings").getString()).getJSONObject("data");
+            sPair = new Pair<>(r.getString("a"),r.getString("s"));
+            return r;
         } catch (final Exception e) {
             MLog.e(TAG, "remote settings failed", e);
             return null;
@@ -125,12 +128,14 @@ public final class NetworkApi {
                 try {
                     final File file = new File(MyApp.getInstance().getCacheDir().getPath() + "/me.jpg");
                     LocalFileUtils.downloadFile(user.getProfilePicUrl(),file,null,null);
-                    new FileUploadApi().postFileToS3(file, "dp_"+user.getId(), Constants.AMAZON_BUCKET_DP_IC, null);
-                    user.setProfilePicUrl("http://"+Constants.AMAZON_BUCKET_DP_IC+".s3.amazonaws.com/dp_"+user.getId());
+                    final String dpid = UUID.randomUUID().toString();
+                    final String dp = "dp_"+user.getId()+"_"+dpid;
+                    new FileUploadApi().postFileToS3(file, dp, Constants.AMAZON_BUCKET_DP_IC, null);
+                    user.setProfilePicUrl(dpid);
+                    Preferences.getInstance(MyApp.getInstance()).saveUser(user);
                     saveUser(null, user, new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Preferences.getInstance(MyApp.getInstance()).saveUser(user);
                         }
                     }, new Response.ErrorListener() {
                         @Override

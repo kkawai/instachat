@@ -20,7 +20,6 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -68,6 +67,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.initech.Constants;
 import com.initech.MyApp;
+import com.initech.api.UploadListener;
 import com.initech.model.User;
 import com.initech.util.MLog;
 import com.initech.util.Preferences;
@@ -82,7 +82,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends BaseActivity implements
         GoogleApiClient.OnConnectionFailedListener, FriendlyMessageContainer,
-        EasyPermissions.PermissionCallbacks, PhotoUploadHelper.PhotoUploadListener {
+        EasyPermissions.PermissionCallbacks, UploadListener {
 
     private static final String TAG = "MainActivity";
 
@@ -111,6 +111,7 @@ public class MainActivity extends BaseActivity implements
 
     // [START declare_ref]
     private PhotoUploadHelper mPhotoUploadHelper;
+    private ProfilePicUploadHelper mProfilePicUploadHelper;
     private DrawerHelper mDrawerHelper;
 
     @Override
@@ -123,6 +124,7 @@ public class MainActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
 
         DataBindingUtil.setContentView(this, R.layout.activity_main);
+        initPhotoHelper();
         setupDrawer();
         setupToolbar();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -205,12 +207,15 @@ public class MainActivity extends BaseActivity implements
             public void afterTextChanged(Editable editable) {
             }
         });
-
         //initDownloadReceiver();
         initButtons();
+    }
+
+    private void initPhotoHelper() {
         mPhotoUploadHelper = new PhotoUploadHelper(this);
         mPhotoUploadHelper.setPhotoUploadListener(this);
-        mPhotoUploadHelper.setStorageRefString(Constants.PHOTOS_CHILD);
+        mProfilePicUploadHelper = new ProfilePicUploadHelper(this);
+        mProfilePicUploadHelper.setPhotoUploadListener(this);
     }
 
     @Override
@@ -297,7 +302,7 @@ public class MainActivity extends BaseActivity implements
                     return;
                 }
                 FriendlyMessage friendlyMessage = new FriendlyMessage(text, username(),
-                        userid(), null, null, System.currentTimeMillis());
+                        userid(), dpid(), null, null, System.currentTimeMillis());
                 mFirebaseDatabaseReference.child(Constants.MESSAGES_CHILD).push().setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -344,6 +349,7 @@ public class MainActivity extends BaseActivity implements
     @Override
     public void onDestroy() {
         mPhotoUploadHelper.cleanup();
+        mProfilePicUploadHelper.cleanup();
         mFirebaseAdapter.cleanup();
         mDrawerHelper.cleanup();
         if (mAdView != null) {
@@ -439,6 +445,7 @@ public class MainActivity extends BaseActivity implements
         super.onActivityResult(requestCode, resultCode, data);
         MLog.d(TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
         mPhotoUploadHelper.onActivityResult(requestCode,resultCode,data);
+        mProfilePicUploadHelper.onActivityResult(requestCode,resultCode,data);
         if (requestCode == REQUEST_INVITE) {
             if (resultCode == RESULT_OK) {
                 // Use Firebase Measurement to log that invitation was sent.
@@ -515,7 +522,7 @@ public class MainActivity extends BaseActivity implements
                         return true;
                     }
                 });
-        mDrawerHelper = new DrawerHelper(this,mDrawerLayout);
+        mDrawerHelper = new DrawerHelper(this,mDrawerLayout,mProfilePicUploadHelper);
         mDrawerHelper.setup(navigationView);
     }
 
@@ -641,6 +648,10 @@ public class MainActivity extends BaseActivity implements
         return Preferences.getInstance(MainActivity.this).getUserId();
     }
 
+    private String dpid() {
+        return Preferences.getInstance(MainActivity.this).getUser().getProfilePicUrl();
+    }
+
     private String username() {
         return Preferences.getInstance(MainActivity.this).getUsername();
     }
@@ -675,8 +686,10 @@ public class MainActivity extends BaseActivity implements
                     @Override
                     public void onBottomSheetItemClick(final MenuItem item) {
                         if (item.getItemId() == R.id.menu_take_photo) {
+                            mPhotoUploadHelper.setStorageRefString(Constants.PHOTOS_CHILD);
                             mPhotoUploadHelper.launchCamera(false);
                         } else if (item.getItemId() == R.id.menu_choose_photo) {
+                            mPhotoUploadHelper.setStorageRefString(Constants.PHOTOS_CHILD);
                             mPhotoUploadHelper.launchCamera(true);
                         }
                     }
@@ -688,6 +701,7 @@ public class MainActivity extends BaseActivity implements
 
     @Override
     public void onErrorReducingPhotoSize() {
+        MLog.i(TAG, "onErrorReducingPhotoSize()");
         if (isActivityDestroyed())
             return;
         showPhotoReduceError();
@@ -695,6 +709,7 @@ public class MainActivity extends BaseActivity implements
 
     @Override
     public void onPhotoUploadStarted() {
+        MLog.i(TAG, "onPhotoUploadStarted()");
         if (isActivityDestroyed())
             return;
         showProgressDialog();
@@ -702,6 +717,7 @@ public class MainActivity extends BaseActivity implements
 
     @Override
     public void onPhotoUploadProgress(int max, int current) {
+        MLog.i(TAG, "onPhotoUploadProgress() "+current + " / " + max);
         if (isActivityDestroyed())
             return;
         if (mProgressDialog != null) {
@@ -716,24 +732,32 @@ public class MainActivity extends BaseActivity implements
 
     @Override
     public void onPhotoUploadSuccess(String photoId, String photoUrl) {
-        if (isActivityDestroyed())
+        if (isActivityDestroyed()) {
             return;
+        }
+        hideProgressDialog();
+        if (photoUrl == null) {
+            /*
+             * must have uploaded a new profile pic since these will not
+             * have a newly generated photoUrl, only a display pic id
+             * in S3
+             */
+            mDrawerHelper.updateProfilePic(photoId);
+            return;
+        }
 
         // Get the public download URL
         FriendlyMessage friendlyMessage = new FriendlyMessage("", username(),
-                userid(), photoUrl, photoId, System.currentTimeMillis());
+                userid(), dpid(), photoUrl, photoId, System.currentTimeMillis());
         MLog.d(TAG, "uploadFromUri:onSuccess photoId: " + photoId);
         mFirebaseDatabaseReference.child(Constants.MESSAGES_CHILD).push().setValue(friendlyMessage);
-
-        hideProgressDialog();
     }
 
     @Override
     public void onPhotoUploadError(Exception exception) {
+        MLog.i(TAG, "onPhotoUploadError() ", exception);
         if (isActivityDestroyed())
             return;
-        MLog.e(TAG, "onPhotoUploadError() ", exception);
-
         hideProgressDialog();
         Toast.makeText(MainActivity.this, R.string.error_send_photo,
                 Toast.LENGTH_SHORT).show();

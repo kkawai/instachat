@@ -29,6 +29,7 @@ public class FriendlyMessage implements Parcelable{
     private String id;
     private String text;
     private String name;
+    private String dpid;
     private int userid;
     private String imageUrl;
     private String imageId;
@@ -37,13 +38,14 @@ public class FriendlyMessage implements Parcelable{
     public FriendlyMessage() {
     }
 
-    public FriendlyMessage(String text, String name, int userid, String imageUrl, String imageId, long time) {
+    public FriendlyMessage(String text, String name, int userid, String dpid, String imageUrl, String imageId, long time) {
         this.text = text;
         this.name = name;
         this.time = time;
         this.userid = userid;
         this.imageUrl = imageUrl;
         this.imageId = imageId;
+        this.dpid = dpid;
     }
 
     public static final Parcelable.Creator<FriendlyMessage> CREATOR = new Parcelable.Creator<FriendlyMessage>() {
@@ -66,6 +68,7 @@ public class FriendlyMessage implements Parcelable{
             imageId = o.optString("imageId");
             text = o.optString("text");
             id = o.getString("id");
+            dpid = o.optString("dpid");
         }catch(final Exception e) {
             MLog.e(TAG,"",e);
         }
@@ -91,6 +94,9 @@ public class FriendlyMessage implements Parcelable{
             if (imageId != null) {
                 o.put("imageId",imageId);
             }
+            if (dpid != null) {
+                o.put("dpid",dpid);
+            }
             parcel.writeString(o.toString());
         }catch (Exception e) {
             MLog.e(TAG,"",e);
@@ -109,32 +115,20 @@ public class FriendlyMessage implements Parcelable{
         return text;
     }
 
-    public void setText(String text) {
-        this.text = text;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getImageUrl() {
         return imageUrl;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public void setUserid(int userid) {
-        this.userid = userid;
-    }
-
     public int getUserid() {
         return userid;
+    }
+
+    public String getDpid() {
+        return dpid;
     }
 
     public long getTime() {
