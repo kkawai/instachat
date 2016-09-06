@@ -1,4 +1,4 @@
-package com.google.firebase.codelab.friendlychat;
+package com.initech.font;
 
 /**
  * Created by kevin on 8/6/2016.

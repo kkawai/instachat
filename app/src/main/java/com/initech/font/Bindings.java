@@ -1,4 +1,4 @@
-package com.google.firebase.codelab.friendlychat;
+package com.initech.font;
 
 import android.databinding.BindingAdapter;
 import android.widget.TextView;

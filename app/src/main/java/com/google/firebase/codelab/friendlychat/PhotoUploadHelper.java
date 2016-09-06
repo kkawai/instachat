@@ -12,8 +12,6 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -46,12 +44,10 @@ public class PhotoUploadHelper {
     private Activity mActivity;
     private UploadListener mListener;
     private StorageReference mStorageRef;
-    private DatabaseReference mFirebaseDatabaseReference;
     private String mStorageRefString;
 
     PhotoUploadHelper(Activity context) {
         mActivity = context;
-        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
     }
 

@@ -1,4 +1,4 @@
-package com.google.firebase.codelab.friendlychat;
+package com.google.firebase.codelab.friendlychat.adapter;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -9,6 +9,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.codelab.friendlychat.R;
+import com.google.firebase.codelab.friendlychat.model.FriendlyMessage;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -52,12 +54,12 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
     }
 
     @Override
-    public com.google.firebase.codelab.friendlychat.MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final com.google.firebase.codelab.friendlychat.MessageViewHolder holder = super.onCreateViewHolder(parent, viewType);
+    public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        final MessageViewHolder holder = super.onCreateViewHolder(parent, viewType);
         holder.messengerImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                final com.google.firebase.codelab.friendlychat.FriendlyMessage msg = getItem(holder.getAdapterPosition());
+                final FriendlyMessage msg = getItem(holder.getAdapterPosition());
                 Toast.makeText(v.getContext(), "clicked on profile: " + msg.getName() + " said: " + msg.getText(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -79,7 +81,7 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(final DialogInterface dialog, final int which) {
-                                final com.google.firebase.codelab.friendlychat.FriendlyMessage msg = getItem(holder.getAdapterPosition());
+                                final FriendlyMessage msg = getItem(holder.getAdapterPosition());
                                 MLog.d(TAG, " msg.getImageUrl(): " + msg.getImageUrl() + " " + msg.getImageId());
                                 if (msg.getImageUrl() != null && msg.getImageId() != null) {
                                     final StorageReference photoRef = mStorageRef.child(Constants.PHOTOS_CHILD)
@@ -106,7 +108,7 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
     }
 
     @Override
-    protected void populateViewHolder(com.google.firebase.codelab.friendlychat.MessageViewHolder viewHolder, com.google.firebase.codelab.friendlychat.FriendlyMessage friendlyMessage, int position) {
+    protected void populateViewHolder(MessageViewHolder viewHolder, FriendlyMessage friendlyMessage, int position) {
 
         mAdapterPopulateHolderListener.onViewHolderPopulated();
         if (StringUtil.isNotEmpty(friendlyMessage.getText()))
@@ -144,8 +146,8 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
     }
 
     @Override
-    protected com.google.firebase.codelab.friendlychat.FriendlyMessage parseSnapshot(DataSnapshot snapshot) {
-        com.google.firebase.codelab.friendlychat.FriendlyMessage friendlyMessage = super.parseSnapshot(snapshot);
+    protected FriendlyMessage parseSnapshot(DataSnapshot snapshot) {
+        FriendlyMessage friendlyMessage = super.parseSnapshot(snapshot);
         friendlyMessage.setId(snapshot.getKey());
         return friendlyMessage;
     }

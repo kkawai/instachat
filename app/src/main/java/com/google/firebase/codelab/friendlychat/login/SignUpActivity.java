@@ -1,4 +1,4 @@
-package com.google.firebase.codelab.friendlychat;
+package com.google.firebase.codelab.friendlychat.login;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -16,6 +15,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.codelab.friendlychat.MainActivity;
+import com.google.firebase.codelab.friendlychat.R;
 import com.initech.MyApp;
 import com.initech.api.NetworkApi;
 import com.initech.model.User;

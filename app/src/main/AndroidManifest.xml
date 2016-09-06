@@ -24,7 +24,7 @@
         </activity>
 
         <activity
-            android:name=".FirstActivity"
+            android:name=".login.FirstActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -34,19 +34,19 @@
         </activity>
 
         <activity
-            android:name=".SignInActivity"
+            android:name=".login.SignInActivity"
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".SignUpActivity"
+            android:name=".login.SignUpActivity"
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".ForgotPasswordActivity"
+            android:name=".login.ForgotPasswordActivity"
             android:screenOrientation="portrait"/>
 
         <service
-            android:name=".MyFirebaseMessagingService"
+            android:name=".messaging.MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
@@ -62,7 +62,7 @@
         </service>
 
         <service
-            android:name=".MyDownloadService"
+            android:name=".download.MyDownloadService"
             android:exported="false"/>
 
         <!--

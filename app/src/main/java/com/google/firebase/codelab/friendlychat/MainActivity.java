@@ -60,6 +60,14 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.codelab.friendlychat.adapter.AdapterPopulateHolderListener;
+import com.google.firebase.codelab.friendlychat.adapter.MessageTextClickedListener;
+import com.google.firebase.codelab.friendlychat.adapter.MessageViewHolder;
+import com.google.firebase.codelab.friendlychat.adapter.MyFirebaseRecyclerAdapter;
+import com.google.firebase.codelab.friendlychat.fullscreen.FriendlyMessageContainer;
+import com.google.firebase.codelab.friendlychat.fullscreen.FullScreenTextFragment;
+import com.google.firebase.codelab.friendlychat.login.SignInActivity;
+import com.google.firebase.codelab.friendlychat.model.FriendlyMessage;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -572,7 +580,7 @@ public class MainActivity extends BaseActivity implements
     }
 
     @Override
-    public void setCurrentPosition(int position) {
+    public void setCurrentFriendlyMessage(int position) {
         mMessageRecyclerView.scrollToPosition(position + 1);
     }
 

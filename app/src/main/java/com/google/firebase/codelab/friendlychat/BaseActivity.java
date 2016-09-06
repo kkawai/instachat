@@ -23,7 +23,7 @@ public class BaseActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    boolean isActivityDestroyed() {
+    protected boolean isActivityDestroyed() {
         if (Build.VERSION.SDK_INT >= 17)
             return isDestroyed() || isFinishing();
         return mIsDestroyed || isFinishing();

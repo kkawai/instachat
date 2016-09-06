@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.firebase.codelab.friendlychat;
+package com.google.firebase.codelab.friendlychat.login;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.firebase.codelab.friendlychat.BaseActivity;
+import com.google.firebase.codelab.friendlychat.R;
 import com.initech.MyApp;
 import com.initech.api.NetworkApi;
-import com.initech.model.User;
 import com.initech.util.ActivityUtil;
 import com.initech.util.MLog;
 import com.initech.util.Preferences;

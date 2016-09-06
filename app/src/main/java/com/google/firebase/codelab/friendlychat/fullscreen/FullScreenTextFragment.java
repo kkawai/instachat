@@ -1,4 +1,4 @@
-package com.google.firebase.codelab.friendlychat;
+package com.google.firebase.codelab.friendlychat.fullscreen;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ath.fuel.FuelInjector;
+import com.google.firebase.codelab.friendlychat.R;
 import com.initech.Constants;
 import com.initech.util.MLog;
 
@@ -92,6 +93,6 @@ public class FullScreenTextFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mFriendlyMessageContainer.setCurrentPosition(mLastPos);
+        mFriendlyMessageContainer.setCurrentFriendlyMessage(mLastPos);
     }
 }

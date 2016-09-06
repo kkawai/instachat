@@ -1,9 +1,11 @@
-package com.google.firebase.codelab.friendlychat;
+package com.google.firebase.codelab.friendlychat.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.firebase.codelab.friendlychat.R;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 

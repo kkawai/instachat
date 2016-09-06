@@ -1,4 +1,4 @@
-package com.google.firebase.codelab.friendlychat;
+package com.google.firebase.codelab.friendlychat.fullscreen;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.codelab.friendlychat.model.FriendlyMessage;
+import com.google.firebase.codelab.friendlychat.R;
 import com.initech.Constants;
 import com.initech.util.MLog;
 import com.initech.util.ScreenUtil;
