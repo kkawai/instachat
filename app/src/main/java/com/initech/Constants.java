@@ -140,5 +140,6 @@ public final class Constants {
     public static final String MESSAGES_CHILD = "messages";
     public static final int MAX_PIC_SIZE_BYTES = 512000;
     public static final int MAX_PROFILE_PIC_SIZE_BYTES = 400000;
+    public static final float MAX_FULLSCREEN_FONT_SIZE = 199f;
 
 }

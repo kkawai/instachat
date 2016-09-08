@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import com.ath.fuel.FuelInjector;
 import com.google.firebase.codelab.friendlychat.R;
+import com.google.firebase.codelab.friendlychat.model.FriendlyMessage;
 import com.initech.Constants;
 import com.initech.util.MLog;
 
@@ -63,6 +64,8 @@ public class FullScreenTextFragment extends Fragment {
             @Override
             public void onPageSelected(int position) {
                 mLastPos = position;
+                FriendlyMessage friendlyMessage = mFriendlyMessageContainer.getFriendlyMessage(position);
+                MLog.d(TAG,"onPageSelected: "+position + " " + friendlyMessage);
             }
 
             @Override

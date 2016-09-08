@@ -36,9 +36,19 @@ public class FullscreenTextSubFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mFriendlyMessage = getArguments().getParcelable(Constants.KEY_FRIENDLY_MESSAGE);
         final AutoResizeTextView textView = (AutoResizeTextView) getView().findViewById(R.id.textView);
+        //textView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         textView.setText(mFriendlyMessage.getText());
         textView.setMaxLines(Integer.MAX_VALUE);
-        textView.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()), getResources().getDisplayMetrics()));
+        //float t = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()), getResources().getDisplayMetrics());
+        //textView.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()), getResources().getDisplayMetrics()));
+        //float x = getResources().getDimension(R.dimen.max_fullscreen_text_size);
+        /**
+         * Constants.MAX_FULLSCREEN_FONT_SIZE
+         * This is the max font size due to a bug in android where it can't handle emoji bigger than 199
+         * https://code.google.com/p/android/issues/detail?id=69706  opengl bug, which is quite stupid
+         * to me; they haven't fixed it in over 2 years
+         */
+        textView.setTextSize(Constants.MAX_FULLSCREEN_FONT_SIZE);
         MLog.i(TAG, "onActivityCreated(): " + mFriendlyMessage.getText() + " textView.height: " + textView.getHeight());
     }
 
