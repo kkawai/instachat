@@ -42,6 +42,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -204,10 +206,55 @@ public class MainActivity extends BaseActivity implements
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                final Animation hideAnimation = AnimationUtils.loadAnimation(MainActivity.this,R.anim.fab_scale_down);
+                final Animation showAnimation = AnimationUtils.loadAnimation(MainActivity.this,R.anim.fab_scale_up);
                 if (charSequence.toString().trim().length() > 0) {
-                    mSendButton.setEnabled(true);
+
+                    if (mSendButton.isEnabled())
+                        return; //already enabled
+
+                    hideAnimation.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            mSendButton.setEnabled(true);
+                            mSendButton.startAnimation(showAnimation);
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {
+
+                        }
+                    });
+
+                    mSendButton.startAnimation(hideAnimation);
                 } else {
-                    mSendButton.setEnabled(false);
+
+                    if (!mSendButton.isEnabled()) {
+                        return; //already disabled
+                    }
+                    hideAnimation.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            mSendButton.setEnabled(false);
+                            mSendButton.startAnimation(showAnimation);
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {
+
+                        }
+                    });
+                    mSendButton.startAnimation(hideAnimation);
                 }
             }
 
@@ -345,6 +392,7 @@ public class MainActivity extends BaseActivity implements
         if (mAdView != null) {
             mAdView.resume();
         }
+        mSendButton.setEnabled(mMessageEditText.getText().toString().trim().length() > 0);
     }
 
     @Override
