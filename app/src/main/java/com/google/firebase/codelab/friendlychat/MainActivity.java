@@ -1,12 +1,12 @@
 /**
  * Copyright Google Inc. All Rights Reserved.
- * <p>
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -206,21 +206,40 @@ public class MainActivity extends BaseActivity implements
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                final Animation hideAnimation = AnimationUtils.loadAnimation(MainActivity.this,R.anim.fab_scale_down);
-                final Animation showAnimation = AnimationUtils.loadAnimation(MainActivity.this,R.anim.fab_scale_up);
+                final Animation hideAnimation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.fab_scale_down);
+                final Animation showAnimation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.fab_scale_up);
                 if (charSequence.toString().trim().length() > 0) {
 
                     if (mSendButton.isEnabled())
                         return; //already enabled
 
+                    if (mIsStartedAnimation)
+                        return;
+
                     hideAnimation.setAnimationListener(new Animation.AnimationListener() {
                         @Override
                         public void onAnimationStart(Animation animation) {
-
                         }
 
                         @Override
                         public void onAnimationEnd(Animation animation) {
+
+                            showAnimation.setAnimationListener(new Animation.AnimationListener() {
+                                @Override
+                                public void onAnimationStart(Animation animation) {
+
+                                }
+
+                                @Override
+                                public void onAnimationEnd(Animation animation) {
+                                    mIsStartedAnimation = false;
+                                }
+
+                                @Override
+                                public void onAnimationRepeat(Animation animation) {
+
+                                }
+                            });
                             mSendButton.setEnabled(true);
                             mSendButton.startAnimation(showAnimation);
                         }
@@ -230,13 +249,17 @@ public class MainActivity extends BaseActivity implements
 
                         }
                     });
-
+                    mIsStartedAnimation = true;
                     mSendButton.startAnimation(hideAnimation);
+
                 } else {
 
-                    if (!mSendButton.isEnabled()) {
+                    if (!mSendButton.isEnabled())
                         return; //already disabled
-                    }
+
+                    if (mIsStartedAnimation)
+                        return;
+
                     hideAnimation.setAnimationListener(new Animation.AnimationListener() {
                         @Override
                         public void onAnimationStart(Animation animation) {
@@ -246,6 +269,22 @@ public class MainActivity extends BaseActivity implements
                         @Override
                         public void onAnimationEnd(Animation animation) {
                             mSendButton.setEnabled(false);
+                            showAnimation.setAnimationListener(new Animation.AnimationListener() {
+                                @Override
+                                public void onAnimationStart(Animation animation) {
+
+                                }
+
+                                @Override
+                                public void onAnimationEnd(Animation animation) {
+                                    mIsStartedAnimation = false;
+                                }
+
+                                @Override
+                                public void onAnimationRepeat(Animation animation) {
+
+                                }
+                            });
                             mSendButton.startAnimation(showAnimation);
                         }
 
@@ -254,6 +293,7 @@ public class MainActivity extends BaseActivity implements
 
                         }
                     });
+                    mIsStartedAnimation = true;
                     mSendButton.startAnimation(hideAnimation);
                 }
             }
@@ -265,6 +305,8 @@ public class MainActivity extends BaseActivity implements
         //initDownloadReceiver();
         initButtons();
     }
+
+    private boolean mIsStartedAnimation;
 
     private void initPhotoHelper() {
         mPhotoUploadHelper = new PhotoUploadHelper(this);
@@ -500,8 +542,8 @@ public class MainActivity extends BaseActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         MLog.d(TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
-        mPhotoUploadHelper.onActivityResult(requestCode,resultCode,data);
-        mProfilePicUploadHelper.onActivityResult(requestCode,resultCode,data);
+        mPhotoUploadHelper.onActivityResult(requestCode, resultCode, data);
+        mProfilePicUploadHelper.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_INVITE) {
             if (resultCode == RESULT_OK) {
                 // Use Firebase Measurement to log that invitation was sent.
@@ -578,7 +620,7 @@ public class MainActivity extends BaseActivity implements
                         return true;
                     }
                 });
-        mDrawerHelper = new DrawerHelper(this,mDrawerLayout,mProfilePicUploadHelper);
+        mDrawerHelper = new DrawerHelper(this, mDrawerLayout, mProfilePicUploadHelper);
         mDrawerHelper.setup(navigationView);
     }
 
@@ -697,7 +739,7 @@ public class MainActivity extends BaseActivity implements
                     mProgressBar.setVisibility(View.GONE);
                 }
             }
-        },5000);
+        }, 5000);
     }
 
     private Integer userid() {
@@ -773,15 +815,15 @@ public class MainActivity extends BaseActivity implements
 
     @Override
     public void onPhotoUploadProgress(int max, int current) {
-        MLog.i(TAG, "onPhotoUploadProgress() "+current + " / " + max);
+        MLog.i(TAG, "onPhotoUploadProgress() " + current + " / " + max);
         if (isActivityDestroyed())
             return;
         if (mProgressDialog != null) {
             try {
                 mProgressDialog.setMax(max);
                 mProgressDialog.setProgress(current);
-            }catch(Exception e) {
-                MLog.e(TAG,"set photo upload progress failed ",e);
+            } catch (Exception e) {
+                MLog.e(TAG, "set photo upload progress failed ", e);
             }
         }
     }
