@@ -206,95 +206,10 @@ public class MainActivity extends BaseActivity implements
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                final Animation hideAnimation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.fab_scale_down);
-                final Animation showAnimation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.fab_scale_up);
                 if (charSequence.toString().trim().length() > 0) {
-
-                    if (mSendButton.isEnabled())
-                        return; //already enabled
-
-                    if (mIsStartedAnimation)
-                        return;
-
-                    hideAnimation.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-
-                            showAnimation.setAnimationListener(new Animation.AnimationListener() {
-                                @Override
-                                public void onAnimationStart(Animation animation) {
-
-                                }
-
-                                @Override
-                                public void onAnimationEnd(Animation animation) {
-                                    mIsStartedAnimation = false;
-                                }
-
-                                @Override
-                                public void onAnimationRepeat(Animation animation) {
-
-                                }
-                            });
-                            mSendButton.setEnabled(true);
-                            mSendButton.startAnimation(showAnimation);
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-
-                        }
-                    });
-                    mIsStartedAnimation = true;
-                    mSendButton.startAnimation(hideAnimation);
-
+                    setEnableSendButton(true);
                 } else {
-
-                    if (!mSendButton.isEnabled())
-                        return; //already disabled
-
-                    if (mIsStartedAnimation)
-                        return;
-
-                    hideAnimation.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            mSendButton.setEnabled(false);
-                            showAnimation.setAnimationListener(new Animation.AnimationListener() {
-                                @Override
-                                public void onAnimationStart(Animation animation) {
-
-                                }
-
-                                @Override
-                                public void onAnimationEnd(Animation animation) {
-                                    mIsStartedAnimation = false;
-                                }
-
-                                @Override
-                                public void onAnimationRepeat(Animation animation) {
-
-                                }
-                            });
-                            mSendButton.startAnimation(showAnimation);
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-
-                        }
-                    });
-                    mIsStartedAnimation = true;
-                    mSendButton.startAnimation(hideAnimation);
+                    setEnableSendButton(false);
                 }
             }
 
@@ -307,6 +222,51 @@ public class MainActivity extends BaseActivity implements
     }
 
     private boolean mIsStartedAnimation;
+
+    private void setEnableSendButton(final boolean isEnable) {
+
+        if (isEnable && mSendButton.isEnabled() || !isEnable && !mSendButton.isEnabled() || mIsStartedAnimation)
+            return; //already set
+
+        final Animation hideAnimation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.fab_scale_down);
+        final Animation showAnimation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.fab_scale_up);
+
+        hideAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+
+                showAnimation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        mIsStartedAnimation = false;
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+                mSendButton.startAnimation(showAnimation);
+                mSendButton.setEnabled(isEnable);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mIsStartedAnimation = true;
+        mSendButton.startAnimation(hideAnimation);
+    }
 
     private void initPhotoHelper() {
         mPhotoUploadHelper = new PhotoUploadHelper(this);
