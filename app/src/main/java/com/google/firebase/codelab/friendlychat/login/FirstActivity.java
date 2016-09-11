@@ -18,7 +18,7 @@ public final class FirstActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Preferences.getInstance(this).getUser() != null) {
+        if (Preferences.getInstance().getUser() != null) {
             startActivity(new Intent(this, MainActivity.class));
             finish();
             return;

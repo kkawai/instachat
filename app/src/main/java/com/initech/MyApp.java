@@ -1,13 +1,15 @@
 package com.initech;
 
 import android.app.Application;
-import android.content.res.Configuration;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.ath.fuel.FuelInjector;
 import com.ath.fuel.FuelModule;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.initech.util.HttpMessage;
+import com.initech.util.MLog;
 import com.initech.util.ThreadWrapper;
 
 /**
@@ -17,7 +19,8 @@ public class MyApp extends Application {
 
     private static final String TAG = "MyApp";
     private static MyApp sInstance;
-    private static boolean isAdmSupported;
+    public static boolean isGcmSupported;
+    public static boolean isAdmSupported;
     private RequestQueue mRequestQueue;
     public static double lat;
     public static double lon;
@@ -26,17 +29,14 @@ public class MyApp extends Application {
     public void onCreate() {
         super.onCreate();
         FuelInjector.setDebug(false);
-        FuelInjector.initializeModule(new FuelModule(this){});
+        FuelInjector.initializeModule(new FuelModule(this) {
+        });
         sInstance = this;
         ThreadWrapper.init();
         HttpMessage.initializeSSL();
         initAdm();
+        initGcm();
         initVolley();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
     }
 
     public static MyApp getInstance() {
@@ -52,19 +52,24 @@ public class MyApp extends Application {
         }
     }
 
+    private void initGcm() {
+        isGcmSupported = false;
+        try {
+            final int resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
+            isGcmSupported = resultCode == ConnectionResult.SUCCESS;
+        } catch (final Throwable t) {
+            MLog.e(TAG, "Device does not support GCM", t);
+        }
+    }
+
     public RequestQueue getRequestQueue() {
         return mRequestQueue;
     }
 
-    public boolean isAdmSupported() {
-        return isAdmSupported;
-    }
-
     private void initVolley() {
-		/*
-		 *  init requestQueue
+        /*
+         *  init requestQueue
 		 */
-        this.mRequestQueue = Volley.newRequestQueue(this
-                .getApplicationContext());
+        mRequestQueue = Volley.newRequestQueue(getApplicationContext());
     }
 }

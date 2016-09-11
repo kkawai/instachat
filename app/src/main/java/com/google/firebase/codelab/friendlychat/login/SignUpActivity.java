@@ -188,8 +188,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     MLog.i("test", "savedUser: " + string);
                     if (response.getString("status").equals("OK")) {
                         user.copyFrom(response.getJSONObject("data"), null);
-                        Preferences.getInstance(SignUpActivity.this).saveUser(user);
-                        Preferences.getInstance(SignUpActivity.this).saveLastSignIn(username);
+                        Preferences.getInstance().saveUser(user);
+                        Preferences.getInstance().saveLastSignIn(username);
                         if (photoUrlFromGoogle != null)
                             NetworkApi.uploadMyPhotoToS3(user);
                         createFirebaseAccount();

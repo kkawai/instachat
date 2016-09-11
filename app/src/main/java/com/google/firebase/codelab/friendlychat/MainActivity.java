@@ -1,12 +1,12 @@
 /**
  * Copyright Google Inc. All Rights Reserved.
- * <p/>
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -78,7 +78,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.initech.Constants;
 import com.initech.MyApp;
 import com.initech.api.UploadListener;
-import com.initech.model.User;
+import com.initech.gcm.GCMHelper;
 import com.initech.util.MLog;
 import com.initech.util.Preferences;
 import com.initech.util.ScreenUtil;
@@ -143,13 +143,14 @@ public class MainActivity extends BaseActivity implements
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
-        User me = Preferences.getInstance(this).getUser();
-        if (me == null) {
+        if (!Preferences.getInstance().isLoggedIn()) {
             // Not signed in, launch the Sign In activity
             startActivity(new Intent(this, SignInActivity.class));
             finish();
             return;
         }
+
+        GCMHelper.onCreate(this);
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mMessageRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
@@ -395,6 +396,9 @@ public class MainActivity extends BaseActivity implements
             mAdView.resume();
         }
         mSendButton.setEnabled(mMessageEditText.getText().toString().trim().length() > 0);
+        if (Preferences.getInstance().isLoggedIn()) {
+            GCMHelper.onResume(this);
+        }
     }
 
     @Override
@@ -441,7 +445,8 @@ public class MainActivity extends BaseActivity implements
                 mFirebaseAuth.signOut();
                 //Auth.GoogleSignInApi.signOut(mGoogleApiClient);
                 //mFirebaseUser = null;
-                Preferences.getInstance(this).saveUser(null);
+                GCMHelper.unregister(Preferences.getInstance().getUserId() + "");
+                Preferences.getInstance().saveUser(null);
                 startActivity(new Intent(this, SignInActivity.class));
                 finish();
                 return true;
@@ -703,15 +708,15 @@ public class MainActivity extends BaseActivity implements
     }
 
     private Integer userid() {
-        return Preferences.getInstance(MainActivity.this).getUserId();
+        return Preferences.getInstance().getUserId();
     }
 
     private String dpid() {
-        return Preferences.getInstance(MainActivity.this).getUser().getProfilePicUrl();
+        return Preferences.getInstance().getUser().getProfilePicUrl();
     }
 
     private String username() {
-        return Preferences.getInstance(MainActivity.this).getUsername();
+        return Preferences.getInstance().getUsername();
     }
 
     private void showFileOptions() {

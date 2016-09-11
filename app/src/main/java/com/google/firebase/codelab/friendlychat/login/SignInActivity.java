@@ -86,7 +86,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         // Initialize FirebaseAuth
         mFirebaseAuth = FirebaseAuth.getInstance();
 
-        String lastSignIn = Preferences.getInstance(this).getLastSignIn();
+        String lastSignIn = Preferences.getInstance().getLastSignIn();
         MLog.i(TAG,"lastSignIn ",lastSignIn);
         if (lastSignIn != null) {
             emailLayout.getEditText().setText(lastSignIn);
@@ -129,8 +129,8 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                         final JSONObject data = response.getJSONObject("data");
                         final User user = new User();
                         user.copyFrom(data, null);
-                        Preferences.getInstance(SignInActivity.this).saveUser(user);
-                        Preferences.getInstance(SignInActivity.this).saveLastSignIn(email);
+                        Preferences.getInstance().saveUser(user);
+                        Preferences.getInstance().saveLastSignIn(email);
                         signIntoFirebase(user.getEmail(), password);
                     } else {
                         showErrorToast(R.string.email_password_not_found);
@@ -252,8 +252,8 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                                 NetworkApi.uploadMyPhotoToS3(user);
                             }
                         }
-                        Preferences.getInstance(SignInActivity.this).saveUser(user);
-                        Preferences.getInstance(SignInActivity.this).saveLastSignIn(user.getUsername());
+                        Preferences.getInstance().saveUser(user);
+                        Preferences.getInstance().saveLastSignIn(user.getUsername());
                         signIntoFirebase(user.getEmail(), user.getPassword());
                     } else { //user does not exist
                         final Intent intent = new Intent(SignInActivity.this, SignUpActivity.class);

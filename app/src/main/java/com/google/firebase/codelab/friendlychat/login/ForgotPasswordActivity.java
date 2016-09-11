@@ -51,7 +51,7 @@ public class ForgotPasswordActivity extends BaseActivity implements View.OnClick
         // Set click listeners
         findViewById(R.id.find_account_button).setOnClickListener(this);
 
-        String lastSignIn = Preferences.getInstance(this).getLastSignIn();
+        String lastSignIn = Preferences.getInstance().getLastSignIn();
         MLog.i(TAG, "lastSignIn ", lastSignIn);
         if (lastSignIn != null) {
             emailLayout.getEditText().setText(lastSignIn);

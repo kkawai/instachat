@@ -150,17 +150,17 @@ public class ProfilePicUploadHelper {
             if (isActivityDestroyed())
                 return;
             final String dpid = UUID.randomUUID().toString();
-            final String dp = "dp_"+Preferences.getInstance(mActivity).getUserId()+"_"+dpid;
+            final String dp = "dp_" + Preferences.getInstance().getUserId() + "_" + dpid;
             new FileUploadApi().postFileToS3(file, dp, Constants.AMAZON_BUCKET_DP_IC, mListener);
             if (isActivityDestroyed())
                 return;
-            final User user = Preferences.getInstance(mActivity).getUser();
+            final User user = Preferences.getInstance().getUser();
             user.setProfilePicUrl(dpid);
-            Preferences.getInstance(mActivity).saveUser(user);
+            Preferences.getInstance().saveUser(user);
             NetworkApi.saveUser(null, user, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    MLog.d(TAG, "saveUser() success via uploadFromUri(): "+response);
+                    MLog.d(TAG, "saveUser() success via uploadFromUri(): " + response);
                 }
             }, new Response.ErrorListener() {
                 @Override

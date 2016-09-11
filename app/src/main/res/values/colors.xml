@@ -4,4 +4,10 @@
     <color name="colorPrimaryDark">#6495ed</color> <!-- drawer -->
     <color name="colorAccent">#a8a8a8</color> <!-- button colors -->
     <color name="colorTitle">#ffffff</color>
+
+    <array name="dot_colors">
+        <item>@color/colorPrimaryDark</item>
+        <item>@color/colorPrimary</item>
+        <item>@color/colorAccent</item>
+    </array>
 </resources>

@@ -7,10 +7,38 @@
 
     <!--
     This permission is not required for Firebase Storage and is only used to read
-    files from the camera and upload them to Firebase Storage as a demonstration.
--->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    files from the camera and upload them to Firebase Storage as a demonstration. -->
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <!--
+        This permission ensures that no other application can intercept
+        your ADM messages. -->
+    <permission
+        android:name="com.google.firebase.codelab.friendlychat.permission.RECEIVE_ADM_MESSAGE"
+        android:protectionLevel="signature"/>
+
+    <uses-permission android:name="com.google.firebase.codelab.friendlychat.permission.RECEIVE_ADM_MESSAGE"/>
+
+    <permission
+        android:name="com.google.firebase.codelab.friendlychat.permission.C2D_MESSAGE"
+        android:protectionLevel="signature"/>
+    <uses-permission android:name="com.google.firebase.codelab.friendlychat.permission.C2D_MESSAGE"/>
+
+
+    <!-- This permission allows your app access to receive push notifications from ADM. -->
+    <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE"/>
+
+    <!-- App receives GCM messages. -->
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <!-- GCM connects to Google Services. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- GCM requires a Google account. -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <!-- Keeps the processor from sleeping when a message is received. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
 
     <application
         android:name="com.initech.MyApp"
@@ -61,14 +89,27 @@
             </intent-filter>
         </service>
 
+
+        <receiver
+            android:name="com.initech.gcm.GCMBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <category android:name="com.google.firebase.codelab.friendlychat"/>
+            </intent-filter>
+        </receiver>
+
+        <service android:name="com.initech.gcm.GCMIntentService"/>
+
+
         <service
             android:name=".download.MyDownloadService"
             android:exported="false"/>
 
         <!--
-  Android N SDK has new restrictions around sharing file:// URIs
-  https://developer.android.com/reference/android/support/v4/content/FileProvider.html#ProviderDefinition
--->
+        Android N SDK has new restrictions around sharing file:// URIs
+        https://developer.android.com/reference/android/support/v4/content/FileProvider.html#ProviderDefinition
+        -->
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.google.firebase.quickstart.firebasestorage.fileprovider"
@@ -76,7 +117,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
+                android:resource="@xml/file_paths"/>
         </provider>
 
     </application>

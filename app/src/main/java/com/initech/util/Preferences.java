@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
+import com.initech.MyApp;
 import com.initech.model.User;
 
 import org.json.JSONException;
@@ -25,6 +26,7 @@ public final class Preferences {
     private static final String PREFERENCE_USER_NAME = "user_name";
     private static final String PREFERENCE_EMAIL = "email";
     private static final String PREFERENCE_USER = "user";
+    private static final String PREFERENCE_IS_LOGGED_IN = "is_logged_in";
     private static final String PREFERENCE_LAST_SIGN_IN = "last_sign_in";
     private static final String INSTAGRAM_ACCESS_TOKEN = "accessToken";
     private static final String INSTAGRAM_STORE = "INSTAGRAM_STORE";
@@ -53,20 +55,17 @@ public final class Preferences {
     private static final long TWO_DAYS = 172800000L;
     private static final long HALF_DAY = 43200000L;
     private static String sUniqueID = null;
-    private Context mContext;
     // private final ObjectMapper mObjectMapper;
     private SharedPreferences mPrefs;
     private static Preferences instance;
 
-    public Preferences(Context context) {
-        this.mContext = context;
-        this.mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        // this.mObjectMapper = new ObjectMapper();
+    private Preferences(Context context) {
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    public static Preferences getInstance(final Context context) {
+    public static Preferences getInstance() {
         if (instance == null)
-            instance = new Preferences(context);
+            instance = new Preferences(MyApp.getInstance());
         return instance;
     }
 
@@ -132,19 +131,28 @@ public final class Preferences {
     }
 
     public void clearUser(Editor editor) {
-        editor.remove(PREFERENCE_USER).apply();
+        editor.remove(PREFERENCE_USER)
+                .remove(PREFERENCE_USER_ID)
+                .remove(PREFERENCE_USER_NAME)
+                .remove(PREFERENCE_EMAIL)
+                .remove(PREFERENCE_IS_LOGGED_IN)
+                .apply();
+    }
+
+    public boolean isLoggedIn() {
+        return mPrefs.getBoolean(PREFERENCE_IS_LOGGED_IN, false);
     }
 
     public Integer getUserId() {
-        return this.mPrefs.getInt(PREFERENCE_USER_ID,0);
+        return mPrefs.getInt(PREFERENCE_USER_ID, 0);
     }
 
     public String getUsername() {
-        return this.mPrefs.getString(PREFERENCE_USER_NAME, null);
+        return mPrefs.getString(PREFERENCE_USER_NAME, null);
     }
 
     public String getEmail() {
-        return this.mPrefs.getString(PREFERENCE_EMAIL, null);
+        return mPrefs.getString(PREFERENCE_EMAIL, null);
     }
 
     public User getUser() {
@@ -155,7 +163,7 @@ public final class Preferences {
             JSONObject json = new JSONObject(mPrefs.getString(
                     PREFERENCE_USER, null));
             final User user = new User();
-            user.copyFrom(json,null);
+            user.copyFrom(json, null);
             return user;
         } catch (JSONException e) {
             // e.printStackTrace();
@@ -164,12 +172,12 @@ public final class Preferences {
     }
 
     public void saveLastSignIn(final String lastSignIn) {
-        MLog.i(TAG,"lastSignIn "+lastSignIn);
+        MLog.i(TAG, "lastSignIn " + lastSignIn);
         mPrefs.edit().putString(PREFERENCE_LAST_SIGN_IN, lastSignIn).apply();
     }
 
     public String getLastSignIn() {
-        return mPrefs.getString(PREFERENCE_LAST_SIGN_IN,null);
+        return mPrefs.getString(PREFERENCE_LAST_SIGN_IN, null);
     }
 
     public void saveUser(final User user) {
@@ -177,16 +185,17 @@ public final class Preferences {
         if (user == null) {
             clearUser(editor);
         } else {
-            editor.putString(PREFERENCE_USER, user.toJSON().toString());
-            editor.putInt(PREFERENCE_USER_ID, user.getId());
-            editor.putString(PREFERENCE_USER_NAME, user.getUsername());
-            editor.putString(PREFERENCE_EMAIL, user.getEmail());
+            editor.putBoolean(PREFERENCE_IS_LOGGED_IN, true)
+                    .putString(PREFERENCE_USER, user.toJSON().toString())
+                    .putInt(PREFERENCE_USER_ID, user.getId())
+                    .putString(PREFERENCE_USER_NAME, user.getUsername())
+                    .putString(PREFERENCE_EMAIL, user.getEmail());
         }
         editor.commit();
     }
 
     public String getAccessToken() {
-        final String accessToken = this.mPrefs.getString(
+        final String accessToken = mPrefs.getString(
                 INSTAGRAM_ACCESS_TOKEN, null);
         MLog.i(Preferences.class.getSimpleName(), "Prefences.getAccessToken()="
                 + accessToken);

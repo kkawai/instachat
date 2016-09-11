@@ -68,9 +68,9 @@ public class DrawerHelper {
 
             @Override
             public void onDrawerOpened(View drawerView) {
-                final User user = Preferences.getInstance(mActivity).getUser();
-                email.setText(Preferences.getInstance(mActivity).getEmail());
-                username.setText(Preferences.getInstance(mActivity).getUsername());
+                final User user = Preferences.getInstance().getUser();
+                email.setText(Preferences.getInstance().getEmail());
+                username.setText(Preferences.getInstance().getUsername());
                 Glide.with(mActivity)
                         .load(Constants.DP_URL(user.getId(), user.getProfilePicUrl()))
                         .error(R.drawable.ic_account_circle_black_36dp)
@@ -84,7 +84,7 @@ public class DrawerHelper {
                 if (isActivityDestroyed())
                     return;
 
-                final String existing = Preferences.getInstance(mActivity).getUsername();
+                final String existing = Preferences.getInstance().getUsername();
                 final String newUsername = username.getText().toString();
                 if (existing.equals(newUsername)) {
                     return;
@@ -101,7 +101,7 @@ public class DrawerHelper {
                             return;
                         try {
                             if (!response.getJSONObject("data").getBoolean("exists")) {
-                                final User user = Preferences.getInstance(mActivity).getUser();
+                                final User user = Preferences.getInstance().getUser();
                                 user.setUsername(newUsername);
                                 NetworkApi.saveUser(mActivity, user, new Response.Listener<String>() {
                                     @Override
@@ -114,9 +114,9 @@ public class DrawerHelper {
                                                 String toast = mActivity.getString(R.string.is_your_new_username, newUsername);
                                                 Toast.makeText(mActivity, toast, Toast.LENGTH_SHORT).show();
                                                 user.setUsername(newUsername);
-                                                Preferences.getInstance(mActivity).saveUser(user);
+                                                Preferences.getInstance().saveUser(user);
                                                 username.setText(newUsername);
-                                                Preferences.getInstance(mActivity).saveLastSignIn(newUsername);
+                                                Preferences.getInstance().saveLastSignIn(newUsername);
                                             }
                                         } catch (Exception e) {
                                             username.setText(existing);
