@@ -55,6 +55,7 @@
         />
 
     <de.hdodenhof.circleimageview.CircleImageView
+        android:transitionName="image"
         android:id="@+id/profile_pic"
         android:layout_width="@dimen/profile_pic_width"
         android:layout_height="@dimen/profile_pic_height"

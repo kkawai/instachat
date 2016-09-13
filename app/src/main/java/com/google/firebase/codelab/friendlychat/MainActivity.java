@@ -45,6 +45,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -597,14 +598,8 @@ public class MainActivity extends BaseActivity implements
             mDrawerLayout.closeDrawer(Gravity.LEFT);
             return;
         }
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FullScreenTextFragment.TAG);
-        if (fragment != null) {
-            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
-            return;
-        }
-        fragment = getSupportFragmentManager().findFragmentByTag(FragmentProfile.TAG);
-        if (fragment != null) {
-            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+        if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
+            getSupportFragmentManager().popBackStack();
             return;
         }
         super.onBackPressed();
@@ -620,7 +615,7 @@ public class MainActivity extends BaseActivity implements
         args.putInt(Constants.KEY_STARTING_POS, startingPos);
         fragment.setArguments(args);
         ((FullScreenTextFragment) fragment).setFriendlyMessageContainer(this);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_content, fragment, FullScreenTextFragment.TAG).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_content, fragment, FullScreenTextFragment.TAG).addToBackStack(null).commit();
     }
 
     private void notifyPagerAdapterDataSetChanged() {
@@ -835,8 +830,10 @@ public class MainActivity extends BaseActivity implements
     }
 
     @Override
-    public void onUserThumbClicked(FriendlyMessage message) {
+    public void onUserThumbClicked(ImageView imageView, FriendlyMessage message) {
         Fragment fragment = FragmentProfile.newInstance(message);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_content, fragment, FragmentProfile.TAG).commit();
+        getSupportFragmentManager().beginTransaction()
+                .addSharedElement(imageView, "image")
+                .replace(R.id.fragment_content, fragment, FragmentProfile.TAG).addToBackStack(null).commit();
     }
 }

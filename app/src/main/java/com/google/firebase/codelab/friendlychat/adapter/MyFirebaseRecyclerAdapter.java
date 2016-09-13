@@ -66,7 +66,7 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
             @Override
             public void onClick(final View v) {
                 final FriendlyMessage msg = getItem(holder.getAdapterPosition());
-                mUserThumbClickedListener.onUserThumbClicked(msg);
+                mUserThumbClickedListener.onUserThumbClicked(holder.messengerImageView,msg);
             }
         });
         final View.OnClickListener onClickListener = new View.OnClickListener() {

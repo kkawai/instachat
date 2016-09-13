@@ -1,11 +1,13 @@
 package com.initech.profile;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +32,12 @@ public class FragmentProfile extends BaseFragment {
         Bundle args = new Bundle();
         args.putParcelable(Constants.KEY_FRIENDLY_MESSAGE, message);
         fragment.setArguments(args);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            fragment.setSharedElementEnterTransition(new ProfilePicTransition());
+            fragment.setEnterTransition(new Fade());
+            fragment.setExitTransition(new Fade());
+            fragment.setSharedElementReturnTransition(new ProfilePicTransition());
+        }
         return fragment;
     }
 
