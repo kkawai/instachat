@@ -7,4 +7,8 @@
     <dimen name="send_button_size">32dp</dimen>
     <dimen name="nav_header_profile_pic_size">72dp</dimen>
     <dimen name="message_thumb_pic_size">36dp</dimen>
+
+    <dimen name="profile_pic_width">220dp</dimen>
+    <dimen name="profile_pic_height">220dp</dimen>
+
 </resources>

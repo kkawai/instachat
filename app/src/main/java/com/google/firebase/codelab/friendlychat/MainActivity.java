@@ -66,6 +66,7 @@ import com.google.firebase.codelab.friendlychat.adapter.AdapterPopulateHolderLis
 import com.google.firebase.codelab.friendlychat.adapter.MessageTextClickedListener;
 import com.google.firebase.codelab.friendlychat.adapter.MessageViewHolder;
 import com.google.firebase.codelab.friendlychat.adapter.MyFirebaseRecyclerAdapter;
+import com.google.firebase.codelab.friendlychat.adapter.UserThumbClickedListener;
 import com.google.firebase.codelab.friendlychat.fullscreen.FriendlyMessageContainer;
 import com.google.firebase.codelab.friendlychat.fullscreen.FullScreenTextFragment;
 import com.google.firebase.codelab.friendlychat.login.SignInActivity;
@@ -79,6 +80,7 @@ import com.initech.Constants;
 import com.initech.MyApp;
 import com.initech.api.UploadListener;
 import com.initech.gcm.GCMHelper;
+import com.initech.profile.FragmentProfile;
 import com.initech.util.MLog;
 import com.initech.util.Preferences;
 import com.initech.util.ScreenUtil;
@@ -92,7 +94,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends BaseActivity implements
         GoogleApiClient.OnConnectionFailedListener, FriendlyMessageContainer,
-        EasyPermissions.PermissionCallbacks, UploadListener {
+        EasyPermissions.PermissionCallbacks, UploadListener, UserThumbClickedListener {
 
     private static final String TAG = "MainActivity";
 
@@ -600,6 +602,11 @@ public class MainActivity extends BaseActivity implements
             getSupportFragmentManager().beginTransaction().remove(fragment).commit();
             return;
         }
+        fragment = getSupportFragmentManager().findFragmentByTag(FragmentProfile.TAG);
+        if (fragment != null) {
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+            return;
+        }
         super.onBackPressed();
     }
 
@@ -672,6 +679,7 @@ public class MainActivity extends BaseActivity implements
                 openFullScreenTextView(position);
             }
         });
+        mFirebaseAdapter.setUserThumbClickedListener(this);
         mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
@@ -826,5 +834,9 @@ public class MainActivity extends BaseActivity implements
                 Toast.LENGTH_SHORT).show();
     }
 
-
+    @Override
+    public void onUserThumbClicked(FriendlyMessage message) {
+        Fragment fragment = FragmentProfile.newInstance(message);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_content, fragment, FragmentProfile.TAG).commit();
+    }
 }

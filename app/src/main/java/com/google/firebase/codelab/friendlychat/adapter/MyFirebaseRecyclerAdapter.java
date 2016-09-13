@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -36,6 +35,7 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
     private WeakReference<Activity> mActivity;
     private AdapterPopulateHolderListener mAdapterPopulateHolderListener;
     private MessageTextClickedListener mMessageTextClickedListener;
+    private UserThumbClickedListener mUserThumbClickedListener;
 
     public MyFirebaseRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, DatabaseReference ref) {
         super(modelClass, modelLayout, viewHolderClass, ref);
@@ -46,11 +46,17 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
     public void setActivity(Activity activity) {
         mActivity = new WeakReference<>(activity);
     }
+
     public void setAdapterPopulateHolderListener(AdapterPopulateHolderListener listener) {
         mAdapterPopulateHolderListener = listener;
     }
+
     public void setMessageTextClickedListener(MessageTextClickedListener listener) {
         mMessageTextClickedListener = listener;
+    }
+
+    public void setUserThumbClickedListener(UserThumbClickedListener listener) {
+        mUserThumbClickedListener = listener;
     }
 
     @Override
@@ -60,7 +66,7 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
             @Override
             public void onClick(final View v) {
                 final FriendlyMessage msg = getItem(holder.getAdapterPosition());
-                Toast.makeText(v.getContext(), "clicked on profile: " + msg.getName() + " said: " + msg.getText(), Toast.LENGTH_SHORT).show();
+                mUserThumbClickedListener.onUserThumbClicked(msg);
             }
         });
         final View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -139,7 +145,7 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
         }
 
         Glide.with(mActivity.get())
-                .load(Constants.DP_URL(friendlyMessage.getUserid(),friendlyMessage.getDpid()))
+                .load(Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid()))
                 .error(R.drawable.ic_account_circle_black_36dp)
                 .into(viewHolder.messengerImageView);
 
@@ -157,13 +163,16 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
             return "";
         }
         if (s.length() <= limit) {
-            return " ("+s+")";
+            return " (" + s + ")";
         }
-        return " ("+ s.substring(0, limit) + "...)";
+        return " (" + s.substring(0, limit) + "...)";
     }
 
     public void cleanup() {
         if (mActivity != null)
             mActivity.clear();
+        mUserThumbClickedListener = null;
+        mAdapterPopulateHolderListener = null;
+        mMessageTextClickedListener = null;
     }
 }

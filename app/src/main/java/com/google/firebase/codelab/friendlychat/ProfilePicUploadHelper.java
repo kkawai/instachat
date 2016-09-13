@@ -147,13 +147,11 @@ public class ProfilePicUploadHelper {
 
     private void uploadFromUri(final File file) {
         try {
-            if (isActivityDestroyed())
-                return;
             final String dpid = UUID.randomUUID().toString();
             final String dp = "dp_" + Preferences.getInstance().getUserId() + "_" + dpid;
-            new FileUploadApi().postFileToS3(file, dp, Constants.AMAZON_BUCKET_DP_IC, mListener);
             if (isActivityDestroyed())
                 return;
+            new FileUploadApi().postFileToS3(file, dp, Constants.AMAZON_BUCKET_DP_IC, mListener);
             final User user = Preferences.getInstance().getUser();
             user.setProfilePicUrl(dpid);
             Preferences.getInstance().saveUser(user);
