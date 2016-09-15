@@ -10,7 +10,7 @@
     android:fitsSystemWindows="true"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context="com.google.firebase.codelab.friendlychat.MainActivity">
+    tools:context=".GroupChatActivity">
 
     <!--
     <android.support.design.widget.AppBarLayout

@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import com.google.firebase.codelab.friendlychat.MainActivity;
+import com.google.firebase.codelab.friendlychat.GroupChatActivity;
 import com.google.firebase.codelab.friendlychat.R;
 import com.initech.util.ActivityUtil;
 import com.initech.util.Preferences;
@@ -19,7 +19,7 @@ public final class FirstActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (Preferences.getInstance().getUser() != null) {
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, GroupChatActivity.class));
             finish();
             return;
         }

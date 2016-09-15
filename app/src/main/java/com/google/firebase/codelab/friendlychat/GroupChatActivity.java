@@ -1,25 +1,12 @@
-/**
- * Copyright Google Inc. All Rights Reserved.
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.google.firebase.codelab.friendlychat;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -93,11 +80,11 @@ import java.util.Map;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends BaseActivity implements
+public class GroupChatActivity extends BaseActivity implements
         GoogleApiClient.OnConnectionFailedListener, FriendlyMessageContainer,
         EasyPermissions.PermissionCallbacks, UploadListener, UserThumbClickedListener {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "GroupChatActivity";
 
     private static final int REQUEST_INVITE = 1;
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 140;
@@ -126,6 +113,7 @@ public class MainActivity extends BaseActivity implements
     private PhotoUploadHelper mPhotoUploadHelper;
     private ProfilePicUploadHelper mProfilePicUploadHelper;
     private DrawerHelper mDrawerHelper;
+    private String mDatabaseChild;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,6 +123,14 @@ public class MainActivity extends BaseActivity implements
             savedInstanceState.remove("android:support:fragments");
         }
         super.onCreate(savedInstanceState);
+
+        if (getIntent() != null && getIntent().hasExtra(Constants.KEY_DATABASE_CHILD)) {
+            mDatabaseChild = getIntent().getStringExtra(Constants.KEY_DATABASE_CHILD);
+        } else {
+            mDatabaseChild = Constants.DEFAULT_MESSAGES_CHILD;
+        }
+
+        checkCallingObjectSuitability(this);
 
         DataBindingUtil.setContentView(this, R.layout.activity_main);
         initPhotoHelper();
@@ -232,8 +228,8 @@ public class MainActivity extends BaseActivity implements
         if (isEnable && mSendButton.isEnabled() || !isEnable && !mSendButton.isEnabled() || mIsStartedAnimation)
             return; //already set
 
-        final Animation hideAnimation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.fab_scale_down);
-        final Animation showAnimation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.fab_scale_up);
+        final Animation hideAnimation = AnimationUtils.loadAnimation(GroupChatActivity.this, R.anim.fab_scale_down);
+        final Animation showAnimation = AnimationUtils.loadAnimation(GroupChatActivity.this, R.anim.fab_scale_up);
 
         hideAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -364,7 +360,7 @@ public class MainActivity extends BaseActivity implements
                 }
                 FriendlyMessage friendlyMessage = new FriendlyMessage(text, username(),
                         userid(), dpid(), null, null, System.currentTimeMillis());
-                mFirebaseDatabaseReference.child(Constants.MESSAGES_CHILD).push().setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
+                mFirebaseDatabaseReference.child(mDatabaseChild).push().setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         //AppBarLayout appBarLayout = ((AppBarLayout)findViewById(R.id.appbar));
@@ -540,7 +536,7 @@ public class MainActivity extends BaseActivity implements
             public void run() {
                 if (isActivityDestroyed())
                     return;
-                Toast.makeText(MainActivity.this, "Could not read photo", Toast.LENGTH_SHORT).show();
+                Toast.makeText(GroupChatActivity.this, "Could not read photo", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -649,6 +645,8 @@ public class MainActivity extends BaseActivity implements
 
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
+        mPhotoUploadHelper.onPermissionsGranted(requestCode,perms);
+        mProfilePicUploadHelper.onPermissionsGranted(requestCode,perms);
     }
 
     @Override
@@ -660,7 +658,8 @@ public class MainActivity extends BaseActivity implements
                 FriendlyMessage.class,
                 R.layout.item_message,
                 MessageViewHolder.class,
-                mFirebaseDatabaseReference.child(Constants.MESSAGES_CHILD));
+                mFirebaseDatabaseReference.child(mDatabaseChild));
+        mFirebaseAdapter.setDatabaseChild(mDatabaseChild);
         mFirebaseAdapter.setActivity(this);
         mFirebaseAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {
             @Override
@@ -816,7 +815,7 @@ public class MainActivity extends BaseActivity implements
         FriendlyMessage friendlyMessage = new FriendlyMessage("", username(),
                 userid(), dpid(), photoUrl, photoId, System.currentTimeMillis());
         MLog.d(TAG, "uploadFromUri:onSuccess photoId: " + photoId);
-        mFirebaseDatabaseReference.child(Constants.MESSAGES_CHILD).push().setValue(friendlyMessage);
+        mFirebaseDatabaseReference.child(mDatabaseChild).push().setValue(friendlyMessage);
     }
 
     @Override
@@ -825,7 +824,7 @@ public class MainActivity extends BaseActivity implements
         if (isActivityDestroyed())
             return;
         hideProgressDialog();
-        Toast.makeText(MainActivity.this, R.string.error_send_photo,
+        Toast.makeText(GroupChatActivity.this, R.string.error_send_photo,
                 Toast.LENGTH_SHORT).show();
     }
 
@@ -835,5 +834,24 @@ public class MainActivity extends BaseActivity implements
         getSupportFragmentManager().beginTransaction()
                 .addSharedElement(imageView, "image")
                 .replace(R.id.fragment_content, fragment, FragmentProfile.TAG).addToBackStack(null).commit();
+    }
+
+    private static void checkCallingObjectSuitability(Object object) {
+        // Make sure Object is an Activity or Fragment
+        boolean isActivity = object instanceof Activity;
+        boolean isSupportFragment = object instanceof Fragment;
+        boolean isAppFragment = object instanceof android.app.Fragment;
+        boolean isMinSdkM = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+
+        MLog.d(TAG, "isActivity ", isActivity, " isSupportFragment ", isSupportFragment, " isAppFragment ", isAppFragment, " isMinSdkM ", isMinSdkM);
+
+        if (!(isSupportFragment || isActivity || (isAppFragment && isMinSdkM))) {
+            if (isAppFragment) {
+                throw new IllegalArgumentException(
+                        "Target SDK needs to be greater than 23 if caller is android.app.Fragment");
+            } else {
+                throw new IllegalArgumentException("Caller must be an Activity or a Fragment.");
+            }
+        }
     }
 }

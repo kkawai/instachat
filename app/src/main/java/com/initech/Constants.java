@@ -126,18 +126,21 @@ public final class Constants {
 
     public static final String KEY_FRIENDLY_MESSAGE = "key_text";
     public static final String KEY_STARTING_POS = "key_starting_pos";
+
     public static String DP_URL(int userid, String dpid) {
-        return "http://dp.ic.s3.amazonaws.com/dp_"+userid+ "_" + dpid;
+        return "http://dp.ic.s3.amazonaws.com/dp_" + userid + "_" + dpid;
     }
+
     public static String DP_URL(String dp) {
-        return "http://dp.ic.s3.amazonaws.com/"+dp;
+        return "http://dp.ic.s3.amazonaws.com/" + dp;
     }
 
     /**
      * Firebase database constants
      */
+    public static final String KEY_DATABASE_CHILD = "database_child";
+    public static final String DEFAULT_MESSAGES_CHILD = "messages";
     public static final String PHOTOS_CHILD = "photos";
-    public static final String MESSAGES_CHILD = "messages";
     public static final int MAX_PIC_SIZE_BYTES = 512000;
     public static final int MAX_PROFILE_PIC_SIZE_BYTES = 400000;
     public static final float MAX_FULLSCREEN_FONT_SIZE = 199f;

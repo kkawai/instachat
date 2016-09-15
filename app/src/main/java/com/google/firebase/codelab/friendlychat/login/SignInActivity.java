@@ -37,7 +37,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.codelab.friendlychat.MainActivity;
+import com.google.firebase.codelab.friendlychat.GroupChatActivity;
 import com.google.firebase.codelab.friendlychat.R;
 import com.initech.MyApp;
 import com.initech.api.NetworkApi;
@@ -159,7 +159,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                     MLog.w(TAG, "signIntoFirebase", task.getException());
                     showErrorToast("Firebase Account Creation Error");
                 } else {
-                    startActivity(new Intent(SignInActivity.this, MainActivity.class));
+                    startActivity(new Intent(SignInActivity.this, GroupChatActivity.class));
                     finish();
                 }
             }
@@ -173,7 +173,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
             Toast.makeText(this, "Welcome " + user.getEmail(), Toast.LENGTH_SHORT).show();
 
             // Go back to the main activity
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, GroupChatActivity.class));
         }
     }
 
@@ -227,7 +227,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     /**
      * Successfully signing in via google means that we must
      * check if the user exists in our system.
-     * If exists already, then just enter MainActivity.
+     * If exists already, then just enter GroupChatActivity.
      * If not exists, we must complete registration,
      * by asking user to enter password.
      *

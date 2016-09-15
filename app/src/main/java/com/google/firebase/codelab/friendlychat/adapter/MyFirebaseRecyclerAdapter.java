@@ -36,11 +36,16 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
     private AdapterPopulateHolderListener mAdapterPopulateHolderListener;
     private MessageTextClickedListener mMessageTextClickedListener;
     private UserThumbClickedListener mUserThumbClickedListener;
+    private String mDatabaseChild;
 
     public MyFirebaseRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, DatabaseReference ref) {
         super(modelClass, modelLayout, viewHolderClass, ref);
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
+    }
+
+    public void setDatabaseChild(String child) {
+        mDatabaseChild = child;
     }
 
     public void setActivity(Activity activity) {
@@ -95,7 +100,7 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
                                     photoRef.delete();
                                     MLog.d(TAG, "deleted photo " + msg.getImageId());
                                 }
-                                DatabaseReference ref = mFirebaseDatabaseReference.child(Constants.MESSAGES_CHILD + "/" + msg.getId());
+                                DatabaseReference ref = mFirebaseDatabaseReference.child(mDatabaseChild + "/" + msg.getId());
                                 if (ref != null)
                                     ref.removeValue();
                             }
@@ -129,7 +134,7 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
             viewHolder.messageTimeTextView.setVisibility(View.INVISIBLE);
         }
 //                if (friendlyMessage.getPhotoUrl() == null) {
-//                    viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(MainActivity.this,
+//                    viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(GroupChatActivity.this,
 //                            R.drawable.ic_account_circle_black_36dp));
 //                } else {
 //

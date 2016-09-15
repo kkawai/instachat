@@ -24,6 +24,7 @@ import com.initech.util.ThreadWrapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -43,8 +44,8 @@ public class ProfilePicUploadHelper {
     private Activity mActivity;
     private UploadListener mListener;
 
-    ProfilePicUploadHelper(Activity context) {
-        mActivity = context;
+    ProfilePicUploadHelper(Activity activity) {
+        mActivity = activity;
     }
 
     public void setPhotoUploadListener(UploadListener listener) {
@@ -105,6 +106,14 @@ public class ProfilePicUploadHelper {
             final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("image/*");
             mActivity.startActivityForResult(Intent.createChooser(intent, "Select Picture"), RC_CHOOSE_PICTURE);
+        }
+    }
+
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+        if (requestCode == RC_TAKE_PICTURE) {
+            launchCamera(false);
+        } else if (requestCode == RC_CHOOSE_PICTURE) {
+            launchCamera(true);
         }
     }
 

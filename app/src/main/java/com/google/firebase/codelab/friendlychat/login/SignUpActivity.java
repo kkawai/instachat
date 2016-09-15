@@ -15,7 +15,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.codelab.friendlychat.MainActivity;
+import com.google.firebase.codelab.friendlychat.GroupChatActivity;
 import com.google.firebase.codelab.friendlychat.R;
 import com.initech.MyApp;
 import com.initech.api.NetworkApi;
@@ -221,7 +221,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     MLog.w(TAG, "createFirebaseAccount", task.getException());
                     showErrorToast("Firebase Account Create Error");
                 } else {
-                    startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                    startActivity(new Intent(SignUpActivity.this, GroupChatActivity.class));
                     finish();
                 }
             }

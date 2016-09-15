@@ -25,6 +25,7 @@ import com.initech.util.ThreadWrapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -46,8 +47,8 @@ public class PhotoUploadHelper {
     private StorageReference mStorageRef;
     private String mStorageRefString;
 
-    PhotoUploadHelper(Activity context) {
-        mActivity = context;
+    PhotoUploadHelper(Activity activity) {
+        mActivity = activity;
         mStorageRef = FirebaseStorage.getInstance().getReference();
     }
 
@@ -72,14 +73,14 @@ public class PhotoUploadHelper {
         if (!isChoose) {
             String perm = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
             if (!EasyPermissions.hasPermissions(mActivity, perm)) {
-                EasyPermissions.requestPermissions(this, mActivity.getString(R.string.rationale_storage),
+                EasyPermissions.requestPermissions(mActivity, mActivity.getString(R.string.rationale_storage),
                         RC_STORAGE_PERMS, perm);
                 return;
             }
         } else {
             String perm = android.Manifest.permission.READ_EXTERNAL_STORAGE;
             if (!EasyPermissions.hasPermissions(mActivity, perm)) {
-                EasyPermissions.requestPermissions(this, mActivity.getString(R.string.rationale_storage),
+                EasyPermissions.requestPermissions(mActivity, mActivity.getString(R.string.rationale_storage),
                         RC_STORAGE_PERMS, perm);
                 return;
             }
@@ -132,6 +133,14 @@ public class PhotoUploadHelper {
         }
     }
 
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+        if (requestCode == RC_TAKE_PICTURE) {
+            launchCamera(false);
+        } else if (requestCode == RC_CHOOSE_PICTURE) {
+            launchCamera(true);
+        }
+    }
+
     private void reducePhotoSize(final Uri uri) {
         ThreadWrapper.executeInWorkerThread(new Runnable() {
             @Override
@@ -177,8 +186,8 @@ public class PhotoUploadHelper {
                     public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
                         if (isActivityDestroyed())
                             return;
-                        mListener.onPhotoUploadProgress((int)taskSnapshot.getTotalByteCount()/1024,
-                                (int)taskSnapshot.getBytesTransferred()/1024);
+                        mListener.onPhotoUploadProgress((int) taskSnapshot.getTotalByteCount() / 1024,
+                                (int) taskSnapshot.getBytesTransferred() / 1024);
                     }
                 })
                 .addOnSuccessListener(mActivity, new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -186,7 +195,7 @@ public class PhotoUploadHelper {
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         if (isActivityDestroyed())
                             return;
-                        mListener.onPhotoUploadSuccess(mFileUri.getLastPathSegment(),taskSnapshot.getDownloadUrl().toString());
+                        mListener.onPhotoUploadSuccess(mFileUri.getLastPathSegment(), taskSnapshot.getDownloadUrl().toString());
                     }
                 })
                 .addOnFailureListener(mActivity, new OnFailureListener() {
