@@ -1,5 +1,12 @@
 package com.initech;
 
+import android.net.Uri;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.initech.util.Preferences;
+
 /**
  * @author kkawai
  */
@@ -124,15 +131,17 @@ public final class Constants {
     public static final String FILE_PROVIDER = "com.instachat.android.fileprovider";
     public static final String FILE_PROVIDER_IMAGES_SUBDIR = "/images"; //look at file_provider_paths.xml
 
+    public static final String KEY_PHOTO_TYPE = "key_phototype";
     public static final String KEY_FRIENDLY_MESSAGE = "key_text";
     public static final String KEY_STARTING_POS = "key_starting_pos";
 
-    public static String DP_URL(int userid, String dpid) {
-        return "http://dp.ic.s3.amazonaws.com/dp_" + userid + "_" + dpid;
+    public static void DP_URL(int userid, String dpid, OnCompleteListener<Uri> onCompleteListener) {
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+        storageReference.child(DP_STORAGE_BASE(userid) + dpid).getDownloadUrl().addOnCompleteListener(onCompleteListener);
     }
 
-    public static String DP_URL(String dp) {
-        return "http://dp.ic.s3.amazonaws.com/" + dp;
+    public static String DP_STORAGE_BASE(int userid) {
+        return "/users/" + userid + "/dp/";
     }
 
     /**

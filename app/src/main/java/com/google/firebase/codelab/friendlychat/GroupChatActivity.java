@@ -36,6 +36,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.ath.fuel.FuelInjector;
 import com.github.rubensousa.bottomsheetbuilder.BottomSheetBuilder;
 import com.github.rubensousa.bottomsheetbuilder.BottomSheetMenuDialog;
@@ -66,8 +68,10 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.initech.Constants;
 import com.initech.MyApp;
+import com.initech.api.NetworkApi;
 import com.initech.api.UploadListener;
 import com.initech.gcm.GCMHelper;
+import com.initech.model.User;
 import com.initech.profile.FragmentProfile;
 import com.initech.util.MLog;
 import com.initech.util.Preferences;
@@ -111,9 +115,9 @@ public class GroupChatActivity extends BaseActivity implements
 
     // [START declare_ref]
     private PhotoUploadHelper mPhotoUploadHelper;
-    private ProfilePicUploadHelper mProfilePicUploadHelper;
     private DrawerHelper mDrawerHelper;
     private String mDatabaseChild;
+    private boolean mIsStartedAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +137,7 @@ public class GroupChatActivity extends BaseActivity implements
         checkCallingObjectSuitability(this);
 
         DataBindingUtil.setContentView(this, R.layout.activity_main);
-        initPhotoHelper();
+        initPhotoHelper(savedInstanceState);
         setupDrawer();
         setupToolbar();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -221,7 +225,14 @@ public class GroupChatActivity extends BaseActivity implements
         initButtons();
     }
 
-    private boolean mIsStartedAnimation;
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (mPhotoUploadHelper.getPhotoType() != null) {
+            outState.putString(Constants.KEY_PHOTO_TYPE, mPhotoUploadHelper.getPhotoType().name());
+            MLog.d(TAG, "onSaveInstanceState() saving photo type: " + mPhotoUploadHelper.getPhotoType().name());
+        }
+        super.onSaveInstanceState(outState);
+    }
 
     private void setEnableSendButton(final boolean isEnable) {
 
@@ -268,11 +279,14 @@ public class GroupChatActivity extends BaseActivity implements
         mSendButton.startAnimation(hideAnimation);
     }
 
-    private void initPhotoHelper() {
+    private void initPhotoHelper(Bundle savedInstanceState) {
         mPhotoUploadHelper = new PhotoUploadHelper(this);
         mPhotoUploadHelper.setPhotoUploadListener(this);
-        mProfilePicUploadHelper = new ProfilePicUploadHelper(this);
-        mProfilePicUploadHelper.setPhotoUploadListener(this);
+        if (savedInstanceState != null && savedInstanceState.containsKey(Constants.KEY_PHOTO_TYPE)) {
+            PhotoUploadHelper.PhotoType photoType = PhotoUploadHelper.PhotoType.valueOf(savedInstanceState.getString(Constants.KEY_PHOTO_TYPE));
+            mPhotoUploadHelper.setPhotoType(photoType);
+            MLog.d(TAG, "initPhotoHelper: retrieved from saved instance state: " + photoType);
+        }
     }
 
     @Override
@@ -410,7 +424,6 @@ public class GroupChatActivity extends BaseActivity implements
     @Override
     public void onDestroy() {
         mPhotoUploadHelper.cleanup();
-        mProfilePicUploadHelper.cleanup();
         mFirebaseAdapter.cleanup();
         mDrawerHelper.cleanup();
         if (mAdView != null) {
@@ -496,7 +509,7 @@ public class GroupChatActivity extends BaseActivity implements
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         // There has been an error fetching the config
-                        Log.w(TAG, "Error fetching config: " + e.getMessage());
+                        MLog.w(TAG, "Error fetching config: " + e.getMessage());
                         applyRetrievedLengthLimit();
                     }
                 });
@@ -507,7 +520,6 @@ public class GroupChatActivity extends BaseActivity implements
         super.onActivityResult(requestCode, resultCode, data);
         MLog.d(TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
         mPhotoUploadHelper.onActivityResult(requestCode, resultCode, data);
-        mProfilePicUploadHelper.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_INVITE) {
             if (resultCode == RESULT_OK) {
                 // Use Firebase Measurement to log that invitation was sent.
@@ -584,7 +596,7 @@ public class GroupChatActivity extends BaseActivity implements
                         return true;
                     }
                 });
-        mDrawerHelper = new DrawerHelper(this, mDrawerLayout, mProfilePicUploadHelper);
+        mDrawerHelper = new DrawerHelper(this, mDrawerLayout, mPhotoUploadHelper);
         mDrawerHelper.setup(navigationView);
     }
 
@@ -645,8 +657,7 @@ public class GroupChatActivity extends BaseActivity implements
 
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
-        mPhotoUploadHelper.onPermissionsGranted(requestCode,perms);
-        mProfilePicUploadHelper.onPermissionsGranted(requestCode,perms);
+        mPhotoUploadHelper.onPermissionsGranted(requestCode, perms);
     }
 
     @Override
@@ -750,11 +761,11 @@ public class GroupChatActivity extends BaseActivity implements
                 .setItemClickListener(new BottomSheetItemClickListener() {
                     @Override
                     public void onBottomSheetItemClick(final MenuItem item) {
+                        mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.chatRoomPhoto);
+                        mPhotoUploadHelper.setStorageRefString(Constants.PHOTOS_CHILD);
                         if (item.getItemId() == R.id.menu_take_photo) {
-                            mPhotoUploadHelper.setStorageRefString(Constants.PHOTOS_CHILD);
                             mPhotoUploadHelper.launchCamera(false);
                         } else if (item.getItemId() == R.id.menu_choose_photo) {
-                            mPhotoUploadHelper.setStorageRefString(Constants.PHOTOS_CHILD);
                             mPhotoUploadHelper.launchCamera(true);
                         }
                     }
@@ -801,21 +812,32 @@ public class GroupChatActivity extends BaseActivity implements
             return;
         }
         hideProgressDialog();
-        if (photoUrl == null) {
-            /*
-             * must have uploaded a new profile pic since these will not
-             * have a newly generated photoUrl, only a display pic id
-             * in S3
-             */
-            mDrawerHelper.updateProfilePic(photoId);
-            return;
-        }
 
-        // Get the public download URL
-        FriendlyMessage friendlyMessage = new FriendlyMessage("", username(),
-                userid(), dpid(), photoUrl, photoId, System.currentTimeMillis());
-        MLog.d(TAG, "uploadFromUri:onSuccess photoId: " + photoId);
-        mFirebaseDatabaseReference.child(mDatabaseChild).push().setValue(friendlyMessage);
+        if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.chatRoomPhoto) {
+
+            FriendlyMessage friendlyMessage = new FriendlyMessage("", username(),
+                    userid(), dpid(), photoUrl, photoId, System.currentTimeMillis());
+            MLog.d(TAG, "uploadFromUri:onSuccess photoId: " + photoId);
+            mFirebaseDatabaseReference.child(mDatabaseChild).push().setValue(friendlyMessage);
+
+
+        } else if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.userProfilePhoto) {
+            final User user = Preferences.getInstance().getUser();
+            user.setProfilePicUrl(photoId);
+            Preferences.getInstance().saveUser(user);
+            NetworkApi.saveUser(null, user, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    MLog.d(TAG, "saveUser() success via uploadFromUri(): " + response);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    MLog.e(TAG, "saveUser() failed via uploadFromUri() ", error);
+                }
+            });
+            mDrawerHelper.updateProfilePic(photoId);
+        }
     }
 
     @Override

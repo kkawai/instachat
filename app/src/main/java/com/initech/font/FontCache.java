@@ -3,11 +3,13 @@ package com.initech.font;
 /**
  * Created by kevin on 8/6/2016.
  */
+
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.util.Log;
 
 import com.initech.MyApp;
+import com.initech.util.MLog;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -16,12 +18,11 @@ import java.util.Map;
 /**
  * A simple font cache that makes a font once when it's first asked for and keeps it for the
  * life of the application.
- *
+ * <p/>
  * To use it, put your fonts in /assets/fonts.  You can access them in XML by their filename, minus
  * the extension (e.g. "Roboto-BoldItalic" or "roboto-bolditalic" for Roboto-BoldItalic.ttf).
- *
+ * <p/>
  * To set custom names for fonts other than their filenames, call addFont().
- *
  */
 public class FontCache {
 
@@ -48,7 +49,7 @@ public class FontCache {
         try {
             fileList = am.list(FONT_DIR);
         } catch (IOException e) {
-            Log.e(TAG, "Error loading fonts from assets/fonts.");
+            MLog.e(TAG, "Error loading fonts from assets/fonts.");
             return;
         }
 

@@ -1,7 +1,9 @@
 package com.initech.profile;
 
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -15,10 +17,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.codelab.friendlychat.R;
 import com.google.firebase.codelab.friendlychat.model.FriendlyMessage;
 import com.initech.BaseFragment;
 import com.initech.Constants;
+import com.initech.api.NetworkApi;
+import com.initech.util.MLog;
 
 /**
  * Created by kevin on 9/13/2016.
@@ -55,11 +61,26 @@ public class FragmentProfile extends BaseFragment {
         setupToolbar(friendlyMessage.getName());
         ((TextView) getView().findViewById(R.id.username)).setText(friendlyMessage.getName());
         final ImageView pic = (ImageView) getView().findViewById(R.id.profile_pic);
-        Glide.with(this)
-                .load(Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid()))
-                .error(R.drawable.ic_account_circle_black_36dp)
-                .crossFade()
-                .into(pic);
+
+        Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if (isActivityDestroyed())
+                            return;
+                        try {
+                            Glide.with(FragmentProfile.this)
+                                    .load(task.getResult().toString())
+                                    .error(R.drawable.ic_account_circle_black_36dp)
+                                    .crossFade()
+                                    .into(pic);
+                        } catch (Exception e) {
+                            MLog.e(TAG, "Constants.DP_URL user profile pic exist in google cloud storage", e);
+                            pic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                        }
+                    }
+                }
+        );
+
 //        getView().findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {

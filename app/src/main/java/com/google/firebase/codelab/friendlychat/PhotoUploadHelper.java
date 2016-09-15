@@ -46,10 +46,23 @@ public class PhotoUploadHelper {
     private UploadListener mListener;
     private StorageReference mStorageRef;
     private String mStorageRefString;
+    private PhotoType mPhotoType;
+
+    public enum PhotoType {
+        chatRoomPhoto, userProfilePhoto
+    }
 
     PhotoUploadHelper(Activity activity) {
         mActivity = activity;
         mStorageRef = FirebaseStorage.getInstance().getReference();
+    }
+
+    public void setPhotoType(PhotoType photoType) {
+        mPhotoType = photoType;
+    }
+
+    public PhotoType getPhotoType() {
+        return mPhotoType;
     }
 
     public void setStorageRefString(String ref) {
@@ -95,7 +108,7 @@ public class PhotoUploadHelper {
                 dir.mkdir();
             }
             boolean created = mFile.createNewFile();
-            Log.d(TAG, "file.createNewFile:" + mFile.getAbsolutePath() + ":" + created);
+            MLog.d(TAG, "file.createNewFile:" + mFile.getAbsolutePath() + ":" + created);
         } catch (IOException e) {
             Log.e(TAG, "file.createNewFile" + mFile.getAbsolutePath() + ":FAILED", e);
         }
@@ -151,7 +164,13 @@ public class PhotoUploadHelper {
                         LocalFileUtils.copyFile(mActivity, uri, mFile);
                     }
 
-                    final Bitmap bitmap = ImageUtils.getBitmap(mActivity, mFileUri, Constants.MAX_PIC_SIZE_BYTES);
+                    int maxSizeBytes = Constants.MAX_PIC_SIZE_BYTES;
+                    if (mPhotoType == PhotoType.chatRoomPhoto) {
+                        maxSizeBytes = Constants.MAX_PIC_SIZE_BYTES;
+                    } else if (mPhotoType == PhotoType.userProfilePhoto) {
+                        maxSizeBytes = Constants.MAX_PROFILE_PIC_SIZE_BYTES;
+                    }
+                    final Bitmap bitmap = ImageUtils.getBitmap(mActivity, mFileUri, maxSizeBytes);
                     ImageUtils.writeBitmapToFile(bitmap, mFile);
                     if (isActivityDestroyed())
                         return;

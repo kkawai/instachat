@@ -1,6 +1,8 @@
 package com.google.firebase.codelab.friendlychat;
 
 import android.app.Activity;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
@@ -13,9 +15,12 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.initech.Constants;
 import com.initech.api.NetworkApi;
 import com.initech.model.User;
+import com.initech.util.MLog;
 import com.initech.util.Preferences;
 import com.initech.util.StringUtil;
 
@@ -28,25 +33,36 @@ public class DrawerHelper {
     private static final String TAG = "DrawerHelper";
     private Activity mActivity;
     private DrawerLayout mDrawerLayout;
-    private ProfilePicUploadHelper mPhotoUploadHelper;
+    private PhotoUploadHelper mPhotoUploadHelper;
     private View mHeaderLayout;
 
-    public DrawerHelper(Activity activity, DrawerLayout drawerLayout, ProfilePicUploadHelper photoUploadHelper) {
+    public DrawerHelper(Activity activity, DrawerLayout drawerLayout, PhotoUploadHelper photoUploadHelper) {
         mActivity = activity;
         mDrawerLayout = drawerLayout;
         mPhotoUploadHelper = photoUploadHelper;
     }
 
-    public void updateProfilePic(String dp) {
+    public void updateProfilePic(String dpid) {
         if (isActivityDestroyed())
             return;
         final ImageView navpic = (ImageView) mHeaderLayout.findViewById(R.id.nav_pic);
         Glide.clear(navpic);
-        Glide.with(mActivity)
-                .load(Constants.DP_URL(dp))
-                .error(R.drawable.ic_account_circle_black_36dp)
-                .crossFade()
-                .into(navpic);
+        final User user = Preferences.getInstance().getUser();
+        Constants.DP_URL(user.getId(), dpid, new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                try {
+                    Glide.with(mActivity)
+                            .load(task.getResult().toString())
+                            .error(R.drawable.ic_account_circle_black_36dp)
+                            .crossFade()
+                            .into(navpic);
+                } catch (Exception e) {
+                    MLog.e(TAG, "DP_URL failed", e);
+                    navpic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                }
+            }
+        });
     }
 
     public void setup(NavigationView navigationView) {
@@ -71,11 +87,24 @@ public class DrawerHelper {
                 final User user = Preferences.getInstance().getUser();
                 email.setText(Preferences.getInstance().getEmail());
                 username.setText(Preferences.getInstance().getUsername());
-                Glide.with(mActivity)
-                        .load(Constants.DP_URL(user.getId(), user.getProfilePicUrl()))
-                        .error(R.drawable.ic_account_circle_black_36dp)
-                        .crossFade()
-                        .into(navpic);
+                Constants.DP_URL(user.getId(), user.getProfilePicUrl(), new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if (isActivityDestroyed())
+                            return;
+                        try {
+                            Glide.with(mActivity)
+                                    .load(task.getResult().toString())
+                                    .error(R.drawable.ic_account_circle_black_36dp)
+                                    .crossFade()
+                                    .into(navpic);
+                        } catch (Exception e) {
+                            MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
+                            navpic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                        }
+                    }
+                });
+
             }
 
             @Override
@@ -176,6 +205,8 @@ public class DrawerHelper {
         builder.setView(view);
         builder.setCancelable(true);
         final AlertDialog dialog = builder.create();
+        mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.userProfilePhoto);
+        mPhotoUploadHelper.setStorageRefString(Constants.DP_STORAGE_BASE(Preferences.getInstance().getUserId()));
         view.findViewById(R.id.menu_choose_photo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

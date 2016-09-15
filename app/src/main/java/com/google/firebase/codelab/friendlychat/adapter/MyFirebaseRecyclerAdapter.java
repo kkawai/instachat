@@ -2,18 +2,23 @@ package com.google.firebase.codelab.friendlychat.adapter;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.codelab.friendlychat.R;
 import com.google.firebase.codelab.friendlychat.model.FriendlyMessage;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageException;
 import com.google.firebase.storage.StorageReference;
 import com.initech.Constants;
 import com.initech.MyApp;
@@ -71,7 +76,7 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
             @Override
             public void onClick(final View v) {
                 final FriendlyMessage msg = getItem(holder.getAdapterPosition());
-                mUserThumbClickedListener.onUserThumbClicked(holder.messengerImageView,msg);
+                mUserThumbClickedListener.onUserThumbClicked(holder.messengerImageView, msg);
             }
         });
         final View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -119,7 +124,7 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
     }
 
     @Override
-    protected void populateViewHolder(MessageViewHolder viewHolder, FriendlyMessage friendlyMessage, int position) {
+    protected void populateViewHolder(final MessageViewHolder viewHolder, final FriendlyMessage friendlyMessage, int position) {
 
         mAdapterPopulateHolderListener.onViewHolderPopulated();
         if (StringUtil.isNotEmpty(friendlyMessage.getText()))
@@ -149,10 +154,23 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
             viewHolder.messagePhotoView.setVisibility(View.GONE);
         }
 
-        Glide.with(mActivity.get())
-                .load(Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid()))
-                .error(R.drawable.ic_account_circle_black_36dp)
-                .into(viewHolder.messengerImageView);
+        Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (isActivityDestroyed())
+                    return;
+                try {
+                    Glide.with(mActivity.get())
+                            .load(task.getResult().toString())
+                            .error(R.drawable.ic_account_circle_black_36dp)
+                            .into(viewHolder.messengerImageView);
+                }catch(final Exception e) {
+                    MLog.e(TAG,"Constants.DP_URL user dp doesn't exist in google cloud storage",e);
+                    viewHolder.messengerImageView.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                }
+            }
+        });
+
 
     }
 
@@ -176,8 +194,13 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
     public void cleanup() {
         if (mActivity != null)
             mActivity.clear();
+        mActivity = null;
         mUserThumbClickedListener = null;
         mAdapterPopulateHolderListener = null;
         mMessageTextClickedListener = null;
+    }
+
+    private boolean isActivityDestroyed() {
+        return (mActivity == null || mActivity.get() == null || mActivity.get().isFinishing());
     }
 }
