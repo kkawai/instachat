@@ -165,16 +165,16 @@ public final class NetworkApi {
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             final User user = Preferences.getInstance().getUser();
                             user.setProfilePicUrl(fileUri.getLastPathSegment());
-                            Preferences.getInstance().saveUser(user);
                             NetworkApi.saveUser(null, user, new Response.Listener<String>() {
                                 @Override
                                 public void onResponse(String response) {
-
+                                    user.setProfilePicUrl(fileUri.getLastPathSegment());
+                                    Preferences.getInstance().saveUser(user);
                                 }
                             }, new Response.ErrorListener() {
                                 @Override
                                 public void onErrorResponse(VolleyError error) {
-
+                                    MLog.e(TAG, "NetworkApi.saveUser() failed inside saveThirdPartyPhoto()", error);
                                 }
                             });
                         }
