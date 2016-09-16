@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
 
@@ -59,8 +60,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     private static final int RC_SIGN_UP = 9002;
     private TextInputLayout passwordLayout, emailLayout;
     private String email, password;
-
-
+    private String thirdPartyProfilePicUrl;
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth mFirebaseAuth;
 
@@ -87,7 +87,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         mFirebaseAuth = FirebaseAuth.getInstance();
 
         String lastSignIn = Preferences.getInstance().getLastSignIn();
-        MLog.i(TAG,"lastSignIn ",lastSignIn);
+        MLog.i(TAG, "lastSignIn ", lastSignIn);
         if (lastSignIn != null) {
             emailLayout.getEditText().setText(lastSignIn);
         }
@@ -126,9 +126,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                 try {
                     final String status = response.getString("status");
                     if (status.equalsIgnoreCase("OK")) {
-                        final JSONObject data = response.getJSONObject("data");
-                        final User user = new User();
-                        user.copyFrom(data, null);
+                        final User user = User.fromResponse(response);
                         Preferences.getInstance().saveUser(user);
                         Preferences.getInstance().saveLastSignIn(email);
                         signIntoFirebase(user.getEmail(), password);
@@ -159,6 +157,13 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                     MLog.w(TAG, "signIntoFirebase", task.getException());
                     showErrorToast("Firebase Account Creation Error");
                 } else {
+
+                    User user = Preferences.getInstance().getUser();
+                    if (StringUtil.isEmpty(user.getProfilePicUrl())) {
+                        if (!TextUtils.isEmpty(thirdPartyProfilePicUrl)) {
+                            NetworkApi.saveThirdPartyPhoto(thirdPartyProfilePicUrl);
+                        }
+                    }
                     startActivity(new Intent(SignInActivity.this, GroupChatActivity.class));
                     finish();
                 }
@@ -190,7 +195,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                 signUp();
                 break;
             case R.id.forgot_password:
-                startActivity(new Intent(this,ForgotPasswordActivity.class));
+                startActivity(new Intent(this, ForgotPasswordActivity.class));
                 break;
             default:
                 return;
@@ -234,24 +239,15 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
      * @param acct
      */
     private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
+        if (acct.getPhotoUrl() != null && !TextUtils.isEmpty(acct.getPhotoUrl().toString())) {
+            thirdPartyProfilePicUrl = acct.getPhotoUrl().toString();
+        }
         NetworkApi.getUserByEmail(this, acct.getEmail(), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(final JSONObject response) {
                 try {
                     if (response.getString("status").equalsIgnoreCase("OK")) {
-                        final User user = new User();
-                        user.copyFrom(response.getJSONObject("data"), null);
-
-                        /*
-                         * Found user in our system.  Copy google photo
-                         * to our system, update user with new url.
-                         */
-                        if (StringUtil.isEmpty(user.getProfilePicUrl())) {
-                            if (acct.getPhotoUrl() != null) {
-                                user.setProfilePicUrl(acct.getPhotoUrl().toString());
-                                NetworkApi.uploadMyPhotoToS3(user);
-                            }
-                        }
+                        final User user = User.fromResponse(response);
                         Preferences.getInstance().saveUser(user);
                         Preferences.getInstance().saveLastSignIn(user.getUsername());
                         signIntoFirebase(user.getEmail(), user.getPassword());

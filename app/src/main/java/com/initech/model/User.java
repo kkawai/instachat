@@ -4,6 +4,8 @@ import android.content.ContentValues;
 
 import com.initech.model.UserManager.UserColumns;
 
+import org.json.JSONObject;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -520,5 +522,12 @@ public class User extends DomainObject {
 
     public interface StatusChangeListener {
         public void onStatusChanged(boolean isOnline);
+    }
+
+    public static User fromResponse(JSONObject response) throws Exception {
+        final JSONObject data = response.getJSONObject("data");
+        final User remote = new User();
+        remote.copyFrom(data, null);
+        return remote;
     }
 }

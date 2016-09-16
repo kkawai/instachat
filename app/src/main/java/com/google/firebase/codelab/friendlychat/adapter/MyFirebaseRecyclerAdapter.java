@@ -18,7 +18,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageException;
 import com.google.firebase.storage.StorageReference;
 import com.initech.Constants;
 import com.initech.MyApp;
@@ -164,8 +163,8 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
                             .load(task.getResult().toString())
                             .error(R.drawable.ic_account_circle_black_36dp)
                             .into(viewHolder.messengerImageView);
-                }catch(final Exception e) {
-                    MLog.e(TAG,"Constants.DP_URL user dp doesn't exist in google cloud storage",e);
+                } catch (final Exception e) {
+                    MLog.e(TAG, "Constants.DP_URL user dp doesn't exist in google cloud storage");
                     viewHolder.messengerImageView.setImageResource(R.drawable.ic_account_circle_black_36dp);
                 }
             }

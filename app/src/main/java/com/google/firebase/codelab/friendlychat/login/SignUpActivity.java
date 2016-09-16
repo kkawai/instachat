@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
 
@@ -39,7 +40,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     private TextInputLayout usernameLayout;
     private String email, username, password;
     private FirebaseAuth mFirebaseAuth;
-    private String photoUrlFromGoogle;
+    private String thirdPartyProfilePicUrl;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -51,11 +52,11 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         passwordLayout = (TextInputLayout) findViewById(R.id.input_password_layout);
         usernameLayout = (TextInputLayout) findViewById(R.id.input_username_layout);
         mFirebaseAuth = FirebaseAuth.getInstance();
-        photoUrlFromGoogle = getIntent() != null ? getIntent().getStringExtra("photo") : null;
+        thirdPartyProfilePicUrl = getIntent() != null ? getIntent().getStringExtra("photo") : null;
         final String emailFromGoogle = getIntent() != null ? getIntent().getStringExtra("email") : null;
         if (emailFromGoogle != null)
             emailLayout.getEditText().setText(emailFromGoogle);
-        MLog.i(TAG,"photo url: "+photoUrlFromGoogle);
+        MLog.i(TAG,"thirdPartyProfilePicUrl: "+ thirdPartyProfilePicUrl);
     }
 
     @Override
@@ -178,8 +179,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         user.setPassword(password);
         user.setUsername(username);
         user.setInstagramId(email);
-        if (photoUrlFromGoogle != null)
-            user.setProfilePicUrl(photoUrlFromGoogle);
+        if (thirdPartyProfilePicUrl != null)
+            user.setProfilePicUrl(thirdPartyProfilePicUrl);
         NetworkApi.saveUser(this, user, new Response.Listener<String>() {
             @Override
             public void onResponse(final String string) {
@@ -190,8 +191,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                         user.copyFrom(response.getJSONObject("data"), null);
                         Preferences.getInstance().saveUser(user);
                         Preferences.getInstance().saveLastSignIn(username);
-                        if (photoUrlFromGoogle != null)
-                            NetworkApi.uploadMyPhotoToS3(user);
                         createFirebaseAccount();
                     } else {
                         Toast.makeText(SignUpActivity.this, "Error creating account (1): " + response.getString("status"), Toast.LENGTH_SHORT).show();
@@ -221,6 +220,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     MLog.w(TAG, "createFirebaseAccount", task.getException());
                     showErrorToast("Firebase Account Create Error");
                 } else {
+                    if (!TextUtils.isEmpty(thirdPartyProfilePicUrl))
+                        NetworkApi.saveThirdPartyPhoto(thirdPartyProfilePicUrl);
                     startActivity(new Intent(SignUpActivity.this, GroupChatActivity.class));
                     finish();
                 }

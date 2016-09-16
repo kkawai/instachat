@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -102,6 +103,7 @@ public class DrawerHelper {
                             MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
                             navpic.setImageResource(R.drawable.ic_account_circle_black_36dp);
                         }
+                        checkForRemoteUpdatesToMyDP();
                     }
                 });
 
@@ -179,6 +181,57 @@ public class DrawerHelper {
             @Override
             public void onDrawerStateChanged(int newState) {
 
+            }
+        });
+    }
+
+    private void checkForRemoteUpdatesToMyDP() {
+        NetworkApi.getUserById(null, Preferences.getInstance().getUserId(), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(final JSONObject response) {
+                try {
+                    if (isActivityDestroyed())
+                        return;
+                    final String status = response.getString("status");
+                    if (status.equalsIgnoreCase("OK")) {
+                        final User remote = User.fromResponse(response);
+                        if (!TextUtils.isEmpty(remote.getProfilePicUrl())) {
+                            User local = Preferences.getInstance().getUser();
+                            final ImageView navpic = (ImageView) mHeaderLayout.findViewById(R.id.nav_pic);
+                            if (TextUtils.isEmpty(local.getProfilePicUrl()) || !remote.getProfilePicUrl().equals(local.getProfilePicUrl())) {
+                                Constants.DP_URL(remote.getId(), remote.getProfilePicUrl(), new OnCompleteListener<Uri>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Uri> task) {
+                                        User user = Preferences.getInstance().getUser();
+                                        user.setProfilePicUrl(remote.getProfilePicUrl());
+                                        Preferences.getInstance().saveUser(user);
+                                        if (isActivityDestroyed())
+                                            return;
+                                        MLog.i(TAG, "checkForRemoteUpdatesToMyDP() my pic changed remotely. attempt to update");
+                                        try {
+                                            Glide.with(mActivity)
+                                                    .load(task.getResult().toString())
+                                                    .error(R.drawable.ic_account_circle_black_36dp)
+                                                    .crossFade()
+                                                    .into(navpic);
+                                        } catch (Exception e) {
+                                            MLog.e(TAG, "onDrawerOpened() could not find my photo in google cloud storage", e);
+                                        }
+                                    }
+                                });
+                            } else {
+                                MLog.i(TAG, "checkForRemoteUpdatesToMyDP() my pic did not change remotely. do not update.");
+                            }
+                        }
+                    }
+                } catch (final Exception e) {
+                    MLog.e(TAG, "checkIfOtherDeviceUpdatedProfilePic(1) failed", e);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(final VolleyError error) {
+                MLog.e(TAG, "checkForRemoteUpdatesToMyDP(2) failed: " + error);
             }
         });
     }

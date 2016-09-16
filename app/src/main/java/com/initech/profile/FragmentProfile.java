@@ -15,7 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -23,8 +26,12 @@ import com.google.firebase.codelab.friendlychat.R;
 import com.google.firebase.codelab.friendlychat.model.FriendlyMessage;
 import com.initech.BaseFragment;
 import com.initech.Constants;
+import com.initech.MyApp;
 import com.initech.api.NetworkApi;
+import com.initech.model.User;
 import com.initech.util.MLog;
+
+import org.json.JSONObject;
 
 /**
  * Created by kevin on 9/13/2016.
@@ -62,24 +69,52 @@ public class FragmentProfile extends BaseFragment {
         ((TextView) getView().findViewById(R.id.username)).setText(friendlyMessage.getName());
         final ImageView pic = (ImageView) getView().findViewById(R.id.profile_pic);
 
-        Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Uri> task) {
-                        if (isActivityDestroyed())
-                            return;
-                        try {
-                            Glide.with(FragmentProfile.this)
-                                    .load(task.getResult().toString())
-                                    .error(R.drawable.ic_account_circle_black_36dp)
-                                    .crossFade()
-                                    .into(pic);
-                        } catch (Exception e) {
-                            MLog.e(TAG, "Constants.DP_URL user profile pic exist in google cloud storage", e);
-                            pic.setImageResource(R.drawable.ic_account_circle_black_36dp);
-                        }
+        NetworkApi.getUserById(this, friendlyMessage.getUserid(), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    final User remote = User.fromResponse(response);
+                    ((TextView) getView().findViewById(R.id.username)).setText(remote.getUsername());
+                    Constants.DP_URL(remote.getId(), remote.getProfilePicUrl(), new OnCompleteListener<Uri>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Uri> task) {
+                                    if (isActivityDestroyed())
+                                        return;
+                                    try {
+                                        Glide.with(FragmentProfile.this)
+                                                .load(task.getResult().toString())
+                                                .error(R.drawable.ic_account_circle_black_36dp)
+                                                .crossFade()
+                                                .into(pic);
+                                    } catch (Exception e) {
+                                        MLog.e(TAG, "Constants.DP_URL user profile pic exist in google cloud storage", e);
+                                        pic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                                    }
+                                }
+                            }
+                    );
+                } catch (Exception e) {
+                    MLog.e(TAG, "Fail within onResponse(1)", e);
+                    try {
+                        Toast.makeText(getActivity(), R.string.general_api_error, Toast.LENGTH_SHORT).show();
+                        getActivity().onBackPressed();
+                    } catch (Exception x) {
+                        MLog.e(TAG, "Fail within onResponse(2)", x);
                     }
                 }
-        );
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                MLog.e(TAG, "Fail within onErrorResponse(1)", error);
+                try {
+                    Toast.makeText(getActivity(), R.string.general_api_error, Toast.LENGTH_SHORT).show();
+                    getActivity().onBackPressed();
+                } catch (Exception e) {
+                    MLog.e(TAG, "Fail within onErrorResponse(2)", e);
+                }
+            }
+        });
 
 //        getView().findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -107,5 +142,11 @@ public class FragmentProfile extends BaseFragment {
         //ab.setDisplayHomeAsUpEnabled(true);
         ab.setTitle(username);
         */
+    }
+
+    @Override
+    public void onDestroy() {
+        MyApp.getInstance().getRequestQueue().cancelAll(this);
+        super.onDestroy();
     }
 }

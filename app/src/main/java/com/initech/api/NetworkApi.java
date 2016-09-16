@@ -1,12 +1,20 @@
 package com.initech.api;
 
 import android.content.Context;
+import android.net.Uri;
+import android.os.Environment;
+import android.support.v4.content.FileProvider;
 import android.support.v4.util.Pair;
+import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.initech.Constants;
 import com.initech.MyApp;
 import com.initech.model.User;
@@ -21,6 +29,7 @@ import com.initech.util.ThreadWrapper;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -66,9 +75,9 @@ public final class NetworkApi {
         MyApp.getInstance().getRequestQueue().add(request);
     }
 
-    public static void getUserByUsernamePassword(final Object cancelTag, final String username, final String pw, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+    public static void getUserById(final Object cancelTag, final int userid, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
 
-        final String url = Constants.API_BASE_URL + "/getu?un=" + username + "&pd=" + Base64.encodeWebSafe(pw.getBytes(), false);
+        final String url = Constants.API_BASE_URL + "/getubid?i=" + userid;
         final Request request = new ApiGetRequest(url, listener, errorListener);
         request.setShouldCache(false).setRetryPolicy(DEFAULT_RETRY_POLICY).setTag(cancelTag);
         MyApp.getInstance().getRequestQueue().add(request);
@@ -122,27 +131,52 @@ public final class NetworkApi {
         MyApp.getInstance().getRequestQueue().add(request);
     }
 
-    public static void uploadMyPhotoToS3(final User user) {
+    public static void saveThirdPartyPhoto(final String thirdPartyProfilePicUrl) {
 
         ThreadWrapper.executeInWorkerThread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    final File file = new File(MyApp.getInstance().getCacheDir().getPath() + "/me.jpg");
-                    LocalFileUtils.downloadFile(user.getProfilePicUrl(), file, null, null);
-                    final String dpid = UUID.randomUUID().toString();
-                    final String dp = "dp_" + user.getId() + "_" + dpid;
-                    new FileUploadApi().postFileToS3(file, dp, Constants.AMAZON_BUCKET_DP_IC, null);
-                    user.setProfilePicUrl(dpid);
-                    Preferences.getInstance().saveUser(user);
-                    saveUser(null, user, new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
+                    File dir = new File(Environment.getExternalStorageDirectory() + "/photos");
+                    File file = new File(dir, UUID.randomUUID().toString() + ".jpg");
+                    try {
+                        // Create directory if it does not exist.
+                        if (!dir.exists()) {
+                            dir.mkdir();
                         }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
+                        boolean created = file.createNewFile();
+                        MLog.d(TAG, "file.createNewFile:" + file.getAbsolutePath() + ":" + created);
+                    } catch (IOException e) {
+                        Log.e(TAG, "file.createNewFile" + file.getAbsolutePath() + ":FAILED", e);
+                    }
 
+                    // Create content:// URI for file, required since Android N
+                    // See: https://developer.android.com/reference/android/support/v4/content/FileProvider.html
+                    final Uri fileUri = FileProvider.getUriForFile(MyApp.getInstance(),
+                            "com.google.firebase.quickstart.firebasestorage.fileprovider", file);
+
+                    LocalFileUtils.downloadFile(thirdPartyProfilePicUrl, file, null, null);
+
+                    StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+                    String childRef = Constants.DP_STORAGE_BASE(Preferences.getInstance().getUserId());
+                    storageReference = storageReference.child(childRef).child(fileUri.getLastPathSegment());
+                    storageReference.putFile(fileUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            final User user = Preferences.getInstance().getUser();
+                            user.setProfilePicUrl(fileUri.getLastPathSegment());
+                            Preferences.getInstance().saveUser(user);
+                            NetworkApi.saveUser(null, user, new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+
+                                }
+                            });
                         }
                     });
                 } catch (final Exception e) {
