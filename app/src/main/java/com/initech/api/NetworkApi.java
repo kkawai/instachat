@@ -180,7 +180,7 @@ public final class NetworkApi {
                         }
                     });
                 } catch (final Exception e) {
-                    MLog.e(TAG, "Failed to upload photo to s3", e);
+                    MLog.e(TAG, "Failed to upload photo to google cloud storage", e);
                 }
             }
         });
