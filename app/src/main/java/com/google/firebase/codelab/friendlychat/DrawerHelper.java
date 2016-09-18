@@ -52,7 +52,14 @@ public class DrawerHelper {
         Constants.DP_URL(user.getId(), dpid, new OnCompleteListener<Uri>() {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
+                if (isActivityDestroyed()) {
+                    return;
+                }
                 try {
+                    if (!task.isSuccessful()) {
+                        navpic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                        return;
+                    }
                     Glide.with(mActivity)
                             .load(task.getResult().toString())
                             .error(R.drawable.ic_account_circle_black_36dp)
@@ -93,6 +100,10 @@ public class DrawerHelper {
                     public void onComplete(@NonNull Task<Uri> task) {
                         if (isActivityDestroyed())
                             return;
+                        if (!task.isSuccessful()) {
+                            navpic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                            return;
+                        }
                         try {
                             Glide.with(mActivity)
                                     .load(task.getResult().toString())
@@ -202,11 +213,13 @@ public class DrawerHelper {
                                 Constants.DP_URL(remote.getId(), remote.getProfilePicUrl(), new OnCompleteListener<Uri>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Uri> task) {
+                                        if (!task.isSuccessful() || isActivityDestroyed()) {
+                                            return;
+                                        }
                                         User user = Preferences.getInstance().getUser();
                                         user.setProfilePicUrl(remote.getProfilePicUrl());
                                         Preferences.getInstance().saveUser(user);
-                                        if (isActivityDestroyed())
-                                            return;
+
                                         MLog.i(TAG, "checkForRemoteUpdatesToMyDP() my pic changed remotely. attempt to update");
                                         try {
                                             Glide.with(mActivity)

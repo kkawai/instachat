@@ -48,7 +48,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.App">
 
-        <activity android:name=".GroupChatActivity">
+        <activity
+            android:name=".GroupChatActivity"
+            android:launchMode="singleTask">
+        </activity>
+
+        <activity
+            android:name=".PrivateChatActivity"
+            android:launchMode="singleTask">
         </activity>
 
         <activity

@@ -159,12 +159,16 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
                 if (isActivityDestroyed())
                     return;
                 try {
+                    if (!task.isSuccessful()) {
+                        viewHolder.messengerImageView.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                        return;
+                    }
                     Glide.with(mActivity.get())
                             .load(task.getResult().toString())
                             .error(R.drawable.ic_account_circle_black_36dp)
                             .into(viewHolder.messengerImageView);
                 } catch (final Exception e) {
-                    MLog.e(TAG, "Constants.DP_URL user dp doesn't exist in google cloud storage");
+                    MLog.e(TAG, "Constants.DP_URL user dp doesn't exist in google cloud storage.  task: "+task.isSuccessful());
                     viewHolder.messengerImageView.setImageResource(R.drawable.ic_account_circle_black_36dp);
                 }
             }

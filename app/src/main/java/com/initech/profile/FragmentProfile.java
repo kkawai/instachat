@@ -22,6 +22,7 @@ import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.codelab.friendlychat.PrivateChatActivity;
 import com.google.firebase.codelab.friendlychat.R;
 import com.google.firebase.codelab.friendlychat.model.FriendlyMessage;
 import com.initech.BaseFragment;
@@ -68,7 +69,6 @@ public class FragmentProfile extends BaseFragment {
         setupToolbar(friendlyMessage.getName());
         ((TextView) getView().findViewById(R.id.username)).setText(friendlyMessage.getName());
         final ImageView pic = (ImageView) getView().findViewById(R.id.profile_pic);
-
         NetworkApi.getUserById(this, friendlyMessage.getUserid(), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -80,6 +80,10 @@ public class FragmentProfile extends BaseFragment {
                                 public void onComplete(@NonNull Task<Uri> task) {
                                     if (isActivityDestroyed())
                                         return;
+                                    if (!task.isSuccessful()) {
+                                        pic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                                        return;
+                                    }
                                     try {
                                         Glide.with(FragmentProfile.this)
                                                 .load(task.getResult().toString())
@@ -93,10 +97,16 @@ public class FragmentProfile extends BaseFragment {
                                 }
                             }
                     );
+                    pic.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            PrivateChatActivity.startPrivateChatActivity(getContext(), remote.getId());
+                        }
+                    });
                 } catch (Exception e) {
                     MLog.e(TAG, "Fail within onResponse(1)", e);
                     try {
-                        Toast.makeText(getActivity(), R.string.general_api_error, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), getString(R.string.general_api_error, "1"), Toast.LENGTH_SHORT).show();
                         getActivity().onBackPressed();
                     } catch (Exception x) {
                         MLog.e(TAG, "Fail within onResponse(2)", x);
@@ -108,7 +118,7 @@ public class FragmentProfile extends BaseFragment {
             public void onErrorResponse(VolleyError error) {
                 MLog.e(TAG, "Fail within onErrorResponse(1)", error);
                 try {
-                    Toast.makeText(getActivity(), R.string.general_api_error, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), getString(R.string.general_api_error, "2"), Toast.LENGTH_SHORT).show();
                     getActivity().onBackPressed();
                 } catch (Exception e) {
                     MLog.e(TAG, "Fail within onErrorResponse(2)", e);

@@ -217,16 +217,26 @@ public final class NetworkApi {
         }
     }
 
-    public static void gcmsend(final String toid, final JSONObject msg) throws Exception {
+    public static void gcmsend(final String toid, final JSONObject msg) {
 
-        final HashMap<String, String> params = new HashMap<>();
-        params.put("toid", toid);
-        params.put("msg", msg.toString());
-        final JSONObject response = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/gcmsend").post(params));
-        if (response.getString("status").equals("OK")) {
-            MLog.i(TAG, "sent gcm message to server: " + response.optString("descr"));
-        } else {
-            MLog.e(TAG, "Error from server: ", response);
-        }
+        ThreadWrapper.executeInWorkerThread(new Runnable() {
+            @Override
+            public void run() {
+                final HashMap<String, String> params = new HashMap<>();
+                params.put("toid", toid);
+                params.put("msg", msg.toString());
+                try {
+                    final JSONObject response = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/gcmsend").post(params));
+                    if (response.getString("status").equals("OK")) {
+                        MLog.i(TAG, "sent gcm message to server: " + response.optString("descr"));
+                    } else {
+                        MLog.e(TAG, "Error from server: ", response);
+                    }
+                }catch (Exception e) {
+                    MLog.e(TAG,"NetworkApi.gcmsend() failed",e);
+                }
+            }
+        });
+
     }
 }

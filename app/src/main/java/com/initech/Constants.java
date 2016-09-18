@@ -140,6 +140,10 @@ public final class Constants {
         storageReference.child(DP_STORAGE_BASE(userid) + dpid).getDownloadUrl().addOnCompleteListener(onCompleteListener);
     }
 
+    public static String PRIVATE_CHAT_REF(int toUserid, int myUserid) {
+        return "/directs/"+ (toUserid > myUserid ? (myUserid+"_"+toUserid) : (toUserid+"_"+myUserid));
+    }
+
     public static String DP_STORAGE_BASE(int userid) {
         return "/users/" + userid + "/dp/";
     }
@@ -153,5 +157,10 @@ public final class Constants {
     public static final int MAX_PIC_SIZE_BYTES = 512000;
     public static final int MAX_PROFILE_PIC_SIZE_BYTES = 400000;
     public static final float MAX_FULLSCREEN_FONT_SIZE = 199f;
+
+    /**
+     * new chat constants
+     */
+    public static final String KEY_USERID = "user_id";
 
 }

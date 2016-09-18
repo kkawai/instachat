@@ -67,7 +67,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.initech.Constants;
-import com.initech.MyApp;
 import com.initech.api.NetworkApi;
 import com.initech.api.UploadListener;
 import com.initech.gcm.GCMHelper;
@@ -128,11 +127,7 @@ public class GroupChatActivity extends BaseActivity implements
         }
         super.onCreate(savedInstanceState);
 
-        if (getIntent() != null && getIntent().hasExtra(Constants.KEY_DATABASE_CHILD)) {
-            mDatabaseChild = getIntent().getStringExtra(Constants.KEY_DATABASE_CHILD);
-        } else {
-            mDatabaseChild = Constants.DEFAULT_MESSAGES_CHILD;
-        }
+        initDatabaseRef();
 
         checkCallingObjectSuitability(this);
 
@@ -226,12 +221,72 @@ public class GroupChatActivity extends BaseActivity implements
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        // Register download receiver
+        //LocalBroadcastManager.getInstance(this)
+        //        .registerReceiver(mDownloadReceiver, MyDownloadService.getIntentFilter());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mAdView != null) {
+            mAdView.resume();
+        }
+        mSendButton.setEnabled(mMessageEditText.getText().toString().trim().length() > 0);
+        if (Preferences.getInstance().isLoggedIn()) {
+            GCMHelper.onResume(this);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        if (mAdView != null) {
+            mAdView.pause();
+        }
+        super.onPause();
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         if (mPhotoUploadHelper.getPhotoType() != null) {
             outState.putString(Constants.KEY_PHOTO_TYPE, mPhotoUploadHelper.getPhotoType().name());
             MLog.d(TAG, "onSaveInstanceState() saving photo type: " + mPhotoUploadHelper.getPhotoType().name());
         }
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // Unregister download receiver
+        //LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadReceiver);
+    }
+
+    @Override
+    public void onDestroy() {
+        mPhotoUploadHelper.cleanup();
+        mFirebaseAdapter.cleanup();
+        mDrawerHelper.cleanup();
+        if (mAdView != null) {
+            mAdView.destroy();
+        }
+        super.onDestroy();
+    }
+
+    void initDatabaseRef() {
+        String databaseRef;
+        if (getIntent() != null && getIntent().hasExtra(Constants.KEY_DATABASE_CHILD)) {
+            databaseRef = getIntent().getStringExtra(Constants.KEY_DATABASE_CHILD);
+        } else {
+            databaseRef = Constants.DEFAULT_MESSAGES_CHILD;
+        }
+        setDatabaseRef(databaseRef);
+    }
+
+    final void setDatabaseRef(final String databaseRef) {
+        mDatabaseChild = databaseRef;
     }
 
     private void setEnableSendButton(final boolean isEnable) {
@@ -287,14 +342,6 @@ public class GroupChatActivity extends BaseActivity implements
             mPhotoUploadHelper.setPhotoType(photoType);
             MLog.d(TAG, "initPhotoHelper: retrieved from saved instance state: " + photoType);
         }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Register download receiver
-        //LocalBroadcastManager.getInstance(this)
-        //        .registerReceiver(mDownloadReceiver, MyDownloadService.getIntentFilter());
     }
 
     /*private void beginDownload() {
@@ -372,13 +419,12 @@ public class GroupChatActivity extends BaseActivity implements
                 if (StringUtil.isEmpty(text)) {
                     return;
                 }
-                FriendlyMessage friendlyMessage = new FriendlyMessage(text, username(),
-                        userid(), dpid(), null, null, System.currentTimeMillis());
+                final FriendlyMessage friendlyMessage = new FriendlyMessage(text, myUsername(),
+                        myUserid(), myDpid(), null, null, System.currentTimeMillis());
                 mFirebaseDatabaseReference.child(mDatabaseChild).push().setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        //AppBarLayout appBarLayout = ((AppBarLayout)findViewById(R.id.appbar));
-                        //appBarLayout.setExpanded(false,true);
+                        onFriendlyMessageSent(friendlyMessage);
                     }
                 });
 
@@ -394,43 +440,8 @@ public class GroupChatActivity extends BaseActivity implements
         });
     }
 
-    @Override
-    public void onPause() {
-        if (mAdView != null) {
-            mAdView.pause();
-        }
-        super.onPause();
-    }
+    void onFriendlyMessageSent(FriendlyMessage friendlyMessage) {
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mAdView != null) {
-            mAdView.resume();
-        }
-        mSendButton.setEnabled(mMessageEditText.getText().toString().trim().length() > 0);
-        if (Preferences.getInstance().isLoggedIn()) {
-            GCMHelper.onResume(this);
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        // Unregister download receiver
-        //LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadReceiver);
-    }
-
-    @Override
-    public void onDestroy() {
-        mPhotoUploadHelper.cleanup();
-        mFirebaseAdapter.cleanup();
-        mDrawerHelper.cleanup();
-        if (mAdView != null) {
-            mAdView.destroy();
-        }
-        MyApp.getInstance().getRequestQueue().cancelAll(this);
-        super.onDestroy();
     }
 
     @Override
@@ -720,15 +731,15 @@ public class GroupChatActivity extends BaseActivity implements
         }, 5000);
     }
 
-    private Integer userid() {
+    Integer myUserid() {
         return Preferences.getInstance().getUserId();
     }
 
-    private String dpid() {
+    String myDpid() {
         return Preferences.getInstance().getUser().getProfilePicUrl();
     }
 
-    private String username() {
+    String myUsername() {
         return Preferences.getInstance().getUsername();
     }
 
@@ -815,11 +826,15 @@ public class GroupChatActivity extends BaseActivity implements
 
         if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.chatRoomPhoto) {
 
-            FriendlyMessage friendlyMessage = new FriendlyMessage("", username(),
-                    userid(), dpid(), photoUrl, photoId, System.currentTimeMillis());
+            final FriendlyMessage friendlyMessage = new FriendlyMessage("", myUsername(),
+                    myUserid(), myDpid(), photoUrl, photoId, System.currentTimeMillis());
             MLog.d(TAG, "uploadFromUri:onSuccess photoId: " + photoId);
-            mFirebaseDatabaseReference.child(mDatabaseChild).push().setValue(friendlyMessage);
-
+            mFirebaseDatabaseReference.child(mDatabaseChild).push().setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    onFriendlyMessageSent(friendlyMessage);
+                }
+            });
 
         } else if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.userProfilePhoto) {
             final User user = Preferences.getInstance().getUser();
