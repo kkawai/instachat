@@ -31,7 +31,6 @@ public class PrivateChatActivity extends GroupChatActivity {
     private User mToUser;
     private static boolean sIsActive;
     private static int sToUserid;
-    private Intent mNewIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,17 +43,6 @@ public class PrivateChatActivity extends GroupChatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         MLog.d(TAG, "onNewIntent() ");
-        this.mNewIntent = intent;
-    }
-
-    private void consumeNewIntentIfNecessary() {
-
-        if (mNewIntent == null) {
-            MLog.d(TAG, "consumeNewIntentIfNecessary() false ");
-            return;
-        }
-        MLog.d(TAG, "consumeNewIntentIfNecessary() true ");
-
         getSupportActionBar().setTitle("");
         final int toUserid = getIntent().getIntExtra(Constants.KEY_USERID, 0);
 
@@ -81,15 +69,12 @@ public class PrivateChatActivity extends GroupChatActivity {
         final NotificationManager notificationManager = ((NotificationManager) getSystemService(NOTIFICATION_SERVICE));
         notificationManager.cancel(toUserid);
         MLog.d(TAG, "Cancelled notification " + toUserid);
-
-        mNewIntent = null;
     }
 
     @Override
     public void onResume() {
         sIsActive = true;
         super.onResume();
-        consumeNewIntentIfNecessary();
     }
 
     @Override
