@@ -31,12 +31,35 @@ public class PrivateChatActivity extends GroupChatActivity {
     private User mToUser;
     private static boolean sIsActive;
     private static int sToUserid;
+    private Intent mNewIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MLog.d(TAG, "onCreate() ");
+        onNewIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        MLog.d(TAG, "onNewIntent() ");
+        this.mNewIntent = intent;
+    }
+
+    private void consumeNewIntentIfNecessary() {
+
+        if (mNewIntent == null) {
+            MLog.d(TAG, "consumeNewIntentIfNecessary() false ");
+            return;
+        }
+        MLog.d(TAG, "consumeNewIntentIfNecessary() true ");
+
         getSupportActionBar().setTitle("");
         final int toUserid = getIntent().getIntExtra(Constants.KEY_USERID, 0);
+
+        MLog.d(TAG, "onNewIntent() toUserid : " + toUserid);
+
         sToUserid = toUserid;
         NetworkApi.getUserById(this, toUserid, new Response.Listener<JSONObject>() {
             @Override
@@ -58,12 +81,15 @@ public class PrivateChatActivity extends GroupChatActivity {
         final NotificationManager notificationManager = ((NotificationManager) getSystemService(NOTIFICATION_SERVICE));
         notificationManager.cancel(toUserid);
         MLog.d(TAG, "Cancelled notification " + toUserid);
+
+        mNewIntent = null;
     }
 
     @Override
     public void onResume() {
         sIsActive = true;
         super.onResume();
+        consumeNewIntentIfNecessary();
     }
 
     @Override
@@ -90,14 +116,16 @@ public class PrivateChatActivity extends GroupChatActivity {
     }
 
     public static void startPrivateChatActivity(Context context, int userid) {
-        Intent intent = createPrivateChatActivityIntent(context, userid);
+        Intent intent = newIntent(context, userid);
         context.startActivity(intent);
     }
 
-    public static Intent createPrivateChatActivityIntent(Context context, int userid) {
+    public static Intent newIntent(Context context, int userid) {
         Intent intent = new Intent(context, PrivateChatActivity.class);
         intent.putExtra(Constants.KEY_USERID, userid);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                | Intent.FLAG_ACTIVITY_NEW_TASK);
+        MLog.d(TAG, "instantiated intent with userid: " + userid);
         return intent;
     }
 

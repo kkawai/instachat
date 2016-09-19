@@ -22,6 +22,7 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.initech.Constants;
 import com.initech.MyApp;
 import com.initech.util.MLog;
+import com.initech.util.Preferences;
 import com.initech.util.ThreadWrapper;
 
 import org.json.JSONObject;
@@ -46,9 +47,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 final FriendlyMessage friendlyMessage = FriendlyMessage.fromJSONObject(msg);
 
                 if (PrivateChatActivity.isActive() && PrivateChatActivity.getActiveUserid() == friendlyMessage.getUserid()) {
-                    //already actively chatting with this person in the PrivateChatActivity
-                    //so no need to put up a notification in the system tray
-                    return;
+                    /* Already actively chatting with this person in the PrivateChatActivity
+                     * so no need to put up a notification in the system tray.
+                     * For debugging purposes, however, if it's myself, then it's ok.
+                     */
+                    if (PrivateChatActivity.getActiveUserid() != Preferences.getInstance().getUserId())
+                        return;
                 }
 
                 Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
@@ -100,8 +104,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         builder.setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp);
 
         // This intent is fired when notification is clicked
-        Intent intent = PrivateChatActivity.createPrivateChatActivityIntent(MyApp.getInstance(), friendlyMessage.getUserid());
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        Intent intent = PrivateChatActivity.newIntent(MyApp.getInstance(), friendlyMessage.getUserid());
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, friendlyMessage.getUserid(), intent, 0);
 
         // Set the intent that will fire when the user taps the notification.
         builder.setContentIntent(pendingIntent);

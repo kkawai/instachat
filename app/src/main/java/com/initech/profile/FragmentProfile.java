@@ -100,6 +100,7 @@ public class FragmentProfile extends BaseFragment {
                     pic.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
+                            MLog.d(TAG, "starting chat activity with " + remote.getId() + "  username: " + remote.getUsername());
                             PrivateChatActivity.startPrivateChatActivity(getContext(), remote.getId());
                         }
                     });

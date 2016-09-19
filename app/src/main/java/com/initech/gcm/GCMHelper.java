@@ -7,6 +7,7 @@ import com.amazon.device.messaging.ADM;
 import com.amazon.device.messaging.development.ADMManifest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.iid.InstanceID;
 import com.initech.Constants;
 import com.initech.Events;
 import com.initech.MyApp;
@@ -148,9 +149,13 @@ public final class GCMHelper {
                                     NetworkApi.gcmunreg(MyApp.getInstance(), userid, regId);
                                     MLog.i(TAG, "gcm unregistered");
                                 } catch (final Exception e) {
-                                    MLog.e(TAG, "", e);
-                                    MLog.i(TAG, "gcm failed to unregister", e);
+                                    MLog.e(TAG, "gcm failed to unregister", e);
                                 }
+                            }
+                            try {
+                                InstanceID.getInstance(MyApp.getInstance()).deleteInstanceID();
+                            } catch (Exception e) {
+                                MLog.e(TAG, "gcm failed to unregister. failed to delete instance id", e);
                             }
                         }
                     }

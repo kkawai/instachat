@@ -49,13 +49,11 @@
         android:theme="@style/Theme.App">
 
         <activity
-            android:name=".GroupChatActivity"
-            android:launchMode="singleTask">
+            android:name=".GroupChatActivity">
         </activity>
 
         <activity
-            android:name=".PrivateChatActivity"
-            android:launchMode="singleTask">
+            android:name=".PrivateChatActivity">
         </activity>
 
         <activity
