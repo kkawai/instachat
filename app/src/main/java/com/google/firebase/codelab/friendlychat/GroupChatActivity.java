@@ -1,12 +1,10 @@
 package com.google.firebase.codelab.friendlychat;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -120,6 +118,7 @@ public class GroupChatActivity extends BaseActivity implements
     private DrawerHelper mDrawerHelper;
     private String mDatabaseChild;
     private boolean mIsStartedAnimation;
+    private DotLoader mDotsLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,12 +131,11 @@ public class GroupChatActivity extends BaseActivity implements
 
         initDatabaseRef();
 
-        checkCallingObjectSuitability(this);
-
         DataBindingUtil.setContentView(this, R.layout.activity_main);
         initPhotoHelper(savedInstanceState);
         setupDrawer();
         setupToolbar();
+        mDotsLoader = (DotLoader) findViewById(R.id.text_dot_loader);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Initialize Firebase Auth
@@ -879,25 +877,6 @@ public class GroupChatActivity extends BaseActivity implements
                 .replace(R.id.fragment_content, fragment, FragmentProfile.TAG).addToBackStack(null).commit();
     }
 
-    private static void checkCallingObjectSuitability(Object object) {
-        // Make sure Object is an Activity or Fragment
-        boolean isActivity = object instanceof Activity;
-        boolean isSupportFragment = object instanceof Fragment;
-        boolean isAppFragment = object instanceof android.app.Fragment;
-        boolean isMinSdkM = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
-
-        MLog.d(TAG, "isActivity ", isActivity, " isSupportFragment ", isSupportFragment, " isAppFragment ", isAppFragment, " isMinSdkM ", isMinSdkM);
-
-        if (!(isSupportFragment || isActivity || (isAppFragment && isMinSdkM))) {
-            if (isAppFragment) {
-                throw new IllegalArgumentException(
-                        "Target SDK needs to be greater than 23 if caller is android.app.Fragment");
-            } else {
-                throw new IllegalArgumentException("Caller must be an Activity or a Fragment.");
-            }
-        }
-    }
-
     @Override
     public void onRemoteUserTyping(int userid) {
         if (isActivityDestroyed()) {
@@ -906,18 +885,22 @@ public class GroupChatActivity extends BaseActivity implements
         showTypingDots();
     }
 
-    void showTypingDots() {
-        final DotLoader dotLoader = (DotLoader) findViewById(R.id.text_dot_loader);
-        if (dotLoader.getVisibility() != View.VISIBLE) {
-            AnimationUtil.fadeInAnimation(dotLoader);
-            dotLoader.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (isActivityDestroyed())
-                        return;
-                    AnimationUtil.fadeOutAnimation(dotLoader);
-                }
-            }, 4000);
+    private Handler mDotsHandler = new Handler();
+    private Runnable mDotsHideRunner = new Runnable() {
+        @Override
+        public void run() {
+            if (isActivityDestroyed())
+                return;
+            AnimationUtil.fadeOutAnimation(mDotsLoader);
         }
+    };
+
+    void showTypingDots() {
+
+        if (mDotsLoader.getVisibility() != View.VISIBLE) {
+            AnimationUtil.fadeInAnimation(mDotsLoader);
+        }
+        mDotsHandler.removeCallbacks(mDotsHideRunner);
+        mDotsHandler.postDelayed(mDotsHideRunner, 3500);
     }
 }
