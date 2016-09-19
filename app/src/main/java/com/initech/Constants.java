@@ -162,5 +162,9 @@ public final class Constants {
      * new chat constants
      */
     public static final String KEY_USERID = "user_id";
-
+    public static final String KEY_GCM_MSG_TYPE = "key_gcm_type";
+    public enum GcmMessageType {
+        msg, typing
+    }
+    public static final String ACTION_USER_TYPING = "action_user_typing";
 }

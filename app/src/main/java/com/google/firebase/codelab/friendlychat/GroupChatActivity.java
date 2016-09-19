@@ -39,6 +39,7 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.ath.fuel.FuelInjector;
+import com.bhargavms.dotloader.DotLoader;
 import com.github.rubensousa.bottomsheetbuilder.BottomSheetBuilder;
 import com.github.rubensousa.bottomsheetbuilder.BottomSheetMenuDialog;
 import com.github.rubensousa.bottomsheetbuilder.adapter.BottomSheetItemClickListener;
@@ -72,6 +73,7 @@ import com.initech.api.UploadListener;
 import com.initech.gcm.GCMHelper;
 import com.initech.model.User;
 import com.initech.profile.FragmentProfile;
+import com.initech.util.AnimationUtil;
 import com.initech.util.MLog;
 import com.initech.util.Preferences;
 import com.initech.util.ScreenUtil;
@@ -85,7 +87,8 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class GroupChatActivity extends BaseActivity implements
         GoogleApiClient.OnConnectionFailedListener, FriendlyMessageContainer,
-        EasyPermissions.PermissionCallbacks, UploadListener, UserThumbClickedListener {
+        EasyPermissions.PermissionCallbacks, UploadListener, UserThumbClickedListener,
+        ChatTypingHelper.UserTypingListener {
 
     private static final String TAG = "GroupChatActivity";
 
@@ -136,8 +139,6 @@ public class GroupChatActivity extends BaseActivity implements
         setupDrawer();
         setupToolbar();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-        // Restore instance state
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -207,6 +208,7 @@ public class GroupChatActivity extends BaseActivity implements
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 if (charSequence.toString().trim().length() > 0) {
                     setEnableSendButton(true);
+                    onMeEnteringText();
                 } else {
                     setEnableSendButton(false);
                 }
@@ -218,6 +220,10 @@ public class GroupChatActivity extends BaseActivity implements
         });
         //initDownloadReceiver();
         initButtons();
+    }
+
+    void onMeEnteringText() {
+
     }
 
     @Override
@@ -889,6 +895,29 @@ public class GroupChatActivity extends BaseActivity implements
             } else {
                 throw new IllegalArgumentException("Caller must be an Activity or a Fragment.");
             }
+        }
+    }
+
+    @Override
+    public void onRemoteUserTyping(int userid) {
+        if (isActivityDestroyed()) {
+            return;
+        }
+        showTypingDots();
+    }
+
+    void showTypingDots() {
+        final DotLoader dotLoader = (DotLoader) findViewById(R.id.text_dot_loader);
+        if (dotLoader.getVisibility() != View.VISIBLE) {
+            AnimationUtil.fadeInAnimation(dotLoader);
+            dotLoader.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (isActivityDestroyed())
+                        return;
+                    AnimationUtil.fadeOutAnimation(dotLoader);
+                }
+            }, 4000);
         }
     }
 }

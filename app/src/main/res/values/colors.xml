@@ -5,9 +5,13 @@
     <color name="colorAccent">#a8a8a8</color> <!-- button colors -->
     <color name="colorTitle">#ffffff</color>
 
+    <color name="dotColor1">#000000</color>
+    <color name="dotColor2">#4c4c4c</color>
+    <color name="dotColor3">#7f7f7f</color>
+
     <array name="dot_colors">
-        <item>@color/colorPrimaryDark</item>
-        <item>@color/colorPrimary</item>
-        <item>@color/colorAccent</item>
+        <item>@color/dotColor1</item>
+        <item>@color/dotColor2</item>
+        <item>@color/dotColor3</item>
     </array>
 </resources>

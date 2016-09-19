@@ -3,11 +3,17 @@ package com.google.firebase.codelab.friendlychat;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.codelab.friendlychat.model.FriendlyMessage;
 import com.initech.Constants;
 import com.initech.api.NetworkApi;
@@ -31,6 +37,8 @@ public class PrivateChatActivity extends GroupChatActivity {
     private User mToUser;
     private static boolean sIsActive;
     private static int sToUserid;
+    private ChatTypingHelper mTypingHelper;
+    private long mLastTypingTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,10 +50,8 @@ public class PrivateChatActivity extends GroupChatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        MLog.d(TAG, "onNewIntent() ");
         getSupportActionBar().setTitle("");
         final int toUserid = getIntent().getIntExtra(Constants.KEY_USERID, 0);
-
         MLog.d(TAG, "onNewIntent() toUserid : " + toUserid);
 
         sToUserid = toUserid;
@@ -54,6 +60,7 @@ public class PrivateChatActivity extends GroupChatActivity {
             public void onResponse(JSONObject response) {
                 try {
                     mToUser = User.fromResponse(response);
+                    fillMiniPic();
                     getSupportActionBar().setTitle(mToUser.getUsername());
                 } catch (Exception e) {
                     Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, "1"), Toast.LENGTH_SHORT).show();
@@ -75,12 +82,17 @@ public class PrivateChatActivity extends GroupChatActivity {
     public void onResume() {
         sIsActive = true;
         super.onResume();
+        mTypingHelper = new ChatTypingHelper();
+        mTypingHelper.setListener(this);
+        mTypingHelper.register();
     }
 
     @Override
     public void onPause() {
         sIsActive = false;
         super.onPause();
+        if (mTypingHelper != null)
+            mTypingHelper.unregister();
     }
 
     @Override
@@ -93,10 +105,27 @@ public class PrivateChatActivity extends GroupChatActivity {
     void onFriendlyMessageSent(FriendlyMessage friendlyMessage) {
         try {
             JSONObject o = friendlyMessage.toJSONObject();
+            o.put(Constants.KEY_GCM_MSG_TYPE, Constants.GcmMessageType.msg.name());
             NetworkApi.gcmsend("" + mToUser.getId(), o);
         } catch (Exception e) {
             MLog.e(TAG, "onFriendlyMessageSent() failed", e);
             Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, "3"), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    void onMeEnteringText() {
+        try {
+            if (System.currentTimeMillis() - mLastTypingTime < 3000) {
+                return;
+            }
+            JSONObject o = new JSONObject();
+            o.put(Constants.KEY_GCM_MSG_TYPE, Constants.GcmMessageType.typing.name());
+            o.put(Constants.KEY_USERID, myUserid());
+            NetworkApi.gcmsend("" + mToUser.getId(), o);
+            mLastTypingTime = System.currentTimeMillis();
+        } catch (Exception e) {
+            MLog.e(TAG, "onMeEnteringText() failed", e);
         }
     }
 
@@ -121,4 +150,40 @@ public class PrivateChatActivity extends GroupChatActivity {
     public static int getActiveUserid() {
         return sToUserid;
     }
+
+    @Override
+    public void onRemoteUserTyping(int userid) {
+        if (!sIsActive || sToUserid != userid || isActivityDestroyed()) {
+            return;
+        }
+        showTypingDots();
+    }
+
+    private void fillMiniPic() {
+        if (mToUser == null || isActivityDestroyed()) return;
+        final ImageView miniPic = (ImageView) findViewById(R.id.superSmallProfileImage);
+        Constants.DP_URL(mToUser.getId(), mToUser.getProfilePicUrl(), new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (isActivityDestroyed())
+                    return;
+                if (!task.isSuccessful()) {
+                    miniPic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                    return;
+                }
+                try {
+                    Glide.with(PrivateChatActivity.this)
+                            .load(task.getResult().toString())
+                            .error(R.drawable.ic_account_circle_black_36dp)
+                            .crossFade()
+                            .into(miniPic);
+                } catch (Exception e) {
+                    MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
+                    miniPic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                }
+            }
+        });
+
+    }
+
 }

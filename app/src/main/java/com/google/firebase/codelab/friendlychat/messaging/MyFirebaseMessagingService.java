@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 
 import com.bumptech.glide.Glide;
@@ -44,6 +45,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             JSONObject object = new JSONObject(remoteMessage.getData());
             if (object.has("msg")) {
                 JSONObject msg = new JSONObject(object.getString("msg"));
+                if (msg.has(Constants.KEY_GCM_MSG_TYPE)) {
+                    if (msg.getString(Constants.KEY_GCM_MSG_TYPE).equals(Constants.GcmMessageType.typing.name())) {
+                        Intent intent = new Intent(Constants.ACTION_USER_TYPING);
+                        intent.putExtra(Constants.KEY_USERID, msg.getInt(Constants.KEY_USERID));
+                        LocalBroadcastManager.getInstance(MyApp.getInstance()).sendBroadcast(intent);
+                        return;
+                    }
+                }
                 final FriendlyMessage friendlyMessage = FriendlyMessage.fromJSONObject(msg);
 
                 if (PrivateChatActivity.isActive() && PrivateChatActivity.getActiveUserid() == friendlyMessage.getUserid()) {
