@@ -43,4 +43,14 @@
     <string name="is_your_new_username">%s is your new username</string>
     <string name="title_update_my_pic">Update my photo</string>
     <string name="sent_via">Sent via %s</string>
+
+    <string name="empty" translatable="false"/>
+    <string name="preview_area">Preview Area</string>
+    <string name="post_area">Post Area</string>
+    <string name="no_thumbnail">No thumbnail</string>
+    <string name="choose_thumbnail">Choose a thumbnail</string>
+    <string name="previous">←</string>
+    <string name="forward">→</string>
+    <string name="post">Post</string>
+    <string name="photo">Photo</string>
 </resources>

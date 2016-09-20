@@ -19,6 +19,15 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
     public ImageView messagePhotoView;
     public CircleImageView messengerImageView;
 
+    /*
+     * Web link content
+     */
+    public TextView webLinkContent;
+    public ImageView webLinkImageView;
+    public TextView webLinkTitle;
+    public TextView webLinkUrl;
+    public TextView webLinkDescription;
+
     public MessageViewHolder(View v) {
         super(v);
         messageTextView = (TextView) itemView.findViewById(R.id.messageTextView);
@@ -26,5 +35,11 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         messengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);
         messageTimeTextView = (TextView) itemView.findViewById(R.id.messageTimeTextView);
         messagePhotoView = (ImageView) itemView.findViewById(R.id.messagePhotoView);
+
+        webLinkContent = (TextView) itemView.findViewById(R.id.post_content);
+        webLinkImageView = (ImageView) itemView.findViewById(R.id.image_post);
+        webLinkTitle = (TextView) itemView.findViewById(R.id.title);
+        webLinkUrl = (TextView) itemView.findViewById(R.id.url);
+        webLinkDescription = (TextView) itemView.findViewById(R.id.description);
     }
 }

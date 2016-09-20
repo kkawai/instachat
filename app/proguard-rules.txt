@@ -70,7 +70,8 @@
 -keep class com.ath.** { *; }
 -keep class pub.devrel.** { *; }
 -keep class com.firebaseui.** { *; }
-
+-keep class org.jsoup.** { *; }
+-keep class com.leocardz.** { *; }
 
 # below was necessary for making proguard work with flurry jar
 -keep class com.flurry.** { *; }

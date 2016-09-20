@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
+import android.text.TextUtils;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -135,7 +136,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         builder.setContentTitle(friendlyMessage.getName());
 
         // Content text, which appears in smaller text below the title
-        builder.setContentText(friendlyMessage.getText() + "");
+        if (!TextUtils.isEmpty(friendlyMessage.getImageUrl()) && TextUtils.isEmpty(friendlyMessage.getText()))
+            builder.setContentText(getString(R.string.photo));
+        else
+            builder.setContentText(friendlyMessage.getText() + "");
+
 
         // The subtext, which appears under the text on newer devices.
         // This will show-up in the devices with Android 4.2 and above only

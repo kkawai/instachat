@@ -2,11 +2,14 @@ package com.google.firebase.codelab.friendlychat.adapter;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.URLUtil;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -33,6 +36,9 @@ import java.lang.ref.WeakReference;
 public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> extends FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> {
 
     public static final String TAG = "MyFirebaseRecyclerAdapter";
+
+    private static final int ITEM_VIEW_TYPE_STANDARD_MESSAGE = 0;
+    private static final int ITEM_VIEW_TYPE_WEB_LINK = 1;
 
     private StorageReference mStorageRef;
     private DatabaseReference mFirebaseDatabaseReference;
@@ -69,8 +75,43 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
     }
 
     @Override
+    public int getItemViewType(int position) {
+        FriendlyMessage friendlyMessage = getItem(position);
+        String text = friendlyMessage.getText() + "";
+        if (URLUtil.isHttpUrl(text) || URLUtil.isHttpsUrl(text)) {
+            return ITEM_VIEW_TYPE_WEB_LINK;
+        }
+        return ITEM_VIEW_TYPE_STANDARD_MESSAGE;
+    }
+
+    private MessageViewHolder createMessageViewHolder(ViewGroup parent, int viewType) {
+        if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_content, parent, false);
+            final MessageViewHolder holder = new MessageViewHolder(view);
+            View.OnClickListener webLinkClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final FriendlyMessage msg = getItem(holder.getAdapterPosition());
+                    final Uri uri = Uri.parse(msg.getText());
+                    mActivity.get().startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                }
+            };
+            holder.webLinkContent.setOnClickListener(webLinkClickListener);
+            holder.webLinkUrl.setOnClickListener(webLinkClickListener);
+            holder.webLinkTitle.setOnClickListener(webLinkClickListener);
+            holder.webLinkDescription.setOnClickListener(webLinkClickListener);
+            holder.webLinkImageView.setOnClickListener(webLinkClickListener);
+            return holder;
+        } else {
+            MessageViewHolder holder = super.onCreateViewHolder(parent, viewType);
+            return holder;
+        }
+    }
+
+    @Override
     public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final MessageViewHolder holder = super.onCreateViewHolder(parent, viewType);
+
+        final MessageViewHolder holder = createMessageViewHolder(parent, viewType);
         holder.messengerImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
@@ -85,7 +126,8 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
             }
         };
         holder.messageTimeTextView.setOnClickListener(onClickListener);
-        holder.messageTextView.setOnClickListener(onClickListener);
+        if (holder.messageTextView != null)
+            holder.messageTextView.setOnClickListener(onClickListener);
         holder.messengerTextView.setOnClickListener(onClickListener);
 
         View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
@@ -117,8 +159,20 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
         };
 
         holder.messageTimeTextView.setOnLongClickListener(onLongClickListener);
-        holder.messageTextView.setOnLongClickListener(onLongClickListener);
+        if (holder.messageTextView != null)
+            holder.messageTextView.setOnLongClickListener(onLongClickListener);
         holder.messengerTextView.setOnLongClickListener(onLongClickListener);
+        if (holder.webLinkContent != null) {
+            holder.webLinkContent.setOnLongClickListener(onLongClickListener);
+            holder.webLinkUrl.setOnLongClickListener(onLongClickListener);
+            holder.webLinkTitle.setOnLongClickListener(onLongClickListener);
+            holder.webLinkDescription.setOnLongClickListener(onLongClickListener);
+            holder.webLinkImageView.setOnLongClickListener(onLongClickListener);
+        }
+        if (holder.messagePhotoView != null) {
+            holder.messagePhotoView.setOnClickListener(onClickListener);
+            holder.messagePhotoView.setOnLongClickListener(onLongClickListener);
+        }
         return holder;
     }
 
@@ -126,10 +180,18 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
     protected void populateViewHolder(final MessageViewHolder viewHolder, final FriendlyMessage friendlyMessage, int position) {
 
         mAdapterPopulateHolderListener.onViewHolderPopulated();
-        if (StringUtil.isNotEmpty(friendlyMessage.getText()))
-            viewHolder.messageTextView.setText(friendlyMessage.getText());
-        else
-            viewHolder.messageTextView.setText("");
+
+        if (getItemViewType(position) == ITEM_VIEW_TYPE_WEB_LINK) {
+            new WebLinkHelper().populateWebLinkPost(viewHolder, friendlyMessage, position);
+        }
+
+        if (viewHolder.messageTextView != null) {
+            if (StringUtil.isNotEmpty(friendlyMessage.getText()))
+                viewHolder.messageTextView.setText(friendlyMessage.getText());
+            else
+                viewHolder.messageTextView.setText("");
+        }
+
         viewHolder.messengerTextView.setText(friendlyMessage.getName());
         if (friendlyMessage.getTime() != 0) {
             viewHolder.messageTimeTextView.setVisibility(View.VISIBLE);
@@ -137,20 +199,17 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
         } else {
             viewHolder.messageTimeTextView.setVisibility(View.INVISIBLE);
         }
-//                if (friendlyMessage.getPhotoUrl() == null) {
-//                    viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(GroupChatActivity.this,
-//                            R.drawable.ic_account_circle_black_36dp));
-//                } else {
-//
-//                }
-        if (friendlyMessage.getImageUrl() != null) {
-            Glide.with(mActivity.get())
-                    .load(friendlyMessage.getImageUrl())
-                    .crossFade()
-                    .into(viewHolder.messagePhotoView);
-            viewHolder.messagePhotoView.setVisibility(View.VISIBLE);
-        } else {
-            viewHolder.messagePhotoView.setVisibility(View.GONE);
+
+        if (viewHolder.messagePhotoView != null) {
+            if (friendlyMessage.getImageUrl() != null) {
+                Glide.with(mActivity.get())
+                        .load(friendlyMessage.getImageUrl())
+                        .crossFade()
+                        .into(viewHolder.messagePhotoView);
+                viewHolder.messagePhotoView.setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.messagePhotoView.setVisibility(View.GONE);
+            }
         }
 
         Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {

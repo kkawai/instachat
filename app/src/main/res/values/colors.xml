@@ -14,4 +14,8 @@
         <item>@color/dotColor2</item>
         <item>@color/dotColor3</item>
     </array>
+
+    <color name="aa">#ff007de3</color>
+    <color name="soft_grey_split">#d0d0d0</color>
+    <color name="soft_grey_choose">#aaa</color>
 </resources>
