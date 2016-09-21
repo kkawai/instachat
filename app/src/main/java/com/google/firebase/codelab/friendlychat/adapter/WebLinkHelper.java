@@ -3,6 +3,9 @@ package com.google.firebase.codelab.friendlychat.adapter;
 import com.bumptech.glide.Glide;
 import com.google.firebase.codelab.friendlychat.model.FriendlyMessage;
 import com.initech.MyApp;
+import com.initech.db.RssDb;
+import com.initech.model.Rss;
+import com.initech.util.MLog;
 import com.leocardz.link.preview.library.LinkPreviewCallback;
 import com.leocardz.link.preview.library.SourceContent;
 import com.leocardz.link.preview.library.TextCrawler;
@@ -12,6 +15,7 @@ import com.leocardz.link.preview.library.TextCrawler;
  */
 public class WebLinkHelper {
 
+    public static final String TAG = "WebLinkHelper";
     private TextCrawler mTextCrawler;
 
     public WebLinkHelper() {
@@ -27,15 +31,38 @@ public class WebLinkHelper {
 
             @Override
             public void onPos(SourceContent sourceContent, boolean b) {
-                viewHolder.webLinkDescription.setText(sourceContent.getDescription());
-                viewHolder.webLinkTitle.setText(sourceContent.getTitle());
-                viewHolder.webLinkUrl.setText(sourceContent.getCannonicalUrl());
-                viewHolder.webLinkContent.setText(sourceContent.getFinalUrl());
+                Rss rss = new Rss();
+                rss.setCategory(friendlyMessage.getUserid() + "");
+                rss.setOriginalCategory(friendlyMessage.getName());
+                rss.setDescr(sourceContent.getDescription());
+                rss.setTitle(sourceContent.getTitle());
+                rss.setBasicLink(sourceContent.getCannonicalUrl());
+                rss.setLink(friendlyMessage.getText().trim());
+                viewHolder.webLinkDescription.setText(sourceContent.getDescription() + "");
+                viewHolder.webLinkTitle.setText(sourceContent.getTitle() + "");
+                viewHolder.webLinkUrl.setText(sourceContent.getCannonicalUrl() + "");
+                viewHolder.webLinkContent.setText(friendlyMessage.getText().trim());
                 if (sourceContent.getImages().size() > 0) {
                     Glide.with(MyApp.getInstance()).load(sourceContent.getImages().get(0)).into(viewHolder.webLinkImageView);
+                    rss.setImageUrl(sourceContent.getImages().get(0));
                 }
+                MLog.d(TAG, "saved link in rss db. basic link: " + rss.getBasicLink() + " main rss link: " + rss.getLink());
+                RssDb.getInstance().insertRss(rss);
             }
         };
-        mTextCrawler.makePreview(callback, friendlyMessage.getText());
+
+        Rss rss = RssDb.getInstance().getRssByLink(friendlyMessage.getText().trim());
+        if (rss != null) {
+            viewHolder.webLinkDescription.setText(rss.getDescr() + "");
+            viewHolder.webLinkTitle.setText(rss.getTitle() + "");
+            viewHolder.webLinkUrl.setText(rss.getBasicLink() + "");
+            viewHolder.webLinkContent.setText(rss.getLink() + "");
+            if (rss.getImageUrl() != null && rss.getImageUrl().toLowerCase().startsWith("http")) {
+                Glide.with(MyApp.getInstance()).load(rss.getImageUrl()).into(viewHolder.webLinkImageView);
+            }
+            MLog.d(TAG, "found link in rss db. basic link: " + rss.getBasicLink() + " main rss link: " + rss.getLink());
+            return;
+        }
+        mTextCrawler.makePreview(callback, friendlyMessage.getText().trim());
     }
 }

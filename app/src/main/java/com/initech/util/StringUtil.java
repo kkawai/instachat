@@ -167,4 +167,28 @@ public class StringUtil {
             return timeStr;
         }
     }
+
+    /**
+     * Strips surrounding single quotes from a string greater than
+     * 2 length.  Also, converts any sequences of 2 quotes to 1.  This method
+     * is the converse of android.database.DatabaseUtils.sqlEscapeString().
+     * <p>
+     * Example: ''the fox''s tail was red'' -> 'the fox's tail was red'
+     * 'the fox''s tail was red' -> the fox's tail was red
+     * stacy''s hair is green -> stacy's hair is green
+     * stacy's hair is green -> stacy's hair is green
+     * my car is blue -> my car is blue
+     *
+     * @param s
+     * @return
+     */
+    public static String unescapeQuotes(String s) {
+        if (s == null)
+            return s;
+        s = s.replace("''", "'");
+        if (s.startsWith("'") && s.endsWith("'") && s.length() > 2) {
+            return s.substring(1, s.length() - 1);
+        }
+        return s;
+    }
 }
