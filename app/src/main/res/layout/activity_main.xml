@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        tools:context=".GroupChatActivity">
+        tools:context="com.instachat.GroupChatActivity">
 
         <!-- android:paddingBottom="@dimen/activity_vertical_margin" -->
         <RelativeLayout
@@ -18,7 +18,7 @@
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".GroupChatActivity">
+            tools:context="com.instachat.GroupChatActivity">
 
             <!--
             <com.google.android.gms.ads.AdView

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">A Group Chat</string>
+    <string name="app_name">Instachat</string>
     <string name="invitation_title">Group Chat Invite</string>
     <string name="invitation_cta">Call to action</string>
     <string name="invitation_message">Please joine me for a friendly chat</string>

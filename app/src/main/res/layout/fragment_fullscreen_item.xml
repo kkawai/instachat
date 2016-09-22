@@ -5,7 +5,7 @@
               android:background="@android:color/white"
               android:orientation="vertical">
 
-    <com.initech.view.AutoResizeTextView
+    <com.instachat.android.view.AutoResizeTextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

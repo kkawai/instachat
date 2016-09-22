@@ -32,7 +32,7 @@
 
                 <!-- android:textAppearance="?android:attr/textAppearanceSmall" -->
 
-                <com.initech.view.CustomFontTextView
+                <com.instachat.android.view.CustomFontTextView
                     android:id="@+id/messengerTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
                     android:textSize="14sp"
                     app:font="Lato-Bold.ttf"/>
 
-                <com.initech.view.CustomFontTextView
+                <com.instachat.android.view.CustomFontTextView
                     android:id="@+id/messageTimeTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

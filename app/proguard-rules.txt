@@ -61,7 +61,7 @@
 -keep class org.apache.** { *; }
 -keep class org.jivesoftware.** { *; }
 -keep class org.xbill.** { *; }
--keep class com.initech.model.** { *; }
+-keep class com.instachat.android.model.** { *; }
 -keep class com.google.firebase.codelab.friendlychat.model.** { *; }
 -keep class com.bumptech.** { *; }
 -keep class com.nineoldandroids.** { *; }
@@ -142,11 +142,11 @@
 
 -keep class android.support.** { *; }
 
--keep class com.google.firebase.codelab.friendlychat.GroupChatActivity
--keepclassmembers class com.google.firebase.codelab.friendlychat.PrivateChatActivity {
+-keep class com.instachat.android.GroupChatActivity
+-keepclassmembers class com.initech.PrivateChatActivity {
     <methods>;
 }
--dontwarn com.google.firebase.codelab.friendlychat.GroupChatActivity
--dontwarn com.google.firebase.codelab.friendlychat.PrivateChatActivity
+-dontwarn com.instachat.android.GroupChatActivity
+-dontwarn com.instachat.android.PrivateChatActivity
 
 -dontwarn

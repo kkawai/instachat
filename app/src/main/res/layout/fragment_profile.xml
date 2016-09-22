@@ -10,7 +10,7 @@
     android:fitsSystemWindows="true"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".GroupChatActivity">
+    tools:context="com.instachat.GroupChatActivity">
 
     <!--
     <android.support.design.widget.AppBarLayout
@@ -44,7 +44,7 @@
     </android.support.design.widget.AppBarLayout>
     -->
 
-    <com.initech.view.CustomFontTextView
+    <com.instachat.android.view.CustomFontTextView
         android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -76,7 +76,7 @@
             android:src="@drawable/presence_green"
             />
 
-        <com.initech.view.CustomFontTextView
+        <com.instachat.android.view.CustomFontTextView
             android:id="@+id/status_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
