@@ -17,7 +17,6 @@ package com.instachat.android;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.instachat.android.util.MLog;
 
 public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
@@ -36,6 +35,6 @@ public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
         MLog.d(TAG, "FCM Token: " + token);
 
         // Once a token is generated, we subscribe to topic.
-        FirebaseMessaging.getInstance().subscribeToTopic(FRIENDLY_ENGAGE_TOPIC);
+        //FirebaseMessaging.getInstance().subscribeToTopic(FRIENDLY_ENGAGE_TOPIC);
     }
 }

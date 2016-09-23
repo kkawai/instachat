@@ -14,8 +14,8 @@ import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.api.NetworkApi;
+import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.model.User;
 import com.instachat.android.util.MLog;
 
