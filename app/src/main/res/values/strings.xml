@@ -53,4 +53,6 @@
     <string name="forward">→</string>
     <string name="post">Post</string>
     <string name="photo">Photo</string>
+    <string name="group_chat_header"># Channels</string>
+    <string name="private_chat_header">Direct Messages</string>
 </resources>

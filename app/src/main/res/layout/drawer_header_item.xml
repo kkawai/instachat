@@ -3,27 +3,26 @@
              xmlns:app="http://schemas.android.com/apk/res-auto"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
-             android:background="@color/colorPrimary"
              android:orientation="horizontal"
              android:paddingBottom="8dp"
              android:paddingTop="8dp">
 
     <com.instachat.android.view.CustomFontTextView
-        android:id="@+id/heading_name"
+        android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
+        android:layout_gravity="left|center_vertical"
         android:paddingLeft="16dp"
         android:text="# Channels"
         android:textColor="@android:color/white"
         android:textSize="18sp"
-        app:font="Lato-Bold.ttf"
+        app:font="Lato-Heavy.ttf"
         />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
+        android:layout_gravity="right|center_vertical"
         android:paddingRight="16dp"
         android:src="@drawable/ic_add_circle_outline_white_24dp"
         />

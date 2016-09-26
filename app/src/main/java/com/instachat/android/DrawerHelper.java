@@ -72,9 +72,39 @@ public class DrawerHelper {
         });
     }
 
+    private void populateNavHeader() {
+        final TextView email = (TextView) mHeaderLayout.findViewById(R.id.nav_email);
+        final TextView username = (TextView) mHeaderLayout.findViewById(R.id.nav_username);
+        final ImageView navpic = (ImageView) mHeaderLayout.findViewById(R.id.nav_pic);
+        final User user = Preferences.getInstance().getUser();
+        email.setText(Preferences.getInstance().getEmail());
+        username.setText(Preferences.getInstance().getUsername());
+        Constants.DP_URL(user.getId(), user.getProfilePicUrl(), new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (isActivityDestroyed())
+                    return;
+                if (!task.isSuccessful()) {
+                    navpic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                    return;
+                }
+                try {
+                    Glide.with(mActivity)
+                            .load(task.getResult().toString())
+                            .error(R.drawable.ic_account_circle_black_36dp)
+                            .crossFade()
+                            .into(navpic);
+                } catch (Exception e) {
+                    MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
+                    navpic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                }
+                checkForRemoteUpdatesToMyDP();
+            }
+        });
+    }
+
     public void setup(NavigationView navigationView) {
         mHeaderLayout = navigationView.getHeaderView(0); // 0-index header
-        final TextView email = (TextView) mHeaderLayout.findViewById(R.id.nav_email);
         final TextView username = (TextView) mHeaderLayout.findViewById(R.id.nav_username);
         final ImageView navpic = (ImageView) mHeaderLayout.findViewById(R.id.nav_pic);
         navpic.setOnClickListener(new View.OnClickListener() {
@@ -91,32 +121,7 @@ public class DrawerHelper {
 
             @Override
             public void onDrawerOpened(View drawerView) {
-                final User user = Preferences.getInstance().getUser();
-                email.setText(Preferences.getInstance().getEmail());
-                username.setText(Preferences.getInstance().getUsername());
-                Constants.DP_URL(user.getId(), user.getProfilePicUrl(), new OnCompleteListener<Uri>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Uri> task) {
-                        if (isActivityDestroyed())
-                            return;
-                        if (!task.isSuccessful()) {
-                            navpic.setImageResource(R.drawable.ic_account_circle_black_36dp);
-                            return;
-                        }
-                        try {
-                            Glide.with(mActivity)
-                                    .load(task.getResult().toString())
-                                    .error(R.drawable.ic_account_circle_black_36dp)
-                                    .crossFade()
-                                    .into(navpic);
-                        } catch (Exception e) {
-                            MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
-                            navpic.setImageResource(R.drawable.ic_account_circle_black_36dp);
-                        }
-                        checkForRemoteUpdatesToMyDP();
-                    }
-                });
-
+                populateNavHeader();
             }
 
             @Override

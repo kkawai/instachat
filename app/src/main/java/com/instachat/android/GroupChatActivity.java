@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
@@ -57,6 +58,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.instachat.android.adapter.AdapterPopulateHolderListener;
+import com.instachat.android.adapter.ChatsItemClickedListener;
+import com.instachat.android.adapter.ChatsRecyclerAdapter;
 import com.instachat.android.adapter.MessageTextClickedListener;
 import com.instachat.android.adapter.MessageViewHolder;
 import com.instachat.android.adapter.MyFirebaseRecyclerAdapter;
@@ -85,7 +88,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class GroupChatActivity extends BaseActivity implements
         GoogleApiClient.OnConnectionFailedListener, FriendlyMessageContainer,
         EasyPermissions.PermissionCallbacks, UploadListener, UserThumbClickedListener,
-        ChatTypingHelper.UserTypingListener {
+        ChatTypingHelper.UserTypingListener, ChatsItemClickedListener {
 
     private static final String TAG = "GroupChatActivity";
 
@@ -118,6 +121,7 @@ public class GroupChatActivity extends BaseActivity implements
     private String mDatabaseChild;
     private boolean mIsStartedAnimation;
     private DotLoader mDotsLoader;
+    private ChatsRecyclerAdapter mChatsRecyclerViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,6 +156,13 @@ public class GroupChatActivity extends BaseActivity implements
         mMessageRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setStackFromEnd(true);
+
+        try {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            MLog.w(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) succeeded");
+        } catch (Exception e) {
+            //MLog.e(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) failed: " + e);
+        }
 
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
@@ -275,9 +286,10 @@ public class GroupChatActivity extends BaseActivity implements
             mFirebaseAdapter.cleanup();
         if (mDrawerHelper != null)
             mDrawerHelper.cleanup();
-        if (mAdView != null) {
+        if (mAdView != null)
             mAdView.destroy();
-        }
+        if (mChatsRecyclerViewAdapter != null)
+            mChatsRecyclerViewAdapter.cleanup();
         super.onDestroy();
     }
 
@@ -604,22 +616,35 @@ public class GroupChatActivity extends BaseActivity implements
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        menuItem.setChecked(true);
-                        mDrawerLayout.closeDrawers();
-                        return true;
-                    }
-                });
+        View headerView = getLayoutInflater().inflate(R.layout.nav_header, navigationView, false);
+        View drawerRecyclerView = getLayoutInflater().inflate(R.layout.drawer_layout, navigationView, false);
+        navigationView.addHeaderView(headerView);
+        navigationView.addHeaderView(drawerRecyclerView);
         mDrawerHelper = new DrawerHelper(this, mDrawerLayout, mPhotoUploadHelper);
         mDrawerHelper.setup(navigationView);
+
+        RecyclerView recyclerView = (RecyclerView) drawerRecyclerView.findViewById(R.id.drawerRecyclerView);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(linearLayoutManager);
+
+        mChatsRecyclerViewAdapter = new ChatsRecyclerAdapter(this, this);
+        recyclerView.setAdapter(mChatsRecyclerViewAdapter);
+        mChatsRecyclerViewAdapter.populateData();
+    }
+
+    private boolean isDrawerOpen() {
+        return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START);
+    }
+
+    private void closeDrawer() {
+        if (mDrawerLayout != null)
+            mDrawerLayout.closeDrawer(Gravity.LEFT);
     }
 
     @Override
     public void onBackPressed() {
-        if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+        if (isDrawerOpen()) {
             mDrawerLayout.closeDrawer(Gravity.LEFT);
             return;
         }
@@ -904,5 +929,18 @@ public class GroupChatActivity extends BaseActivity implements
         }
         mDotsHandler.removeCallbacks(mDotsHideRunner);
         mDotsHandler.postDelayed(mDotsHideRunner, 3500);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (isDrawerOpen())
+            closeDrawer();
+    }
+
+    @Override
+    public void onNameClicked() {
+        if (isDrawerOpen())
+            closeDrawer();
     }
 }

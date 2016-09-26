@@ -253,6 +253,7 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
     }
 
     public void cleanup() {
+        super.cleanup();
         if (mActivity != null)
             mActivity.clear();
         mActivity = null;

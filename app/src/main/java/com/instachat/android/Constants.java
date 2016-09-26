@@ -5,6 +5,7 @@ import android.net.Uri;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.instachat.android.util.Preferences;
 
 /**
  * @author kkawai
@@ -139,8 +140,14 @@ public final class Constants {
         storageReference.child(DP_STORAGE_BASE(userid) + dpid).getDownloadUrl().addOnCompleteListener(onCompleteListener);
     }
 
-    public static String PRIVATE_CHAT_REF(int toUserid, int myUserid) {
+    public static String PRIVATE_CHAT_REF(int toUserid) {
+        final int myUserid = Preferences.getInstance().getUserId();
         return "/directs/"+ (toUserid > myUserid ? (myUserid+"_"+toUserid) : (toUserid+"_"+myUserid));
+    }
+
+    public static String PRIVATE_CHATS_SUMMARY_PARENT_REF() {
+        int myUserid = Preferences.getInstance().getUserId();
+        return "/users/"+myUserid+"/private_summaries/";
     }
 
     public static String DP_STORAGE_BASE(int userid) {

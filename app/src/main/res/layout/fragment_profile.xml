@@ -10,7 +10,7 @@
     android:fitsSystemWindows="true"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context="com.instachat.GroupChatActivity">
+    tools:context="com.instachat.android.GroupChatActivity">
 
     <!--
     <android.support.design.widget.AppBarLayout
@@ -70,9 +70,10 @@
 
         <ImageView
             android:id="@+id/status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="11dp"
+            android:layout_height="11dp"
             android:baselineAlignBottom="true"
+            android:scaleType="fitXY"
             android:src="@drawable/presence_green"
             />
 

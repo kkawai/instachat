@@ -14,8 +14,11 @@ import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.model.FriendlyMessage;
+import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.model.User;
 import com.instachat.android.util.MLog;
 
@@ -59,6 +62,7 @@ public class PrivateChatActivity extends GroupChatActivity {
             public void onResponse(JSONObject response) {
                 try {
                     mToUser = User.fromResponse(response);
+                    initPrivateChatSummaryIfNecessary();
                     fillMiniPic();
                     getSupportActionBar().setTitle(mToUser.getUsername());
                 } catch (Exception e) {
@@ -75,6 +79,70 @@ public class PrivateChatActivity extends GroupChatActivity {
         final NotificationManager notificationManager = ((NotificationManager) getSystemService(NOTIFICATION_SERVICE));
         notificationManager.cancel(toUserid);
         MLog.d(TAG, "Cancelled notification " + toUserid);
+    }
+
+    private void initPrivateChatSummaryIfNecessary() {
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
+        PrivateChatSummary summary = new PrivateChatSummary();
+        summary.setName(mToUser.getUsername());
+        summary.setDpid(mToUser.getProfilePicUrl());
+        ref.child(mToUser.getId() + "").updateChildren(PrivateChatSummary.toMap(summary));
+
+        /*DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
+        ref.limitToLast(1000).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                try {
+                    PrivateChatSummary summary = new PrivateChatSummary();
+                    summary.setId(dataSnapshot.getKey());
+                    String name = (String) dataSnapshot.child("name").getValue();
+                    String dpid = (String) dataSnapshot.child("dpid").getValue();
+                    long lastMessageTime = (Long) dataSnapshot.child("lastMessageTime").getValue();
+                    MLog.d(TAG, "got summary: ", name, " dpid: ", dpid, " lastMessageTime: ", lastMessageTime);
+                } catch (Exception e) {
+                    MLog.e(TAG, "", e);
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });*/
+        /*DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
+        PrivateChatSummary summary = new PrivateChatSummary();
+        summary.setName(mToUser.getUsername());
+        summary.setDpid(mToUser.getProfilePicUrl());
+        summary.setLastMessageTime(100);
+        ref.child(mToUser.getId() + "").setValue(summary);
+
+        summary.setName("fakeTestUser");
+        summary.setDpid("some fake dpid");
+        summary.setLastMessageTime(99);
+        ref.child("1111").setValue(summary);
+
+        summary.setName("fakeTestUser 2");
+        summary.setDpid("some fake dpid 2");
+        summary.setLastMessageTime(101);
+        ref.child("1112").setValue(summary);*/
+
+
     }
 
     @Override
@@ -97,7 +165,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     @Override
     void initDatabaseRef() {
         int toUserid = getIntent().getIntExtra(Constants.KEY_USERID, 0);
-        setDatabaseRef(Constants.PRIVATE_CHAT_REF(toUserid, myUserid()));
+        setDatabaseRef(Constants.PRIVATE_CHAT_REF(toUserid));
     }
 
     @Override
