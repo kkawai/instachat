@@ -1,7 +1,6 @@
 package com.instachat.android.profile;
 
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.transition.Fade;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,13 +20,13 @@ import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.instachat.android.PrivateChatActivity;
-import com.instachat.android.R;
-import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.BaseFragment;
 import com.instachat.android.Constants;
 import com.instachat.android.MyApp;
+import com.instachat.android.PrivateChatActivity;
+import com.instachat.android.R;
 import com.instachat.android.api.NetworkApi;
+import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.model.User;
 import com.instachat.android.util.MLog;
 
@@ -46,12 +44,12 @@ public class FragmentProfile extends BaseFragment {
         Bundle args = new Bundle();
         args.putParcelable(Constants.KEY_FRIENDLY_MESSAGE, message);
         fragment.setArguments(args);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            fragment.setSharedElementEnterTransition(new ProfilePicTransition());
-            fragment.setEnterTransition(new Fade());
-            fragment.setExitTransition(new Fade());
-            fragment.setSharedElementReturnTransition(new ProfilePicTransition());
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            fragment.setSharedElementEnterTransition(new ProfilePicTransition());
+//            fragment.setEnterTransition(new Fade());
+//            fragment.setExitTransition(new Fade());
+//            fragment.setSharedElementReturnTransition(new ProfilePicTransition());
+//        }
         return fragment;
     }
 

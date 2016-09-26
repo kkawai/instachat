@@ -14,9 +14,9 @@
         android:layout_height="@dimen/nav_header_profile_pic_size"
         android:layout_marginBottom="10dp"
         android:src="@drawable/ic_account_circle_black_36dp"
-        app:border_color="@android:color/white"
-        app:border_overlay="true"
-        app:border_width="1px"/>
+        app:civ_border_color="@android:color/white"
+        app:civ_border_overlay="true"
+        app:civ_border_width="1px"/>
 
     <EditText
         android:id="@+id/nav_username"

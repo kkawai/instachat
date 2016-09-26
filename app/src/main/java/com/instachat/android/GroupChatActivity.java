@@ -656,6 +656,9 @@ public class GroupChatActivity extends BaseActivity implements
     }
 
     private void openFullScreenTextView(final int startingPos) {
+        if (isDrawerOpen())
+            closeDrawer();
+        ScreenUtil.hideVirtualKeyboard(mMessageEditText);
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(FullScreenTextFragment.TAG);
         if (fragment != null) {
             return;
@@ -665,7 +668,11 @@ public class GroupChatActivity extends BaseActivity implements
         args.putInt(Constants.KEY_STARTING_POS, startingPos);
         fragment.setArguments(args);
         ((FullScreenTextFragment) fragment).setFriendlyMessageContainer(this);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_content, fragment, FullScreenTextFragment.TAG).addToBackStack(null).commit();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down)
+                .replace(R.id.fragment_content, fragment, FullScreenTextFragment.TAG)
+                .addToBackStack(null).commit();
     }
 
     private void notifyPagerAdapterDataSetChanged() {
@@ -898,10 +905,15 @@ public class GroupChatActivity extends BaseActivity implements
 
     @Override
     public void onUserThumbClicked(ImageView imageView, FriendlyMessage message) {
+        if (isDrawerOpen())
+            closeDrawer();
+        ScreenUtil.hideVirtualKeyboard(mMessageEditText);
         Fragment fragment = FragmentProfile.newInstance(message);
         getSupportFragmentManager().beginTransaction()
-                .addSharedElement(imageView, "image")
-                .replace(R.id.fragment_content, fragment, FragmentProfile.TAG).addToBackStack(null).commit();
+                .setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down)
+                //.addSharedElement(imageView, "image")
+                .replace(R.id.fragment_content, fragment, FragmentProfile.TAG)
+                .addToBackStack(null).commit();
     }
 
     @Override
