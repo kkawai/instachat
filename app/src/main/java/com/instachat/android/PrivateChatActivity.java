@@ -47,6 +47,12 @@ public class PrivateChatActivity extends GroupChatActivity {
         super.onCreate(savedInstanceState);
         MLog.d(TAG, "onCreate() ");
         onNewIntent(getIntent());
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_keyboard_arrow_left_white_36dp);
+    }
+
+    @Override
+    protected void onHomeClicked() {
+        finish();
     }
 
     @Override

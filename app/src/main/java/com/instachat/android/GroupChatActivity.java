@@ -469,11 +469,15 @@ public class GroupChatActivity extends BaseActivity implements
         return true;
     }
 
+    protected void onHomeClicked() {
+        mDrawerLayout.openDrawer(GravityCompat.START);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                mDrawerLayout.openDrawer(GravityCompat.START);
+                onHomeClicked();
                 return true;
             case R.id.invite_menu:
                 sendInvitation();
