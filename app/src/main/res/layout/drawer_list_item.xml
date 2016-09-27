@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:app="http://schemas.android.com/apk/res-auto"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             android:orientation="horizontal"
-             android:paddingTop="3dp"
-             android:paddingBottom="6dp" >
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp">
 
     <ImageView
         android:id="@+id/status"
         android:layout_width="9dp"
         android:layout_height="9dp"
-        android:layout_gravity="left|center_vertical"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
         android:layout_marginLeft="16dp"
         android:scaleType="fitXY"
         android:src="@drawable/presence_green"
@@ -21,9 +21,13 @@
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_marginLeft="36dp"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/unread_message_count"
+        android:layout_toRightOf="@+id/status"
         android:background="@android:color/transparent"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingLeft="8dp"
         android:text="Jondotli"
         android:textColor="@android:color/white"
         android:textSize="18sp"
@@ -35,13 +39,16 @@
         android:id="@+id/unread_message_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right|center_vertical"
-        android:layout_marginRight="16dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center"
+        android:layout_marginRight="17dp"
         android:background="@drawable/oval_shape"
+        android:ellipsize="marquee"
+        android:maxLines="1"
         android:text=" 1 "
         android:textColor="@android:color/white"
         android:textSize="15sp"
-        app:font="Lato-Heavy.ttf"
-        />
+        app:font="Lato-Heavy.ttf"/>
 
-</FrameLayout>
+</RelativeLayout>
