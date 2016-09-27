@@ -209,11 +209,25 @@ public class GroupChatActivity extends BaseActivity implements
                 .getInt(Constants.KEY_FRIENDLY_MSG_LENGTH, DEFAULT_MSG_LENGTH_LIMIT))});
         mMessageEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            public void beforeTextChanged(CharSequence charSequence, int start, int before, int count) {
             }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+
+                if (before > 3 && count > 0) {
+                    prevInputTime = System.currentTimeMillis();
+                    prevInputCount = count;
+                }
+                if (before > 3 && count == 0 && prevInputCount > 0) {
+                    if (System.currentTimeMillis() - prevInputTime < 1500L) {
+                        return;  //fix weird voice input bug
+                        //where onTextChanged incorrectly reports a count of 0
+                        //when using voice input
+                    }
+                }
+
+                MLog.i(TAG, "input onTextChanged() text start: " + start + " before: " + before + " count: " + count);
                 if (charSequence.toString().trim().length() > 0) {
                     setEnableSendButton(true);
                     onMeEnteringText();
@@ -229,6 +243,9 @@ public class GroupChatActivity extends BaseActivity implements
         //initDownloadReceiver();
         initButtons();
     }
+
+    private long prevInputTime;
+    private int prevInputCount;
 
     void onMeEnteringText() {
 
