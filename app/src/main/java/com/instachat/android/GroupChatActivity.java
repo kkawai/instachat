@@ -38,7 +38,6 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.ath.fuel.FuelInjector;
-import com.bhargavms.dotloader.DotLoader;
 import com.github.rubensousa.bottomsheetbuilder.BottomSheetBuilder;
 import com.github.rubensousa.bottomsheetbuilder.BottomSheetMenuDialog;
 import com.github.rubensousa.bottomsheetbuilder.adapter.BottomSheetItemClickListener;
@@ -78,6 +77,7 @@ import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
+import com.instachat.android.view.AnimatedDotLoadingView;
 
 import java.util.HashMap;
 import java.util.List;
@@ -120,7 +120,7 @@ public class GroupChatActivity extends BaseActivity implements
     private DrawerHelper mDrawerHelper;
     private String mDatabaseChild;
     private boolean mIsStartedAnimation;
-    private DotLoader mDotsLoader;
+    private AnimatedDotLoadingView mDotsLoader;
     private ChatsRecyclerAdapter mChatsRecyclerViewAdapter;
 
     @Override
@@ -138,7 +138,7 @@ public class GroupChatActivity extends BaseActivity implements
         initPhotoHelper(savedInstanceState);
         setupDrawer();
         setupToolbar();
-        mDotsLoader = (DotLoader) findViewById(R.id.text_dot_loader);
+        mDotsLoader = (AnimatedDotLoadingView) findViewById(R.id.text_dot_loader);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Initialize Firebase Auth
@@ -934,15 +934,14 @@ public class GroupChatActivity extends BaseActivity implements
         public void run() {
             if (isActivityDestroyed())
                 return;
-            AnimationUtil.fadeOutAnimation(mDotsLoader);
+            mDotsLoader.stopAnimation();
+            hideDotsParent(true);
         }
     };
 
     void showTypingDots() {
-
-        if (mDotsLoader.getVisibility() != View.VISIBLE) {
-            AnimationUtil.fadeInAnimation(mDotsLoader);
-        }
+        showDotsParent(true);
+        mDotsLoader.startAnimation();
         mDotsHandler.removeCallbacks(mDotsHideRunner);
         mDotsHandler.postDelayed(mDotsHideRunner, 3500);
     }
@@ -958,5 +957,25 @@ public class GroupChatActivity extends BaseActivity implements
     public void onNameClicked() {
         if (isDrawerOpen())
             closeDrawer();
+    }
+
+    protected void hideDotsParent(boolean isAnimate) {
+        if (mDotsLoader.getVisibility() == View.GONE)
+            return;
+        mDotsLoader.setVisibility(View.GONE);
+        if (isAnimate)
+            AnimationUtil.fadeOutAnimation(findViewById(R.id.dotsLayout));
+        else
+            findViewById(R.id.dotsLayout).setVisibility(View.GONE);
+    }
+
+    protected void showDotsParent(boolean isAnimate) {
+        if (mDotsLoader.getVisibility() == View.VISIBLE)
+            return;
+        mDotsLoader.setVisibility(View.VISIBLE);
+        if (isAnimate)
+            AnimationUtil.fadeInAnimation(findViewById(R.id.dotsLayout));
+        else
+            findViewById(R.id.dotsLayout).setVisibility(View.VISIBLE);
     }
 }

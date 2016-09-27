@@ -82,6 +82,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:paddingTop="8dp"
+                    android:visibility="gone"
                     >
 
                     <de.hdodenhof.circleimageview.CircleImageView
@@ -91,11 +92,11 @@
                         android:layout_marginLeft="16dp"
                         android:src="@drawable/ic_account_circle_black_36dp"/>
 
-                    <com.bhargavms.dotloader.DotLoader
+                    <com.instachat.android.view.AnimatedDotLoadingView
                         android:id="@+id/text_dot_loader"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:visibility="invisible"
+                        android:visibility="gone"
                         app:color_array="@array/dot_colors"
                         app:dot_radius="4dp"
                         app:number_of_dots="3"/>
@@ -202,8 +203,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:fitsSystemWindows="true"
-            android:background="@color/colorPrimaryDark"/>
+            android:background="@color/colorPrimaryDark"
+            android:fitsSystemWindows="true"/>
 
     </android.support.v4.widget.DrawerLayout>
 
