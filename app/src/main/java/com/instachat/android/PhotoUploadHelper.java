@@ -38,7 +38,6 @@ public class PhotoUploadHelper {
     private static final String TAG = "PhotoUploadHelper";
     private static final int RC_CHOOSE_PICTURE = 103;
     private static final int RC_TAKE_PICTURE = 101;
-    private static final int RC_STORAGE_PERMS = 102;
     private Uri mFileUri = null;
     private File mFile = null;
     private Activity mActivity;
@@ -77,7 +76,6 @@ public class PhotoUploadHelper {
         mListener = null;
     }
 
-    @AfterPermissionGranted(RC_STORAGE_PERMS)
     public void launchCamera(boolean isChoose) {
         Log.d(TAG, "launchCamera");
 
@@ -86,14 +84,14 @@ public class PhotoUploadHelper {
             String perm = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
             if (!EasyPermissions.hasPermissions(mActivity, perm)) {
                 EasyPermissions.requestPermissions(mActivity, mActivity.getString(R.string.rationale_storage),
-                        RC_STORAGE_PERMS, perm);
+                        RC_TAKE_PICTURE, perm);
                 return;
             }
         } else {
             String perm = android.Manifest.permission.READ_EXTERNAL_STORAGE;
             if (!EasyPermissions.hasPermissions(mActivity, perm)) {
                 EasyPermissions.requestPermissions(mActivity, mActivity.getString(R.string.rationale_storage),
-                        RC_STORAGE_PERMS, perm);
+                        RC_CHOOSE_PICTURE, perm);
                 return;
             }
         }
@@ -146,6 +144,10 @@ public class PhotoUploadHelper {
     }
 
     public void onPermissionsGranted(int requestCode, List<String> perms) {
+        MLog.i(TAG, "onPermissionsGranted() requestCode: " + requestCode);
+        for (int i = 0; perms != null && i < perms.size(); i++) {
+            MLog.i(TAG, "onPermissionsGranted() requestCode: " + requestCode, " perm: ", perms.get(i));
+        }
         if (requestCode == RC_TAKE_PICTURE) {
             launchCamera(false);
         } else if (requestCode == RC_CHOOSE_PICTURE) {

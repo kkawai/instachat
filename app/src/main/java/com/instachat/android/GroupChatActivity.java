@@ -723,6 +723,13 @@ public class GroupChatActivity extends BaseActivity implements
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+        MLog.i(TAG,"onRequestPermissionsResult() requestCode: "+requestCode);
+        for (int i=0;permissions!=null && i<permissions.length;i++) {
+            MLog.i(TAG,"onRequestPermissionsResult() requestCode: "+requestCode, " ", "permission ", permissions[i]);
+        }
+        for (int i=0;grantResults!=null && i<grantResults.length;i++) {
+            MLog.i(TAG,"onRequestPermissionsResult() requestCode: "+requestCode, " ", "grant result ", grantResults[i]);
+        }
     }
 
     @Override
