@@ -39,6 +39,8 @@ public class FragmentProfile extends BaseFragment {
 
     public static final String TAG = "FragmentProfile";
 
+    private int ANONYMOUS_USER_DRAWABLE_RES_ID;
+
     public static Fragment newInstance(final FriendlyMessage message) {
         Fragment fragment = new FragmentProfile();
         Bundle args = new Bundle();
@@ -60,37 +62,42 @@ public class FragmentProfile extends BaseFragment {
         return view;
     }
 
+    private String enrichUsername(String username) {
+        return '@' + username;
+    }
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        ANONYMOUS_USER_DRAWABLE_RES_ID = R.drawable.ic_person_black_48dp;
         final FriendlyMessage friendlyMessage = getArguments().getParcelable(Constants.KEY_FRIENDLY_MESSAGE);
         setupToolbar(friendlyMessage.getName());
-        ((TextView) getView().findViewById(R.id.username)).setText(friendlyMessage.getName());
+        ((TextView) getView().findViewById(R.id.username)).setText(enrichUsername(friendlyMessage.getName()));
         final ImageView pic = (ImageView) getView().findViewById(R.id.profile_pic);
         NetworkApi.getUserById(this, friendlyMessage.getUserid(), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     final User remote = User.fromResponse(response);
-                    ((TextView) getView().findViewById(R.id.username)).setText(remote.getUsername());
+                    ((TextView) getView().findViewById(R.id.username)).setText(enrichUsername(remote.getUsername()));
                     Constants.DP_URL(remote.getId(), remote.getProfilePicUrl(), new OnCompleteListener<Uri>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Uri> task) {
                                     if (isActivityDestroyed())
                                         return;
                                     if (!task.isSuccessful()) {
-                                        pic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                                        pic.setImageResource(ANONYMOUS_USER_DRAWABLE_RES_ID);
                                         return;
                                     }
                                     try {
                                         Glide.with(FragmentProfile.this)
                                                 .load(task.getResult().toString())
-                                                .error(R.drawable.ic_account_circle_black_36dp)
+                                                .error(ANONYMOUS_USER_DRAWABLE_RES_ID)
                                                 .crossFade()
                                                 .into(pic);
                                     } catch (Exception e) {
                                         MLog.e(TAG, "Constants.DP_URL user profile pic exist in google cloud storage", e);
-                                        pic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                                        pic.setImageResource(ANONYMOUS_USER_DRAWABLE_RES_ID);
                                     }
                                 }
                             }

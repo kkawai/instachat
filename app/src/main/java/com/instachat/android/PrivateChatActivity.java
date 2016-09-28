@@ -47,7 +47,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         super.onCreate(savedInstanceState);
         MLog.d(TAG, "onCreate() ");
         onNewIntent(getIntent());
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_keyboard_arrow_left_white_36dp);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
     }
 
     @Override
@@ -178,8 +178,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     void onFriendlyMessageSent(FriendlyMessage friendlyMessage) {
         try {
             JSONObject o = friendlyMessage.toJSONObject();
-            o.put(Constants.KEY_GCM_MSG_TYPE, Constants.GcmMessageType.msg.name());
-            NetworkApi.gcmsend("" + mToUser.getId(), o);
+            NetworkApi.gcmsend("" + mToUser.getId(), Constants.GcmMessageType.msg, o);
         } catch (Exception e) {
             MLog.e(TAG, "onFriendlyMessageSent() failed", e);
             Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, "3"), Toast.LENGTH_SHORT).show();
@@ -193,9 +192,8 @@ public class PrivateChatActivity extends GroupChatActivity {
                 return;
             }
             JSONObject o = new JSONObject();
-            o.put(Constants.KEY_GCM_MSG_TYPE, Constants.GcmMessageType.typing.name());
             o.put(Constants.KEY_USERID, myUserid());
-            NetworkApi.gcmsend("" + mToUser.getId(), o);
+            NetworkApi.gcmsend("" + mToUser.getId(), Constants.GcmMessageType.typing, o);
             mLastTypingTime = System.currentTimeMillis();
         } catch (Exception e) {
             MLog.e(TAG, "onMeEnteringText() failed", e);

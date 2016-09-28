@@ -156,7 +156,7 @@ public class DrawerHelper {
                                             return;
                                         try {
                                             JSONObject object = new JSONObject(response);
-                                            if (object.getString("status").equals("OK")) {
+                                            if (object.getString(NetworkApi.KEY_RESPONSE_STATUS).equals(NetworkApi.RESPONSE_OK)) {
                                                 String toast = mActivity.getString(R.string.is_your_new_username, newUsername);
                                                 Toast.makeText(mActivity, toast, Toast.LENGTH_SHORT).show();
                                                 user.setUsername(newUsername);
@@ -207,8 +207,8 @@ public class DrawerHelper {
                 try {
                     if (isActivityDestroyed())
                         return;
-                    final String status = response.getString("status");
-                    if (status.equalsIgnoreCase("OK")) {
+                    final String status = response.getString(NetworkApi.KEY_RESPONSE_STATUS);
+                    if (status.equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                         final User remote = User.fromResponse(response);
                         if (!TextUtils.isEmpty(remote.getProfilePicUrl())) {
                             User local = Preferences.getInstance().getUser();

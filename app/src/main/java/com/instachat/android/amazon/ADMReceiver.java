@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import com.amazon.device.messaging.ADMMessageHandlerBase;
 import com.amazon.device.messaging.ADMMessageReceiver;
+import com.instachat.android.Constants;
 import com.instachat.android.MyApp;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.util.MLog;
@@ -122,7 +123,7 @@ public class ADMReceiver extends ADMMessageHandlerBase {
         // Due to varying network conditions, messages may be delivered more
         // than once.
         // Your app must be able to handle instances of duplicate messages.
-        final String msg = extras.getString("msg");
+        final String msg = extras.getString(Constants.KEY_MESSAGE);
         //final String data = extras.getString("data");
         //final String time = extras.getString(timeKey);
 

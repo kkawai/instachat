@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#87cefa</color> <!-- action title bar -->
-    <color name="colorPrimaryDark">#6495ed</color> <!-- drawer -->
+    <color name="colorPrimaryDark">#6495ed</color> <!-- drawer, status bar -->
     <color name="colorAccent">#a8a8a8</color> <!-- button colors -->
     <color name="colorTitle">#ffffff</color>
+
+    <color name="jonPink">#FF425A</color>
+    <color name="jonGray">#F7F8FA</color>
+    <color name="jonGreen">#F1EFC5</color>
 
     <color name="dotColor1">#000000</color>
     <color name="dotColor2">#4c4c4c</color>

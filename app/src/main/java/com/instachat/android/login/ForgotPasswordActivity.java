@@ -69,8 +69,8 @@ public class ForgotPasswordActivity extends BaseActivity implements View.OnClick
             public void onResponse(final String response) {
                 try {
                     final JSONObject object = new JSONObject(response);
-                    final String status = object.getString("status");
-                    if (status.equalsIgnoreCase("OK")) {
+                    final String status = object.getString(NetworkApi.KEY_RESPONSE_STATUS);
+                    if (status.equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                         Toast.makeText(ForgotPasswordActivity.this, R.string.information_emailed, Toast.LENGTH_LONG).show();
                         new Handler().postDelayed(new Runnable() {
                             @Override

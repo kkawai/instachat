@@ -124,8 +124,8 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
             @Override
             public void onResponse(final JSONObject response) {
                 try {
-                    final String status = response.getString("status");
-                    if (status.equalsIgnoreCase("OK")) {
+                    final String status = response.getString(NetworkApi.KEY_RESPONSE_STATUS);
+                    if (status.equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                         final User user = User.fromResponse(response);
                         Preferences.getInstance().saveUser(user);
                         Preferences.getInstance().saveLastSignIn(email);
@@ -246,7 +246,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
             @Override
             public void onResponse(final JSONObject response) {
                 try {
-                    if (response.getString("status").equalsIgnoreCase("OK")) {
+                    if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                         final User user = User.fromResponse(response);
                         Preferences.getInstance().saveUser(user);
                         Preferences.getInstance().saveLastSignIn(user.getUsername());

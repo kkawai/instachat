@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.instachat.android.Constants;
 import com.instachat.android.Events;
 import com.instachat.android.util.AnalyticsHelper;
 import com.instachat.android.util.MLog;
@@ -26,7 +27,7 @@ public final class GCMIntentService extends IntentService {
 
     private void onMessage(final Context context, final Intent data) throws Exception {
 
-        final JSONObject msg = new JSONObject(data.getStringExtra("msg"));
+        final JSONObject msg = new JSONObject(data.getStringExtra(Constants.KEY_MESSAGE));
         MLog.i(TAG, "onMessage: ", msg.toString());
         //final org.jivesoftware.smack.packet.Message message = MessageUtils.toXMPPMessage(msg);
         //XMPPService.consumeMessage(context, message);

@@ -44,8 +44,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
          */
         try {
             JSONObject object = new JSONObject(remoteMessage.getData());
-            if (object.has("msg")) {
-                JSONObject msg = new JSONObject(object.getString("msg"));
+            if (object.has(Constants.KEY_MESSAGE)) {
+                JSONObject msg = new JSONObject(object.getString(Constants.KEY_MESSAGE));
                 if (msg.has(Constants.KEY_GCM_MSG_TYPE)) {
                     if (msg.getString(Constants.KEY_GCM_MSG_TYPE).equals(Constants.GcmMessageType.typing.name())) {
                         Intent intent = new Intent(Constants.ACTION_USER_TYPING);

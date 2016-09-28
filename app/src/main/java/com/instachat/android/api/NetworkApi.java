@@ -44,6 +44,9 @@ public final class NetworkApi {
 
     private static final int REQUEST_TIMEOUT_MS = 10000;
 
+    public static final String RESPONSE_OK = "OK";
+    public static final String KEY_RESPONSE_STATUS = "status";
+
     private static final DefaultRetryPolicy DEFAULT_RETRY_POLICY = new DefaultRetryPolicy(
             REQUEST_TIMEOUT_MS,
             DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
@@ -195,7 +198,7 @@ public final class NetworkApi {
         params.put("deviceid", androidId);
         params.put("regid", regid);
         final JSONObject response = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/gcmreg").post(params));
-        if (response.getString("status").equals("OK")) {
+        if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
             MLog.i(TAG, "debugx registered successfully at server ");
         } else {
             MLog.e(TAG, "Error from server: ", response);
@@ -210,30 +213,31 @@ public final class NetworkApi {
         params.put("deviceid", androidId);
         params.put("regid", regid);
         final JSONObject response = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/gcmunreg").post(params));
-        if (response.getString("status").equals("OK")) {
+        if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
             MLog.i(TAG, "unregistered successfully at server ");
         } else {
             MLog.e(TAG, "Error from server: ", response);
         }
     }
 
-    public static void gcmsend(final String toid, final JSONObject msg) {
+    public static void gcmsend(final String toid, final Constants.GcmMessageType messageType, final JSONObject msg) {
 
         ThreadWrapper.executeInWorkerThread(new Runnable() {
             @Override
             public void run() {
-                final HashMap<String, String> params = new HashMap<>();
-                params.put("toid", toid);
-                params.put("msg", msg.toString());
                 try {
+                    msg.put(Constants.KEY_GCM_MSG_TYPE, messageType.name());
+                    final HashMap<String, String> params = new HashMap<>();
+                    params.put(Constants.KEY_TO_USERID, toid);
+                    params.put(Constants.KEY_MESSAGE, msg.toString());
                     final JSONObject response = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/gcmsend").post(params));
-                    if (response.getString("status").equals("OK")) {
+                    if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                         MLog.i(TAG, "sent gcm message to server: " + response.optString("descr"));
                     } else {
                         MLog.e(TAG, "Error from server: ", response);
                     }
-                }catch (Exception e) {
-                    MLog.e(TAG,"NetworkApi.gcmsend() failed",e);
+                } catch (Exception e) {
+                    MLog.e(TAG, "NetworkApi.gcmsend() failed", e);
                 }
             }
         });

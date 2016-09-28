@@ -117,9 +117,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                         //status:OK
                         //exists:true|false
                         try {
-                            if (!response.getString("status").equalsIgnoreCase("OK")) {
+                            if (!response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                                 showErrorToast("1");
-                            } else if (response.getString("status").equalsIgnoreCase("OK") && response.getJSONObject("data").getBoolean("exists")) {
+                            } else if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK) && response.getJSONObject("data").getBoolean("exists")) {
                                 emailLayout.setError(errorMessage(R.string.email_exists,email));
                             } else {
                                 remotelyValidateUsername();
@@ -145,9 +145,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                         //status:OK
                         //exists:true|false
                         try {
-                            if (!response.getString("status").equalsIgnoreCase("OK")) {
+                            if (!response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                                 showErrorToast("1");
-                            } else if (response.getString("status").equalsIgnoreCase("OK") && response.getJSONObject("data").getBoolean("exists")) {
+                            } else if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK) && response.getJSONObject("data").getBoolean("exists")) {
                                 usernameLayout.setError(errorMessage(R.string.username_exists,username));
                             } else {
                                 createAccount();
@@ -187,7 +187,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 try {
                     final JSONObject response = new JSONObject(string);
                     MLog.i("test", "savedUser: " + string);
-                    if (response.getString("status").equals("OK")) {
+                    if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                         user.copyFrom(response.getJSONObject("data"), null);
                         Preferences.getInstance().saveUser(user);
                         Preferences.getInstance().saveLastSignIn(username);

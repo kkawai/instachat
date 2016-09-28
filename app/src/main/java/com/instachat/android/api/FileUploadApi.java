@@ -169,7 +169,7 @@ public final class FileUploadApi {
                     }
                 });
 
-                response.getString("status").equals("OK");
+                response.getString(NetworkApi.KEY_RESPONSE_STATUS).equals(NetworkApi.RESPONSE_OK);
 
                 if (isReadAllBytes) {
                     key = response.getJSONObject("data").getString("key");
