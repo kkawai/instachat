@@ -174,6 +174,6 @@ public final class Constants {
     }
     public static final String ACTION_USER_TYPING = "action_user_typing";
     public static final String KEY_FRIENDLY_MSG_LENGTH = "friendly_msg_length";
-    public static final String KEY_MESSAGE = "msg";
+    public static final String KEY_GCM_MESSAGE = "msg";
     public static final String KEY_TO_USERID = "toid";
 }

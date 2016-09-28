@@ -29,7 +29,7 @@ import java.util.Map;
  * <p>
  * try {
  * JSONObject json = new JSONObject(response);
- * message = json.optString(Constants.KEY_MESSAGE);
+ * message = json.optString(Constants.KEY_GCM_MESSAGE);
  * <p>
  * } catch (JSONException e) {
  * e.printStackTrace();

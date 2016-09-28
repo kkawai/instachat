@@ -16,13 +16,13 @@ import android.text.TextUtils;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.instachat.android.PrivateChatActivity;
-import com.instachat.android.R;
-import com.instachat.android.model.FriendlyMessage;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.instachat.android.Constants;
 import com.instachat.android.MyApp;
+import com.instachat.android.PrivateChatActivity;
+import com.instachat.android.R;
+import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ThreadWrapper;
@@ -44,59 +44,58 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
          */
         try {
             JSONObject object = new JSONObject(remoteMessage.getData());
-            if (object.has(Constants.KEY_MESSAGE)) {
-                JSONObject msg = new JSONObject(object.getString(Constants.KEY_MESSAGE));
-                if (msg.has(Constants.KEY_GCM_MSG_TYPE)) {
-                    if (msg.getString(Constants.KEY_GCM_MSG_TYPE).equals(Constants.GcmMessageType.typing.name())) {
-                        Intent intent = new Intent(Constants.ACTION_USER_TYPING);
-                        intent.putExtra(Constants.KEY_USERID, msg.getInt(Constants.KEY_USERID));
-                        LocalBroadcastManager.getInstance(MyApp.getInstance()).sendBroadcast(intent);
-                        return;
-                    }
-                }
-                final FriendlyMessage friendlyMessage = FriendlyMessage.fromJSONObject(msg);
+            if (object.has(Constants.KEY_GCM_MESSAGE)) {
+                JSONObject msg = new JSONObject(object.getString(Constants.KEY_GCM_MESSAGE));
+                if (msg.has(Constants.KEY_GCM_MSG_TYPE) && msg.getString(Constants.KEY_GCM_MSG_TYPE).equals(Constants.GcmMessageType.typing.name())) {
+                    Intent intent = new Intent(Constants.ACTION_USER_TYPING);
+                    intent.putExtra(Constants.KEY_USERID, msg.getInt(Constants.KEY_USERID));
+                    LocalBroadcastManager.getInstance(MyApp.getInstance()).sendBroadcast(intent);
+                    return;
+                } else if (msg.has(Constants.KEY_GCM_MSG_TYPE) && msg.getString(Constants.KEY_GCM_MSG_TYPE).equals(Constants.GcmMessageType.msg.name())) {
+                    final FriendlyMessage friendlyMessage = FriendlyMessage.fromJSONObject(msg);
 
-                if (PrivateChatActivity.isActive() && PrivateChatActivity.getActiveUserid() == friendlyMessage.getUserid()) {
+                    if (PrivateChatActivity.isActive() && PrivateChatActivity.getActiveUserid() == friendlyMessage.getUserid()) {
                     /* Already actively chatting with this person in the PrivateChatActivity
                      * so no need to put up a notification in the system tray.
                      * For debugging purposes, however, if it's myself, then it's ok.
                      */
-                    if (PrivateChatActivity.getActiveUserid() != Preferences.getInstance().getUserId())
-                        return;
-                }
-
-                Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
-                    @Override
-                    public void onComplete(final @NonNull Task<Uri> task) {
-                        try {
-                            if (!task.isSuccessful()) {
-                                showNotification(friendlyMessage, null);
-                                return;
-                            }
-                            ThreadWrapper.executeInWorkerThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        Bitmap bitmap = Glide.
-                                                with(MyApp.getInstance()).
-                                                load(task.getResult().toString()).
-                                                asBitmap().
-                                                into(thumbSize(), thumbSize()). // Width and height
-                                                get();
-                                        showNotification(friendlyMessage, bitmap);
-                                    } catch (Exception e) {
-                                        MLog.e(TAG, "", e); //todo better error handling/message
-                                        showNotification(friendlyMessage, null);
-                                    }
-                                }
-                            });
-
-                        } catch (Exception e) {
-                            MLog.e(TAG, "", e); //todo better error handling/message
-                            showNotification(friendlyMessage, null);
-                        }
+                        if (PrivateChatActivity.getActiveUserid() != Preferences.getInstance().getUserId())
+                            return;
                     }
-                });
+
+                    Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(final @NonNull Task<Uri> task) {
+                            try {
+                                if (!task.isSuccessful()) {
+                                    showNotification(friendlyMessage, null);
+                                    return;
+                                }
+                                ThreadWrapper.executeInWorkerThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            Bitmap bitmap = Glide.
+                                                    with(MyApp.getInstance()).
+                                                    load(task.getResult().toString()).
+                                                    asBitmap().
+                                                    into(thumbSize(), thumbSize()). // Width and height
+                                                    get();
+                                            showNotification(friendlyMessage, bitmap);
+                                        } catch (Exception e) {
+                                            MLog.e(TAG, "", e); //todo better error handling/message
+                                            showNotification(friendlyMessage, null);
+                                        }
+                                    }
+                                });
+
+                            } catch (Exception e) {
+                                MLog.e(TAG, "", e); //todo better error handling/message
+                                showNotification(friendlyMessage, null);
+                            }
+                        }
+                    });
+                }
             }
         } catch (Exception e) {
             MLog.e(TAG, "", e); //todo better error handling/message
