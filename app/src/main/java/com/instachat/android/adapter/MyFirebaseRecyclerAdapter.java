@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +46,7 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
     private AdapterPopulateHolderListener mAdapterPopulateHolderListener;
     private MessageTextClickedListener mMessageTextClickedListener;
     private UserThumbClickedListener mUserThumbClickedListener;
-    private String mDatabaseChild;
+    private String mDatabaseRoot;
 
     public MyFirebaseRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, DatabaseReference ref) {
         super(modelClass, modelLayout, viewHolderClass, ref);
@@ -53,8 +54,8 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
         mStorageRef = FirebaseStorage.getInstance().getReference();
     }
 
-    public void setDatabaseChild(String child) {
-        mDatabaseChild = child;
+    public void setDatabaseRoot(String root) {
+        mDatabaseRoot = root;
     }
 
     public void setActivity(Activity activity) {
@@ -114,13 +115,20 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
         holder.messengerImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                final FriendlyMessage msg = getItem(holder.getAdapterPosition());
-                mUserThumbClickedListener.onUserThumbClicked(holder.messengerImageView, msg);
+                final FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
+                if (TextUtils.isEmpty(friendlyMessage.getName())) {
+                    return;
+                }
+                mUserThumbClickedListener.onUserThumbClicked(holder.messengerImageView, friendlyMessage);
             }
         });
         final View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
+                if (TextUtils.isEmpty(friendlyMessage.getName())) {
+                    return;
+                }
                 mMessageTextClickedListener.onMessageClicked(holder.getAdapterPosition());
             }
         };
@@ -132,6 +140,10 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
         View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
+                FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
+                if (TextUtils.isEmpty(friendlyMessage.getName())) {
+                    return true;
+                }
                 new ThemedAlertDialog.Builder(view.getContext())
                         .setMessage(MyApp.getInstance().getString(R.string.delete_message_question) + limitString(getItem(holder.getAdapterPosition()).getText(), 15))
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -140,12 +152,12 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
                                 final FriendlyMessage msg = getItem(holder.getAdapterPosition());
                                 MLog.d(TAG, " msg.getImageUrl(): " + msg.getImageUrl() + " " + msg.getImageId());
                                 if (msg.getImageUrl() != null && msg.getImageId() != null) {
-                                    final StorageReference photoRef = mStorageRef.child(Constants.PHOTOS_CHILD)
+                                    final StorageReference photoRef = mStorageRef.child(mDatabaseRoot)
                                             .child(msg.getImageId());
                                     photoRef.delete();
                                     MLog.d(TAG, "deleted photo " + msg.getImageId());
                                 }
-                                DatabaseReference ref = mFirebaseDatabaseReference.child(mDatabaseChild + "/" + msg.getId());
+                                DatabaseReference ref = mFirebaseDatabaseReference.child(mDatabaseRoot + "/" + msg.getId());
                                 if (ref != null)
                                     ref.removeValue();
                             }
@@ -153,7 +165,7 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
                         .setNegativeButton(android.R.string.no, null)
                         .setCancelable(true).setOnCancelListener(null)
                         .create().show();
-                return false;
+                return true;
             }
         };
 
@@ -211,26 +223,31 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
             }
         }
 
-        Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                if (isActivityDestroyed())
-                    return;
-                try {
-                    if (!task.isSuccessful()) {
-                        viewHolder.messengerImageView.setImageResource(R.drawable.ic_account_circle_black_36dp);
+        if (TextUtils.isEmpty(friendlyMessage.getName())) {
+            viewHolder.messengerImageView.setVisibility(View.GONE);
+        } else {
+            viewHolder.messengerImageView.setVisibility(View.VISIBLE);
+            Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (isActivityDestroyed())
                         return;
+                    try {
+                        if (!task.isSuccessful()) {
+                            viewHolder.messengerImageView.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                            return;
+                        }
+                        Glide.with(mActivity.get())
+                                .load(task.getResult().toString())
+                                .error(R.drawable.ic_account_circle_black_36dp)
+                                .into(viewHolder.messengerImageView);
+                    } catch (final Exception e) {
+                        MLog.e(TAG, "Constants.DP_URL user dp doesn't exist in google cloud storage.  task: " + task.isSuccessful());
+                        viewHolder.messengerImageView.setImageResource(R.drawable.ic_account_circle_black_36dp);
                     }
-                    Glide.with(mActivity.get())
-                            .load(task.getResult().toString())
-                            .error(R.drawable.ic_account_circle_black_36dp)
-                            .into(viewHolder.messengerImageView);
-                } catch (final Exception e) {
-                    MLog.e(TAG, "Constants.DP_URL user dp doesn't exist in google cloud storage.  task: " + task.isSuccessful());
-                    viewHolder.messengerImageView.setImageResource(R.drawable.ic_account_circle_black_36dp);
                 }
-            }
-        });
+            });
+        }
 
     }
 

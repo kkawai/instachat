@@ -315,7 +315,7 @@ public class GroupChatActivity extends BaseActivity implements
         if (getIntent() != null && getIntent().hasExtra(Constants.KEY_DATABASE_CHILD)) {
             databaseRef = getIntent().getStringExtra(Constants.KEY_DATABASE_CHILD);
         } else {
-            databaseRef = Constants.DEFAULT_MESSAGES_CHILD;
+            databaseRef = Constants.DEFAULT_PUBLIC_GROUP_REFERENCE;
         }
         setDatabaseRoot(databaseRef);
     }
@@ -749,7 +749,7 @@ public class GroupChatActivity extends BaseActivity implements
                 R.layout.item_message,
                 MessageViewHolder.class,
                 mFirebaseDatabaseReference.child(mDatabaseRoot));
-        mFirebaseAdapter.setDatabaseChild(mDatabaseRoot);
+        mFirebaseAdapter.setDatabaseRoot(mDatabaseRoot);
         mFirebaseAdapter.setActivity(this);
         mFirebaseAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {
             @Override
@@ -841,7 +841,7 @@ public class GroupChatActivity extends BaseActivity implements
                     @Override
                     public void onBottomSheetItemClick(final MenuItem item) {
                         mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.chatRoomPhoto);
-                        mPhotoUploadHelper.setStorageRefString(Constants.PHOTOS_CHILD);
+                        mPhotoUploadHelper.setStorageRefString(mDatabaseRoot);
                         if (item.getItemId() == R.id.menu_take_photo) {
                             mPhotoUploadHelper.launchCamera(false);
                         } else if (item.getItemId() == R.id.menu_choose_photo) {

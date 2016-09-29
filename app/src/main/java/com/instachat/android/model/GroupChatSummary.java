@@ -1,5 +1,8 @@
 package com.instachat.android.model;
 
+import com.google.firebase.database.DataSnapshot;
+import com.instachat.android.util.MLog;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -103,5 +106,34 @@ public class GroupChatSummary {
             map.put("unreadMessageCount", getUnreadMessageCount());
         }
         return map;
+    }
+
+    public static GroupChatSummary fromDataSnapshot(DataSnapshot dataSnapshot) {
+        GroupChatSummary groupChatSummary = new GroupChatSummary();
+        try {
+            groupChatSummary.setId(dataSnapshot.getKey());
+
+            if (dataSnapshot.hasChild("name")) {
+                groupChatSummary.setName((String) dataSnapshot.child("name").getValue());
+            }
+            if (dataSnapshot.hasChild("dpid")) {
+                groupChatSummary.setDpid((String) dataSnapshot.child("dpid").getValue());
+            }
+            if (dataSnapshot.hasChild("imageUrl")) {
+                groupChatSummary.setImageUrl((String) dataSnapshot.child("imageUrl").getValue());
+            }
+            if (dataSnapshot.hasChild("lastMessageTime")) {
+                groupChatSummary.setLastMessageTime((Long) dataSnapshot.child("lastMessageTime").getValue());
+            }
+            if (dataSnapshot.hasChild("lastMessage")) {
+                groupChatSummary.setLastMessage((String) dataSnapshot.child("lastMessage").getValue());
+            }
+            if (dataSnapshot.hasChild("unreadMessageCount")) {
+                groupChatSummary.setUnreadMessageCount((Integer) dataSnapshot.child("unreadMessageCount").getValue());
+            }
+        } catch (Exception e) {
+            MLog.e(TAG, "", e);
+        }
+        return groupChatSummary;
     }
 }

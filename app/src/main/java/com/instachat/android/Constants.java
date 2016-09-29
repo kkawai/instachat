@@ -142,13 +142,15 @@ public final class Constants {
 
     public static String PRIVATE_CHAT_REF(int toUserid) {
         final int myUserid = Preferences.getInstance().getUserId();
-        return "/directs/"+ (toUserid > myUserid ? (myUserid+"_"+toUserid) : (toUserid+"_"+myUserid));
+        return "/directs/" + (toUserid > myUserid ? (myUserid + "_" + toUserid) : (toUserid + "_" + myUserid));
     }
 
     public static String PRIVATE_CHATS_SUMMARY_PARENT_REF() {
         int myUserid = Preferences.getInstance().getUserId();
-        return "/users/"+myUserid+"/private_summaries/";
+        return "/users/" + myUserid + "/private_summaries/";
     }
+
+    public static String PUBLIC_CHATS_SUMMARY_PARENT_REF = "/public_group_summaries/";
 
     public static String DP_STORAGE_BASE(int userid) {
         return "/users/" + userid + "/dp/";
@@ -158,8 +160,7 @@ public final class Constants {
      * Firebase database constants
      */
     public static final String KEY_DATABASE_CHILD = "database_child";
-    public static final String DEFAULT_MESSAGES_CHILD = "messages";
-    public static final String PHOTOS_CHILD = "photos";
+    public static final String DEFAULT_PUBLIC_GROUP_REFERENCE = "/public_group_messages/1";
     public static final int MAX_PIC_SIZE_BYTES = 512000;
     public static final int MAX_PROFILE_PIC_SIZE_BYTES = 400000;
     public static final float MAX_FULLSCREEN_FONT_SIZE = 199f;
@@ -169,9 +170,11 @@ public final class Constants {
      */
     public static final String KEY_USERID = "user_id";
     public static final String KEY_GCM_MSG_TYPE = "key_gcm_type";
+
     public enum GcmMessageType {
         msg, typing
     }
+
     public static final String ACTION_USER_TYPING = "action_user_typing";
     public static final String KEY_FRIENDLY_MSG_LENGTH = "friendly_msg_length";
     public static final String KEY_GCM_MESSAGE = "msg";

@@ -196,7 +196,7 @@
         </RelativeLayout>
 
         <!--
-                    app:headerLayout="@layout/nav_header"
+            app:headerLayout="@layout/nav_header"
             app:menu="@menu/drawer_view" -->
         <android.support.design.widget.NavigationView
             android:id="@+id/nav_view"

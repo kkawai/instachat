@@ -38,8 +38,8 @@ public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
     private static final int TYPE_GROUP_HEADER = 3;
 
     private List<Object> data = new ArrayList<>(40);
-    private ChildEventListener listener;
-    private DatabaseReference databaseReference;
+    private ChildEventListener privateChatsSummaryListener, publicGroupChatsSummaryListener;
+    private DatabaseReference privateChatsSummaryReference, publicGroupChatsSummaryReference;
     private Activity activity;
     private ChatsItemClickedListener chatsItemClickedListener;
 
@@ -52,8 +52,8 @@ public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
 
         data.add(new GroupChatHeader(MyApp.getInstance().getString(R.string.group_chat_header)));
         data.add(new PrivateChatHeader(MyApp.getInstance().getString(R.string.private_chat_header)));
-        databaseReference = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
-        listener = new ChildEventListener() {
+        privateChatsSummaryReference = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
+        privateChatsSummaryListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 PrivateChatSummary privateChatSummary = PrivateChatSummary.fromDataSnapshot(dataSnapshot);
@@ -80,7 +80,37 @@ public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
                 //??
             }
         };
-        databaseReference.addChildEventListener(listener);
+        privateChatsSummaryReference.addChildEventListener(privateChatsSummaryListener);
+
+        publicGroupChatsSummaryReference = FirebaseDatabase.getInstance().getReference(Constants.PUBLIC_CHATS_SUMMARY_PARENT_REF);
+        publicGroupChatsSummaryListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                GroupChatSummary groupChatSummary = GroupChatSummary.fromDataSnapshot(dataSnapshot);
+                insertGroupChatSummary(groupChatSummary);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                //todo to-user might have changed their name
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                //todo user can remove this summary
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                //probably not useful
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //??
+            }
+        };
+        publicGroupChatsSummaryReference.addChildEventListener(publicGroupChatsSummaryListener);
     }
 
     private void insertPrivateChatSummary(PrivateChatSummary privateChatSummary) {
@@ -183,6 +213,7 @@ public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
     }
 
     public void cleanup() {
-        databaseReference.removeEventListener(listener);
+        privateChatsSummaryReference.removeEventListener(privateChatsSummaryListener);
+        publicGroupChatsSummaryReference.removeEventListener(publicGroupChatsSummaryListener);
     }
 }
