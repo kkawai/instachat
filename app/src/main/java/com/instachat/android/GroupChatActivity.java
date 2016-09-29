@@ -118,7 +118,7 @@ public class GroupChatActivity extends BaseActivity implements
     // [START declare_ref]
     private PhotoUploadHelper mPhotoUploadHelper;
     private DrawerHelper mDrawerHelper;
-    private String mDatabaseChild;
+    private String mDatabaseRoot;
     private boolean mIsStartedAnimation;
     private AnimatedDotLoadingView mDotsLoader;
     private ChatsRecyclerAdapter mChatsRecyclerViewAdapter;
@@ -317,11 +317,11 @@ public class GroupChatActivity extends BaseActivity implements
         } else {
             databaseRef = Constants.DEFAULT_MESSAGES_CHILD;
         }
-        setDatabaseRef(databaseRef);
+        setDatabaseRoot(databaseRef);
     }
 
-    final void setDatabaseRef(final String databaseRef) {
-        mDatabaseChild = databaseRef;
+    final void setDatabaseRoot(final String root) {
+        mDatabaseRoot = root;
     }
 
     private void setEnableSendButton(final boolean isEnable) {
@@ -456,13 +456,15 @@ public class GroupChatActivity extends BaseActivity implements
                 }
                 final FriendlyMessage friendlyMessage = new FriendlyMessage(text, myUsername(),
                         myUserid(), myDpid(), null, null, System.currentTimeMillis());
-                mFirebaseDatabaseReference.child(mDatabaseChild).push().setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
+                mFirebaseDatabaseReference
+                        .child(mDatabaseRoot)
+                        .child(friendlyMessage.getId())
+                        .updateChildren(FriendlyMessage.toMap(friendlyMessage)).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         onFriendlyMessageSent(friendlyMessage);
                     }
                 });
-
                 mMessageEditText.setText("");
                 mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
             }
@@ -723,12 +725,12 @@ public class GroupChatActivity extends BaseActivity implements
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-        MLog.i(TAG,"onRequestPermissionsResult() requestCode: "+requestCode);
-        for (int i=0;permissions!=null && i<permissions.length;i++) {
-            MLog.i(TAG,"onRequestPermissionsResult() requestCode: "+requestCode, " ", "permission ", permissions[i]);
+        MLog.i(TAG, "onRequestPermissionsResult() requestCode: " + requestCode);
+        for (int i = 0; permissions != null && i < permissions.length; i++) {
+            MLog.i(TAG, "onRequestPermissionsResult() requestCode: " + requestCode, " ", "permission ", permissions[i]);
         }
-        for (int i=0;grantResults!=null && i<grantResults.length;i++) {
-            MLog.i(TAG,"onRequestPermissionsResult() requestCode: "+requestCode, " ", "grant result ", grantResults[i]);
+        for (int i = 0; grantResults != null && i < grantResults.length; i++) {
+            MLog.i(TAG, "onRequestPermissionsResult() requestCode: " + requestCode, " ", "grant result ", grantResults[i]);
         }
     }
 
@@ -746,8 +748,8 @@ public class GroupChatActivity extends BaseActivity implements
                 FriendlyMessage.class,
                 R.layout.item_message,
                 MessageViewHolder.class,
-                mFirebaseDatabaseReference.child(mDatabaseChild));
-        mFirebaseAdapter.setDatabaseChild(mDatabaseChild);
+                mFirebaseDatabaseReference.child(mDatabaseRoot));
+        mFirebaseAdapter.setDatabaseChild(mDatabaseRoot);
         mFirebaseAdapter.setActivity(this);
         mFirebaseAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {
             @Override
@@ -895,7 +897,10 @@ public class GroupChatActivity extends BaseActivity implements
             final FriendlyMessage friendlyMessage = new FriendlyMessage("", myUsername(),
                     myUserid(), myDpid(), photoUrl, photoId, System.currentTimeMillis());
             MLog.d(TAG, "uploadFromUri:onSuccess photoId: " + photoId);
-            mFirebaseDatabaseReference.child(mDatabaseChild).push().setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
+            mFirebaseDatabaseReference
+                    .child(mDatabaseRoot)
+                    .child(friendlyMessage.getId())
+                    .updateChildren(FriendlyMessage.toMap(friendlyMessage)).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     onFriendlyMessageSent(friendlyMessage);

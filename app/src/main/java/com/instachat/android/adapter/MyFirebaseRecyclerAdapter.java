@@ -15,15 +15,14 @@ import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.instachat.android.R;
-import com.instachat.android.model.FriendlyMessage;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.instachat.android.Constants;
 import com.instachat.android.MyApp;
+import com.instachat.android.R;
+import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.StringUtil;
 import com.instachat.android.view.ThemedAlertDialog;
@@ -233,13 +232,6 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
             }
         });
 
-    }
-
-    @Override
-    protected FriendlyMessage parseSnapshot(DataSnapshot snapshot) {
-        FriendlyMessage friendlyMessage = super.parseSnapshot(snapshot);
-        friendlyMessage.setId(snapshot.getKey());
-        return friendlyMessage;
     }
 
     private String limitString(final String s, final int limit) {

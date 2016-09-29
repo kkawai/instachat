@@ -171,7 +171,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     @Override
     void initDatabaseRef() {
         int toUserid = getIntent().getIntExtra(Constants.KEY_USERID, 0);
-        setDatabaseRef(Constants.PRIVATE_CHAT_REF(toUserid));
+        setDatabaseRoot(Constants.PRIVATE_CHAT_REF(toUserid));
     }
 
     @Override

@@ -50,7 +50,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     Intent intent = new Intent(Constants.ACTION_USER_TYPING);
                     intent.putExtra(Constants.KEY_USERID, msg.getInt(Constants.KEY_USERID));
                     LocalBroadcastManager.getInstance(MyApp.getInstance()).sendBroadcast(intent);
-                    return;
                 } else if (msg.has(Constants.KEY_GCM_MSG_TYPE) && msg.getString(Constants.KEY_GCM_MSG_TYPE).equals(Constants.GcmMessageType.msg.name())) {
                     final FriendlyMessage friendlyMessage = FriendlyMessage.fromJSONObject(msg);
 

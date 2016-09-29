@@ -23,6 +23,10 @@ import com.instachat.android.util.MLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 public class FriendlyMessage implements Parcelable {
 
     private static final String TAG = "FriendlyMessage";
@@ -39,6 +43,27 @@ public class FriendlyMessage implements Parcelable {
     public FriendlyMessage() {
     }
 
+    public static Map<String, Object> toMap(FriendlyMessage friendlyMessage) {
+        Map<String, Object> map = new HashMap<>(8);
+        if (friendlyMessage.getName() != null)
+            map.put("name", friendlyMessage.getName());
+        if (friendlyMessage.getDpid() != null)
+            map.put("dpid", friendlyMessage.getDpid());
+        if (friendlyMessage.getImageUrl() != null)
+            map.put("imageUrl", friendlyMessage.getImageUrl());
+        if (friendlyMessage.getImageId() != null)
+            map.put("imageId", friendlyMessage.getImageId());
+        if (friendlyMessage.getId() != null)
+            map.put("id", friendlyMessage.getId());
+        if (friendlyMessage.getText() != null)
+            map.put("text", friendlyMessage.getText());
+        if (friendlyMessage.getUserid() != 0)
+            map.put("userid", friendlyMessage.getUserid());
+        if (friendlyMessage.getTime() != 0)
+            map.put("time", friendlyMessage.getTime());
+        return map;
+    }
+
     public FriendlyMessage(String text, String name, int userid, String dpid, String imageUrl, String imageId, long time) {
         this.text = text;
         this.name = name;
@@ -47,6 +72,7 @@ public class FriendlyMessage implements Parcelable {
         this.imageUrl = imageUrl;
         this.imageId = imageId;
         this.dpid = dpid;
+        this.id = userid + '-' + UUID.randomUUID().toString();
     }
 
     public JSONObject toJSONObject() throws JSONException {
