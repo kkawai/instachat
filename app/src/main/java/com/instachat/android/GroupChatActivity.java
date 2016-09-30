@@ -1,7 +1,9 @@
 package com.instachat.android;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -131,9 +133,7 @@ public class GroupChatActivity extends BaseActivity implements
             savedInstanceState.remove("android:support:fragments");
         }
         super.onCreate(savedInstanceState);
-
         initDatabaseRef();
-
         DataBindingUtil.setContentView(this, R.layout.activity_main);
         initPhotoHelper(savedInstanceState);
         setupDrawer();
@@ -242,6 +242,10 @@ public class GroupChatActivity extends BaseActivity implements
         });
         //initDownloadReceiver();
         initButtons();
+
+        if (getIntent() != null && getIntent().hasExtra(Constants.KEY_GROUP_NAME)) {
+            getSupportActionBar().setTitle(getIntent().getStringExtra(Constants.KEY_GROUP_NAME));
+        }
     }
 
     private long prevInputTime;
@@ -312,10 +316,10 @@ public class GroupChatActivity extends BaseActivity implements
 
     void initDatabaseRef() {
         String databaseRef;
-        if (getIntent() != null && getIntent().hasExtra(Constants.KEY_DATABASE_CHILD)) {
-            databaseRef = getIntent().getStringExtra(Constants.KEY_DATABASE_CHILD);
+        if (getIntent() != null && getIntent().hasExtra(Constants.KEY_GROUPID)) {
+            databaseRef = Constants.GROUP_CHAT_REF(getIntent().getLongExtra(Constants.KEY_GROUPID, Constants.DEFAULT_PUBLIC_GROUP_ID));
         } else {
-            databaseRef = Constants.DEFAULT_PUBLIC_GROUP_REFERENCE;
+            databaseRef = Constants.GROUP_CHAT_REF(Constants.DEFAULT_PUBLIC_GROUP_ID);
         }
         setDatabaseRoot(databaseRef);
     }
@@ -1006,5 +1010,19 @@ public class GroupChatActivity extends BaseActivity implements
             AnimationUtil.fadeInAnimation(findViewById(R.id.dotsLayout));
         else
             findViewById(R.id.dotsLayout).setVisibility(View.VISIBLE);
+    }
+
+    public static void startGroupChatActivity(Context context, long groupId, String groupName) {
+        Intent intent = newIntent(context, groupId, groupName);
+        context.startActivity(intent);
+    }
+
+    public static Intent newIntent(Context context, long groupId, String groupName) {
+        Intent intent = new Intent(context, GroupChatActivity.class);
+        intent.putExtra(Constants.KEY_GROUPID, groupId);
+        intent.putExtra(Constants.KEY_GROUP_NAME, groupName);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                | Intent.FLAG_ACTIVITY_NEW_TASK);
+        return intent;
     }
 }

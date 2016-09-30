@@ -12,6 +12,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.Constants;
+import com.instachat.android.GroupChatActivity;
 import com.instachat.android.MyApp;
 import com.instachat.android.PrivateChatActivity;
 import com.instachat.android.R;
@@ -19,6 +20,7 @@ import com.instachat.android.model.GroupChatHeader;
 import com.instachat.android.model.GroupChatSummary;
 import com.instachat.android.model.PrivateChatHeader;
 import com.instachat.android.model.PrivateChatSummary;
+import com.instachat.android.util.MLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,8 @@ import java.util.List;
  * objects in an array list;
  */
 public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
+
+    public static final String TAG = "ChatsRecyclerAdapter";
 
     private static final int TYPE_GROUP_SUMMARY = 0;
     private static final int TYPE_PRIVATE_SUMMARY = 1;
@@ -111,6 +115,7 @@ public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
             }
         };
         publicGroupChatsSummaryReference.addChildEventListener(publicGroupChatsSummaryListener);
+        MLog.d(TAG, "publicGroupChatsSummaryReference.addChildEventListener(publicGroupChatsSummaryListener);");
     }
 
     private void insertPrivateChatSummary(PrivateChatSummary privateChatSummary) {
@@ -149,10 +154,12 @@ public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
                 GroupChatSummary summary = (GroupChatSummary) o;
                 if (groupChatSummary.compareTo(summary) < 0) {
                     data.add(i, groupChatSummary);
+                    notifyItemInserted(i);
                     break;
                 }
             } else {
                 data.add(i, groupChatSummary);
+                notifyItemInserted(i);
                 break;
             }
 
@@ -187,7 +194,15 @@ public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
             return holder;
         } else if (viewType == TYPE_GROUP_SUMMARY) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_list_item, parent, false);
-            GroupChatSummaryViewHolder holder = new GroupChatSummaryViewHolder(view);
+            final GroupChatSummaryViewHolder holder = new GroupChatSummaryViewHolder(view);
+            holder.name.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    GroupChatSummary groupChatSummary = (GroupChatSummary) data.get(holder.getAdapterPosition());
+                    GroupChatActivity.startGroupChatActivity(activity, groupChatSummary.getId(), groupChatSummary.getName());
+                    chatsItemClickedListener.onNameClicked();
+                }
+            });
             return holder;
         } else if (viewType == TYPE_PRIVATE_SUMMARY) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_list_item, parent, false);

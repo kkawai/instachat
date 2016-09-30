@@ -106,7 +106,7 @@ public class FragmentProfile extends BaseFragment {
                         @Override
                         public void onClick(View view) {
                             MLog.d(TAG, "starting chat activity with " + remote.getId() + "  username: " + remote.getUsername());
-                            PrivateChatActivity.startPrivateChatActivity(getContext(), remote.getId());
+                            PrivateChatActivity.startPrivateChatActivity(getActivity(), remote.getId());
                         }
                     });
                 } catch (Exception e) {

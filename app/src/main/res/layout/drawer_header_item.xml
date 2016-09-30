@@ -22,6 +22,10 @@
         app:font="Lato-Heavy.ttf"
         />
 
+    <!--
+    todo: add feature to search for groups and users to add
+    for now, gone the view
+    -->
     <ImageView
         android:id="@+id/add"
         android:layout_width="wrap_content"
@@ -31,6 +35,7 @@
         android:layout_marginRight="14dp"
         android:scaleType="fitXY"
         android:src="@drawable/ic_add_circle_outline_white_24dp"
+        android:visibility="gone"
         />
 
 </RelativeLayout>

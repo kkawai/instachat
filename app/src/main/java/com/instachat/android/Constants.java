@@ -150,6 +150,10 @@ public final class Constants {
         return "/users/" + myUserid + "/private_summaries/";
     }
 
+    public static String GROUP_CHAT_REF(long groupid) {
+        return "/public_group_messages/" + groupid;
+    }
+
     public static String PUBLIC_CHATS_SUMMARY_PARENT_REF = "/public_group_summaries/";
 
     public static String DP_STORAGE_BASE(int userid) {
@@ -160,14 +164,13 @@ public final class Constants {
      * Firebase database constants
      */
     public static final String KEY_DATABASE_CHILD = "database_child";
-    public static final String DEFAULT_PUBLIC_GROUP_REFERENCE = "/public_group_messages/1";
+    public static final long DEFAULT_PUBLIC_GROUP_ID = 1;
     public static final int MAX_PIC_SIZE_BYTES = 512000;
     public static final int MAX_PROFILE_PIC_SIZE_BYTES = 400000;
     public static final float MAX_FULLSCREEN_FONT_SIZE = 199f;
 
-    /**
-     * new chat constants
-     */
+    public static final String KEY_GROUPID = "group_id";
+    public static final String KEY_GROUP_NAME = "group_name";
     public static final String KEY_USERID = "user_id";
     public static final String KEY_GCM_MSG_TYPE = "key_gcm_type";
 
