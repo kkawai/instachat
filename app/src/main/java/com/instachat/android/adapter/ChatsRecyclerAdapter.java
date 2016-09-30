@@ -60,13 +60,14 @@ public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
         privateChatsSummaryListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                PrivateChatSummary privateChatSummary = PrivateChatSummary.fromDataSnapshot(dataSnapshot);
+                PrivateChatSummary privateChatSummary = dataSnapshot.getValue(PrivateChatSummary.class);
                 insertPrivateChatSummary(privateChatSummary);
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 //todo to-user might have changed their name
+                MLog.d(TAG, "onChildChanged() " + dataSnapshot.toString());
             }
 
             @Override
@@ -84,7 +85,6 @@ public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
                 //??
             }
         };
-        privateChatsSummaryReference.addChildEventListener(privateChatsSummaryListener);
 
         publicGroupChatsSummaryReference = FirebaseDatabase.getInstance().getReference(Constants.PUBLIC_CHATS_SUMMARY_PARENT_REF);
         publicGroupChatsSummaryListener = new ChildEventListener() {
@@ -115,6 +115,7 @@ public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
             }
         };
         publicGroupChatsSummaryReference.addChildEventListener(publicGroupChatsSummaryListener);
+        privateChatsSummaryReference.addChildEventListener(privateChatsSummaryListener);
         MLog.d(TAG, "publicGroupChatsSummaryReference.addChildEventListener(publicGroupChatsSummaryListener);");
     }
 
@@ -238,11 +239,14 @@ public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
 
             GroupChatSummary groupChatSummary = (GroupChatSummary) data.get(position);
             ((GroupChatSummaryViewHolder) holder).name.setText(groupChatSummary.getName());
+            ((GroupChatSummaryViewHolder) holder).status.setVisibility(View.INVISIBLE);
+            ((GroupChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.INVISIBLE);
 
         } else if (viewType == TYPE_PRIVATE_SUMMARY) {
 
             PrivateChatSummary privateChatSummary = (PrivateChatSummary) data.get(position);
             ((PrivateChatSummaryViewHolder) holder).name.setText(privateChatSummary.getName());
+            ((PrivateChatSummaryViewHolder) holder).status.setVisibility(View.VISIBLE);
         }
     }
 
