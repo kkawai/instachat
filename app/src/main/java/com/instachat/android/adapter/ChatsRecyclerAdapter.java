@@ -86,7 +86,7 @@ public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
         publicGroupChatsSummaryListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                GroupChatSummary groupChatSummary = GroupChatSummary.fromDataSnapshot(dataSnapshot);
+                GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
                 insertGroupChatSummary(groupChatSummary);
             }
 
@@ -125,13 +125,37 @@ public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
     }
 
     private void insertGroupChatSummary(GroupChatSummary groupChatSummary) {
+        int groupHeaderIndex = -1;
         for (int i = 0; i < data.size(); i++) {
             Object o = data.get(i);
             if (o instanceof GroupChatHeader) {
-                data.add(i + 1, groupChatSummary);
-                notifyItemInserted(i + 1);
+                groupHeaderIndex = i;
+
+                //handle case where GroupChatHeader is the only
+                //or last item in the data set
+                if (groupHeaderIndex + 1 == data.size()) {
+                    data.add(i + 1, groupChatSummary);
+                    notifyItemInserted(i + 1);
+                    break;
+                } else {
+                    continue;
+                }
+            }
+
+            if (groupHeaderIndex == -1)
+                continue;//keep iterating thru the data set until we find the GroupChatHeader
+
+            if (o instanceof GroupChatSummary) {
+                GroupChatSummary summary = (GroupChatSummary) o;
+                if (groupChatSummary.compareTo(summary) < 0) {
+                    data.add(i, groupChatSummary);
+                    break;
+                }
+            } else {
+                data.add(i, groupChatSummary);
                 break;
             }
+
         }
     }
 

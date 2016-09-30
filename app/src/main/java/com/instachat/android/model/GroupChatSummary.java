@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Created by kevin on 9/24/2016.
  */
-public class GroupChatSummary {
+public class GroupChatSummary implements Comparable<GroupChatSummary> {
 
     private static final String TAG = "GroupChatSummary";
 
@@ -17,7 +17,7 @@ public class GroupChatSummary {
      * The 'id' of the PrivateChatSummary is the same as the id
      * of the person whom you are having the conversation with
      */
-    private String id;
+    private long id;
 
     /**
      * information of the user with whom you are chatting with
@@ -28,12 +28,13 @@ public class GroupChatSummary {
     private long lastMessageTime;
     private String lastMessage;
     private int unreadMessageCount = -1;
+    private int order;
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -81,6 +82,14 @@ public class GroupChatSummary {
         return unreadMessageCount;
     }
 
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
     public void setUnreadMessageCount(int unreadMessageCount) {
         this.unreadMessageCount = unreadMessageCount;
     }
@@ -108,32 +117,14 @@ public class GroupChatSummary {
         return map;
     }
 
-    public static GroupChatSummary fromDataSnapshot(DataSnapshot dataSnapshot) {
-        GroupChatSummary groupChatSummary = new GroupChatSummary();
-        try {
-            groupChatSummary.setId(dataSnapshot.getKey());
-
-            if (dataSnapshot.hasChild("name")) {
-                groupChatSummary.setName((String) dataSnapshot.child("name").getValue());
-            }
-            if (dataSnapshot.hasChild("dpid")) {
-                groupChatSummary.setDpid((String) dataSnapshot.child("dpid").getValue());
-            }
-            if (dataSnapshot.hasChild("imageUrl")) {
-                groupChatSummary.setImageUrl((String) dataSnapshot.child("imageUrl").getValue());
-            }
-            if (dataSnapshot.hasChild("lastMessageTime")) {
-                groupChatSummary.setLastMessageTime((Long) dataSnapshot.child("lastMessageTime").getValue());
-            }
-            if (dataSnapshot.hasChild("lastMessage")) {
-                groupChatSummary.setLastMessage((String) dataSnapshot.child("lastMessage").getValue());
-            }
-            if (dataSnapshot.hasChild("unreadMessageCount")) {
-                groupChatSummary.setUnreadMessageCount((Integer) dataSnapshot.child("unreadMessageCount").getValue());
-            }
-        } catch (Exception e) {
-            MLog.e(TAG, "", e);
+    @Override
+    public int compareTo(GroupChatSummary groupChatSummary) {
+        if (this.order < groupChatSummary.order) {
+            return -1;
+        } else if (this.order > groupChatSummary.order) {
+            return 1;
+        } else {
+            return this.name.compareTo(groupChatSummary.name);
         }
-        return groupChatSummary;
     }
 }
