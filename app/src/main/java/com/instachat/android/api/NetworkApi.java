@@ -156,7 +156,7 @@ public final class NetworkApi {
                     // Create content:// URI for file, required since Android N
                     // See: https://developer.android.com/reference/android/support/v4/content/FileProvider.html
                     final Uri fileUri = FileProvider.getUriForFile(MyApp.getInstance(),
-                            "com.google.firebase.quickstart.firebasestorage.fileprovider", file);
+                            MyApp.getInstance().getPackageName()+".fileprovider", file);
 
                     LocalFileUtils.downloadFile(thirdPartyProfilePicUrl, file, null, null);
 

@@ -113,7 +113,7 @@ public class PhotoUploadHelper {
         // Create content:// URI for file, required since Android N
         // See: https://developer.android.com/reference/android/support/v4/content/FileProvider.html
         mFileUri = FileProvider.getUriForFile(mActivity,
-                "com.google.firebase.quickstart.firebasestorage.fileprovider", mFile);
+                mActivity.getPackageName()+".fileprovider", mFile);
 
         if (!isChoose) {
             // Create and launch the intent
