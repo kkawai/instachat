@@ -32,9 +32,9 @@ import java.util.List;
  * GroupChatSummary, PrivateChatHeader, and GroupChatHeader
  * objects in an array list;
  */
-public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
+public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
 
-    public static final String TAG = "ChatsRecyclerAdapter";
+    public static final String TAG = "ChatSummariesRecyclerAdapter";
 
     private static final int TYPE_GROUP_SUMMARY = 0;
     private static final int TYPE_PRIVATE_SUMMARY = 1;
@@ -47,7 +47,7 @@ public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
     private Activity activity;
     private ChatsItemClickedListener chatsItemClickedListener;
 
-    public ChatsRecyclerAdapter(Activity activity, ChatsItemClickedListener chatsItemClickedListener) {
+    public ChatSummariesRecyclerAdapter(Activity activity, ChatsItemClickedListener chatsItemClickedListener) {
         this.activity = activity;
         this.chatsItemClickedListener = chatsItemClickedListener;
     }

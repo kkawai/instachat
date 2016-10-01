@@ -57,11 +57,11 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.instachat.android.adapter.AdapterPopulateHolderListener;
 import com.instachat.android.adapter.ChatsItemClickedListener;
-import com.instachat.android.adapter.ChatsRecyclerAdapter;
+import com.instachat.android.adapter.ChatSummariesRecyclerAdapter;
 import com.instachat.android.adapter.FriendlyMessageListener;
 import com.instachat.android.adapter.MessageTextClickedListener;
 import com.instachat.android.adapter.MessageViewHolder;
-import com.instachat.android.adapter.MyFirebaseRecyclerAdapter;
+import com.instachat.android.adapter.MessagesRecyclerAdapter;
 import com.instachat.android.adapter.UserThumbClickedListener;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.api.UploadListener;
@@ -100,7 +100,7 @@ public class GroupChatActivity extends BaseActivity implements
     private View mSendButton, mAttachButton;
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
-    private MyFirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
+    private MessagesRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
     private ProgressBar mProgressBar;
     private DatabaseReference mFirebaseDatabaseReference;
     private FirebaseAuth mFirebaseAuth;
@@ -121,7 +121,7 @@ public class GroupChatActivity extends BaseActivity implements
     private String mDatabaseRoot;
     private boolean mIsStartedAnimation;
     private AnimatedDotLoadingView mDotsLoader;
-    private ChatsRecyclerAdapter mChatsRecyclerViewAdapter;
+    private ChatSummariesRecyclerAdapter mChatsRecyclerViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -655,7 +655,7 @@ public class GroupChatActivity extends BaseActivity implements
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        mChatsRecyclerViewAdapter = new ChatsRecyclerAdapter(this, this);
+        mChatsRecyclerViewAdapter = new ChatSummariesRecyclerAdapter(this, this);
         recyclerView.setAdapter(mChatsRecyclerViewAdapter);
         mChatsRecyclerViewAdapter.populateData();
     }
@@ -748,7 +748,7 @@ public class GroupChatActivity extends BaseActivity implements
     }
 
     private void initFirebaseAdapter() {
-        mFirebaseAdapter = new MyFirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder>(
+        mFirebaseAdapter = new MessagesRecyclerAdapter<FriendlyMessage, MessageViewHolder>(
                 FriendlyMessage.class,
                 R.layout.item_message,
                 MessageViewHolder.class,

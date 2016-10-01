@@ -33,9 +33,9 @@ import java.lang.ref.WeakReference;
 /**
  * Created by kevin on 8/23/2016.
  */
-public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> extends FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> {
+public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> extends FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> {
 
-    public static final String TAG = "MyFirebaseRecyclerAdapter";
+    public static final String TAG = "MessagesRecyclerAdapter";
 
     private static final int ITEM_VIEW_TYPE_STANDARD_MESSAGE = 0;
     private static final int ITEM_VIEW_TYPE_WEB_LINK = 1;
@@ -49,7 +49,7 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
     private FriendlyMessageListener mFriendlyMessageListener;
     private String mDatabaseRoot;
 
-    public MyFirebaseRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, DatabaseReference ref) {
+    public MessagesRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, DatabaseReference ref) {
         super(modelClass, modelLayout, viewHolderClass, ref);
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
