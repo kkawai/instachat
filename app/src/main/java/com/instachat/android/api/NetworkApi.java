@@ -234,7 +234,7 @@ public final class NetworkApi {
                     if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                         MLog.i(TAG, "sent gcm message to server: " + response.optString("descr"));
                     } else {
-                        MLog.e(TAG, "Error from server: ", response);
+                        MLog.e(TAG, "gcmsend() failed. Error from server: ", response, " toid: ", toid, " msg: ", msg.toString());
                     }
                 } catch (Exception e) {
                     MLog.e(TAG, "NetworkApi.gcmsend() failed", e);

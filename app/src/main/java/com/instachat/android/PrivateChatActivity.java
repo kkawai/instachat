@@ -123,7 +123,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     public void onFriendlyMessageSuccess(FriendlyMessage friendlyMessage) {
         super.onFriendlyMessageSuccess(friendlyMessage);
         try {
-            JSONObject o = friendlyMessage.toJSONObject();
+            JSONObject o = friendlyMessage.toLightweightJSONObject();
             NetworkApi.gcmsend("" + mToUser.getId(), Constants.GcmMessageType.msg, o);
         } catch (Exception e) {
             MLog.e(TAG, "onFriendlyMessageSent() failed", e);

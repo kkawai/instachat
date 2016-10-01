@@ -1,12 +1,12 @@
 /**
  * Copyright Google Inc. All Rights Reserved.
- * <p>
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,7 @@ package com.instachat.android.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import com.instachat.android.util.MLog;
 
@@ -93,8 +94,36 @@ public class FriendlyMessage implements Parcelable {
     }
 
     /**
+     * Only create lightweight json object for the purpose of
+     * notification messaging.  Cannot send payloads of more than
+     * a few K over gcm!
+     *
+     * @return
+     * @throws JSONException
+     */
+    public JSONObject toLightweightJSONObject() throws JSONException {
+        JSONObject o = new JSONObject();
+        o.put("id", id);
+        if (!TextUtils.isEmpty(text))
+            o.put("text", shorten(text, 64));
+        o.put("name", name);
+        o.put("userid", userid);
+        if (dpid != null) {
+            o.put("dpid", dpid);
+        }
+        return o;
+    }
+
+    private String shorten(final String s, final int limit) {
+        if (s.length() <= limit) {
+            return s;
+        }
+        return s.substring(0, limit) + "...";
+    }
+
+    /**
      * tests if the given FriendlyMessage can be appended to this FriendlyMessage
-     * <p>
+     * <p/>
      * If the current friendly message already has an image and the given FriendlyMessage
      * has an image, then we cannot append.  Otherwise, we can append.
      *
@@ -109,8 +138,8 @@ public class FriendlyMessage implements Parcelable {
     }
 
     /**
-     * Attemps to append the given FriendlyMessage to this
-     * FrienlyMessage.
+     * Attempts to append the given FriendlyMessage to this
+     * FriendlyMessage.
      *
      * @param friendlyMessage
      * @return - true if was able to append; false otherwise
@@ -138,7 +167,7 @@ public class FriendlyMessage implements Parcelable {
         try {
             friendlyMessage.name = o.getString("name");
             friendlyMessage.userid = o.getInt("userid");
-            friendlyMessage.time = o.getLong("time");
+            friendlyMessage.time = o.optLong("time");
             friendlyMessage.imageUrl = o.optString("imageUrl");
             friendlyMessage.imageId = o.optString("imageId");
             friendlyMessage.text = o.optString("text");

@@ -134,7 +134,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         builder.setContentTitle(friendlyMessage.getName());
 
         // Content text, which appears in smaller text below the title
-        if (!TextUtils.isEmpty(friendlyMessage.getImageUrl()) && TextUtils.isEmpty(friendlyMessage.getText()))
+        if (TextUtils.isEmpty(friendlyMessage.getText()))
             builder.setContentText(getString(R.string.photo));
         else
             builder.setContentText(friendlyMessage.getText() + "");

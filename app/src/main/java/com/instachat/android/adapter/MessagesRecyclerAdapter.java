@@ -296,10 +296,9 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        mFriendlyMessageListener.onFriendlyMessageSuccess(lastFriendlyMessage);
-                                        notifyItemChanged(itemCount - 1);
+                                        mFriendlyMessageListener.onFriendlyMessageSuccess(friendlyMessage);
                                     } else {
-                                        mFriendlyMessageListener.onFriendlyMessageFail(lastFriendlyMessage);
+                                        mFriendlyMessageListener.onFriendlyMessageFail(friendlyMessage);
                                     }
                                 }
                             });
@@ -313,7 +312,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 .push()
                 .getKey();
         friendlyMessage.setId(key);
-
 
         mFirebaseDatabaseReference
                 .child(mDatabaseRoot)
