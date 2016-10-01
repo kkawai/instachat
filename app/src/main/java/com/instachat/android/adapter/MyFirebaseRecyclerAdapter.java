@@ -46,6 +46,7 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
     private AdapterPopulateHolderListener mAdapterPopulateHolderListener;
     private MessageTextClickedListener mMessageTextClickedListener;
     private UserThumbClickedListener mUserThumbClickedListener;
+    private FriendlyMessageListener mFriendlyMessageListener;
     private String mDatabaseRoot;
 
     public MyFirebaseRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, DatabaseReference ref) {
@@ -72,6 +73,10 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
 
     public void setUserThumbClickedListener(UserThumbClickedListener listener) {
         mUserThumbClickedListener = listener;
+    }
+
+    public void setFriendlyMessageListener(FriendlyMessageListener listener) {
+        mFriendlyMessageListener = listener;
     }
 
     @Override
@@ -273,5 +278,56 @@ public class MyFirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> ex
 
     private boolean isActivityDestroyed() {
         return (mActivity == null || mActivity.get() == null || mActivity.get().isFinishing());
+    }
+
+    public void sendFriendlyMessage(final FriendlyMessage friendlyMessage) {
+
+        final int itemCount = getItemCount();
+        if (itemCount > 0) {
+            final FriendlyMessage lastFriendlyMessage = getItem(itemCount - 1);
+            if (friendlyMessage.getUserid() == lastFriendlyMessage.getUserid()) {
+
+                if (lastFriendlyMessage.append(friendlyMessage)) {
+                    mFirebaseDatabaseReference
+                            .child(mDatabaseRoot)
+                            .child(lastFriendlyMessage.getId())
+                            .updateChildren(FriendlyMessage.toMap(lastFriendlyMessage))
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        mFriendlyMessageListener.onFriendlyMessageSuccess(lastFriendlyMessage);
+                                        notifyItemChanged(itemCount - 1);
+                                    } else {
+                                        mFriendlyMessageListener.onFriendlyMessageFail(lastFriendlyMessage);
+                                    }
+                                }
+                            });
+                    return;
+                }
+            }
+        }
+
+        final String key = mFirebaseDatabaseReference
+                .child(mDatabaseRoot)
+                .push()
+                .getKey();
+        friendlyMessage.setId(key);
+
+
+        mFirebaseDatabaseReference
+                .child(mDatabaseRoot)
+                .child(friendlyMessage.getId())
+                .setValue(friendlyMessage)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            mFriendlyMessageListener.onFriendlyMessageSuccess(friendlyMessage);
+                        } else {
+                            mFriendlyMessageListener.onFriendlyMessageFail(friendlyMessage);
+                        }
+                    }
+                });
     }
 }

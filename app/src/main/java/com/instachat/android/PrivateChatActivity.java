@@ -94,61 +94,6 @@ public class PrivateChatActivity extends GroupChatActivity {
         summary.setName(mToUser.getUsername());
         summary.setDpid(mToUser.getProfilePicUrl());
         ref.child(mToUser.getId() + "").updateChildren(PrivateChatSummary.toMap(summary));
-
-        /*DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
-        ref.limitToLast(1000).addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                try {
-                    PrivateChatSummary summary = new PrivateChatSummary();
-                    summary.setId(dataSnapshot.getKey());
-                    String name = (String) dataSnapshot.child("name").getValue();
-                    String dpid = (String) dataSnapshot.child("dpid").getValue();
-                    long lastMessageTime = (Long) dataSnapshot.child("lastMessageTime").getValue();
-                    MLog.d(TAG, "got summary: ", name, " dpid: ", dpid, " lastMessageTime: ", lastMessageTime);
-                } catch (Exception e) {
-                    MLog.e(TAG, "", e);
-                }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });*/
-        /*DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
-        PrivateChatSummary summary = new PrivateChatSummary();
-        summary.setName(mToUser.getUsername());
-        summary.setDpid(mToUser.getProfilePicUrl());
-        summary.setLastMessageTime(100);
-        ref.child(mToUser.getId() + "").setValue(summary);
-
-        summary.setName("fakeTestUser");
-        summary.setDpid("some fake dpid");
-        summary.setLastMessageTime(99);
-        ref.child("1111").setValue(summary);
-
-        summary.setName("fakeTestUser 2");
-        summary.setDpid("some fake dpid 2");
-        summary.setLastMessageTime(101);
-        ref.child("1112").setValue(summary);*/
-
-
     }
 
     @Override
@@ -175,7 +120,8 @@ public class PrivateChatActivity extends GroupChatActivity {
     }
 
     @Override
-    void onFriendlyMessageSent(FriendlyMessage friendlyMessage) {
+    public void onFriendlyMessageSuccess(FriendlyMessage friendlyMessage) {
+        super.onFriendlyMessageSuccess(friendlyMessage);
         try {
             JSONObject o = friendlyMessage.toJSONObject();
             NetworkApi.gcmsend("" + mToUser.getId(), Constants.GcmMessageType.msg, o);

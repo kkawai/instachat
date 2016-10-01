@@ -25,7 +25,6 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class FriendlyMessage implements Parcelable {
 
@@ -72,7 +71,6 @@ public class FriendlyMessage implements Parcelable {
         this.imageUrl = imageUrl;
         this.imageId = imageId;
         this.dpid = dpid;
-        this.id = userid + '-' + UUID.randomUUID().toString();
     }
 
     public JSONObject toJSONObject() throws JSONException {
@@ -92,6 +90,47 @@ public class FriendlyMessage implements Parcelable {
             o.put("dpid", dpid);
         }
         return o;
+    }
+
+    /**
+     * tests if the given FriendlyMessage can be appended to this FriendlyMessage
+     * <p>
+     * If the current friendly message already has an image and the given FriendlyMessage
+     * has an image, then we cannot append.  Otherwise, we can append.
+     *
+     * @param friendlyMessage
+     * @return
+     */
+    private boolean canAppend(FriendlyMessage friendlyMessage) {
+        if (imageUrl != null && friendlyMessage.imageUrl != null) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Attemps to append the given FriendlyMessage to this
+     * FrienlyMessage.
+     *
+     * @param friendlyMessage
+     * @return - true if was able to append; false otherwise
+     */
+    public boolean append(FriendlyMessage friendlyMessage) {
+
+        if (!canAppend(friendlyMessage)) {
+            return false;
+        }
+        time = friendlyMessage.getTime();
+        if (friendlyMessage.imageUrl != null)
+            imageUrl = friendlyMessage.imageUrl;
+        if (friendlyMessage.imageId != null)
+            imageId = friendlyMessage.imageId;
+        if (text != null && friendlyMessage.text != null) {
+            text = text + "\n" + friendlyMessage.text;
+        } else if (text == null && friendlyMessage.text != null) {
+            text = friendlyMessage.text;
+        }
+        return true;
     }
 
     public static FriendlyMessage fromJSONObject(JSONObject o) {

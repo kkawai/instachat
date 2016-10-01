@@ -51,6 +51,14 @@
                     app:font="Lato-Regular.ttf"/>
             </LinearLayout>
 
+            <ImageView
+                android:id="@+id/messagePhotoView"
+                android:layout_width="@dimen/posted_photo_size"
+                android:layout_height="@dimen/posted_photo_size"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                />
+
             <com.instachat.android.view.CustomFontTextView
                 android:id="@+id/messageTextView"
                 android:layout_width="wrap_content"
@@ -61,13 +69,6 @@
                 android:textSize="15sp"
                 app:font="Lato-Regular.ttf"/>
 
-            <ImageView
-                android:id="@+id/messagePhotoView"
-                android:layout_width="@dimen/posted_photo_size"
-                android:layout_height="@dimen/posted_photo_size"
-                android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
-                />
         </LinearLayout>
 
     </LinearLayout>

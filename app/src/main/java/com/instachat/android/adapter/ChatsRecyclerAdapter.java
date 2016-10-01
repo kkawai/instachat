@@ -61,6 +61,7 @@ public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 PrivateChatSummary privateChatSummary = dataSnapshot.getValue(PrivateChatSummary.class);
+                privateChatSummary.setId(dataSnapshot.getKey());
                 insertPrivateChatSummary(privateChatSummary);
             }
 
@@ -91,6 +92,7 @@ public class ChatsRecyclerAdapter extends RecyclerView.Adapter {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
+                groupChatSummary.setId(Long.parseLong(dataSnapshot.getKey()));
                 insertGroupChatSummary(groupChatSummary);
             }
 

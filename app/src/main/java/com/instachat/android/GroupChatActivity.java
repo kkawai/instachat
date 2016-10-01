@@ -1,6 +1,5 @@
 package com.instachat.android;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -47,10 +46,8 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.crash.FirebaseCrash;
@@ -61,6 +58,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.instachat.android.adapter.AdapterPopulateHolderListener;
 import com.instachat.android.adapter.ChatsItemClickedListener;
 import com.instachat.android.adapter.ChatsRecyclerAdapter;
+import com.instachat.android.adapter.FriendlyMessageListener;
 import com.instachat.android.adapter.MessageTextClickedListener;
 import com.instachat.android.adapter.MessageViewHolder;
 import com.instachat.android.adapter.MyFirebaseRecyclerAdapter;
@@ -90,7 +88,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class GroupChatActivity extends BaseActivity implements
         GoogleApiClient.OnConnectionFailedListener, FriendlyMessageContainer,
         EasyPermissions.PermissionCallbacks, UploadListener, UserThumbClickedListener,
-        ChatTypingHelper.UserTypingListener, ChatsItemClickedListener {
+        ChatTypingHelper.UserTypingListener, ChatsItemClickedListener, FriendlyMessageListener {
 
     private static final String TAG = "GroupChatActivity";
 
@@ -458,19 +456,14 @@ public class GroupChatActivity extends BaseActivity implements
                 if (StringUtil.isEmpty(text)) {
                     return;
                 }
+                mMessageEditText.setText("");//fast double taps on send can cause 2x sends!
                 final FriendlyMessage friendlyMessage = new FriendlyMessage(text, myUsername(),
                         myUserid(), myDpid(), null, null, System.currentTimeMillis());
-                mFirebaseDatabaseReference
-                        .child(mDatabaseRoot)
-                        .child(friendlyMessage.getId())
-                        .updateChildren(FriendlyMessage.toMap(friendlyMessage)).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        onFriendlyMessageSent(friendlyMessage);
-                    }
-                });
-                mMessageEditText.setText("");
-                mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
+                try {
+                    mFirebaseAdapter.sendFriendlyMessage(friendlyMessage);
+                }catch(Exception e) {
+                    MLog.e(TAG,"",e);
+                }
             }
         });
         mAttachButton.setOnClickListener(new View.OnClickListener() {
@@ -481,8 +474,15 @@ public class GroupChatActivity extends BaseActivity implements
         });
     }
 
-    void onFriendlyMessageSent(FriendlyMessage friendlyMessage) {
+    @Override
+    public void onFriendlyMessageSuccess(FriendlyMessage friendlyMessage) {
+        mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
+    }
 
+    @Override
+    public void onFriendlyMessageFail(FriendlyMessage friendlyMessage) {
+        mMessageEditText.setText(friendlyMessage.getText());
+        Toast.makeText(this, R.string.could_not_send_message, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -767,6 +767,7 @@ public class GroupChatActivity extends BaseActivity implements
                 openFullScreenTextView(position);
             }
         });
+        mFirebaseAdapter.setFriendlyMessageListener(this);
         mFirebaseAdapter.setUserThumbClickedListener(this);
         mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
@@ -901,15 +902,11 @@ public class GroupChatActivity extends BaseActivity implements
             final FriendlyMessage friendlyMessage = new FriendlyMessage("", myUsername(),
                     myUserid(), myDpid(), photoUrl, photoId, System.currentTimeMillis());
             MLog.d(TAG, "uploadFromUri:onSuccess photoId: " + photoId);
-            mFirebaseDatabaseReference
-                    .child(mDatabaseRoot)
-                    .child(friendlyMessage.getId())
-                    .updateChildren(FriendlyMessage.toMap(friendlyMessage)).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    onFriendlyMessageSent(friendlyMessage);
-                }
-            });
+            try {
+                mFirebaseAdapter.sendFriendlyMessage(friendlyMessage);
+            }catch(final Exception e) {
+                MLog.e(TAG,"",e);
+            }
 
         } else if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.userProfilePhoto) {
             final User user = Preferences.getInstance().getUser();
