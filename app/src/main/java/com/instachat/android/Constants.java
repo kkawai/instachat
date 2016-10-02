@@ -150,6 +150,11 @@ public final class Constants {
         return "/users/" + myUserid + "/private_summaries/";
     }
 
+    public static String PRIVATE_UNREAD_MESSAGES_PARENT_REF() {
+        int myUserid = Preferences.getInstance().getUserId();
+        return "/users/" + myUserid + "/private_unread_messages/";
+    }
+
     public static String GROUP_CHAT_REF(long groupid) {
         return "/public_group_messages/" + groupid;
     }

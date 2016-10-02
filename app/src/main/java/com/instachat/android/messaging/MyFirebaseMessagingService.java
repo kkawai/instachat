@@ -16,6 +16,8 @@ import android.text.TextUtils;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.instachat.android.Constants;
@@ -28,6 +30,9 @@ import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ThreadWrapper;
 
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
@@ -61,6 +66,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         if (PrivateChatActivity.getActiveUserid() != Preferences.getInstance().getUserId())
                             return;
                     }
+
+                    incrementPrivateUnreadMessages(friendlyMessage);
 
                     Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
                         @Override
@@ -153,5 +160,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private int thumbSize() {
         return MyApp.getInstance().getResources().getDimensionPixelSize(R.dimen.message_thumb_pic_size);
+    }
+
+    private void incrementPrivateUnreadMessages(final FriendlyMessage friendlyMessage) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_UNREAD_MESSAGES_PARENT_REF());
+        Map<String,Object> map = new HashMap<>(1);
+        map.put("id",friendlyMessage.getId());
+        ref.child(friendlyMessage.getUserid() + "").child(friendlyMessage.getId()).updateChildren(map);
     }
 }
