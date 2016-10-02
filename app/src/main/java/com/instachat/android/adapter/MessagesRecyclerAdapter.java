@@ -288,6 +288,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             if (friendlyMessage.getUserid() == lastFriendlyMessage.getUserid()) {
 
                 if (lastFriendlyMessage.append(friendlyMessage)) {
+                    friendlyMessage.setId(lastFriendlyMessage.getId());
                     mFirebaseDatabaseReference
                             .child(mDatabaseRoot)
                             .child(lastFriendlyMessage.getId())
