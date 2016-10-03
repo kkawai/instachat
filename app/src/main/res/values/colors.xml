@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#87cefa</color> <!-- action title bar -->
+   <!-- <color name="colorPrimary">#87cefa</color> --> <!-- action title bar -->
+   <!-- <color name="colorPrimary">#87cefa</color> --> <!-- action title bar -->
+    <color name="colorPrimary">#FFFFFF</color> <!-- action title bar -->
     <color name="colorPrimaryDark">#6495ed</color> <!-- drawer, status bar -->
     <color name="colorAccent">#a8a8a8</color> <!-- button colors -->
     <color name="colorTitle">#ffffff</color>

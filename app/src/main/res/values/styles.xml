@@ -4,7 +4,7 @@
     <style name="Theme.App" parent="Theme.Base.App">
     </style>
 
-    <style name="Theme.Base.App" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <style name="Theme.Base.App" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
