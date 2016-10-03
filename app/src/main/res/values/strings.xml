@@ -53,4 +53,5 @@
     <string name="private_chat_header">Direct Messages</string>
 
     <string name="could_not_send_message">Sorry!  Could not send message.  Please try again.</string>
+    <string name="please_upload_photo">Please upload a display photo to start chatting</string>
 </resources>
