@@ -163,9 +163,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void incrementPrivateUnreadMessages(final FriendlyMessage friendlyMessage) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_UNREAD_MESSAGES_PARENT_REF());
-        Map<String,Object> map = new HashMap<>(1);
-        map.put("id",friendlyMessage.getId());
-        ref.child(friendlyMessage.getUserid() + "").child(friendlyMessage.getId()).updateChildren(map);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
+        Map<String, Object> map = new HashMap<>(1);
+        map.put("id", friendlyMessage.getId());
+        ref.child(friendlyMessage.getUserid() + "").child(Constants.CHILD_UNREAD_MESSAGES).child(friendlyMessage.getId()).updateChildren(map);
     }
 }

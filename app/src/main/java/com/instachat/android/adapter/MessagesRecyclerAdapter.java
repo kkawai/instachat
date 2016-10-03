@@ -282,28 +282,30 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
     public void sendFriendlyMessage(final FriendlyMessage friendlyMessage) {
 
-        final int itemCount = getItemCount();
-        if (itemCount > 0) {
-            final FriendlyMessage lastFriendlyMessage = getItem(itemCount - 1);
-            if (friendlyMessage.getUserid() == lastFriendlyMessage.getUserid()) {
+        if (Constants.IS_SUPPORT_MESSAGE_APPENDING) {
+            final int itemCount = getItemCount();
+            if (itemCount > 0) {
+                final FriendlyMessage lastFriendlyMessage = getItem(itemCount - 1);
+                if (friendlyMessage.getUserid() == lastFriendlyMessage.getUserid()) {
 
-                if (lastFriendlyMessage.append(friendlyMessage)) {
-                    friendlyMessage.setId(lastFriendlyMessage.getId());
-                    mFirebaseDatabaseReference
-                            .child(mDatabaseRoot)
-                            .child(lastFriendlyMessage.getId())
-                            .updateChildren(FriendlyMessage.toMap(lastFriendlyMessage))
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        mFriendlyMessageListener.onFriendlyMessageSuccess(friendlyMessage);
-                                    } else {
-                                        mFriendlyMessageListener.onFriendlyMessageFail(friendlyMessage);
+                    if (lastFriendlyMessage.append(friendlyMessage)) {
+                        friendlyMessage.setId(lastFriendlyMessage.getId());
+                        mFirebaseDatabaseReference
+                                .child(mDatabaseRoot)
+                                .child(lastFriendlyMessage.getId())
+                                .updateChildren(FriendlyMessage.toMap(lastFriendlyMessage))
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            mFriendlyMessageListener.onFriendlyMessageSuccess(friendlyMessage);
+                                        } else {
+                                            mFriendlyMessageListener.onFriendlyMessageFail(friendlyMessage);
+                                        }
                                     }
-                                }
-                            });
-                    return;
+                                });
+                        return;
+                    }
                 }
             }
         }

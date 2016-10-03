@@ -150,11 +150,6 @@ public final class Constants {
         return "/users/" + myUserid + "/private_summaries/";
     }
 
-    public static String PRIVATE_UNREAD_MESSAGES_PARENT_REF() {
-        int myUserid = Preferences.getInstance().getUserId();
-        return "/users/" + myUserid + "/private_unread_messages/";
-    }
-
     public static String GROUP_CHAT_REF(long groupid) {
         return "/public_group_messages/" + groupid;
     }
@@ -168,7 +163,6 @@ public final class Constants {
     /**
      * Firebase database constants
      */
-    public static final String KEY_DATABASE_CHILD = "database_child";
     public static final long DEFAULT_PUBLIC_GROUP_ID = 1;
     public static final int MAX_PIC_SIZE_BYTES = 512000;
     public static final int MAX_PROFILE_PIC_SIZE_BYTES = 400000;
@@ -187,4 +181,13 @@ public final class Constants {
     public static final String KEY_FRIENDLY_MSG_LENGTH = "friendly_msg_length";
     public static final String KEY_GCM_MESSAGE = "msg";
     public static final String KEY_TO_USERID = "toid";
+    public static final String CHILD_UNREAD_MESSAGES = "unread_messages";
+
+    /**
+     * Any message received by a user whose last message
+     * in the conversation is the same user, then instead
+     * of creating a new message line, append it to the last
+     * message.
+     */
+    public static final boolean IS_SUPPORT_MESSAGE_APPENDING = true;
 }

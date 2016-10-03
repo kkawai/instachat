@@ -85,6 +85,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         final NotificationManager notificationManager = ((NotificationManager) getSystemService(NOTIFICATION_SERVICE));
         notificationManager.cancel(toUserid);
         MLog.d(TAG, "Cancelled notification " + toUserid);
+        clearPrivateUnreadMessages(toUserid);
     }
 
     private void initPrivateChatSummaryIfNecessary() {
@@ -201,6 +202,15 @@ public class PrivateChatActivity extends GroupChatActivity {
             }
         });
 
+    }
+
+    private void clearPrivateUnreadMessages(int toUserid) {
+        try {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
+            ref.child(toUserid + "").child(Constants.CHILD_UNREAD_MESSAGES).removeValue();
+        } catch (Exception e) {
+            MLog.e(TAG, "", e);
+        }
     }
 
 }

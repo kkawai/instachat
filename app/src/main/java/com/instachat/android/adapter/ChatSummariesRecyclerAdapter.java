@@ -60,25 +60,33 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
         privateChatsSummaryListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                PrivateChatSummary privateChatSummary = dataSnapshot.getValue(PrivateChatSummary.class);
-                privateChatSummary.setId(dataSnapshot.getKey());
+                MLog.d(TAG, "onChildAdded() dataSnapshot: " + dataSnapshot.toString());
+                PrivateChatSummary privateChatSummary = getPrivateChatSummary(dataSnapshot);
                 insertPrivateChatSummary(privateChatSummary);
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                //todo to-user might have changed their name
-                MLog.d(TAG, "onChildChanged() " + dataSnapshot.toString());
+                //todo to-user might have changed their name or sent a message that is unread by you
+                MLog.d(TAG, "onChildChanged() dataSnapshot: " + dataSnapshot.toString());
+                PrivateChatSummary privateChatSummary = getPrivateChatSummary(dataSnapshot);
+                updatePrivateChatSummary(privateChatSummary);
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 //todo user can remove this summary
+                MLog.d(TAG, "onChildRemoved() dataSnapshot: " + dataSnapshot.toString());
+                PrivateChatSummary privateChatSummary = getPrivateChatSummary(dataSnapshot);
+                removePrivateChatSummary(privateChatSummary);
+
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                //probably not useful
+                //probably not useful right now, but will be later
+                //when we prioritize private conversations
+                MLog.d(TAG, "onChildMoved() dataSnapshot: " + dataSnapshot.toString());
             }
 
             @Override
@@ -119,6 +127,18 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
         publicGroupChatsSummaryReference.addChildEventListener(publicGroupChatsSummaryListener);
         privateChatsSummaryReference.addChildEventListener(privateChatsSummaryListener);
         MLog.d(TAG, "publicGroupChatsSummaryReference.addChildEventListener(publicGroupChatsSummaryListener);");
+
+    }
+
+    private PrivateChatSummary getPrivateChatSummary(DataSnapshot dataSnapshot) {
+        PrivateChatSummary privateChatSummary = dataSnapshot.getValue(PrivateChatSummary.class);
+        privateChatSummary.setId(dataSnapshot.getKey());
+        if (dataSnapshot.hasChild(Constants.CHILD_UNREAD_MESSAGES)) {
+            privateChatSummary.setUnreadMessageCount((int) dataSnapshot.child(Constants.CHILD_UNREAD_MESSAGES).getChildrenCount());
+        } else {
+            privateChatSummary.setUnreadMessageCount(0);
+        }
+        return privateChatSummary;
     }
 
     private void insertPrivateChatSummary(PrivateChatSummary privateChatSummary) {
@@ -128,6 +148,34 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
                 data.add(i + 1, privateChatSummary);
                 notifyItemInserted(i + 1);
                 break;
+            }
+        }
+    }
+
+    private void updatePrivateChatSummary(PrivateChatSummary privateChatSummary) {
+        for (int i = 0; i < data.size(); i++) {
+            Object o = data.get(i);
+            if (o instanceof PrivateChatSummary) {
+                PrivateChatSummary existingPrivateChatSummary = (PrivateChatSummary) o;
+                if (existingPrivateChatSummary.getId().equals(privateChatSummary.getId())) {
+                    data.set(i, privateChatSummary);
+                    notifyItemChanged(i);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void removePrivateChatSummary(PrivateChatSummary privateChatSummary) {
+        for (int i = 0; i < data.size(); i++) {
+            Object o = data.get(i);
+            if (o instanceof PrivateChatSummary) {
+                PrivateChatSummary existingPrivateChatSummary = (PrivateChatSummary) o;
+                if (existingPrivateChatSummary.getId().equals(privateChatSummary.getId())) {
+                    data.remove(i);
+                    notifyItemRemoved(i);
+                    break;
+                }
             }
         }
     }
@@ -249,6 +297,12 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
             PrivateChatSummary privateChatSummary = (PrivateChatSummary) data.get(position);
             ((PrivateChatSummaryViewHolder) holder).name.setText(privateChatSummary.getName());
             ((PrivateChatSummaryViewHolder) holder).status.setVisibility(View.VISIBLE);
+            if (privateChatSummary.getUnreadMessageCount() > 0) {
+                ((PrivateChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.VISIBLE);
+                ((PrivateChatSummaryViewHolder) holder).unreadMessageCount.setText(" " + privateChatSummary.getUnreadMessageCount() + " ");
+            } else {
+                ((PrivateChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
