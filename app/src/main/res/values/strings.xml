@@ -2,7 +2,7 @@
     <string name="app_name">Instachat</string>
     <string name="invitation_title">Group Chat Invite</string>
     <string name="invitation_cta">Call to action</string>
-    <string name="invitation_message">Please joine me for a friendly chat</string>
+    <string name="invitation_message">Please join me for a friendly chat</string>
     <string name="welcome_msg">Welcome!</string>
     <string name="sign_out">Sign Out</string>
     <string name="contacts_permission_rationale">Access to account information is required to sign in.</string>
@@ -39,7 +39,7 @@
     <string name="menu_choose_photo">Choose Photo</string>
     <string name="menu_take_photo">Take Photo</string>
     <string name="message_hint">Send a friendly message...</string>
-    <string name="error_send_photo">Sorry, could not upload photo. please try again.</string>
+    <string name="error_send_photo">Sorry, could not upload photo. Please try again.</string>
     <string name="is_your_new_username">%s is your new username</string>
     <string name="title_update_my_pic">Update my photo</string>
     <string name="sent_via">Sent via %s</string>
