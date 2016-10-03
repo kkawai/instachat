@@ -35,7 +35,6 @@
     <string name="username_exists">Please choose a username name.  %s is already taken.</string>
     <string name="email_password_not_found">Account not found.  Try again.</string>
     <string name="wrong_password">Wrong password.  Try again.</string>
-    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
     <string name="menu_choose_photo">Choose Photo</string>
     <string name="menu_take_photo">Take Photo</string>
     <string name="message_hint">Send a friendly message...</string>
@@ -44,13 +43,10 @@
     <string name="title_update_my_pic">Update my photo</string>
     <string name="sent_via">Sent via %s</string>
 
-    <string name="empty" translatable="false"/>
     <string name="preview_area">Preview Area</string>
     <string name="post_area">Post Area</string>
     <string name="no_thumbnail">No thumbnail</string>
     <string name="choose_thumbnail">Choose a thumbnail</string>
-    <string name="previous">←</string>
-    <string name="forward">→</string>
     <string name="post">Post</string>
     <string name="photo">Photo</string>
     <string name="group_chat_header"># Channels</string>
