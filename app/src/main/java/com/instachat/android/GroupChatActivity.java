@@ -56,8 +56,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.instachat.android.adapter.AdapterPopulateHolderListener;
-import com.instachat.android.adapter.ChatsItemClickedListener;
 import com.instachat.android.adapter.ChatSummariesRecyclerAdapter;
+import com.instachat.android.adapter.ChatsItemClickedListener;
 import com.instachat.android.adapter.FriendlyMessageListener;
 import com.instachat.android.adapter.MessageTextClickedListener;
 import com.instachat.android.adapter.MessageViewHolder;
@@ -70,6 +70,8 @@ import com.instachat.android.fullscreen.FullScreenTextFragment;
 import com.instachat.android.gcm.GCMHelper;
 import com.instachat.android.login.SignInActivity;
 import com.instachat.android.model.FriendlyMessage;
+import com.instachat.android.model.GroupChatSummary;
+import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.model.User;
 import com.instachat.android.profile.FragmentProfile;
 import com.instachat.android.util.AnimationUtil;
@@ -461,8 +463,8 @@ public class GroupChatActivity extends BaseActivity implements
                         myUserid(), myDpid(), null, null, System.currentTimeMillis());
                 try {
                     mFirebaseAdapter.sendFriendlyMessage(friendlyMessage);
-                }catch(Exception e) {
-                    MLog.e(TAG,"",e);
+                } catch (Exception e) {
+                    MLog.e(TAG, "", e);
                 }
             }
         });
@@ -655,7 +657,7 @@ public class GroupChatActivity extends BaseActivity implements
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        mChatsRecyclerViewAdapter = new ChatSummariesRecyclerAdapter(this, this);
+        mChatsRecyclerViewAdapter = new ChatSummariesRecyclerAdapter(this);
         recyclerView.setAdapter(mChatsRecyclerViewAdapter);
         mChatsRecyclerViewAdapter.populateData();
     }
@@ -904,8 +906,8 @@ public class GroupChatActivity extends BaseActivity implements
             MLog.d(TAG, "uploadFromUri:onSuccess photoId: " + photoId);
             try {
                 mFirebaseAdapter.sendFriendlyMessage(friendlyMessage);
-            }catch(final Exception e) {
-                MLog.e(TAG,"",e);
+            } catch (final Exception e) {
+                MLog.e(TAG, "", e);
             }
 
         } else if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.userProfilePhoto) {
@@ -984,9 +986,17 @@ public class GroupChatActivity extends BaseActivity implements
     }
 
     @Override
-    public void onNameClicked() {
+    public void onGroupChatClicked(GroupChatSummary groupChatSummary) {
         if (isDrawerOpen())
             closeDrawer();
+        startGroupChatActivity(this, groupChatSummary.getId(), groupChatSummary.getName());
+    }
+
+    @Override
+    public void onPrivateChatClicked(PrivateChatSummary privateChatSummary) {
+        if (isDrawerOpen())
+            closeDrawer();
+        PrivateChatActivity.startPrivateChatActivity(this, Integer.parseInt(privateChatSummary.getId()));
     }
 
     protected void hideDotsParent(boolean isAnimate) {
