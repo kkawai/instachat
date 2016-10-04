@@ -2,7 +2,7 @@
 <resources>
    <!-- <color name="colorPrimary">#87cefa</color> --> <!-- action title bar -->
     <color name="colorPrimary">#FFFFFF</color> <!-- action title bar -->
-    <color name="colorPrimaryDark">#F7F8FA</color> <!-- drawer, status bar -->
+    <color name="colorPrimaryDark">#FF425A</color> <!-- drawer, status bar -->
     <color name="colorAccent">#F7F8FA</color> <!-- button colors -->
     <color name="colorTitle">#ffffff</color>
 

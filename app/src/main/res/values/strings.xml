@@ -49,8 +49,8 @@
     <string name="choose_thumbnail">Choose a thumbnail</string>
     <string name="post">Post</string>
     <string name="photo">Photo</string>
-    <string name="group_chat_header"># Channels</string>
-    <string name="private_chat_header">Direct Messages</string>
+    <string name="group_chat_header">LIVE</string>
+    <string name="private_chat_header">PRIVATE MESSAGES</string>
 
     <string name="could_not_send_message">Sorry!  Could not send message.  Please try again.</string>
     <string name="please_upload_photo">Please upload a display photo to start chatting</string>
