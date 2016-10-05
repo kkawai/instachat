@@ -125,6 +125,10 @@ public class GroupChatActivity extends BaseActivity implements
     private AnimatedDotLoadingView mDotsLoader;
     private ChatSummariesRecyclerAdapter mChatsRecyclerViewAdapter;
 
+    protected int getLayout() {
+        return R.layout.activity_main;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (savedInstanceState != null) { // Android support FragmentManager v4 erroneously remembers every Fragment, even when "retain instance" is
@@ -134,7 +138,7 @@ public class GroupChatActivity extends BaseActivity implements
         }
         super.onCreate(savedInstanceState);
         initDatabaseRef();
-        DataBindingUtil.setContentView(this, R.layout.activity_main);
+        DataBindingUtil.setContentView(this, getLayout());
         initPhotoHelper(savedInstanceState);
         setupDrawer();
         setupToolbar();

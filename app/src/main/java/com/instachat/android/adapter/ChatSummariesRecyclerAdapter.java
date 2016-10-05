@@ -1,5 +1,6 @@
 package com.instachat.android.adapter;
 
+import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -321,11 +322,14 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
             PrivateChatSummary privateChatSummary = (PrivateChatSummary) data.get(position);
             ((PrivateChatSummaryViewHolder) holder).name.setText(privateChatSummary.getName());
             ((PrivateChatSummaryViewHolder) holder).status.setVisibility(View.VISIBLE);
+            Resources res = ((PrivateChatSummaryViewHolder) holder).name.getContext().getResources();
             if (privateChatSummary.getUnreadMessageCount() > 0) {
                 ((PrivateChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.VISIBLE);
                 ((PrivateChatSummaryViewHolder) holder).unreadMessageCount.setText(" " + privateChatSummary.getUnreadMessageCount() + " ");
+                ((PrivateChatSummaryViewHolder) holder).name.setTextColor(res.getColor(android.R.color.white));
             } else {
                 ((PrivateChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.INVISIBLE);
+                ((PrivateChatSummaryViewHolder) holder).name.setTextColor(res.getColor(R.color.defaultChatSummaryNameColor));
             }
         }
     }

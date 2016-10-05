@@ -43,6 +43,11 @@ public class PrivateChatActivity extends GroupChatActivity {
     private long mLastTypingTime;
 
     @Override
+    protected int getLayout() {
+        return R.layout.activity_private_chat;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MLog.d(TAG, "onCreate() ");

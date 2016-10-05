@@ -6,6 +6,8 @@
     <color name="colorAccent">#F7F8FA</color> <!-- button colors -->
     <color name="colorTitle">#ffffff</color>
 
+    <color name="defaultChatSummaryNameColor">#d8dade</color>
+
     <color name="jonPink">#FF425A</color>
     <color name="jonGray">#F7F8FA</color>
     <color name="jonGreen">#71EFC5</color>
