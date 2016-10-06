@@ -11,7 +11,7 @@ public final class DeviceUtil {
         return "IH" + Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
 
 		/*
-		 * Do not rely on the WifiManager. On Nexus devices, if the WIFI is
+         * Do not rely on the WifiManager. On Nexus devices, if the WIFI is
 		 * turned off, MAC address is null.
 		 */
 //		try {
@@ -26,6 +26,13 @@ public final class DeviceUtil {
         final View view = activity.getCurrentFocus();
         if (view != null) {
             ((InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE)).
+                    hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
+
+    public static void hideKeyboard(final View view) {
+        if (view != null) {
+            ((InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE)).
                     hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }

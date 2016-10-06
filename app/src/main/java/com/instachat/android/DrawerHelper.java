@@ -23,6 +23,7 @@ import com.instachat.android.api.NetworkApi;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.User;
 import com.instachat.android.profile.UserBioHelper;
+import com.instachat.android.util.DeviceUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.StringUtil;
@@ -142,14 +143,23 @@ public class DrawerHelper {
 
                 final String existing = Preferences.getInstance().getUsername();
                 final String newUsername = username.getText().toString();
+                if (username.hasFocus())
+                    DeviceUtil.hideKeyboard(username);
+                else
+                    DeviceUtil.hideKeyboard(mActivity);
+                /**
+                 * check if user changed their username
+                 */
                 if (existing.equals(newUsername)) {
                     return;
                 }
+
                 if (!StringUtil.isValidUsername(newUsername)) {
                     username.setText(existing);
                     Toast.makeText(mActivity, mActivity.getString(R.string.invalid_username), Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 NetworkApi.isExistsUsername(mActivity, newUsername, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
