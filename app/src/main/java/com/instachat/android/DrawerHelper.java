@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,7 +20,9 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.instachat.android.api.NetworkApi;
+import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.User;
+import com.instachat.android.profile.UserBioHelper;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.StringUtil;
@@ -75,6 +78,7 @@ public class DrawerHelper {
     private void populateNavHeader() {
         final TextView email = (TextView) mHeaderLayout.findViewById(R.id.nav_email);
         final TextView username = (TextView) mHeaderLayout.findViewById(R.id.nav_username);
+        FontUtil.setEditTextFont((EditText) username);
         final ImageView navpic = (ImageView) mHeaderLayout.findViewById(R.id.nav_pic);
         final User user = Preferences.getInstance().getUser();
         email.setText(Preferences.getInstance().getEmail());
@@ -99,6 +103,12 @@ public class DrawerHelper {
                     navpic.setImageResource(R.drawable.ic_account_circle_black_36dp);
                 }
                 checkForRemoteUpdatesToMyDP();
+            }
+        });
+        mHeaderLayout.findViewById(R.id.edit_bio).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new UserBioHelper().showBioInputDialog(mActivity);
             }
         });
     }
@@ -137,6 +147,7 @@ public class DrawerHelper {
                 }
                 if (!StringUtil.isValidUsername(newUsername)) {
                     username.setText(existing);
+                    Toast.makeText(mActivity, mActivity.getString(R.string.invalid_username), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 NetworkApi.isExistsUsername(mActivity, newUsername, new Response.Listener<JSONObject>() {
@@ -176,6 +187,7 @@ public class DrawerHelper {
                                 });
 
                             } else {
+                                Toast.makeText(mActivity, mActivity.getString(R.string.username_exists, newUsername), Toast.LENGTH_SHORT).show();
                                 username.setText(existing);
                             }
 

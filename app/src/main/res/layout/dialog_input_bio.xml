@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <com.instachat.android.view.CustomFontTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="40dp"
+            android:text="@string/bio"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:font="Lato-Bold.ttf"/>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_boi_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/input_bio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_write_something_about_yourself"
+                android:inputType="textMultiLine|text"
+                android:lines="3"
+                android:maxLength="@integer/max_bio"
+                android:maxLines="3"/>
+
+        </android.support.design.widget.TextInputLayout>
+    </LinearLayout>
+</layout>

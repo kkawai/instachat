@@ -39,9 +39,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.instachat.android.GroupChatActivity;
-import com.instachat.android.R;
 import com.instachat.android.MyApp;
+import com.instachat.android.R;
 import com.instachat.android.api.NetworkApi;
+import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.User;
 import com.instachat.android.util.ActivityUtil;
 import com.instachat.android.util.DeviceUtil;
@@ -73,6 +74,8 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         emailLayout = (TextInputLayout) findViewById(R.id.input_email_layout);
         findViewById(R.id.sign_in_with_email_button).setOnClickListener(this);
         findViewById(R.id.forgot_password).setOnClickListener(this);
+        FontUtil.setEditTextFont(passwordLayout);
+        FontUtil.setEditTextFont(emailLayout);
 
         // Assign fields
         findViewById(R.id.sign_in_with_google_textview).setOnClickListener(this);

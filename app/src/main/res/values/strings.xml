@@ -25,8 +25,8 @@
     <string name="hint_email_or_username">Username or Email</string>
     <string name="hint_password">Password</string>
     <string name="invalid_email">Invalid Email</string>
-    <string name="invalid_password">Invalid Password</string>
-    <string name="invalid_username">Invalid Username Name</string>
+    <string name="invalid_password">Invalid password</string>
+    <string name="invalid_username">Invalid username</string>
     <string name="create_account">Create Account</string>
     <string name="fresh_config">Fresh Config</string>
     <string name="cause_crash">Cause Crash</string>
@@ -54,4 +54,12 @@
 
     <string name="could_not_send_message">Sorry!  Could not send message.  Please try again.</string>
     <string name="please_upload_photo">Please upload a display photo to start chatting</string>
+    <string name="bio">Bio</string>
+    <string name="hint_write_something_about_yourself">Write something about yourself...</string>
+
+    <!-- sweet alert dialog -->
+    <string name="dialog_default_title">Here\'s a message!</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="LOADING">Loading...</string>
 </resources>

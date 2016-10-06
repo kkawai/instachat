@@ -10,48 +10,50 @@
         tools:context="com.instachat.GroupChatActivity">
 
         <TextView
-            android:clickable="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="false"
+            android:gravity="center_vertical"
+            android:paddingBottom="8dp"
+            android:paddingLeft="32dp"
+            android:paddingTop="16dp"
             android:text="@string/title_update_my_pic"
             android:textSize="16sp"
             android:textStyle="bold"
             app:font="@{`Lato-Regular`}"
-            android:gravity="center_vertical"
-            android:paddingLeft="32dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="8dp"
             />
 
         <TextView
             android:id="@+id/menu_choose_photo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/menu_choose_photo"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/jonPink"
-            app:font="@{`Lato-Regular`}"
             android:drawableLeft="@drawable/ic_photo_library_black_36dp"
+            android:drawablePadding="16dp"
             android:gravity="center_vertical"
+            android:paddingBottom="8dp"
             android:paddingLeft="32dp"
             android:paddingTop="8dp"
-            android:paddingBottom="8dp"
+            android:text="@string/menu_choose_photo"
+            android:textColor="@color/jonPink"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:font="@{`Lato-Regular`}"
             />
 
         <TextView
             android:id="@+id/menu_take_photo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/menu_take_photo"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/jonGreen"
             android:drawableLeft="@drawable/ic_photo_camera_black_36dp"
+            android:drawablePadding="16dp"
             android:gravity="center_vertical"
+            android:paddingBottom="8dp"
             android:paddingLeft="32dp"
             android:paddingTop="8dp"
-            android:paddingBottom="8dp"
+            android:text="@string/menu_take_photo"
+            android:textColor="@color/jonGreen"
+            android:textSize="16sp"
+            android:textStyle="bold"
             />
 
     </LinearLayout>

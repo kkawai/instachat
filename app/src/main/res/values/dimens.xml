@@ -14,4 +14,11 @@
     <dimen name="profile_pic_height">220dp</dimen>
     <dimen name="posted_photo_size">320dp</dimen>
 
+    <!-- sweet alert dialog -->
+    <dimen name="alert_width">290dp</dimen>
+    <dimen name="common_circle_width">3dp</dimen>
+    <dimen name="progress_circle_radius">34dp</dimen>
+
+    <integer name="max_bio">256</integer>
+
 </resources>

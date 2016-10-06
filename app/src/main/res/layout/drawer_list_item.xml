@@ -43,7 +43,7 @@
         android:layout_centerVertical="true"
         android:layout_gravity="center"
         android:layout_marginRight="17dp"
-        android:background="@drawable/oval_shape"
+        android:background="@drawable/rounded_white_trim_red_background"
         android:ellipsize="marquee"
         android:maxLines="1"
         android:text=" 1 "

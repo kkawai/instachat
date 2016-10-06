@@ -17,9 +17,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.instachat.android.GroupChatActivity;
-import com.instachat.android.R;
 import com.instachat.android.MyApp;
+import com.instachat.android.R;
 import com.instachat.android.api.NetworkApi;
+import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.User;
 import com.instachat.android.util.ActivityUtil;
 import com.instachat.android.util.DeviceUtil;
@@ -56,7 +57,11 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         final String emailFromGoogle = getIntent() != null ? getIntent().getStringExtra("email") : null;
         if (emailFromGoogle != null)
             emailLayout.getEditText().setText(emailFromGoogle);
-        MLog.i(TAG,"thirdPartyProfilePicUrl: "+ thirdPartyProfilePicUrl);
+
+        FontUtil.setEditTextFont(emailLayout);
+        FontUtil.setEditTextFont(passwordLayout);
+        FontUtil.setEditTextFont(usernameLayout);
+        MLog.i(TAG, "thirdPartyProfilePicUrl: " + thirdPartyProfilePicUrl);
     }
 
     @Override
@@ -120,11 +125,11 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             if (!response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                                 showErrorToast("1");
                             } else if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK) && response.getJSONObject("data").getBoolean("exists")) {
-                                emailLayout.setError(errorMessage(R.string.email_exists,email));
+                                emailLayout.setError(errorMessage(R.string.email_exists, email));
                             } else {
                                 remotelyValidateUsername();
                             }
-                        }catch(final Exception e) {
+                        } catch (final Exception e) {
                             showErrorToast("2");
                         }
 
@@ -148,11 +153,11 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             if (!response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                                 showErrorToast("1");
                             } else if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK) && response.getJSONObject("data").getBoolean("exists")) {
-                                usernameLayout.setError(errorMessage(R.string.username_exists,username));
+                                usernameLayout.setError(errorMessage(R.string.username_exists, username));
                             } else {
                                 createAccount();
                             }
-                        }catch(final Exception e) {
+                        } catch (final Exception e) {
                             showErrorToast("2");
                         }
 
@@ -166,11 +171,11 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private String errorMessage(final int stringResId, final String str) {
-        return getString(stringResId,str);
+        return getString(stringResId, str);
     }
 
     private void showErrorToast(final String distinctScreenCode) {
-        Toast.makeText(this, getString(R.string.general_api_error,distinctScreenCode),Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.general_api_error, distinctScreenCode), Toast.LENGTH_SHORT).show();
     }
 
     private void createAccount() {
@@ -208,7 +213,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void createFirebaseAccount() {
-        mFirebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        mFirebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 MLog.d(TAG, "createUserWithEmailAndPassword:onComplete:" + task.isSuccessful());
