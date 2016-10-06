@@ -62,4 +62,6 @@
     <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="LOADING">Loading...</string>
+
+    <string name="save_username">Save</string>
 </resources>
