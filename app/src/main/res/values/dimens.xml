@@ -12,6 +12,10 @@
 
     <dimen name="profile_pic_width">220dp</dimen>
     <dimen name="profile_pic_height">220dp</dimen>
+
+    <dimen name="profile_header_height">300dp</dimen>
+    <dimen name="profile_pic2_size">220dp</dimen>
+
     <dimen name="posted_photo_size">320dp</dimen>
 
     <!-- sweet alert dialog -->

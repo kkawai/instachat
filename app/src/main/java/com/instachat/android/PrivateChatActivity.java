@@ -6,7 +6,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -74,7 +78,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                 try {
                     mToUser = User.fromResponse(response);
                     initPrivateChatSummaryIfNecessary();
-                    fillMiniPic();
+                    populateUserProfile();
                     getSupportActionBar().setTitle(mToUser.getUsername());
                 } catch (Exception e) {
                     Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, "1"), Toast.LENGTH_SHORT).show();
@@ -91,7 +95,35 @@ public class PrivateChatActivity extends GroupChatActivity {
         notificationManager.cancel(toUserid);
         MLog.d(TAG, "Cancelled notification " + toUserid);
         clearPrivateUnreadMessages(toUserid);
+
+        final ImageButton viewProfileButton = (ImageButton) findViewById(R.id.view_profile_button);
+        final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (verticalOffset == 0) {
+                    mIsAppBarExpanded = true;
+                    viewProfileButton.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
+                } else {
+                    mIsAppBarExpanded = false;
+                    viewProfileButton.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
+                }
+            }
+        });
+
+        viewProfileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!mIsAppBarExpanded)
+                    appBarLayout.setExpanded(true, true);
+                else
+                    appBarLayout.setExpanded(false, true);
+            }
+        });
+
     }
+
+    private boolean mIsAppBarExpanded = true; //initially it's expanded
 
     private void initPrivateChatSummaryIfNecessary() {
 
@@ -182,9 +214,11 @@ public class PrivateChatActivity extends GroupChatActivity {
         showTypingDots();
     }
 
-    private void fillMiniPic() {
+    private void populateUserProfile() {
         if (mToUser == null || isActivityDestroyed()) return;
         final ImageView miniPic = (ImageView) findViewById(R.id.superSmallProfileImage);
+        final TextView bio = (TextView) findViewById(R.id.bio);
+        final ImageView profilePic = (ImageView) findViewById(R.id.profile_pic);
         Constants.DP_URL(mToUser.getId(), mToUser.getProfilePicUrl(), new OnCompleteListener<Uri>() {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
@@ -200,12 +234,19 @@ public class PrivateChatActivity extends GroupChatActivity {
                             .error(R.drawable.ic_account_circle_black_36dp)
                             .crossFade()
                             .into(miniPic);
+                    Glide.with(PrivateChatActivity.this)
+                            .load(task.getResult().toString())
+                            .error(R.drawable.ic_account_circle_black_36dp)
+                            .crossFade()
+                            .into(profilePic);
+
                 } catch (Exception e) {
                     MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
                     miniPic.setImageResource(R.drawable.ic_account_circle_black_36dp);
                 }
             }
         });
+        bio.setText(mToUser.getBio() + "");
 
     }
 

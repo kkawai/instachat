@@ -146,8 +146,11 @@ public final class Constants {
     }
 
     public static String PRIVATE_CHATS_SUMMARY_PARENT_REF() {
-        int myUserid = Preferences.getInstance().getUserId();
-        return "/users/" + myUserid + "/private_summaries/";
+        return "/users/" + Preferences.getInstance().getUserId() + "/private_summaries/";
+    }
+
+    public static String BLOCKS_REF() {
+        return "/users/" + Preferences.getInstance().getUserId() + "/blocks/";
     }
 
     public static String GROUP_CHAT_REF(long groupid) {
