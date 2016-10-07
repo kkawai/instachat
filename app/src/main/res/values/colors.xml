@@ -5,6 +5,7 @@
     <color name="colorPrimaryDark">#FF425A</color> <!-- drawer, status bar -->
     <color name="colorAccent">#a8a8a8</color> <!-- button colors -->
     <color name="colorTitle">#ffffff</color>
+    <color name="whiteOff">#f5f2f2</color>
 
     <color name="defaultChatSummaryNameColor">#d8dade</color>
 
