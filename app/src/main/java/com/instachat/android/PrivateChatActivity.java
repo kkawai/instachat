@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -96,22 +95,32 @@ public class PrivateChatActivity extends GroupChatActivity {
         MLog.d(TAG, "Cancelled notification " + toUserid);
         clearPrivateUnreadMessages(toUserid);
 
-        final ImageButton viewProfileButton = (ImageButton) findViewById(R.id.view_profile_button);
+        final ImageView toolbarProfileImageView = (ImageView) findViewById(R.id.topCornerUserThumb);
+        final TextView bio = (TextView) findViewById(R.id.bio);
+        final ImageView profilePic = (ImageView) findViewById(R.id.profile_pic);
         final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                //android.R.attr.actionBarSize
+                float alpha = 1 - (float) (Math.abs(verticalOffset) + getToolbarHeight()) / appBarLayout.getHeight();
+                if (verticalOffset == 0) {
+                    alpha = 1;
+                }
+                bio.setAlpha(alpha);
+                profilePic.setAlpha(alpha);
+                toolbarProfileImageView.setAlpha(1 - alpha);
+
+                MLog.d(TAG, "appBarLayout.height: " + appBarLayout.getHeight(), " verticalOffset ", verticalOffset, " toolbarHeight ", getToolbarHeight(), " alpha ", alpha);
                 if (verticalOffset == 0) {
                     mIsAppBarExpanded = true;
-                    viewProfileButton.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
-                } else {
+                } else if (Math.abs(verticalOffset) + getToolbarHeight() == appBarLayout.getHeight()) {
                     mIsAppBarExpanded = false;
-                    viewProfileButton.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
                 }
             }
         });
 
-        viewProfileButton.setOnClickListener(new View.OnClickListener() {
+        final View.OnClickListener onClickExpandCollapseListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!mIsAppBarExpanded)
@@ -119,7 +128,11 @@ public class PrivateChatActivity extends GroupChatActivity {
                 else
                     appBarLayout.setExpanded(false, true);
             }
-        });
+        };
+        findViewById(R.id.toolbar).setOnClickListener(onClickExpandCollapseListener);
+        bio.setOnClickListener(onClickExpandCollapseListener);
+        profilePic.setOnClickListener(onClickExpandCollapseListener);
+
 
     }
 
@@ -216,6 +229,7 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     private void populateUserProfile() {
         if (mToUser == null || isActivityDestroyed()) return;
+        final ImageView toolbarProfileImageView = (ImageView) findViewById(R.id.topCornerUserThumb);
         final ImageView miniPic = (ImageView) findViewById(R.id.superSmallProfileImage);
         final TextView bio = (TextView) findViewById(R.id.bio);
         final ImageView profilePic = (ImageView) findViewById(R.id.profile_pic);
@@ -239,6 +253,11 @@ public class PrivateChatActivity extends GroupChatActivity {
                             .error(R.drawable.ic_account_circle_black_36dp)
                             .crossFade()
                             .into(profilePic);
+                    Glide.with(PrivateChatActivity.this)
+                            .load(task.getResult().toString())
+                            .error(R.drawable.ic_account_circle_black_36dp)
+                            .crossFade()
+                            .into(toolbarProfileImageView);
 
                 } catch (Exception e) {
                     MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);

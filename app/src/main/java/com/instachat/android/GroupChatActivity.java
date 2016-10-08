@@ -34,6 +34,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -65,6 +66,7 @@ import com.instachat.android.adapter.MessagesRecyclerAdapter;
 import com.instachat.android.adapter.UserThumbClickedListener;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.api.UploadListener;
+import com.instachat.android.font.FontUtil;
 import com.instachat.android.fullscreen.FriendlyMessageContainer;
 import com.instachat.android.fullscreen.FullScreenTextFragment;
 import com.instachat.android.gcm.GCMHelper;
@@ -73,7 +75,6 @@ import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.model.GroupChatSummary;
 import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.model.User;
-import com.instachat.android.profile.FragmentProfile;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
@@ -637,6 +638,12 @@ public class GroupChatActivity extends BaseActivity implements
         ActionBar ab = getSupportActionBar();
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
+        applyFontForToolbarTitle(toolbar);
+    }
+
+    protected int getToolbarHeight() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        return toolbar.getHeight();
     }
 
     private void setupDrawer() {
@@ -948,12 +955,13 @@ public class GroupChatActivity extends BaseActivity implements
         if (isDrawerOpen())
             closeDrawer();
         ScreenUtil.hideVirtualKeyboard(mMessageEditText);
-        Fragment fragment = FragmentProfile.newInstance(message);
+        PrivateChatActivity.startPrivateChatActivity(this, message.getUserid());
+        /*Fragment fragment = FragmentProfile.newInstance(message);
         getSupportFragmentManager().beginTransaction()
                 .setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down)
                 //.addSharedElement(imageView, "image")
                 .replace(R.id.fragment_content, fragment, FragmentProfile.TAG)
-                .addToBackStack(null).commit();
+                .addToBackStack(null).commit();*/
     }
 
     @Override
@@ -1035,5 +1043,15 @@ public class GroupChatActivity extends BaseActivity implements
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
                 | Intent.FLAG_ACTIVITY_NEW_TASK);
         return intent;
+    }
+
+    private void applyFontForToolbarTitle(Toolbar toolbar) {
+        for (int i = 0; i < toolbar.getChildCount(); i++) {
+            View view = toolbar.getChildAt(i);
+            if (view instanceof TextView) {
+                FontUtil.setTextViewFont((TextView) view);
+                break;
+            }
+        }
     }
 }

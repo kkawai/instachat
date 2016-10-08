@@ -31,7 +31,7 @@ public class UserBioHelper {
 
         final User user = Preferences.getInstance().getUser();
         final TextInputEditText editText = (TextInputEditText) promptView.findViewById(R.id.input_bio);
-        FontUtil.setEditTextFont(editText);
+        FontUtil.setTextViewFont(editText);
         editText.setText(user.getBio());
         // setup a dialog window
         alertDialogBuilder.setCancelable(false)

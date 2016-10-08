@@ -58,9 +58,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         if (emailFromGoogle != null)
             emailLayout.getEditText().setText(emailFromGoogle);
 
-        FontUtil.setEditTextFont(emailLayout);
-        FontUtil.setEditTextFont(passwordLayout);
-        FontUtil.setEditTextFont(usernameLayout);
+        FontUtil.setTextViewFont(emailLayout);
+        FontUtil.setTextViewFont(passwordLayout);
+        FontUtil.setTextViewFont(usernameLayout);
         MLog.i(TAG, "thirdPartyProfilePicUrl: " + thirdPartyProfilePicUrl);
     }
 

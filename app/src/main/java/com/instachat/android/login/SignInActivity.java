@@ -74,8 +74,8 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         emailLayout = (TextInputLayout) findViewById(R.id.input_email_layout);
         findViewById(R.id.sign_in_with_email_button).setOnClickListener(this);
         findViewById(R.id.forgot_password).setOnClickListener(this);
-        FontUtil.setEditTextFont(passwordLayout);
-        FontUtil.setEditTextFont(emailLayout);
+        FontUtil.setTextViewFont(passwordLayout);
+        FontUtil.setTextViewFont(emailLayout);
 
         // Assign fields
         findViewById(R.id.sign_in_with_google_textview).setOnClickListener(this);

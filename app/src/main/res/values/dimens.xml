@@ -8,13 +8,13 @@
     <dimen name="nav_header_profile_pic_size">72dp</dimen>
     <dimen name="message_thumb_pic_size">36dp</dimen>
 
+    <!-- fragment profile -->
+    <dimen name="fragment_profile_pic_size">220dp</dimen>
+
+    <!-- private chat activity profile -->
+    <dimen name="profile_header_height">285dp</dimen>
+    <dimen name="private_activity_profile_pic_size">180dp</dimen>
     <dimen name="super_small_user_thumb_size">26dp</dimen>
-
-    <dimen name="profile_pic_width">220dp</dimen>
-    <dimen name="profile_pic_height">220dp</dimen>
-
-    <dimen name="profile_header_height">300dp</dimen>
-    <dimen name="profile_pic2_size">220dp</dimen>
 
     <dimen name="posted_photo_size">320dp</dimen>
 

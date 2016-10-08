@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.ScaleAnimation;
 
 public final class AnimationUtil {
     private AnimationUtil() {
@@ -19,8 +20,12 @@ public final class AnimationUtil {
     }
 
     public static void fadeOutAnimation(final View view) {
+        fadeOutAnimation(view, View.GONE);
+    }
+
+    public static void fadeOutAnimation(final View view, final int visibility) {
         final Animation anim = AnimationUtils.loadAnimation(view.getContext(), android.R.anim.fade_out);
-        view.setVisibility(View.GONE);
+        view.setVisibility(visibility);
         view.startAnimation(anim);
     }
 
@@ -175,4 +180,14 @@ public final class AnimationUtil {
        final ResizeAnimation resizeAnimation = new ResizeAnimation(view,fromWidth,fromHeight,toWidth,toHeight,durationMs);
        view.startAnimation(resizeAnimation);
     }*/
+
+    public static void scaleInFromCenter(final View view) {
+
+        ScaleAnimation fade_in = new ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        fade_in.setDuration(300);     // animation duration in milliseconds
+        fade_in.setFillAfter(true);    // If fillAfter is true, the transformation that this animation performed will persist when it is finished.
+        view.startAnimation(fade_in);
+
+    }
+
 }

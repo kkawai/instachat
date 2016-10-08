@@ -80,7 +80,7 @@ public class DrawerHelper {
     private void populateNavHeader() {
         final TextView email = (TextView) mHeaderLayout.findViewById(R.id.nav_email);
         final TextView username = (TextView) mHeaderLayout.findViewById(R.id.nav_username);
-        FontUtil.setEditTextFont((EditText) username);
+        FontUtil.setTextViewFont((EditText) username);
         final ImageView navpic = (ImageView) mHeaderLayout.findViewById(R.id.nav_pic);
         final User user = Preferences.getInstance().getUser();
         email.setText(Preferences.getInstance().getEmail());
