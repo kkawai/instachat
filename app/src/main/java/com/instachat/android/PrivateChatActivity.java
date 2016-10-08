@@ -180,6 +180,10 @@ public class PrivateChatActivity extends GroupChatActivity {
             MLog.e(TAG, "onFriendlyMessageSent() failed", e);
             Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, "3"), Toast.LENGTH_SHORT).show();
         }
+        if (mIsAppBarExpanded) {
+            final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
+            appBarLayout.setExpanded(false, true);
+        }
     }
 
     @Override

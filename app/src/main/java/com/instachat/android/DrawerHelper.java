@@ -24,9 +24,9 @@ import com.instachat.android.api.NetworkApi;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.User;
 import com.instachat.android.profile.UserBioHelper;
-import com.instachat.android.util.DeviceUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
+import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
 
 import org.json.JSONObject;
@@ -155,9 +155,9 @@ public class DrawerHelper {
                 final String existing = Preferences.getInstance().getUsername();
                 final String newUsername = username.getText().toString();
                 if (username.hasFocus())
-                    DeviceUtil.hideKeyboard(username);
+                    ScreenUtil.hideKeyboard(username);
                 else
-                    DeviceUtil.hideKeyboard(mActivity);
+                    ScreenUtil.hideKeyboard(mActivity);
                 /**
                  * check if user changed their username
                  */

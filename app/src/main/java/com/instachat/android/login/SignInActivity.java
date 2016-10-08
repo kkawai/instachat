@@ -45,10 +45,10 @@ import com.instachat.android.api.NetworkApi;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.User;
 import com.instachat.android.util.ActivityUtil;
-import com.instachat.android.util.DeviceUtil;
 import com.instachat.android.util.EmailUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
+import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
 
 import org.json.JSONObject;
@@ -97,7 +97,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     }
 
     private void validateAccount() {
-        DeviceUtil.hideKeyboard(this);
+        ScreenUtil.hideKeyboard(this);
 
         email = emailLayout.getEditText().getText().toString().trim();
         emailLayout.getEditText().setOnFocusChangeListener(this);

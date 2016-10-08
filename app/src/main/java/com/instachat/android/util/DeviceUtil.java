@@ -1,10 +1,7 @@
 package com.instachat.android.util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.provider.Settings.Secure;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 
 public final class DeviceUtil {
     public static String getAndroidId(final Context context) {
@@ -22,18 +19,4 @@ public final class DeviceUtil {
 //		}
     }
 
-    public static void hideKeyboard(final Activity activity) {
-        final View view = activity.getCurrentFocus();
-        if (view != null) {
-            ((InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE)).
-                    hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
-    }
-
-    public static void hideKeyboard(final View view) {
-        if (view != null) {
-            ((InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE)).
-                    hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
-    }
 }
