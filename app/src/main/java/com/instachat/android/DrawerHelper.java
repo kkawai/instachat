@@ -264,8 +264,7 @@ public class DrawerHelper {
                 if (saveButton.getVisibility() == View.VISIBLE) {
                     return;
                 }
-                if (TextUtils.isEmpty(charSequence)
-                        || Preferences.getInstance().getUsername().equals(charSequence.toString())
+                if (Preferences.getInstance().getUsername().equals(charSequence.toString())
                         || !StringUtil.isValidUsername(charSequence.toString())) {
                     return;
                 }
