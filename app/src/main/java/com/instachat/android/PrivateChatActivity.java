@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.view.View;
@@ -15,6 +16,9 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
@@ -251,17 +255,32 @@ public class PrivateChatActivity extends GroupChatActivity {
                             .load(task.getResult().toString())
                             .error(R.drawable.ic_account_circle_black_36dp)
                             .crossFade()
-                            .into(miniPic);
-                    Glide.with(PrivateChatActivity.this)
-                            .load(task.getResult().toString())
-                            .error(R.drawable.ic_account_circle_black_36dp)
-                            .crossFade()
+                            .listener(new RequestListener<String, GlideDrawable>() {
+                                @Override
+                                public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                    return false;
+                                }
+
+                                @Override
+                                public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                    if (isActivityDestroyed())
+                                        return false;
+                                    collapseAppbarAfterDelay();
+                                    return false;
+                                }
+                            })
                             .into(profilePic);
                     Glide.with(PrivateChatActivity.this)
                             .load(task.getResult().toString())
                             .error(R.drawable.ic_account_circle_black_36dp)
                             .crossFade()
+                            .into(miniPic);
+                    Glide.with(PrivateChatActivity.this)
+                            .load(task.getResult().toString())
+                            .error(R.drawable.ic_account_circle_black_36dp)
+                            .crossFade()
                             .into(toolbarProfileImageView);
+
 
                 } catch (Exception e) {
                     MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
@@ -271,6 +290,19 @@ public class PrivateChatActivity extends GroupChatActivity {
         });
         bio.setText(mToUser.getBio() + "");
 
+    }
+
+    private void collapseAppbarAfterDelay() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isActivityDestroyed())
+                    return;
+                final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
+                if (mIsAppBarExpanded)
+                    appBarLayout.setExpanded(false, true);
+            }
+        }, 1750);
     }
 
     private void clearPrivateUnreadMessages(int toUserid) {
