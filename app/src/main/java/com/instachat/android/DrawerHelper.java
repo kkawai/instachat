@@ -7,10 +7,11 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +25,7 @@ import com.instachat.android.api.NetworkApi;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.User;
 import com.instachat.android.profile.UserBioHelper;
+import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ScreenUtil;
@@ -80,7 +82,7 @@ public class DrawerHelper {
     private void populateNavHeader() {
         final TextView email = (TextView) mHeaderLayout.findViewById(R.id.nav_email);
         final TextView username = (TextView) mHeaderLayout.findViewById(R.id.nav_username);
-        FontUtil.setTextViewFont((EditText) username);
+        FontUtil.setTextViewFont(username);
         final ImageView navpic = (ImageView) mHeaderLayout.findViewById(R.id.nav_pic);
         final User user = Preferences.getInstance().getUser();
         email.setText(Preferences.getInstance().getEmail());
@@ -143,6 +145,11 @@ public class DrawerHelper {
 
             @Override
             public void onDrawerOpened(View drawerView) {
+                MLog.d(TAG, "onDrawerOpened() ");
+                if (mHeaderLayout.findViewById(R.id.edit_bio).getVisibility() != View.VISIBLE) {
+                    mHeaderLayout.findViewById(R.id.edit_bio).setVisibility(View.VISIBLE);
+                    AnimationUtil.scaleInFromCenter(mHeaderLayout.findViewById(R.id.edit_bio));
+                }
                 populateNavHeader();
             }
 
@@ -152,6 +159,19 @@ public class DrawerHelper {
                 if (isActivityDestroyed())
                     return;
 
+                /**
+                 * don't bother setting visibility to invisible on any view
+                 * in the navigation drawer after the first drawer open
+                 * it won't work.  android caches it and I'm not sure
+                 * how to fix it right now.  no big deal.
+                 */
+                /*
+                mHeaderLayout.findViewById(R.id.save_username).setVisibility(View.INVISIBLE);
+                mHeaderLayout.findViewById(R.id.edit_bio).setVisibility(View.INVISIBLE);
+                */
+
+                MLog.d(TAG, "onDrawerClosed() mHeaderLayout.findViewById(R.id.save_username).getVisibility(): ", mHeaderLayout.findViewById(R.id.save_username).getVisibility());
+
                 final String existing = Preferences.getInstance().getUsername();
                 final String newUsername = username.getText().toString();
                 if (username.hasFocus())
@@ -159,7 +179,7 @@ public class DrawerHelper {
                 else
                     ScreenUtil.hideKeyboard(mActivity);
                 /**
-                 * check if user changed their username
+                 * check if user changed their username. if changed, validate and save.
                  */
                 if (existing.equals(newUsername)) {
                     return;
@@ -228,6 +248,33 @@ public class DrawerHelper {
 
             @Override
             public void onDrawerStateChanged(int newState) {
+
+            }
+        });
+
+        username.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                View saveButton = mHeaderLayout.findViewById(R.id.save_username);
+                if (saveButton.getVisibility() == View.VISIBLE) {
+                    return;
+                }
+                if (TextUtils.isEmpty(charSequence)
+                        || Preferences.getInstance().getUsername().equals(charSequence.toString())
+                        || !StringUtil.isValidUsername(charSequence.toString())) {
+                    return;
+                }
+                saveButton.setVisibility(View.VISIBLE);
+                AnimationUtil.scaleInFromCenter(saveButton);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
 
             }
         });
