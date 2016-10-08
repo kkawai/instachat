@@ -248,6 +248,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                     return;
                 if (!task.isSuccessful()) {
                     miniPic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                    collapseAppbarAfterDelay();
                     return;
                 }
                 try {
@@ -258,6 +259,9 @@ public class PrivateChatActivity extends GroupChatActivity {
                             .listener(new RequestListener<String, GlideDrawable>() {
                                 @Override
                                 public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                    if (isActivityDestroyed())
+                                        return false;
+                                    collapseAppbarAfterDelay();
                                     return false;
                                 }
 
@@ -285,6 +289,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                 } catch (Exception e) {
                     MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
                     miniPic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                    collapseAppbarAfterDelay();
                 }
             }
         });
