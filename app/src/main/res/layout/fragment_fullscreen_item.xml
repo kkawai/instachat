@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@android:color/white"
-              android:orientation="vertical">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@color/white_baby_powder">
 
     <com.instachat.android.view.AutoResizeTextView
-        android:id="@+id/textView"
+        android:id="@+id/autoResizeTextView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
@@ -15,13 +15,109 @@
         android:textAlignment="center"
         />
 
-    <ImageView
+    <com.instachat.android.view.ZoomableImageView
         android:id="@+id/messagePhotoView"
-        android:layout_width="@dimen/posted_photo_size"
-        android:layout_height="@dimen/posted_photo_size"
-        android:layout_gravity="center"
-        android:adjustViewBounds="true"
-        android:scaleType="centerCrop"
-        />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"/>
 
-</LinearLayout>
+    <RelativeLayout
+        android:id="@+id/messageTextViewParent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom">
+
+        <!-- android:layout_toRightOf="@+id/likeButton" -->
+        <com.instachat.android.view.CustomFontTextView
+            android:id="@+id/messageTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="148dp"
+            android:layout_above="@+id/location"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="16dip"
+            android:layout_marginRight="16dip"
+            android:autoLink="web|map|email|phone"
+            android:gravity="bottom"
+            android:scrollbars="vertical"
+            android:text=""
+            android:textAlignment="center"
+            android:textColor="@color/text_color"
+            android:textSize="15sp"
+            app:font="Lato-Regular.ttf"
+            />
+
+        <!--
+        <CheckBox
+            android:id="@+id/likeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/location"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="3dip"
+            android:layout_marginRight="3dip"
+            android:layout_marginTop="3dip"
+            android:button="@drawable/stream_photo_activity_button_like"
+            android:clickable="true"/>  -->
+
+        <TextView
+            android:id="@+id/location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="3dip"
+            android:layout_marginRight="3dip"
+            android:gravity="right"
+            android:text=""
+            android:textColor="@color/link_color"
+            android:textStyle="bold"/>
+
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/doubletap_heart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:src="@drawable/doubletap_heart"
+        android:visibility="gone"/>
+
+    <ImageView
+        android:id="@+id/rotate90"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|right"
+        android:layout_marginTop="16dip"
+        android:layout_marginRight="16dip"
+        android:background="@null"
+        android:src="@drawable/ic_rotate_90_degrees_ccw_black_36dp"/>
+
+    <!--
+    <ImageView
+        android:id="@+id/playVideo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|right"
+        android:layout_margin="4dip"
+        android:background="@null"
+        android:contentDescription="@string/ih_play"
+        android:src="@drawable/video_play_filterscreen"/>  -->
+
+    <!--
+    <VideoView
+        android:id="@+id/videoView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        />  -->
+
+    <TextView
+        android:id="@+id/likes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_margin="4dip"
+        android:text=""/>
+
+</FrameLayout>

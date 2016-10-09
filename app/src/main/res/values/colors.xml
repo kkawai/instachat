@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-   <!-- <color name="colorPrimary">#87cefa</color> --> <!-- action title bar -->
+    <!-- <color name="colorPrimary">#87cefa</color> --> <!-- action title bar -->
     <color name="colorPrimary">#FFFFFF</color> <!-- action title bar -->
     <color name="colorPrimaryDark">#FF425A</color> <!-- drawer, status bar -->
     <color name="colorAccent">#a8a8a8</color> <!-- button colors -->
@@ -22,6 +22,9 @@
         <item>@color/dotColor2</item>
         <item>@color/dotColor3</item>
     </array>
+
+    <color name="white_baby_powder">#FEFEFA</color>
+    <color name="link_color">#ff3f739a</color>
 
     <color name="aa">#ff007de3</color>
     <color name="soft_grey_split">#d0d0d0</color>

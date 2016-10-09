@@ -3,11 +3,13 @@ package com.instachat.android;
 import android.app.Application;
 
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.ath.fuel.FuelInjector;
 import com.ath.fuel.FuelModule;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.instachat.android.util.BitmapLruCache;
 import com.instachat.android.util.HttpMessage;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.ThreadWrapper;
@@ -22,6 +24,7 @@ public class MyApp extends Application {
     public static boolean isGcmSupported;
     public static boolean isAdmSupported;
     private RequestQueue mRequestQueue;
+    private ImageLoader mImageLoader;
     public static double lat;
     public static double lon;
 
@@ -66,10 +69,19 @@ public class MyApp extends Application {
         return mRequestQueue;
     }
 
+    public ImageLoader getImageLoader() {
+        return mImageLoader;
+    }
+
     private void initVolley() {
         /*
          *  init requestQueue
 		 */
         mRequestQueue = Volley.newRequestQueue(getApplicationContext());
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        final int maxCacheSize = maxMemory / 8;
+        this.mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache(
+                maxCacheSize));
+
     }
 }

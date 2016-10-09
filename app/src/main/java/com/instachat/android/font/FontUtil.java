@@ -18,9 +18,9 @@ public final class FontUtil {
         setTextViewFont(textInputLayout.getEditText());
     }
 
-    public static void setTextViewFont(TextView editText) {
+    public static void setTextViewFont(TextView textView) {
         if (sGlobalEditTextFont == null)
-            sGlobalEditTextFont = Typeface.createFromAsset(editText.getContext().getAssets(), "fonts/Lato-Regular.ttf");
-        editText.setTypeface(sGlobalEditTextFont);
+            sGlobalEditTextFont = Typeface.createFromAsset(textView.getContext().getAssets(), "fonts/Lato-Regular.ttf");
+        textView.setTypeface(sGlobalEditTextFont);
     }
 }

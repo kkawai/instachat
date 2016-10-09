@@ -761,11 +761,11 @@ public class GroupChatActivity extends BaseActivity implements
     }
 
     private void initFirebaseAdapter() {
-        mFirebaseAdapter = new MessagesRecyclerAdapter<FriendlyMessage, MessageViewHolder>(
+        mFirebaseAdapter = new MessagesRecyclerAdapter<>(
                 FriendlyMessage.class,
                 R.layout.item_message,
                 MessageViewHolder.class,
-                mFirebaseDatabaseReference.child(mDatabaseRoot));
+                mFirebaseDatabaseReference.child(mDatabaseRoot).limitToLast(Constants.MAX_MESSAGE_HISTORY));
         mFirebaseAdapter.setDatabaseRoot(mDatabaseRoot);
         mFirebaseAdapter.setActivity(this);
         mFirebaseAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {

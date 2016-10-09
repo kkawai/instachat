@@ -42,7 +42,9 @@ public class FullScreenTextFragment extends Fragment {
             public Fragment getItem(final int position) {
                 final Fragment fragment = new FullscreenTextSubFragment();
                 final Bundle args = new Bundle();
-                args.putParcelable(Constants.KEY_FRIENDLY_MESSAGE,mFriendlyMessageContainer.getFriendlyMessage(position));
+                FriendlyMessage friendlyMessage = mFriendlyMessageContainer.getFriendlyMessage(position);
+                MLog.d(TAG, "onActivityCreated() friendlyMessage: " + friendlyMessage.toString());
+                args.putParcelable(Constants.KEY_FRIENDLY_MESSAGE,friendlyMessage);
                 fragment.setArguments(args);
                 return fragment;
             }

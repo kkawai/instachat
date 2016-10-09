@@ -5,32 +5,44 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.instachat.android.R;
-import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.Constants;
+import com.instachat.android.R;
+import com.instachat.android.font.FontUtil;
+import com.instachat.android.model.FriendlyMessage;
+import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.ScreenUtil;
-import com.instachat.android.view.AutoResizeTextView;
+import com.instachat.android.view.ZoomImageListener;
+import com.instachat.android.view.ZoomableImageView;
 
 /**
  * Created by kevin on 8/21/2016.
  */
-public class FullscreenTextSubFragment extends Fragment {
+public class FullscreenTextSubFragment extends Fragment implements ZoomImageListener {
 
     public static final String TAG = "FullscreenTextSubFragment";
     private FriendlyMessage mFriendlyMessage;
+    private RelativeLayout mMessageViewParent;
+    private ZoomableImageView mZoomableImageView;
+    private TextView mAutoResizeTextView, mTextView;
+    private ImageView mRotateButton;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_fullscreen_item, container, false);
+        mMessageViewParent = (RelativeLayout) view.findViewById(R.id.messageTextViewParent);
+        mZoomableImageView = (ZoomableImageView) view.findViewById(R.id.messagePhotoView);
+        mAutoResizeTextView = (TextView) view.findViewById(R.id.autoResizeTextView);
+        mTextView = (TextView) view.findViewById(R.id.messageTextView);
+        mRotateButton = (ImageView) view.findViewById(R.id.rotate90);
+        mRotateButton.setVisibility(View.GONE);
         return view;
     }
 
@@ -38,14 +50,18 @@ public class FullscreenTextSubFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mFriendlyMessage = getArguments().getParcelable(Constants.KEY_FRIENDLY_MESSAGE);
-        final AutoResizeTextView textView = (AutoResizeTextView) getView().findViewById(R.id.textView);
-        final ImageView photoView = (ImageView) getView().findViewById(R.id.messagePhotoView);
-        if (TextUtils.isEmpty(mFriendlyMessage.getText())) {
-            textView.setVisibility(View.GONE);
-        } else {
-            textView.setVisibility(View.VISIBLE);
-            textView.setText(mFriendlyMessage.getText());
-            textView.setMaxLines(Integer.MAX_VALUE);
+
+        MLog.d(TAG, "onActivityCreated() friendlyMessage: " + mFriendlyMessage.toString());
+
+        if (!TextUtils.isEmpty(mFriendlyMessage.getImageUrl())) {
+            mZoomableImageView.setZoomableImageListener(this);
+            mZoomableImageView.setImageUrl(mFriendlyMessage.getImageUrl());
+        }
+
+        if (TextUtils.isEmpty(mFriendlyMessage.getImageUrl())) {
+            FontUtil.setTextViewFont(mAutoResizeTextView);
+            mAutoResizeTextView.setText(mFriendlyMessage.getText());
+            mAutoResizeTextView.setMaxLines(Integer.MAX_VALUE);
             //float t = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()), getResources().getDisplayMetrics());
             //textView.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()), getResources().getDisplayMetrics()));
             //float x = getResources().getDimension(R.dimen.max_fullscreen_text_size);
@@ -55,24 +71,40 @@ public class FullscreenTextSubFragment extends Fragment {
              * https://code.google.com/p/android/issues/detail?id=69706  opengl bug, which is quite stupid
              * to me; they haven't fixed it in over 2 years
              */
-            textView.setTextSize(Constants.MAX_FULLSCREEN_FONT_SIZE);
+            mAutoResizeTextView.setTextSize(Constants.MAX_FULLSCREEN_FONT_SIZE);
+        } else if (!TextUtils.isEmpty(mFriendlyMessage.getImageUrl()) && !TextUtils.isEmpty(mFriendlyMessage.getText())) {
+            mTextView.setText(mFriendlyMessage.getText());
         }
-        if (TextUtils.isEmpty(mFriendlyMessage.getImageUrl())) {
-            photoView.setVisibility(View.GONE);
-        } else {
-            photoView.setVisibility(View.VISIBLE);
-            Glide.with(getActivity())
-                    .load(mFriendlyMessage.getImageUrl())
-                    .crossFade()
-                    .into(photoView);
-        }
-        MLog.i(TAG, "onActivityCreated(): " + mFriendlyMessage.getText() + " textView.height: " + textView.getHeight());
+
+        mRotateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mZoomableImageView.rotate();
+            }
+        });
+
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        final AutoResizeTextView textView = (AutoResizeTextView) getView().findViewById(R.id.textView);
-        textView.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()), getResources().getDisplayMetrics()));
+        //final AutoResizeTextView textView = (AutoResizeTextView) getView().findViewById(R.id.textView);
+        //textView.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()), getResources().getDisplayMetrics()));
+    }
+
+    @Override
+    public void onImageTouched() {
+
+    }
+
+    @Override
+    public void onRequestDisallowInterceptTouchEvent(boolean isZoomed) {
+
+    }
+
+    @Override
+    public void onSetImageBitmap() {
+        mRotateButton.setVisibility(View.VISIBLE);
+        AnimationUtil.scaleInFromCenter(mRotateButton);
     }
 }
