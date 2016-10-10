@@ -25,7 +25,6 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -33,7 +32,6 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,10 +59,11 @@ import com.instachat.android.adapter.AdapterPopulateHolderListener;
 import com.instachat.android.adapter.ChatSummariesRecyclerAdapter;
 import com.instachat.android.adapter.ChatsItemClickedListener;
 import com.instachat.android.adapter.FriendlyMessageListener;
+import com.instachat.android.adapter.GroupChatUsersRecyclerAdapter;
 import com.instachat.android.adapter.MessageTextClickedListener;
 import com.instachat.android.adapter.MessageViewHolder;
 import com.instachat.android.adapter.MessagesRecyclerAdapter;
-import com.instachat.android.adapter.UserThumbClickedListener;
+import com.instachat.android.adapter.UserClickedListener;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.api.UploadListener;
 import com.instachat.android.font.FontUtil;
@@ -91,7 +90,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class GroupChatActivity extends BaseActivity implements
         GoogleApiClient.OnConnectionFailedListener, FriendlyMessageContainer,
-        EasyPermissions.PermissionCallbacks, UploadListener, UserThumbClickedListener,
+        EasyPermissions.PermissionCallbacks, UploadListener, UserClickedListener,
         ChatTypingHelper.UserTypingListener, ChatsItemClickedListener, FriendlyMessageListener {
 
     private static final String TAG = "GroupChatActivity";
@@ -114,18 +113,19 @@ public class GroupChatActivity extends BaseActivity implements
     private AdView mAdView;
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
     //private GoogleApiClient mGoogleApiClient;
-    private DrawerLayout mDrawerLayout;
+    private DrawerLayout mDrawerLayout, mDrawerLayoutRight;
 
     private BroadcastReceiver mDownloadReceiver;
     private ProgressDialog mProgressDialog;
 
     // [START declare_ref]
     private PhotoUploadHelper mPhotoUploadHelper;
-    private DrawerHelper mDrawerHelper;
+    private LeftDrawerHelper mLeftDrawerHelper;
     private String mDatabaseRoot;
     private boolean mIsStartedAnimation;
     private AnimatedDotLoadingView mDotsLoader;
     private ChatSummariesRecyclerAdapter mChatsRecyclerViewAdapter;
+    private GroupChatUsersRecyclerAdapter mGroupChatUsersRecyclerAdapter;
     private ExternalSendIntentConsumer mExternalSendIntentConsumer;
     private Uri mSharePhotoUri;
     private String mShareText;
@@ -146,7 +146,7 @@ public class GroupChatActivity extends BaseActivity implements
         initDatabaseRef();
         DataBindingUtil.setContentView(this, getLayout());
         initPhotoHelper(savedInstanceState);
-        setupDrawer();
+        setupDrawers();
         setupToolbar();
         mDotsLoader = (AnimatedDotLoadingView) findViewById(R.id.text_dot_loader);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -343,14 +343,16 @@ public class GroupChatActivity extends BaseActivity implements
             mPhotoUploadHelper.cleanup();
         if (mFirebaseAdapter != null)
             mFirebaseAdapter.cleanup();
-        if (mDrawerHelper != null)
-            mDrawerHelper.cleanup();
+        if (mLeftDrawerHelper != null)
+            mLeftDrawerHelper.cleanup();
         if (mAdView != null)
             mAdView.destroy();
         if (mChatsRecyclerViewAdapter != null)
             mChatsRecyclerViewAdapter.cleanup();
         if (mExternalSendIntentConsumer != null)
             mExternalSendIntentConsumer.cleanup();
+        if (mGroupChatUsersRecyclerAdapter != null)
+            mGroupChatUsersRecyclerAdapter.cleanup();
         super.onDestroy();
     }
 
@@ -687,13 +689,10 @@ public class GroupChatActivity extends BaseActivity implements
         return toolbar.getHeight();
     }
 
-    private void setupDrawer() {
+    private void setupDrawers() {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        if (navigationView != null) {
-            setupDrawerContent(navigationView);
-        }
+        setupLeftDrawerContent();
+        setupRightDrawerContent();
     }
 
     private MyProfilePicListener mMyProfilePicListener = new MyProfilePicListener() {
@@ -709,13 +708,16 @@ public class GroupChatActivity extends BaseActivity implements
         mPhotoUploadHelper.launchCamera(isLaunchCamera);
     }
 
-    private void setupDrawerContent(NavigationView navigationView) {
+    private void setupLeftDrawerContent() {
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        if (navigationView == null)
+            return;
         View headerView = getLayoutInflater().inflate(R.layout.nav_header, navigationView, false);
         View drawerRecyclerView = getLayoutInflater().inflate(R.layout.drawer_layout, navigationView, false);
         navigationView.addHeaderView(headerView);
         navigationView.addHeaderView(drawerRecyclerView);
-        mDrawerHelper = new DrawerHelper(this, mDrawerLayout, mMyProfilePicListener);
-        mDrawerHelper.setup(navigationView);
+        mLeftDrawerHelper = new LeftDrawerHelper(this, mDrawerLayout, mMyProfilePicListener);
+        mLeftDrawerHelper.setup(navigationView);
 
         RecyclerView recyclerView = (RecyclerView) drawerRecyclerView.findViewById(R.id.drawerRecyclerView);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -727,19 +729,64 @@ public class GroupChatActivity extends BaseActivity implements
         mChatsRecyclerViewAdapter.populateData();
     }
 
-    private boolean isDrawerOpen() {
+    protected void setupRightDrawerContent() {
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.right_nav_view);
+        if (navigationView == null) {
+            return;
+        }
+        //View headerView = getLayoutInflater().inflate(R.layout.nav_header, navigationView, false);
+        View drawerRecyclerView = getLayoutInflater().inflate(R.layout.drawer_layout, navigationView, false);
+
+        int topPadding = getResources().getDimensionPixelSize(R.dimen.right_drawer_top_padding);
+        drawerRecyclerView.setPadding(0, topPadding, 0, 0);
+        //navigationView.addHeaderView(headerView);
+        navigationView.addHeaderView(drawerRecyclerView);
+
+        RecyclerView recyclerView = (RecyclerView) drawerRecyclerView.findViewById(R.id.drawerRecyclerView);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(linearLayoutManager);
+
+        mGroupChatUsersRecyclerAdapter = new GroupChatUsersRecyclerAdapter(this, this, mGroupId);
+        recyclerView.setAdapter(mGroupChatUsersRecyclerAdapter);
+        mGroupChatUsersRecyclerAdapter.populateData();
+    }
+
+    private boolean isLeftDrawerOpen() {
         return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START);
     }
 
-    private void closeDrawer() {
+    private boolean isRightDrawerOpen() {
+        return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.END);
+    }
+
+    private void closeLeftDrawer() {
         if (mDrawerLayout != null)
-            mDrawerLayout.closeDrawer(Gravity.LEFT);
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+    }
+
+    private void closeRightDrawer() {
+        if (mDrawerLayout != null)
+            mDrawerLayout.closeDrawer(GravityCompat.END);
+    }
+
+    private boolean closeBothDrawers() {
+        boolean atLeastOneClosed = false;
+        if (isRightDrawerOpen()) {
+            closeRightDrawer();
+            atLeastOneClosed = true;
+        }
+        if (isLeftDrawerOpen()) {
+            closeLeftDrawer();
+            atLeastOneClosed = true;
+        }
+        return atLeastOneClosed;
     }
 
     @Override
     public void onBackPressed() {
-        if (isDrawerOpen()) {
-            mDrawerLayout.closeDrawer(Gravity.LEFT);
+        if (closeBothDrawers()) {
             return;
         }
         if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
@@ -750,8 +797,7 @@ public class GroupChatActivity extends BaseActivity implements
     }
 
     private void openFullScreenTextView(final int startingPos) {
-        if (isDrawerOpen())
-            closeDrawer();
+        closeBothDrawers();
         ScreenUtil.hideVirtualKeyboard(mMessageEditText);
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(FullScreenTextFragment.TAG);
         if (fragment != null) {
@@ -990,7 +1036,7 @@ public class GroupChatActivity extends BaseActivity implements
                     MLog.e(TAG, "saveUser() failed via uploadFromUri() ", error);
                 }
             });
-            mDrawerHelper.updateProfilePic(photoId);
+            mLeftDrawerHelper.updateProfilePic(photoId);
         }
     }
 
@@ -1005,11 +1051,10 @@ public class GroupChatActivity extends BaseActivity implements
     }
 
     @Override
-    public void onUserThumbClicked(ImageView imageView, FriendlyMessage message) {
-        if (isDrawerOpen())
-            closeDrawer();
+    public void onUserClicked(int userid) {
+        closeBothDrawers();
         ScreenUtil.hideVirtualKeyboard(mMessageEditText);
-        PrivateChatActivity.startPrivateChatActivity(this, message.getUserid(), null, null);
+        PrivateChatActivity.startPrivateChatActivity(this, userid, null, null);
         /*Fragment fragment = FragmentProfile.newInstance(message);
         getSupportFragmentManager().beginTransaction()
                 .setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down)
@@ -1047,14 +1092,12 @@ public class GroupChatActivity extends BaseActivity implements
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (isDrawerOpen())
-            closeDrawer();
+        closeBothDrawers();
     }
 
     @Override
     public void onGroupChatClicked(GroupChatSummary groupChatSummary) {
-        if (isDrawerOpen())
-            closeDrawer();
+        closeBothDrawers();
         startGroupChatActivity(this, groupChatSummary.getId(), groupChatSummary.getName(),
                 mSharePhotoUri, mShareText);
         mSharePhotoUri = null;
@@ -1063,8 +1106,7 @@ public class GroupChatActivity extends BaseActivity implements
 
     @Override
     public void onPrivateChatClicked(PrivateChatSummary privateChatSummary) {
-        if (isDrawerOpen())
-            closeDrawer();
+        closeBothDrawers();
         PrivateChatActivity.startPrivateChatActivity(this, Integer.parseInt(privateChatSummary.getId()),
                 mSharePhotoUri, mShareText);
         mSharePhotoUri = null;

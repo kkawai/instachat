@@ -23,6 +23,8 @@
     <dimen name="common_circle_width">3dp</dimen>
     <dimen name="progress_circle_radius">34dp</dimen>
 
+    <dimen name="right_drawer_top_padding">36dp</dimen>
+
     <integer name="max_bio">256</integer>
 
 </resources>

@@ -49,7 +49,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private WeakReference<Activity> mActivity;
     private AdapterPopulateHolderListener mAdapterPopulateHolderListener;
     private MessageTextClickedListener mMessageTextClickedListener;
-    private UserThumbClickedListener mUserThumbClickedListener;
+    private UserClickedListener mUserClickedListener;
     private FriendlyMessageListener mFriendlyMessageListener;
     private String mDatabaseRoot;
 
@@ -75,8 +75,8 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         mMessageTextClickedListener = listener;
     }
 
-    public void setUserThumbClickedListener(UserThumbClickedListener listener) {
-        mUserThumbClickedListener = listener;
+    public void setUserThumbClickedListener(UserClickedListener listener) {
+        mUserClickedListener = listener;
     }
 
     public void setFriendlyMessageListener(FriendlyMessageListener listener) {
@@ -128,7 +128,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 if (TextUtils.isEmpty(friendlyMessage.getName())) {
                     return;
                 }
-                mUserThumbClickedListener.onUserThumbClicked(holder.messengerImageView, friendlyMessage);
+                mUserClickedListener.onUserClicked(friendlyMessage.getUserid());
             }
         });
         final View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -263,7 +263,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         if (mActivity != null)
             mActivity.clear();
         mActivity = null;
-        mUserThumbClickedListener = null;
+        mUserClickedListener = null;
         mAdapterPopulateHolderListener = null;
         mMessageTextClickedListener = null;
     }

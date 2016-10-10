@@ -38,18 +38,16 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 /**
  * Created by kevin on 9/4/2016.
  */
-public class DrawerHelper {
-    private static final String TAG = "DrawerHelper";
+public class LeftDrawerHelper {
+    private static final String TAG = "LeftDrawerHelper";
     private Activity mActivity;
     private DrawerLayout mDrawerLayout;
-    //private PhotoUploadHelper mPhotoUploadHelper;
     private View mHeaderLayout;
     private MyProfilePicListener mMyProfilePicListener;
 
-    public DrawerHelper(Activity activity, DrawerLayout drawerLayout, MyProfilePicListener listener) {
+    public LeftDrawerHelper(Activity activity, DrawerLayout drawerLayout, MyProfilePicListener listener) {
         mActivity = activity;
         mDrawerLayout = drawerLayout;
-        //mPhotoUploadHelper = photoUploadHelper;
         mMyProfilePicListener = listener;
     }
 
@@ -131,6 +129,8 @@ public class DrawerHelper {
         });
     }
 
+    private int mWhichDrawerLastOpened;
+
     public void setup(NavigationView navigationView) {
         mHeaderLayout = navigationView.getHeaderView(0); // 0-index header
         final TextView username = (TextView) mHeaderLayout.findViewById(R.id.nav_username);
@@ -149,7 +149,16 @@ public class DrawerHelper {
 
             @Override
             public void onDrawerOpened(View drawerView) {
-                MLog.d(TAG, "onDrawerOpened() ");
+
+                if (mDrawerLayout.isDrawerOpen(GravityCompat.START))
+                    mWhichDrawerLastOpened = GravityCompat.START;
+                else
+                    mWhichDrawerLastOpened = GravityCompat.END;
+
+                if (mWhichDrawerLastOpened != GravityCompat.START)
+                    return; //only handle left drawer logic
+
+                MLog.d(TAG, "onDrawerOpened() LEFT drawer");
                 if (mHeaderLayout.findViewById(R.id.edit_bio).getVisibility() != View.VISIBLE) {
                     mHeaderLayout.findViewById(R.id.edit_bio).setVisibility(View.VISIBLE);
                     AnimationUtil.scaleInFromCenter(mHeaderLayout.findViewById(R.id.edit_bio));
@@ -160,8 +169,13 @@ public class DrawerHelper {
             @Override
             public void onDrawerClosed(View drawerView) {
 
+                if (mWhichDrawerLastOpened != GravityCompat.START)
+                    return; //only handle left drawer stuff here
+
                 if (isActivityDestroyed())
                     return;
+
+                MLog.d(TAG, "onDrawerClosed() LEFT drawer");
 
                 /**
                  * don't bother setting visibility to invisible on any view

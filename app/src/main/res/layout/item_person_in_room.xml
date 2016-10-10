@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="13dp"
+        android:paddingLeft="16dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/userPic"
+            android:layout_width="@dimen/message_thumb_pic_size"
+            android:layout_height="@dimen/message_thumb_pic_size"
+            android:src="@drawable/ic_account_circle_black_36dp"
+            android:transitionName="image"/>
+
+        <com.instachat.android.view.CustomFontTextView
+            android:id="@+id/username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:text="theonetrevor"
+            android:textColor="@android:color/white"
+            android:textSize="15sp"
+            app:font="Lato-Bold.ttf"/>
+
+    </LinearLayout>
+
+</layout>

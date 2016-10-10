@@ -333,4 +333,9 @@ public class PrivateChatActivity extends GroupChatActivity {
     protected void removeUserPresence() {
         //user presence does not apply in private chat situations
     }
+
+    @Override
+    protected void setupRightDrawerContent() {
+        // does not apply to private chat situations
+    }
 }
