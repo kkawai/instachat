@@ -40,13 +40,15 @@ public class DrawerHelper {
     private static final String TAG = "DrawerHelper";
     private Activity mActivity;
     private DrawerLayout mDrawerLayout;
-    private PhotoUploadHelper mPhotoUploadHelper;
+    //private PhotoUploadHelper mPhotoUploadHelper;
     private View mHeaderLayout;
+    private MyProfilePicListener mMyProfilePicListener;
 
-    public DrawerHelper(Activity activity, DrawerLayout drawerLayout, PhotoUploadHelper photoUploadHelper) {
+    public DrawerHelper(Activity activity, DrawerLayout drawerLayout, MyProfilePicListener listener) {
         mActivity = activity;
         mDrawerLayout = drawerLayout;
-        mPhotoUploadHelper = photoUploadHelper;
+        //mPhotoUploadHelper = photoUploadHelper;
+        mMyProfilePicListener = listener;
     }
 
     public void updateProfilePic(String dpid) {
@@ -335,7 +337,7 @@ public class DrawerHelper {
     public void cleanup() {
         mActivity = null;
         mDrawerLayout = null;
-        mPhotoUploadHelper = null;
+        mMyProfilePicListener = null;
     }
 
     private boolean isActivityDestroyed() {
@@ -354,20 +356,19 @@ public class DrawerHelper {
         builder.setView(view);
         builder.setCancelable(true);
         final AlertDialog dialog = builder.create();
-        mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.userProfilePhoto);
-        mPhotoUploadHelper.setStorageRefString(Constants.DP_STORAGE_BASE(Preferences.getInstance().getUserId()));
+
         view.findViewById(R.id.menu_choose_photo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
-                mPhotoUploadHelper.launchCamera(true);
+                mMyProfilePicListener.onProfilePicChangeRequest(true);
             }
         });
         view.findViewById(R.id.menu_take_photo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
-                mPhotoUploadHelper.launchCamera(false);
+                mMyProfilePicListener.onProfilePicChangeRequest(false);
             }
         });
         dialog.show();

@@ -696,12 +696,25 @@ public class GroupChatActivity extends BaseActivity implements
         }
     }
 
+    private MyProfilePicListener mMyProfilePicListener = new MyProfilePicListener() {
+        @Override
+        public void onProfilePicChangeRequest(boolean isLaunchCamera) {
+            GroupChatActivity.this.onProfilePicChangeRequest(isLaunchCamera);
+        }
+    };
+
+    private void onProfilePicChangeRequest(boolean isLaunchCamera) {
+        mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.userProfilePhoto);
+        mPhotoUploadHelper.setStorageRefString(Constants.DP_STORAGE_BASE(myUserid()));
+        mPhotoUploadHelper.launchCamera(isLaunchCamera);
+    }
+
     private void setupDrawerContent(NavigationView navigationView) {
         View headerView = getLayoutInflater().inflate(R.layout.nav_header, navigationView, false);
         View drawerRecyclerView = getLayoutInflater().inflate(R.layout.drawer_layout, navigationView, false);
         navigationView.addHeaderView(headerView);
         navigationView.addHeaderView(drawerRecyclerView);
-        mDrawerHelper = new DrawerHelper(this, mDrawerLayout, mPhotoUploadHelper);
+        mDrawerHelper = new DrawerHelper(this, mDrawerLayout, mMyProfilePicListener);
         mDrawerHelper.setup(navigationView);
 
         RecyclerView recyclerView = (RecyclerView) drawerRecyclerView.findViewById(R.id.drawerRecyclerView);
@@ -1120,4 +1133,5 @@ public class GroupChatActivity extends BaseActivity implements
         mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(mGroupId)).
                 child(myUserid() + "").removeValue();
     }
+
 }
