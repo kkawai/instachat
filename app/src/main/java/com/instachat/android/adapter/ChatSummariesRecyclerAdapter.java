@@ -325,6 +325,11 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
             GroupChatSummary groupChatSummary = (GroupChatSummary) data.get(position);
             ((GroupChatSummaryViewHolder) holder).name.setText(groupChatSummary.getName());
             ((GroupChatSummaryViewHolder) holder).status.setVisibility(View.INVISIBLE);
+            /**
+             * Note!  In the beginning stages of this app, we don't have group notifications
+             * working yet as it requires some server work.  Let's use unread message count
+             * for the number of users in the room for now.
+             */
             if (groupChatSummary.getUsersInRoomCount() > 0) {
                 ((GroupChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.VISIBLE);
                 ((GroupChatSummaryViewHolder) holder).unreadMessageCount.setText(" " + groupChatSummary.getUsersInRoomCount() + " ");
