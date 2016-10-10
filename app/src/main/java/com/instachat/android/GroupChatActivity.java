@@ -87,7 +87,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class GroupChatActivity extends BaseActivity implements
@@ -258,55 +257,20 @@ public class GroupChatActivity extends BaseActivity implements
             getSupportActionBar().setTitle(getIntent().getStringExtra(Constants.KEY_GROUP_NAME));
         }
 
-        mExternalSendIntentConsumer = new ExternalSendIntentConsumer();
+        mExternalSendIntentConsumer = new ExternalSendIntentConsumer(this);
         mExternalSendIntentConsumer.setListener(new ExternalSendIntentConsumer.ExternalSendIntentListener() {
             @Override
             public void onHandleSendImage(final Uri imageUri) {
-                new SweetAlertDialog(GroupChatActivity.this, SweetAlertDialog.NORMAL_TYPE)
-                        .setTitleText(getString(R.string.share_photo))
-                        .setContentText(getString(R.string.please_choose_person_or_group))
-                        .setCancelText(getString(android.R.string.cancel))
-                        .setConfirmText(getString(android.R.string.ok))
-                        .showCancelButton(true)
-                        .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                            @Override
-                            public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                sweetAlertDialog.cancel();
-                            }
-                        }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-                        sweetAlertDialog.dismiss();
-                        mDrawerLayout.openDrawer(GravityCompat.START);
-                        mSharePhotoUri = imageUri;
-                    }
-                }).show();
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                mSharePhotoUri = imageUri;
             }
 
             @Override
             public void onHandleSendText(final String text) {
-                new SweetAlertDialog(GroupChatActivity.this, SweetAlertDialog.NORMAL_TYPE)
-                        .setTitleText(getString(R.string.share_message))
-                        .setContentText(getString(R.string.please_choose_person_or_group))
-                        .setCancelText(getString(android.R.string.cancel))
-                        .setConfirmText(getString(android.R.string.ok))
-                        .showCancelButton(true)
-                        .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                            @Override
-                            public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                sweetAlertDialog.cancel();
-                            }
-                        }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-                        sweetAlertDialog.dismiss();
-                        mDrawerLayout.openDrawer(GravityCompat.START);
-                        mShareText = text;
-                    }
-                }).show();
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                mShareText = text;
             }
         });
-        mExternalSendIntentConsumer.consumeIntent(getIntent());
         if (getIntent() != null && getIntent().hasExtra(Constants.KEY_SHARE_PHOTO_URI)) {
             mPhotoUploadHelper.setStorageRefString(getDatabaseRoot());
             mPhotoUploadHelper.consumeExternallySharedPhoto((Uri) getIntent().getParcelableExtra(Constants.KEY_SHARE_PHOTO_URI));
@@ -344,6 +308,8 @@ public class GroupChatActivity extends BaseActivity implements
         if (Preferences.getInstance().isLoggedIn()) {
             GCMHelper.onResume(this);
         }
+        if (mExternalSendIntentConsumer != null)
+            mExternalSendIntentConsumer.consumeIntent(getIntent());
     }
 
     @Override
@@ -384,7 +350,7 @@ public class GroupChatActivity extends BaseActivity implements
         if (mChatsRecyclerViewAdapter != null)
             mChatsRecyclerViewAdapter.cleanup();
         if (mExternalSendIntentConsumer != null)
-            mExternalSendIntentConsumer.clear();
+            mExternalSendIntentConsumer.cleanup();
         super.onDestroy();
     }
 
@@ -1145,13 +1111,13 @@ public class GroupChatActivity extends BaseActivity implements
         MLog.d(TAG, "addUserPresence() mGroupId: ", mGroupId, " username: ", myUsername());
         User me = Preferences.getInstance().getUser();
         mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(mGroupId)).
-                child(myUserid()+"").updateChildren(me.getPresenceMap());
+                child(myUserid() + "").updateChildren(me.getPresenceMap());
 
     }
 
     protected void removeUserPresence() {
         MLog.d(TAG, "removeUserPresence() mGroupId: ", mGroupId, " username: ", myUsername());
         mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(mGroupId)).
-                child(myUserid()+"").removeValue();
+                child(myUserid() + "").removeValue();
     }
 }

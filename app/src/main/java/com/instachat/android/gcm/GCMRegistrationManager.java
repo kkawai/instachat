@@ -109,7 +109,7 @@ public final class GCMRegistrationManager {
             MLog.i(TAG, "Registration not found.");
             return "";
         }
-        // Check if app was updated; if so, it must clear the registration ID
+        // Check if app was updated; if so, it must cleanup the registration ID
         // since the existing regID is not guaranteed to work with the new
         // app version.
         final int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);

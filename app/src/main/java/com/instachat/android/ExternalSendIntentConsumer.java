@@ -1,9 +1,13 @@
 package com.instachat.android;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.text.TextUtils;
 
 import java.util.ArrayList;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
  * Created by kevin on 10/9/2016.
@@ -11,10 +15,16 @@ import java.util.ArrayList;
 
 public class ExternalSendIntentConsumer {
 
+    public ExternalSendIntentConsumer(Context context) {
+        this.context = context;
+    }
+
     private ExternalSendIntentListener listener;
+    private Context context;
 
     public interface ExternalSendIntentListener {
         void onHandleSendImage(Uri imageUri);
+
         void onHandleSendText(String text);
     }
 
@@ -22,8 +32,9 @@ public class ExternalSendIntentConsumer {
         this.listener = listener;
     }
 
-    public void clear() {
+    public void cleanup() {
         listener = null;
+        context = null;
     }
 
     public void consumeIntent(Intent intent) {
@@ -52,17 +63,54 @@ public class ExternalSendIntentConsumer {
     }
 
     private void handleSendText(Intent intent) {
-        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-        if (sharedText != null && listener != null) {
-            listener.onHandleSendText(sharedText);
+        final String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+        if (TextUtils.isEmpty(sharedText) || listener == null) {
+            return;
         }
+        intent.removeExtra(Intent.EXTRA_TEXT);
+        new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
+                .setTitleText(context.getString(R.string.share_message))
+                .setContentText(context.getString(R.string.please_choose_person_or_group))
+                .setCancelText(context.getString(android.R.string.cancel))
+                .setConfirmText(context.getString(android.R.string.ok))
+                .showCancelButton(true)
+                .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        sweetAlertDialog.cancel();
+                    }
+                }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                sweetAlertDialog.dismiss();
+                listener.onHandleSendText(sharedText);
+            }
+        }).show();
     }
 
     private void handleSendImage(Intent intent) {
-        Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
-        if (imageUri != null && listener != null) {
-            listener.onHandleSendImage(imageUri);
-        }
+        final Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (imageUri == null || listener == null)
+            return;
+        intent.removeExtra(Intent.EXTRA_STREAM);
+        new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE)
+                .setTitleText(context.getString(R.string.share_photo))
+                .setContentText(context.getString(R.string.please_choose_person_or_group))
+                .setCancelText(context.getString(android.R.string.cancel))
+                .setConfirmText(context.getString(android.R.string.ok))
+                .showCancelButton(true)
+                .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        sweetAlertDialog.cancel();
+                    }
+                }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                sweetAlertDialog.dismiss();
+                listener.onHandleSendImage(imageUri);
+            }
+        }).show();
     }
 
     //not supported yet
