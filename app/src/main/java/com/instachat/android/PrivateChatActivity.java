@@ -205,8 +205,13 @@ public class PrivateChatActivity extends GroupChatActivity {
         }
     }
 
-    public static void startPrivateChatActivity(Context context, int userid) {
+    public static void startPrivateChatActivity(Context context, int userid,
+                                                Uri sharePhotoUri, String shareMessage) {
         Intent intent = newIntent(context, userid);
+        if (sharePhotoUri != null)
+            intent.putExtra(Constants.KEY_SHARE_PHOTO_URI, sharePhotoUri);
+        if (shareMessage != null)
+            intent.putExtra(Constants.KEY_SHARE_MESSAGE, shareMessage);
         context.startActivity(intent);
     }
 

@@ -64,4 +64,7 @@
     <string name="LOADING">Loading...</string>
 
     <string name="save_username">Save</string>
+    <string name="share_message">Share message</string>
+    <string name="share_photo">Share photo</string>
+    <string name="please_choose_person_or_group">Please choose person or group</string>
 </resources>

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -86,6 +87,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class GroupChatActivity extends BaseActivity implements
@@ -125,6 +127,9 @@ public class GroupChatActivity extends BaseActivity implements
     private boolean mIsStartedAnimation;
     private AnimatedDotLoadingView mDotsLoader;
     private ChatSummariesRecyclerAdapter mChatsRecyclerViewAdapter;
+    private ExternalSendIntentConsumer mExternalSendIntentConsumer;
+    private Uri mSharePhotoUri;
+    private String mShareText;
 
     protected int getLayout() {
         return R.layout.activity_main;
@@ -251,6 +256,65 @@ public class GroupChatActivity extends BaseActivity implements
         if (getIntent() != null && getIntent().hasExtra(Constants.KEY_GROUP_NAME)) {
             getSupportActionBar().setTitle(getIntent().getStringExtra(Constants.KEY_GROUP_NAME));
         }
+
+        mExternalSendIntentConsumer = new ExternalSendIntentConsumer();
+        mExternalSendIntentConsumer.setListener(new ExternalSendIntentConsumer.ExternalSendIntentListener() {
+            @Override
+            public void onHandleSendImage(final Uri imageUri) {
+                new SweetAlertDialog(GroupChatActivity.this, SweetAlertDialog.NORMAL_TYPE)
+                        .setTitleText(getString(R.string.share_photo))
+                        .setContentText(getString(R.string.please_choose_person_or_group))
+                        .setCancelText(getString(android.R.string.cancel))
+                        .setConfirmText(getString(android.R.string.ok))
+                        .showCancelButton(true)
+                        .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                            @Override
+                            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                sweetAlertDialog.cancel();
+                            }
+                        }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        sweetAlertDialog.dismiss();
+                        mDrawerLayout.openDrawer(GravityCompat.START);
+                        mSharePhotoUri = imageUri;
+                    }
+                }).show();
+            }
+
+            @Override
+            public void onHandleSendText(final String text) {
+                new SweetAlertDialog(GroupChatActivity.this, SweetAlertDialog.NORMAL_TYPE)
+                        .setTitleText(getString(R.string.share_message))
+                        .setContentText(getString(R.string.please_choose_person_or_group))
+                        .setCancelText(getString(android.R.string.cancel))
+                        .setConfirmText(getString(android.R.string.ok))
+                        .showCancelButton(true)
+                        .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                            @Override
+                            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                sweetAlertDialog.cancel();
+                            }
+                        }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        sweetAlertDialog.dismiss();
+                        mDrawerLayout.openDrawer(GravityCompat.START);
+                        mShareText = text;
+                    }
+                }).show();
+            }
+        });
+        mExternalSendIntentConsumer.consumeIntent(getIntent());
+        if (getIntent() != null && getIntent().hasExtra(Constants.KEY_SHARE_PHOTO_URI)) {
+            mPhotoUploadHelper.setStorageRefString(getDatabaseRoot());
+            mPhotoUploadHelper.consumeExternallySharedPhoto((Uri) getIntent().getParcelableExtra(Constants.KEY_SHARE_PHOTO_URI));
+            getIntent().removeExtra(Constants.KEY_SHARE_PHOTO_URI);
+        }
+        if (getIntent() != null && getIntent().hasExtra(Constants.KEY_SHARE_MESSAGE)) {
+            mMessageEditText.setText(getIntent().getStringExtra(Constants.KEY_SHARE_MESSAGE));
+            getIntent().removeExtra(Constants.KEY_SHARE_MESSAGE);
+        }
     }
 
     private long prevInputTime;
@@ -316,6 +380,8 @@ public class GroupChatActivity extends BaseActivity implements
             mAdView.destroy();
         if (mChatsRecyclerViewAdapter != null)
             mChatsRecyclerViewAdapter.cleanup();
+        if (mExternalSendIntentConsumer != null)
+            mExternalSendIntentConsumer.clear();
         super.onDestroy();
     }
 
@@ -327,6 +393,10 @@ public class GroupChatActivity extends BaseActivity implements
             databaseRef = Constants.GROUP_CHAT_REF(Constants.DEFAULT_PUBLIC_GROUP_ID);
         }
         setDatabaseRoot(databaseRef);
+    }
+
+    final String getDatabaseRoot() {
+        return mDatabaseRoot;
     }
 
     final void setDatabaseRoot(final String root) {
@@ -955,7 +1025,7 @@ public class GroupChatActivity extends BaseActivity implements
         if (isDrawerOpen())
             closeDrawer();
         ScreenUtil.hideVirtualKeyboard(mMessageEditText);
-        PrivateChatActivity.startPrivateChatActivity(this, message.getUserid());
+        PrivateChatActivity.startPrivateChatActivity(this, message.getUserid(), null, null);
         /*Fragment fragment = FragmentProfile.newInstance(message);
         getSupportFragmentManager().beginTransaction()
                 .setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down)
@@ -1001,14 +1071,20 @@ public class GroupChatActivity extends BaseActivity implements
     public void onGroupChatClicked(GroupChatSummary groupChatSummary) {
         if (isDrawerOpen())
             closeDrawer();
-        startGroupChatActivity(this, groupChatSummary.getId(), groupChatSummary.getName());
+        startGroupChatActivity(this, groupChatSummary.getId(), groupChatSummary.getName(),
+                mSharePhotoUri, mShareText);
+        mSharePhotoUri = null;
+        mShareText = null;
     }
 
     @Override
     public void onPrivateChatClicked(PrivateChatSummary privateChatSummary) {
         if (isDrawerOpen())
             closeDrawer();
-        PrivateChatActivity.startPrivateChatActivity(this, Integer.parseInt(privateChatSummary.getId()));
+        PrivateChatActivity.startPrivateChatActivity(this, Integer.parseInt(privateChatSummary.getId()),
+                mSharePhotoUri, mShareText);
+        mSharePhotoUri = null;
+        mShareText = null;
     }
 
     protected void hideDotsParent(boolean isAnimate) {
@@ -1031,8 +1107,13 @@ public class GroupChatActivity extends BaseActivity implements
             findViewById(R.id.dotsLayout).setVisibility(View.VISIBLE);
     }
 
-    public static void startGroupChatActivity(Context context, long groupId, String groupName) {
+    public static void startGroupChatActivity(Context context, long groupId, String groupName,
+                                              Uri sharePhotoUri, String shareMessage) {
         Intent intent = newIntent(context, groupId, groupName);
+        if (sharePhotoUri != null)
+            intent.putExtra(Constants.KEY_SHARE_PHOTO_URI, sharePhotoUri);
+        if (shareMessage != null)
+            intent.putExtra(Constants.KEY_SHARE_MESSAGE, shareMessage);
         context.startActivity(intent);
     }
 

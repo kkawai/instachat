@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.instachat.android.Constants;
@@ -28,7 +27,6 @@ public class FullscreenTextSubFragment extends Fragment implements ZoomImageList
 
     public static final String TAG = "FullscreenTextSubFragment";
     private FriendlyMessage mFriendlyMessage;
-    private RelativeLayout mMessageViewParent;
     private ZoomableImageView mZoomableImageView;
     private TextView mAutoResizeTextView, mTextView;
     private ImageView mRotateButton;
@@ -37,7 +35,6 @@ public class FullscreenTextSubFragment extends Fragment implements ZoomImageList
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_fullscreen_item, container, false);
-        mMessageViewParent = (RelativeLayout) view.findViewById(R.id.messageTextViewParent);
         mZoomableImageView = (ZoomableImageView) view.findViewById(R.id.messagePhotoView);
         mAutoResizeTextView = (TextView) view.findViewById(R.id.autoResizeTextView);
         mTextView = (TextView) view.findViewById(R.id.messageTextView);
@@ -83,13 +80,6 @@ public class FullscreenTextSubFragment extends Fragment implements ZoomImageList
             }
         });
 
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        //final AutoResizeTextView textView = (AutoResizeTextView) getView().findViewById(R.id.textView);
-        //textView.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()), getResources().getDisplayMetrics()));
     }
 
     @Override

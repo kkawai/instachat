@@ -49,11 +49,29 @@
         android:theme="@style/Theme.App">
 
         <activity
-            android:name=".GroupChatActivity">
+            android:name=".GroupChatActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="image/*"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
+            <!-- think about supporting consumption of multiple images later
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter> -->
         </activity>
 
         <activity
-            android:name=".PrivateChatActivity">
+            android:name=".PrivateChatActivity"
+            android:screenOrientation="portrait">
         </activity>
 
         <activity

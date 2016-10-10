@@ -177,6 +177,8 @@ public final class Constants {
     public static final String KEY_GROUP_NAME = "group_name";
     public static final String KEY_USERID = "user_id";
     public static final String KEY_GCM_MSG_TYPE = "key_gcm_type";
+    public static final String KEY_SHARE_PHOTO_URI = "key_share_photo_uri";
+    public static final String KEY_SHARE_MESSAGE = "key_share_message";
 
     public enum GcmMessageType {
         msg, typing

@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
 /**
@@ -38,13 +37,14 @@ public class PhotoUploadHelper {
     private static final String TAG = "PhotoUploadHelper";
     private static final int RC_CHOOSE_PICTURE = 103;
     private static final int RC_TAKE_PICTURE = 101;
-    private Uri mFileUri = null;
-    private File mFile = null;
+    private Uri mTargetFileUri = null;
+    private File mTargetFile = null;
     private Activity mActivity;
     private UploadListener mListener;
     private StorageReference mStorageRef;
     private String mStorageRefString;
     private PhotoType mPhotoType;
+    private File mTempPhotoUploadDir;
 
     public enum PhotoType {
         chatRoomPhoto, userProfilePhoto
@@ -53,6 +53,13 @@ public class PhotoUploadHelper {
     PhotoUploadHelper(Activity activity) {
         mActivity = activity;
         mStorageRef = FirebaseStorage.getInstance().getReference();
+        mTempPhotoUploadDir = new File(Environment.getExternalStorageDirectory() + "/photos");
+        ThreadWrapper.executeInWorkerThread(new Runnable() {
+            @Override
+            public void run() {
+                LocalFileUtils.deleteDirectoryAndContents(mTempPhotoUploadDir, true);
+            }
+        });
     }
 
     public void setPhotoType(PhotoType photoType) {
@@ -77,7 +84,6 @@ public class PhotoUploadHelper {
     }
 
     public void launchCamera(boolean isChoose) {
-        Log.d(TAG, "launchCamera");
 
         // Check that we have permission to read images from external storage.
         if (!isChoose) {
@@ -96,29 +102,12 @@ public class PhotoUploadHelper {
             }
         }
 
-        // Choose file storage location, must be listed in res/xml/file_paths.xml
-        File dir = new File(Environment.getExternalStorageDirectory() + "/photos");
-        mFile = new File(dir, UUID.randomUUID().toString() + ".jpg");
-        try {
-            // Create directory if it does not exist.
-            if (!dir.exists()) {
-                dir.mkdir();
-            }
-            boolean created = mFile.createNewFile();
-            MLog.d(TAG, "file.createNewFile:" + mFile.getAbsolutePath() + ":" + created);
-        } catch (IOException e) {
-            Log.e(TAG, "file.createNewFile" + mFile.getAbsolutePath() + ":FAILED", e);
-        }
-
-        // Create content:// URI for file, required since Android N
-        // See: https://developer.android.com/reference/android/support/v4/content/FileProvider.html
-        mFileUri = FileProvider.getUriForFile(mActivity,
-                mActivity.getPackageName()+".fileprovider", mFile);
+        setupTargetFile();
 
         if (!isChoose) {
             // Create and launch the intent
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mFileUri);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mTargetFileUri);
             mActivity.startActivityForResult(takePictureIntent, RC_TAKE_PICTURE);
         } else {
             final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -127,16 +116,53 @@ public class PhotoUploadHelper {
         }
     }
 
+    /**
+     * Set up target file and target file Uri; The final image will be stored in the
+     * target file and referenced via the Uri.
+     */
+    private void setupTargetFile() {
+        // Choose file storage location, must be listed in res/xml/file_paths.xml
+        mTargetFile = new File(mTempPhotoUploadDir, UUID.randomUUID().toString() + ".jpg");
+        try {
+            // Create directory if it does not exist.
+            if (!mTempPhotoUploadDir.exists()) {
+                mTempPhotoUploadDir.mkdir();
+            }
+            boolean created = mTargetFile.createNewFile();
+            MLog.d(TAG, "file.createNewFile:" + mTargetFile.getAbsolutePath() + ":" + created);
+        } catch (IOException e) {
+            Log.e(TAG, "file.createNewFile" + mTargetFile.getAbsolutePath() + ":FAILED", e);
+        }
+
+        // Create content:// URI for file, required since Android N
+        // See: https://developer.android.com/reference/android/support/v4/content/FileProvider.html
+        mTargetFileUri = FileProvider.getUriForFile(mActivity,
+                mActivity.getPackageName() + ".fileprovider", mTargetFile);
+    }
+
+    /**
+     * Consume external ACTION_SEND intent.  In this case, we are receiving
+     * some photo uri from outside the app.
+     *
+     * @param photoUri
+     */
+    public void consumeExternallySharedPhoto(final Uri photoUri) {
+        setupTargetFile();
+        mPhotoType = PhotoType.chatRoomPhoto;
+        reducePhotoSize(photoUri);
+
+    }
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == RC_TAKE_PICTURE) {
             if (resultCode == Activity.RESULT_OK) {
-                if (mFileUri != null) {
+                if (mTargetFileUri != null) {
                     reducePhotoSize(null);
                 }
             }
         } else if (requestCode == RC_CHOOSE_PICTURE) {
             if (resultCode == Activity.RESULT_OK) {
-                if (mFileUri != null) {
+                if (mTargetFileUri != null) {
                     reducePhotoSize(data.getData());
                 }
             }
@@ -162,7 +188,7 @@ public class PhotoUploadHelper {
                 try {
 
                     if (uri != null) {
-                        LocalFileUtils.copyFile(mActivity, uri, mFile);
+                        LocalFileUtils.copyFile(mActivity, uri, mTargetFile);
                     }
 
                     int maxSizeBytes = Constants.MAX_PIC_SIZE_BYTES;
@@ -171,8 +197,8 @@ public class PhotoUploadHelper {
                     } else if (mPhotoType == PhotoType.userProfilePhoto) {
                         maxSizeBytes = Constants.MAX_PROFILE_PIC_SIZE_BYTES;
                     }
-                    final Bitmap bitmap = ImageUtils.getBitmap(mActivity, mFileUri, maxSizeBytes);
-                    ImageUtils.writeBitmapToFile(bitmap, mFile);
+                    final Bitmap bitmap = ImageUtils.getBitmap(mActivity, mTargetFileUri, maxSizeBytes);
+                    ImageUtils.writeBitmapToFile(bitmap, mTargetFile);
                     if (isActivityDestroyed())
                         return;
                     mActivity.runOnUiThread(new Runnable() {
@@ -180,7 +206,7 @@ public class PhotoUploadHelper {
                         public void run() {
                             if (isActivityDestroyed())
                                 return;
-                            uploadFromUri(mFileUri);
+                            uploadFromUri(mTargetFileUri);
                         }
                     });
                 } catch (final Exception e) {
@@ -195,7 +221,7 @@ public class PhotoUploadHelper {
         MLog.d(TAG, "uploadFromUri:src:" + fileUri.toString());
 
         final StorageReference photoRef = mStorageRef.child(mStorageRefString)
-                .child(mFileUri.getLastPathSegment());
+                .child(mTargetFileUri.getLastPathSegment());
 
         mListener.onPhotoUploadStarted();
 
@@ -215,7 +241,7 @@ public class PhotoUploadHelper {
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         if (isActivityDestroyed())
                             return;
-                        mListener.onPhotoUploadSuccess(mFileUri.getLastPathSegment(), taskSnapshot.getDownloadUrl().toString());
+                        mListener.onPhotoUploadSuccess(mTargetFileUri.getLastPathSegment(), taskSnapshot.getDownloadUrl().toString());
                     }
                 })
                 .addOnFailureListener(mActivity, new OnFailureListener() {
