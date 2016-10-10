@@ -40,6 +40,7 @@
     <string name="message_hint">Send a friendly message...</string>
     <string name="error_send_photo">Sorry, could not upload photo. Please try again.</string>
     <string name="is_your_new_username">%s is your new username</string>
+    <string name="username_changed_dialog_title">Username changed!</string>
     <string name="title_update_my_pic">Update my photo</string>
     <string name="sent_via">Sent via %s</string>
 

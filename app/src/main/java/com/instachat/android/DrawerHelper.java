@@ -33,6 +33,8 @@ import com.instachat.android.util.StringUtil;
 
 import org.json.JSONObject;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 /**
  * Created by kevin on 9/4/2016.
  */
@@ -211,8 +213,7 @@ public class DrawerHelper {
                                         try {
                                             JSONObject object = new JSONObject(response);
                                             if (object.getString(NetworkApi.KEY_RESPONSE_STATUS).equals(NetworkApi.RESPONSE_OK)) {
-                                                String toast = mActivity.getString(R.string.is_your_new_username, newUsername);
-                                                Toast.makeText(mActivity, toast, Toast.LENGTH_SHORT).show();
+                                                showNewUsernameMessage(newUsername);
                                                 user.setUsername(newUsername);
                                                 Preferences.getInstance().saveUser(user);
                                                 username.setText(newUsername);
@@ -373,5 +374,14 @@ public class DrawerHelper {
         });
         dialog.show();
 
+    }
+
+    private void showNewUsernameMessage(String newUsername) {
+        //String toast = mActivity.getString(R.string.is_your_new_username, newUsername);
+        //Toast.makeText(mActivity, toast, Toast.LENGTH_SHORT).show();
+        new SweetAlertDialog(mActivity, SweetAlertDialog.SUCCESS_TYPE)
+                .setTitleText(mActivity.getString(R.string.username_changed_dialog_title))
+                .setContentText(mActivity.getString(R.string.is_your_new_username, newUsername))
+                .show();
     }
 }
