@@ -159,6 +159,10 @@ public final class Constants {
         return "/public_group_messages/" + groupid;
     }
 
+    public static String GROUP_CHAT_USERS_REF(long groupid) {
+        return "/public_group_users/" + groupid;
+    }
+
     public static String PUBLIC_CHATS_SUMMARY_PARENT_REF = "/public_group_summaries/";
 
     public static String DP_STORAGE_BASE(int userid) {

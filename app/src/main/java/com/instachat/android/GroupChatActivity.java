@@ -130,6 +130,7 @@ public class GroupChatActivity extends BaseActivity implements
     private ExternalSendIntentConsumer mExternalSendIntentConsumer;
     private Uri mSharePhotoUri;
     private String mShareText;
+    private long mGroupId = Constants.DEFAULT_PUBLIC_GROUP_ID;
 
     protected int getLayout() {
         return R.layout.activity_main;
@@ -315,6 +316,7 @@ public class GroupChatActivity extends BaseActivity implements
             mMessageEditText.setText(getIntent().getStringExtra(Constants.KEY_SHARE_MESSAGE));
             getIntent().removeExtra(Constants.KEY_SHARE_MESSAGE);
         }
+        addUserPresence();
     }
 
     private long prevInputTime;
@@ -370,6 +372,7 @@ public class GroupChatActivity extends BaseActivity implements
 
     @Override
     public void onDestroy() {
+        removeUserPresence();
         if (mPhotoUploadHelper != null)
             mPhotoUploadHelper.cleanup();
         if (mFirebaseAdapter != null)
@@ -388,8 +391,10 @@ public class GroupChatActivity extends BaseActivity implements
     void initDatabaseRef() {
         String databaseRef;
         if (getIntent() != null && getIntent().hasExtra(Constants.KEY_GROUPID)) {
-            databaseRef = Constants.GROUP_CHAT_REF(getIntent().getLongExtra(Constants.KEY_GROUPID, Constants.DEFAULT_PUBLIC_GROUP_ID));
+            mGroupId = getIntent().getLongExtra(Constants.KEY_GROUPID, Constants.DEFAULT_PUBLIC_GROUP_ID);
+            databaseRef = Constants.GROUP_CHAT_REF(mGroupId);
         } else {
+            mGroupId = Constants.DEFAULT_PUBLIC_GROUP_ID;
             databaseRef = Constants.GROUP_CHAT_REF(Constants.DEFAULT_PUBLIC_GROUP_ID);
         }
         setDatabaseRoot(databaseRef);
@@ -1134,5 +1139,19 @@ public class GroupChatActivity extends BaseActivity implements
                 break;
             }
         }
+    }
+
+    protected void addUserPresence() {
+        MLog.d(TAG, "addUserPresence() mGroupId: ", mGroupId, " username: ", myUsername());
+        User me = Preferences.getInstance().getUser();
+        mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(mGroupId)).
+                child(myUserid()+"").updateChildren(me.getPresenceMap());
+
+    }
+
+    protected void removeUserPresence() {
+        MLog.d(TAG, "removeUserPresence() mGroupId: ", mGroupId, " username: ", myUsername());
+        mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(mGroupId)).
+                child(myUserid()+"").removeValue();
     }
 }

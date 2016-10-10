@@ -21,7 +21,9 @@ import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.util.MLog;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by kevin on 9/26/2016.
@@ -39,10 +41,16 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
     private static final int TYPE_PRIVATE_HEADER = 2;
     private static final int TYPE_GROUP_HEADER = 3;
 
+    private static final class Pair {
+        DatabaseReference ref;
+        ChildEventListener listener;
+    }
+
     private List<Object> data = new ArrayList<>(40);
     private ChildEventListener privateChatsSummaryListener, publicGroupChatsSummaryListener;
     private DatabaseReference privateChatsSummaryReference, publicGroupChatsSummaryReference;
     private ChatsItemClickedListener chatsItemClickedListener;
+    private Map<Long, Pair> publicGroupChatPresenceReferences = new HashMap<>();
 
     public ChatSummariesRecyclerAdapter(ChatsItemClickedListener chatsItemClickedListener) {
         this.chatsItemClickedListener = chatsItemClickedListener;
@@ -98,6 +106,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
                 GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
                 groupChatSummary.setId(Long.parseLong(dataSnapshot.getKey()));
                 insertGroupChatSummary(groupChatSummary);
+                addPublicGroupChatPresenceReference(groupChatSummary.getId());
             }
 
             @Override
@@ -112,6 +121,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
                 GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
                 groupChatSummary.setId(Long.parseLong(dataSnapshot.getKey()));
                 removeGroupChatSummary(groupChatSummary);
+                removePublicGroupChatPresenceReference(groupChatSummary.getId());
             }
 
             @Override
@@ -315,7 +325,11 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
             GroupChatSummary groupChatSummary = (GroupChatSummary) data.get(position);
             ((GroupChatSummaryViewHolder) holder).name.setText(groupChatSummary.getName());
             ((GroupChatSummaryViewHolder) holder).status.setVisibility(View.INVISIBLE);
-            ((GroupChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.INVISIBLE);
+            if (groupChatSummary.getUsersInRoomCount() > 0) {
+                ((GroupChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.VISIBLE);
+                ((GroupChatSummaryViewHolder) holder).unreadMessageCount.setText(" " + groupChatSummary.getUsersInRoomCount() + " ");
+            } else
+                ((GroupChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.INVISIBLE);
 
         } else if (viewType == TYPE_PRIVATE_SUMMARY) {
 
@@ -342,5 +356,88 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
     public void cleanup() {
         privateChatsSummaryReference.removeEventListener(privateChatsSummaryListener);
         publicGroupChatsSummaryReference.removeEventListener(publicGroupChatsSummaryListener);
+        for (long groupid : publicGroupChatPresenceReferences.keySet()) {
+            Pair pair = publicGroupChatPresenceReferences.get(groupid);
+            pair.ref.removeEventListener(pair.listener);
+        }
+        publicGroupChatPresenceReferences.clear();
+    }
+
+    private synchronized void addPublicGroupChatPresenceReference(final long groupid) {
+        if (publicGroupChatPresenceReferences.containsKey(groupid))
+            return;
+        /*
+onChildAdded() dataSnapshot: DataSnapshot { key = 3733523, value = {username=kevintrevor, id=3733523, profilePicUrl=ea34ff82-066a-413f-9efe-a816d59863a7.jpg} }
+onChildAdded() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {username=CoolistUserInWorld, id=234fakeUserid, profilePicUrl=blahblahblah} }
+onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {username=CoolistUserInWorld, id=234fakeUserid, profilePicUrl=blahblahblah} }
+         */
+        Pair pair = new Pair();
+        pair.ref = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(groupid));
+        pair.listener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildAdded() dataSnapshot: " + dataSnapshot);
+                addUserToPublicGroupChat(groupid);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildChanged() dataSnapshot: " + dataSnapshot);
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildRemoved() dataSnapshot: " + dataSnapshot);
+                removeUserFromPublicGroupChat(groupid);
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildMoved() dataSnapshot: " + dataSnapshot);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        pair.ref.addChildEventListener(pair.listener);
+        publicGroupChatPresenceReferences.put(groupid, pair);
+    }
+
+    private void removeUserFromPublicGroupChat(long groupid) {
+        for (int i = 0; i < data.size(); i++) {
+            Object o = data.get(i);
+            if (o instanceof GroupChatSummary) {
+                GroupChatSummary groupChatSummary = (GroupChatSummary) o;
+                if (groupChatSummary.getId() == groupid && groupChatSummary.getUsersInRoomCount() > 0) {
+                    groupChatSummary.setUsersInRoomCount(groupChatSummary.getUsersInRoomCount() - 1);
+                    notifyItemChanged(i);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void addUserToPublicGroupChat(long groupid) {
+        for (int i = 0; i < data.size(); i++) {
+            Object o = data.get(i);
+            if (o instanceof GroupChatSummary) {
+                GroupChatSummary groupChatSummary = (GroupChatSummary) o;
+                if (groupChatSummary.getId() == groupid) {
+                    groupChatSummary.setUsersInRoomCount(groupChatSummary.getUsersInRoomCount() + 1);
+                    notifyItemChanged(i);
+                    break;
+                }
+            }
+        }
+    }
+
+    private synchronized void removePublicGroupChatPresenceReference(final long groupid) {
+        Pair pair = publicGroupChatPresenceReferences.get(groupid);
+        if (pair != null) {
+            pair.ref.removeEventListener(pair.listener);
+            publicGroupChatPresenceReferences.remove(groupid);
+        }
     }
 }

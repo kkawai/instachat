@@ -9,6 +9,8 @@ import org.json.JSONObject;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class User extends DomainObject {
 
@@ -137,6 +139,19 @@ public class User extends DomainObject {
         values.put(UserColumns.IS_INSTALLED, isInstalled ? 1 : 0);
         values.put(UserColumns.TIME_STAMP, tstamp.getTime());
         return values;
+    }
+
+    /**
+     * Return a map of only the attributes necessary for
+     * indicating user presence in a group chat context
+     * @return
+     */
+    public Map<String, Object> getPresenceMap() {
+        Map<String, Object> map = new HashMap<>(1);
+        map.put("username", username);
+        map.put("profilePicUrl", profilePicUrl);
+        map.put("id",id);
+        return map;
     }
 
     public int getId() {

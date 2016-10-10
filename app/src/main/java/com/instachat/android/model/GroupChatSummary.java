@@ -13,21 +13,15 @@ public class GroupChatSummary implements Comparable<GroupChatSummary> {
 
     private static final String TAG = "GroupChatSummary";
 
-    /**
-     * The 'id' of the PrivateChatSummary is the same as the id
-     * of the person whom you are having the conversation with
-     */
     private long id;
 
-    /**
-     * information of the user with whom you are chatting with
-     */
     private String name;
     private String dpid;
     private String imageUrl;
     private long lastMessageTime;
     private String lastMessage;
     private int unreadMessageCount = -1;
+    private int usersInRoomCount;
     private int order;
 
     public long getId() {
@@ -94,6 +88,14 @@ public class GroupChatSummary implements Comparable<GroupChatSummary> {
         this.unreadMessageCount = unreadMessageCount;
     }
 
+    public int getUsersInRoomCount() {
+        return usersInRoomCount;
+    }
+
+    public void setUsersInRoomCount(int usersInRoomCount) {
+        this.usersInRoomCount = usersInRoomCount;
+    }
+
     /**
      * @return returns only the fields you want
      * to update in cloud database
@@ -114,6 +116,7 @@ public class GroupChatSummary implements Comparable<GroupChatSummary> {
         if (getUnreadMessageCount() >= 0) {
             map.put("unreadMessageCount", getUnreadMessageCount());
         }
+        map.put("usersInRoomCount", usersInRoomCount);
         return map;
     }
 

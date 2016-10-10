@@ -324,4 +324,13 @@ public class PrivateChatActivity extends GroupChatActivity {
         }
     }
 
+    @Override
+    protected void addUserPresence() {
+        //user presence does not apply in private chat situations
+    }
+
+    @Override
+    protected void removeUserPresence() {
+        //user presence does not apply in private chat situations
+    }
 }
