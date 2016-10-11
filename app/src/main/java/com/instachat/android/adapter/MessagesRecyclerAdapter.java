@@ -274,12 +274,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
     public void sendFriendlyMessage(final FriendlyMessage friendlyMessage) {
 
-        User user = Preferences.getInstance().getUser();
-//        if (TextUtils.isEmpty(user.getProfilePicUrl())) {
-//            new UserBioHelper().showBioInputDialog(mActivity.get());
-        //return;
-//        }
-
         if (Constants.IS_SUPPORT_MESSAGE_APPENDING) {
             final int itemCount = getItemCount();
             if (itemCount > 0) {

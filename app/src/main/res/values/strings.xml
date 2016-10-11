@@ -70,4 +70,8 @@
     <string name="please_choose_person_or_group">Please choose person or group</string>
     <string name="people_in_group">People in group</string>
     <string name="view_profile">View profile</string>
+    <string name="display_photo">Before you can post messages, please add a display photo of yourself</string>
+    <string name="display_photo_title">Add display photo</string>
+    <string name="display_photo_tooltip">Tap here to upload a display photo of yourself</string>
+    <string name="change_username_tooltip">If you wish, you can change your username here</string>
 </resources>

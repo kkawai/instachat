@@ -73,6 +73,7 @@
 -keep class org.jsoup.** { *; }
 -keep class com.leocardz.** { *; }
 -keep class cn.pedant.** { *; }
+-keep class com.pnikosis.** { *; }
 
 # below was necessary for making proguard work with flurry jar
 -keep class com.flurry.** { *; }

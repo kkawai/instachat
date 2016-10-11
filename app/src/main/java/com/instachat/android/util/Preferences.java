@@ -290,4 +290,11 @@ public final class Preferences {
         return cur;
     }
 
+    public boolean hasShownUsernameTooltip() {
+        return mPrefs.getBoolean("shown_username_tooltip", false);
+    }
+
+    public void setShownUsernameTooltip(boolean shown) {
+        mPrefs.edit().putBoolean("shown_username_tooltip", shown).apply();
+    }
 }

@@ -30,6 +30,8 @@ import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
+import com.tooltip.OnDismissListener;
+import com.tooltip.Tooltip;
 
 import org.json.JSONObject;
 
@@ -44,6 +46,7 @@ public class LeftDrawerHelper {
     private DrawerLayout mDrawerLayout;
     private View mHeaderLayout;
     private MyProfilePicListener mMyProfilePicListener;
+    private Tooltip mTooltip;
 
     public LeftDrawerHelper(Activity activity, DrawerLayout drawerLayout, MyProfilePicListener listener) {
         mActivity = activity;
@@ -127,6 +130,29 @@ public class LeftDrawerHelper {
                 mDrawerLayout.closeDrawer(GravityCompat.START);
             }
         });
+
+        if (TextUtils.isEmpty(user.getProfilePicUrl())) {
+            mTooltip = new Tooltip.Builder(navpic, R.style.drawer_tooltip)
+                    .setText(mActivity.getString(R.string.display_photo_tooltip))
+                    .show();
+            mTooltip.setOnDismissListener(new OnDismissListener() {
+                @Override
+                public void onDismiss() {
+                    checkIfShownUsernameTooltip(username);
+                }
+            });
+        } else {
+            checkIfShownUsernameTooltip(username);
+        }
+    }
+
+    private void checkIfShownUsernameTooltip(View anchor) {
+        if (!Preferences.getInstance().hasShownUsernameTooltip()) {
+            mTooltip = new Tooltip.Builder(anchor, R.style.drawer_tooltip)
+                    .setText(mActivity.getString(R.string.change_username_tooltip))
+                    .show();
+            Preferences.getInstance().setShownUsernameTooltip(true);
+        }
     }
 
     private int mWhichDrawerLastOpened;
@@ -170,7 +196,7 @@ public class LeftDrawerHelper {
             public void onDrawerClosed(View drawerView) {
 
                 if (mWhichDrawerLastOpened != GravityCompat.START)
-                    return; //only handle left drawer stuff here
+                    return; //only handle left drawer stuff in this module
 
                 if (isActivityDestroyed())
                     return;
@@ -187,6 +213,8 @@ public class LeftDrawerHelper {
                 mHeaderLayout.findViewById(R.id.save_username).setVisibility(View.INVISIBLE);
                 mHeaderLayout.findViewById(R.id.edit_bio).setVisibility(View.INVISIBLE);
                 */
+                if (mTooltip != null && mTooltip.isShowing())
+                    mTooltip.dismiss();
 
                 MLog.d(TAG, "onDrawerClosed() mHeaderLayout.findViewById(R.id.save_username).getVisibility(): ", mHeaderLayout.findViewById(R.id.save_username).getVisibility());
 

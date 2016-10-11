@@ -56,4 +56,32 @@
         <item name="android:paddingRight">21dp</item>
         <item name="android:textColor">@color/button_text_color</item>
     </style>
+
+    <style name="drawer_tooltip">
+        <item name="cancelable">true</item>
+        <item name="dismissOnClick">true</item>
+        <item name="cornerRadius">9dp</item>
+        <item name="android:typeface">sans</item>
+    </style>
+
+    <!--  Tooltip attributes
+    <attr name="cancelable" format="boolean"/> - dismiss on outside touch. Default is false
+    <attr name="dismissOnClick" format="boolean"/> - dismiss on inside toush. Default is false
+    <attr name="backgroundColor" format="color"/> - background color. Default is Color.GRAY
+    <attr name="cornerRadius" format="dimension"/> - background drawable corner radius
+    <attr name="arrowHeight" format="dimension"/>
+    <attr name="arrowWidth" format="dimension"/>
+    <attr name="arrowDrawable" format="reference"/>
+    <attr name="margin" format="dimension"/> - margin between arrow and anchor view
+    <attr name="textAppearance" format="reference"/>
+    <attr name="android:padding"/> - content padding
+    <attr name="android:text"/>
+    <attr name="android:textSize"/>
+    <attr name="android:textColor"/>
+    <attr name="android:textStyle"/>
+    <attr name="android:gravity"/> - Tooltip gravity
+    <attr name="android:fontFamily"/>
+    <attr name="android:typeface"/>
+    <attr name="android:lineSpacingExtra"/>
+    <attr name="android:lineSpacingMultiplier"/> -->
 </resources>

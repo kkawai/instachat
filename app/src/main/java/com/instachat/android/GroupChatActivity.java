@@ -23,6 +23,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputFilter;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
@@ -89,6 +90,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class GroupChatActivity extends BaseActivity implements
@@ -509,6 +511,8 @@ public class GroupChatActivity extends BaseActivity implements
                 if (StringUtil.isEmpty(text)) {
                     return;
                 }
+                if (isNeedsDp())
+                    return;
                 mMessageEditText.setText("");//fast double taps on send can cause 2x sends!
                 final FriendlyMessage friendlyMessage = new FriendlyMessage(text, myUsername(),
                         myUserid(), myDpid(), null, null, System.currentTimeMillis());
@@ -804,6 +808,11 @@ public class GroupChatActivity extends BaseActivity implements
             mDrawerLayout.openDrawer(GravityCompat.END);
     }
 
+    private void openLeftDrawer() {
+        if (mDrawerLayout != null)
+            mDrawerLayout.openDrawer(GravityCompat.START);
+    }
+
     private boolean closeBothDrawers() {
         boolean atLeastOneClosed = false;
         if (isRightDrawerOpen()) {
@@ -1045,6 +1054,9 @@ public class GroupChatActivity extends BaseActivity implements
 
         if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.chatRoomPhoto) {
 
+            if (isNeedsDp())
+                return;
+
             final FriendlyMessage friendlyMessage = new FriendlyMessage("", myUsername(),
                     myUserid(), myDpid(), photoUrl, photoId, System.currentTimeMillis());
             MLog.d(TAG, "uploadFromUri:onSuccess photoId: " + photoId);
@@ -1071,6 +1083,35 @@ public class GroupChatActivity extends BaseActivity implements
             });
             mLeftDrawerHelper.updateProfilePic(photoId);
         }
+    }
+
+    private boolean isNeedsDp() {
+
+        if (!TextUtils.isEmpty(myDpid()))
+            return false;
+        new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE)
+                .setTitleText(this.getString(R.string.display_photo_title))
+                .setContentText(this.getString(R.string.display_photo))
+                .setCancelText(this.getString(android.R.string.cancel))
+                .setConfirmText(this.getString(android.R.string.ok))
+                .showCancelButton(true)
+                .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        sweetAlertDialog.cancel();
+                    }
+                }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                sweetAlertDialog.dismiss();
+                if (isRightDrawerOpen())
+                    closeRightDrawer();
+                if (!isLeftDrawerOpen()) {
+                    openLeftDrawer();
+                }
+            }
+        }).show();
+        return true;
     }
 
     @Override
