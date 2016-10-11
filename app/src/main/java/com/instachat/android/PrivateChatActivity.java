@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -124,20 +127,24 @@ public class PrivateChatActivity extends GroupChatActivity {
             }
         });
 
-        final View.OnClickListener onClickExpandCollapseListener = new View.OnClickListener() {
+        final View.OnClickListener appBarOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!mIsAppBarExpanded)
-                    appBarLayout.setExpanded(true, true);
-                else
-                    appBarLayout.setExpanded(false, true);
+                toggleAppbar();
             }
         };
-        findViewById(R.id.toolbar).setOnClickListener(onClickExpandCollapseListener);
-        bio.setOnClickListener(onClickExpandCollapseListener);
-        profilePic.setOnClickListener(onClickExpandCollapseListener);
+        appBarLayout.setOnClickListener(appBarOnClickListener);
+        //findViewById(R.id.toolbar).setOnClickListener(appBarOnClickListener);
+        //bio.setOnClickListener(appBarOnClickListener);
+        //profilePic.setOnClickListener(appBarOnClickListener);
+    }
 
-
+    private void toggleAppbar() {
+        final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
+        if (!mIsAppBarExpanded)
+            appBarLayout.setExpanded(true, true);
+        else
+            appBarLayout.setExpanded(false, true);
     }
 
     private boolean mIsAppBarExpanded = true; //initially it's expanded
@@ -337,5 +344,30 @@ public class PrivateChatActivity extends GroupChatActivity {
     @Override
     protected void setupRightDrawerContent() {
         // does not apply to private chat situations
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.private_chat_options_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onHomeClicked();
+                return true;
+            case R.id.view_profile:
+                if (!mIsAppBarExpanded)
+                    toggleAppbar();
+                return true;
+            case R.id.invite_menu:
+                sendInvitation();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

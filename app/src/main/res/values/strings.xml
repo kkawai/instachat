@@ -68,4 +68,6 @@
     <string name="share_message">Share message</string>
     <string name="share_photo">Share photo</string>
     <string name="please_choose_person_or_group">Please choose person or group</string>
+    <string name="people_in_group">People in group</string>
+    <string name="view_profile">View profile</string>
 </resources>

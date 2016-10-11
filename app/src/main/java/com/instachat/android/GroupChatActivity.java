@@ -51,8 +51,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.instachat.android.adapter.AdapterPopulateHolderListener;
@@ -538,7 +541,7 @@ public class GroupChatActivity extends BaseActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
+        inflater.inflate(R.menu.group_chat_options_menu, menu);
         return true;
     }
 
@@ -552,6 +555,14 @@ public class GroupChatActivity extends BaseActivity implements
             case android.R.id.home:
                 onHomeClicked();
                 return true;
+            case R.id.people_in_group:
+                if (isLeftDrawerOpen()) {
+                    closeLeftDrawer();
+                }
+                if (!isRightDrawerOpen()) {
+                    openRightDrawer();
+                }
+                return true;
             case R.id.invite_menu:
                 sendInvitation();
                 return true;
@@ -560,13 +571,7 @@ public class GroupChatActivity extends BaseActivity implements
                 causeCrash();
                 return true;
             case R.id.sign_out_menu:
-                mFirebaseAuth.signOut();
-                //Auth.GoogleSignInApi.signOut(mGoogleApiClient);
-                //mFirebaseUser = null;
-                GCMHelper.unregister(Preferences.getInstance().getUserId() + "");
-                Preferences.getInstance().saveUser(null);
-                startActivity(new Intent(this, SignInActivity.class));
-                finish();
+                signout();
                 return true;
             case R.id.fresh_config_menu:
                 fetchConfig();
@@ -586,7 +591,7 @@ public class GroupChatActivity extends BaseActivity implements
         throw new NullPointerException("Fake null pointer exception");
     }
 
-    private void sendInvitation() {
+    protected void sendInvitation() {
         Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
                 .setMessage(getString(R.string.invitation_message))
                 .setCallToActionText(getString(R.string.invitation_cta))
@@ -681,7 +686,13 @@ public class GroupChatActivity extends BaseActivity implements
         ActionBar ab = getSupportActionBar();
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
-        applyFontForToolbarTitle(toolbar);
+        setupToolbarTitle(toolbar);
+        toolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleRightDrawer();
+            }
+        });
     }
 
     protected int getToolbarHeight() {
@@ -737,10 +748,23 @@ public class GroupChatActivity extends BaseActivity implements
         }
         //View headerView = getLayoutInflater().inflate(R.layout.nav_header, navigationView, false);
         View drawerRecyclerView = getLayoutInflater().inflate(R.layout.drawer_layout, navigationView, false);
+        final View headerView = getLayoutInflater().inflate(R.layout.right_nav_header, navigationView, false);
 
-        int topPadding = getResources().getDimensionPixelSize(R.dimen.right_drawer_top_padding);
-        drawerRecyclerView.setPadding(0, topPadding, 0, 0);
-        //navigationView.addHeaderView(headerView);
+        FirebaseDatabase.getInstance().getReference(Constants.PUBLIC_CHATS_SUMMARY_PARENT_REF).child(mGroupId + "").
+                addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        MLog.d(TAG, "setupRightDrawerContent() dataSnapshot: ", dataSnapshot);
+                        GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
+                        ((TextView) headerView.findViewById(R.id.groupname)).setText(groupChatSummary.getName());
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+        navigationView.addHeaderView(headerView);
         navigationView.addHeaderView(drawerRecyclerView);
 
         RecyclerView recyclerView = (RecyclerView) drawerRecyclerView.findViewById(R.id.drawerRecyclerView);
@@ -771,6 +795,11 @@ public class GroupChatActivity extends BaseActivity implements
             mDrawerLayout.closeDrawer(GravityCompat.END);
     }
 
+    private void openRightDrawer() {
+        if (mDrawerLayout != null)
+            mDrawerLayout.openDrawer(GravityCompat.END);
+    }
+
     private boolean closeBothDrawers() {
         boolean atLeastOneClosed = false;
         if (isRightDrawerOpen()) {
@@ -796,7 +825,7 @@ public class GroupChatActivity extends BaseActivity implements
         super.onBackPressed();
     }
 
-    private void openFullScreenTextView(final int startingPos) {
+    protected void openFullScreenTextView(final int startingPos) {
         closeBothDrawers();
         ScreenUtil.hideVirtualKeyboard(mMessageEditText);
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(FullScreenTextFragment.TAG);
@@ -1152,7 +1181,7 @@ public class GroupChatActivity extends BaseActivity implements
         return intent;
     }
 
-    private void applyFontForToolbarTitle(Toolbar toolbar) {
+    private void setupToolbarTitle(Toolbar toolbar) {
         for (int i = 0; i < toolbar.getChildCount(); i++) {
             View view = toolbar.getChildAt(i);
             if (view instanceof TextView) {
@@ -1176,4 +1205,23 @@ public class GroupChatActivity extends BaseActivity implements
                 child(myUserid() + "").removeValue();
     }
 
+    private void toggleRightDrawer() {
+        if (isRightDrawerOpen()) {
+            closeRightDrawer();
+            return;
+        } else if (isLeftDrawerOpen()) {
+            closeLeftDrawer();
+        }
+        openRightDrawer();
+    }
+
+    protected void signout() {
+        mFirebaseAuth.signOut();
+        //Auth.GoogleSignInApi.signOut(mGoogleApiClient);
+        //mFirebaseUser = null;
+        GCMHelper.unregister(Preferences.getInstance().getUserId() + "");
+        Preferences.getInstance().saveUser(null);
+        startActivity(new Intent(this, SignInActivity.class));
+        finish();
+    }
 }
