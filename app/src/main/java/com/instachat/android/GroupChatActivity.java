@@ -687,6 +687,10 @@ public class GroupChatActivity extends BaseActivity implements
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
         setupToolbarTitle(toolbar);
+        setToolbarOnClickListener(toolbar);
+    }
+
+    protected void setToolbarOnClickListener(Toolbar toolbar) {
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
