@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -239,7 +238,9 @@ public class LeftDrawerHelper {
 
                 if (!StringUtil.isValidUsername(newUsername)) {
                     username.setText(existing);
-                    Toast.makeText(mActivity, mActivity.getString(R.string.invalid_username), Toast.LENGTH_SHORT).show();
+                    new SweetAlertDialog(mActivity, SweetAlertDialog.ERROR_TYPE)
+                            .setContentText(mActivity.getString(R.string.invalid_username))
+                            .show();
                     return;
                 }
 
@@ -279,7 +280,9 @@ public class LeftDrawerHelper {
                                 });
 
                             } else {
-                                Toast.makeText(mActivity, mActivity.getString(R.string.username_exists, newUsername), Toast.LENGTH_SHORT).show();
+                                new SweetAlertDialog(mActivity, SweetAlertDialog.ERROR_TYPE)
+                                        .setContentText(mActivity.getString(R.string.username_exists, newUsername))
+                                        .show();
                                 username.setText(existing);
                             }
 
@@ -421,8 +424,6 @@ public class LeftDrawerHelper {
     }
 
     private void showNewUsernameMessage(String newUsername) {
-        //String toast = mActivity.getString(R.string.is_your_new_username, newUsername);
-        //Toast.makeText(mActivity, toast, Toast.LENGTH_SHORT).show();
         new SweetAlertDialog(mActivity, SweetAlertDialog.SUCCESS_TYPE)
                 .setTitleText(mActivity.getString(R.string.username_changed_dialog_title))
                 .setContentText(mActivity.getString(R.string.is_your_new_username, newUsername))

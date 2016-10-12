@@ -32,7 +32,7 @@ public class MessageOptionsDialogHelper {
                                           @NotNull final FriendlyMessage friendlyMessage,
                                           @NotNull final MessageOptionsListener listener) {
         final TextView title = new TextView(context);
-        title.setTextAppearance(context, R.style.MessageOptionsDialogTitle);
+        title.setTextAppearance(context,R.style.MessageOptionsDialogTitle);
         FontUtil.setTextViewFont(title);
         int padding = context.getResources().getDimensionPixelSize(R.dimen.dialog_options_title_padding);
         title.setPadding(padding, padding, padding, 0);

@@ -550,7 +550,9 @@ public class GroupChatActivity extends BaseActivity implements
     @Override
     public void onFriendlyMessageFail(FriendlyMessage friendlyMessage) {
         mMessageEditText.setText(friendlyMessage.getText());
-        Toast.makeText(this, R.string.could_not_send_message, Toast.LENGTH_SHORT).show();
+        new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+                .setContentText(getString(R.string.could_not_send_message))
+                .show();
     }
 
     @Override
@@ -967,7 +969,7 @@ public class GroupChatActivity extends BaseActivity implements
                     mProgressBar.setVisibility(View.GONE);
                 }
             }
-        }, 5000);
+        }, Constants.MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS);
     }
 
     Integer myUserid() {
@@ -1128,8 +1130,9 @@ public class GroupChatActivity extends BaseActivity implements
         if (isActivityDestroyed())
             return;
         hideProgressDialog();
-        Toast.makeText(GroupChatActivity.this, R.string.error_send_photo,
-                Toast.LENGTH_SHORT).show();
+        new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+                .setContentText(getString(R.string.error_send_photo))
+                .show();
     }
 
     @Override
@@ -1168,7 +1171,7 @@ public class GroupChatActivity extends BaseActivity implements
         showDotsParent(true);
         mDotsLoader.startAnimation();
         mDotsHandler.removeCallbacks(mDotsHideRunner);
-        mDotsHandler.postDelayed(mDotsHideRunner, 3500);
+        mDotsHandler.postDelayed(mDotsHideRunner, Constants.MAX_TYPING_DOTS_DISPLAY_TIME);
     }
 
     @Override

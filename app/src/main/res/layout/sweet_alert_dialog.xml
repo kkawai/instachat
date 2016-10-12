@@ -124,7 +124,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:maxLines="1"
-        android:text="@string/dialog_default_title"
+        android:text="@string/sweet_alert_dialog_default_title"
         android:textColor="#575757"
         android:textSize="19sp"/>
 
@@ -150,12 +150,12 @@
             style="@style/dialog_blue_button"
             android:layout_marginRight="10dp"
             android:background="@drawable/sweet_alert_gray_button_background"
-            android:text="@string/dialog_cancel"
+            android:text="@string/sweet_alert_dialog_cancel"
             android:visibility="gone"/>
 
         <Button
             android:id="@+id/confirm_button"
             style="@style/dialog_blue_button"
-            android:text="@string/dialog_ok"/>
+            android:text="@string/sweet_alert_dialog_ok"/>
     </LinearLayout>
 </LinearLayout>

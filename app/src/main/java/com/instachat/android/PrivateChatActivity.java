@@ -158,7 +158,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                 if (tooltip.isShowing())
                     tooltip.dismiss();
             }
-        }, 2500);
+        }, Constants.MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME);
 
     }
 
@@ -342,7 +342,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                 if (mIsAppBarExpanded)
                     appBarLayout.setExpanded(false, true);
             }
-        }, 1750);
+        }, Constants.COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY);
     }
 
     private void clearPrivateUnreadMessages(int toUserid) {

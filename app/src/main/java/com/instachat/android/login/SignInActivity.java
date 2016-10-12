@@ -174,17 +174,6 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         });
     }
 
-    private void handleFirebaseAuthResult(AuthResult authResult) {
-        if (authResult != null) {
-            // Welcome the user
-            FirebaseUser user = authResult.getUser();
-            Toast.makeText(this, "Welcome " + user.getEmail(), Toast.LENGTH_SHORT).show();
-
-            // Go back to the main activity
-            startActivity(new Intent(this, GroupChatActivity.class));
-        }
-    }
-
     @Override
     public void onClick(final View v) {
         switch (v.getId()) {

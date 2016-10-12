@@ -26,6 +26,11 @@ public final class Constants {
     public static final int MAX_PASSWORD_LENGTH = 10;
     public static final int MIN_PASSWORD_LENGTH = 4;
 
+    public static final int MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS = 3500;
+    public static final int MAX_TYPING_DOTS_DISPLAY_TIME = 3500;
+    public static final int COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY = 1750;
+    public static final int MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME = 4000;
+
     /*
      * CHANGE THESE WHEN MAKING PRODUCTION BUILDS
      */

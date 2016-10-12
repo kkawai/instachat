@@ -25,8 +25,8 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.instachat.android.BaseActivity;
-import com.instachat.android.R;
 import com.instachat.android.MyApp;
+import com.instachat.android.R;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.util.ActivityUtil;
 import com.instachat.android.util.MLog;
@@ -34,6 +34,8 @@ import com.instachat.android.util.Preferences;
 import com.instachat.android.util.StringUtil;
 
 import org.json.JSONObject;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class ForgotPasswordActivity extends BaseActivity implements View.OnClickListener {
 
@@ -61,7 +63,9 @@ public class ForgotPasswordActivity extends BaseActivity implements View.OnClick
     private void find() {
         final String emailOrUsername = emailLayout.getEditText().getText().toString();
         if (StringUtil.isEmpty(emailOrUsername)) {
-            Toast.makeText(this, R.string.please_enter_username_or_email, Toast.LENGTH_SHORT).show();
+            new SweetAlertDialog(ForgotPasswordActivity.this, SweetAlertDialog.NORMAL_TYPE)
+                    .setContentText(getString(R.string.please_enter_username_or_email))
+                    .show();
             return;
         }
         NetworkApi.forgotPassword(this, emailOrUsername, new Response.Listener<String>() {
@@ -71,7 +75,9 @@ public class ForgotPasswordActivity extends BaseActivity implements View.OnClick
                     final JSONObject object = new JSONObject(response);
                     final String status = object.getString(NetworkApi.KEY_RESPONSE_STATUS);
                     if (status.equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
-                        Toast.makeText(ForgotPasswordActivity.this, R.string.information_emailed, Toast.LENGTH_LONG).show();
+                        new SweetAlertDialog(ForgotPasswordActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+                                .setContentText(getString(R.string.information_emailed))
+                                .show();
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -79,7 +85,7 @@ public class ForgotPasswordActivity extends BaseActivity implements View.OnClick
                                     return;
                                 finish();
                             }
-                        },2000);
+                        }, Toast.LENGTH_SHORT);
                     } else {
                         showErrorToast(R.string.email_password_not_found);
                     }
@@ -118,7 +124,9 @@ public class ForgotPasswordActivity extends BaseActivity implements View.OnClick
     private void showErrorToast(final int stringResId) {
         if (isActivityDestroyed())
             return;
-        Toast.makeText(this, stringResId, Toast.LENGTH_SHORT).show();
+        new SweetAlertDialog(ForgotPasswordActivity.this, SweetAlertDialog.ERROR_TYPE)
+                .setContentText(getString(stringResId))
+                .show();
     }
 
 }
