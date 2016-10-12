@@ -18,6 +18,7 @@ package com.instachat.android.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
+import android.webkit.URLUtil;
 
 import com.instachat.android.util.MLog;
 
@@ -132,6 +133,9 @@ public class FriendlyMessage implements Parcelable {
      */
     private boolean canAppend(FriendlyMessage friendlyMessage) {
         if (imageUrl != null && friendlyMessage.imageUrl != null) {
+            return false;
+        }
+        if (text != null && (URLUtil.isHttpUrl(text) || URLUtil.isHttpsUrl(text))) {
             return false;
         }
         return true;
