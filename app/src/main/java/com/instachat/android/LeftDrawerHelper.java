@@ -257,6 +257,7 @@ public class LeftDrawerHelper {
                                 NetworkApi.saveUser(mActivity, user, new Response.Listener<String>() {
                                     @Override
                                     public void onResponse(String response) {
+                                        MLog.d(TAG,"response: ",response);
                                         if (mActivityState.isActivityDestroyed())
                                             return;
                                         try {
@@ -275,6 +276,7 @@ public class LeftDrawerHelper {
                                 }, new Response.ErrorListener() {
                                     @Override
                                     public void onErrorResponse(VolleyError error) {
+                                        MLog.d(TAG,"error response: ",error);
                                         username.setText(existing);
                                     }
                                 });

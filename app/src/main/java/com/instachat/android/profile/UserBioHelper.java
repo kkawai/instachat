@@ -13,6 +13,7 @@ import com.instachat.android.R;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.User;
+import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 
 /**
@@ -41,12 +42,13 @@ public class UserBioHelper {
                         NetworkApi.saveUser(activity, user, new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
+                                MLog.d("UserBioHelper","response: ",response);
                                 Preferences.getInstance().saveUser(user);
                             }
                         }, new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-
+                                MLog.d("UserBioHelper","error response: ",error);
                             }
                         });
                     }

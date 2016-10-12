@@ -19,6 +19,7 @@ android {
         versionCode 70
         versionName "2.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -91,6 +92,7 @@ dependencies {
 
     compile 'com.pnikosis:materialish-progress:1.7'
     compile 'com.github.vihtarb:tooltip:0.1.9'
+    compile 'com.android.support:multidex:1.0.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

@@ -1,6 +1,8 @@
 package com.instachat.android;
 
 import android.app.Application;
+import android.support.multidex.MultiDex;
+import android.support.multidex.MultiDexApplication;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
@@ -17,7 +19,7 @@ import com.instachat.android.util.ThreadWrapper;
 /**
  * Created by kevin on 7/23/2016.
  */
-public class MyApp extends Application {
+public class MyApp extends MultiDexApplication {
 
     private static final String TAG = "MyApp";
     private static MyApp sInstance;
