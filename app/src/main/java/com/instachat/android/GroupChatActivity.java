@@ -528,6 +528,8 @@ public class GroupChatActivity extends BaseActivity implements
         mAttachButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (isNeedsDp())
+                    return;
                 showFileOptions();
             }
         });
@@ -1062,9 +1064,6 @@ public class GroupChatActivity extends BaseActivity implements
         hideProgressDialog();
 
         if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.chatRoomPhoto) {
-
-            if (isNeedsDp())
-                return;
 
             final FriendlyMessage friendlyMessage = new FriendlyMessage("", myUsername(),
                     myUserid(), myDpid(), photoUrl, photoId, System.currentTimeMillis());
