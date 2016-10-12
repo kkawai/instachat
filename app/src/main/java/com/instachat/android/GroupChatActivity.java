@@ -70,6 +70,7 @@ import com.instachat.android.adapter.MessagesRecyclerAdapter;
 import com.instachat.android.adapter.UserClickedListener;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.api.UploadListener;
+import com.instachat.android.blocks.BlocksFragment;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.fullscreen.FriendlyMessageContainer;
 import com.instachat.android.fullscreen.FullScreenTextFragment;
@@ -571,6 +572,17 @@ public class GroupChatActivity extends BaseActivity implements
         switch (item.getItemId()) {
             case android.R.id.home:
                 onHomeClicked();
+                return true;
+            case R.id.manage_blocks:
+                if (isLeftDrawerOpen()) {
+                    closeLeftDrawer();
+                }
+                Fragment fragment = new BlocksFragment();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down)
+                        .replace(R.id.fragment_content, fragment, BlocksFragment.TAG)
+                        .addToBackStack(null).commit();
                 return true;
             case R.id.people_in_group:
                 if (isLeftDrawerOpen()) {
