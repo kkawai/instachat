@@ -33,6 +33,7 @@ import com.instachat.android.util.StringUtil;
 import com.tooltip.OnDismissListener;
 import com.tooltip.Tooltip;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -47,15 +48,20 @@ public class LeftDrawerHelper {
     private View mHeaderLayout;
     private MyProfilePicListener mMyProfilePicListener;
     private Tooltip mTooltip;
+    private ActivityState mActivityState;
 
-    public LeftDrawerHelper(Activity activity, DrawerLayout drawerLayout, MyProfilePicListener listener) {
+    public LeftDrawerHelper(@NotNull Activity activity,
+                            @NonNull ActivityState activityState,
+                            @NotNull DrawerLayout drawerLayout,
+                            @NotNull MyProfilePicListener listener) {
         mActivity = activity;
+        mActivityState = activityState;
         mDrawerLayout = drawerLayout;
         mMyProfilePicListener = listener;
     }
 
     public void updateProfilePic(String dpid) {
-        if (isActivityDestroyed())
+        if (mActivityState.isActivityDestroyed())
             return;
         final ImageView navpic = (ImageView) mHeaderLayout.findViewById(R.id.nav_pic);
         Glide.clear(navpic);
@@ -63,7 +69,7 @@ public class LeftDrawerHelper {
         Constants.DP_URL(user.getId(), dpid, new OnCompleteListener<Uri>() {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
-                if (isActivityDestroyed()) {
+                if (mActivityState.isActivityDestroyed()) {
                     return;
                 }
                 try {
@@ -95,7 +101,7 @@ public class LeftDrawerHelper {
         Constants.DP_URL(user.getId(), user.getProfilePicUrl(), new OnCompleteListener<Uri>() {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
-                if (isActivityDestroyed())
+                if (mActivityState.isActivityDestroyed())
                     return;
                 if (!task.isSuccessful()) {
                     navpic.setImageResource(R.drawable.ic_account_circle_black_36dp);
@@ -198,7 +204,7 @@ public class LeftDrawerHelper {
                 if (mWhichDrawerLastOpened != GravityCompat.START)
                     return; //only handle left drawer stuff in this module
 
-                if (isActivityDestroyed())
+                if (mActivityState.isActivityDestroyed())
                     return;
 
                 MLog.d(TAG, "onDrawerClosed() LEFT drawer");
@@ -241,7 +247,7 @@ public class LeftDrawerHelper {
                     @Override
                     public void onResponse(JSONObject response) {
 
-                        if (isActivityDestroyed())
+                        if (mActivityState.isActivityDestroyed())
                             return;
                         try {
                             if (!response.getJSONObject("data").getBoolean("exists")) {
@@ -250,7 +256,7 @@ public class LeftDrawerHelper {
                                 NetworkApi.saveUser(mActivity, user, new Response.Listener<String>() {
                                     @Override
                                     public void onResponse(String response) {
-                                        if (isActivityDestroyed())
+                                        if (mActivityState.isActivityDestroyed())
                                             return;
                                         try {
                                             JSONObject object = new JSONObject(response);
@@ -284,7 +290,7 @@ public class LeftDrawerHelper {
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        if (isActivityDestroyed())
+                        if (mActivityState.isActivityDestroyed())
                             return;
                         username.setText(existing);
                     }
@@ -329,7 +335,7 @@ public class LeftDrawerHelper {
             @Override
             public void onResponse(final JSONObject response) {
                 try {
-                    if (isActivityDestroyed())
+                    if (mActivityState.isActivityDestroyed())
                         return;
                     final String status = response.getString(NetworkApi.KEY_RESPONSE_STATUS);
                     if (status.equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
@@ -341,7 +347,7 @@ public class LeftDrawerHelper {
                                 Constants.DP_URL(remote.getId(), remote.getProfilePicUrl(), new OnCompleteListener<Uri>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Uri> task) {
-                                        if (!task.isSuccessful() || isActivityDestroyed()) {
+                                        if (!task.isSuccessful() || mActivityState.isActivityDestroyed()) {
                                             return;
                                         }
                                         User user = Preferences.getInstance().getUser();
@@ -383,12 +389,8 @@ public class LeftDrawerHelper {
         mMyProfilePicListener = null;
     }
 
-    private boolean isActivityDestroyed() {
-        return mActivity == null || mActivity.isFinishing();
-    }
-
     private void showChooseDialog() {
-        if (isActivityDestroyed())
+        if (mActivityState.isActivityDestroyed())
             return;
         final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
         // Get the layout inflater

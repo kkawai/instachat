@@ -1,6 +1,7 @@
 package com.instachat.android.adapter;
 
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.instachat.android.ActivityState;
 import com.instachat.android.Constants;
 import com.instachat.android.MyApp;
 import com.instachat.android.R;
@@ -51,9 +53,12 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
     private DatabaseReference privateChatsSummaryReference, publicGroupChatsSummaryReference;
     private ChatsItemClickedListener chatsItemClickedListener;
     private Map<Long, Pair> publicGroupChatPresenceReferences = new HashMap<>();
+    private ActivityState activityState;
 
-    public ChatSummariesRecyclerAdapter(ChatsItemClickedListener chatsItemClickedListener) {
+    public ChatSummariesRecyclerAdapter(@NonNull ChatsItemClickedListener chatsItemClickedListener,
+                                        @NonNull ActivityState activityState) {
         this.chatsItemClickedListener = chatsItemClickedListener;
+        this.activityState = activityState;
     }
 
     public void populateData() {
@@ -64,6 +69,8 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
         privateChatsSummaryListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (activityState.isActivityDestroyed())
+                    return;
                 MLog.d(TAG, "onChildAdded() dataSnapshot: " + dataSnapshot.toString());
                 PrivateChatSummary privateChatSummary = getPrivateChatSummary(dataSnapshot);
                 insertPrivateChatSummary(privateChatSummary);
@@ -72,6 +79,8 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 //todo to-user might have changed their name or sent a message that is unread by you
+                if (activityState.isActivityDestroyed())
+                    return;
                 MLog.d(TAG, "onChildChanged() dataSnapshot: " + dataSnapshot.toString());
                 PrivateChatSummary privateChatSummary = getPrivateChatSummary(dataSnapshot);
                 updatePrivateChatSummary(privateChatSummary);
@@ -80,6 +89,8 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 //todo user can remove this summary
+                if (activityState.isActivityDestroyed())
+                    return;
                 MLog.d(TAG, "onChildRemoved() dataSnapshot: " + dataSnapshot.toString());
                 PrivateChatSummary privateChatSummary = getPrivateChatSummary(dataSnapshot);
                 removePrivateChatSummary(privateChatSummary);
@@ -103,6 +114,8 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
         publicGroupChatsSummaryListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (activityState.isActivityDestroyed())
+                    return;
                 GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
                 groupChatSummary.setId(Long.parseLong(dataSnapshot.getKey()));
                 insertGroupChatSummary(groupChatSummary);
@@ -111,6 +124,8 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                if (activityState.isActivityDestroyed())
+                    return;
                 GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
                 groupChatSummary.setId(Long.parseLong(dataSnapshot.getKey()));
                 updateGroupChatSummary(groupChatSummary);
@@ -118,6 +133,8 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
+                if (activityState.isActivityDestroyed())
+                    return;
                 GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
                 groupChatSummary.setId(Long.parseLong(dataSnapshot.getKey()));
                 removeGroupChatSummary(groupChatSummary);
@@ -381,6 +398,8 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
         pair.listener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (activityState.isActivityDestroyed())
+                    return;
                 MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildAdded() dataSnapshot: " + dataSnapshot);
                 addUserToPublicGroupChat(groupid);
             }
@@ -392,6 +411,8 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
+                if (activityState.isActivityDestroyed())
+                    return;
                 MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildRemoved() dataSnapshot: " + dataSnapshot);
                 removeUserFromPublicGroupChat(groupid);
             }

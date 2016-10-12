@@ -16,10 +16,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.instachat.android.ActivityState;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.model.User;
 import com.instachat.android.util.MLog;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -47,12 +50,17 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
     private long groupid;
     private UserClickedListener userClickedListener;
     private WeakReference<Activity> mActivity;
+    private ActivityState mActivityState;
     private Map<Long, Pair> publicGroupChatPresenceReferences = new HashMap<>();
 
-    public GroupChatUsersRecyclerAdapter(Activity activity, UserClickedListener userClickedListener, long groupid) {
+    public GroupChatUsersRecyclerAdapter(@NotNull Activity activity,
+                                         @NotNull ActivityState activityState,
+                                         @NonNull UserClickedListener userClickedListener,
+                                         long groupid) {
+        mActivity = new WeakReference<>(activity);
+        mActivityState = activityState;
         this.userClickedListener = userClickedListener;
         this.groupid = groupid;
-        mActivity = new WeakReference<>(activity);
     }
 
     public void populateData() {
@@ -82,7 +90,7 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
         Constants.DP_URL(user.getId(), user.getProfilePicUrl(), new OnCompleteListener<Uri>() {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
-                if (isActivityDestroyed())
+                if (mActivityState.isActivityDestroyed())
                     return;
                 try {
                     if (!task.isSuccessful()) {
@@ -172,9 +180,5 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
         };
         pair.ref.addChildEventListener(pair.listener);
         publicGroupChatPresenceReferences.put(groupid, pair);
-    }
-
-    private boolean isActivityDestroyed() {
-        return (mActivity == null || mActivity.get() == null || mActivity.get().isFinishing());
     }
 }

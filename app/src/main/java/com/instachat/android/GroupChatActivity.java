@@ -429,7 +429,7 @@ public class GroupChatActivity extends BaseActivity implements
     }
 
     private void initPhotoHelper(Bundle savedInstanceState) {
-        mPhotoUploadHelper = new PhotoUploadHelper(this);
+        mPhotoUploadHelper = new PhotoUploadHelper(this, this);
         mPhotoUploadHelper.setPhotoUploadListener(this);
         if (savedInstanceState != null && savedInstanceState.containsKey(Constants.KEY_PHOTO_TYPE)) {
             PhotoUploadHelper.PhotoType photoType = PhotoUploadHelper.PhotoType.valueOf(savedInstanceState.getString(Constants.KEY_PHOTO_TYPE));
@@ -535,6 +535,13 @@ public class GroupChatActivity extends BaseActivity implements
 
     @Override
     public void onFriendlyMessageSuccess(FriendlyMessage friendlyMessage) {
+        try {
+            if (isActivityDestroyed())
+                return;
+            mMessageRecyclerView.scrollToPosition(mFirebaseAdapter.getItemCount() - 1);
+        } catch (final Exception e) {
+            MLog.e(TAG, "", e);
+        }
         mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
     }
 
@@ -737,7 +744,7 @@ public class GroupChatActivity extends BaseActivity implements
         View drawerRecyclerView = getLayoutInflater().inflate(R.layout.drawer_layout, navigationView, false);
         navigationView.addHeaderView(headerView);
         navigationView.addHeaderView(drawerRecyclerView);
-        mLeftDrawerHelper = new LeftDrawerHelper(this, mDrawerLayout, mMyProfilePicListener);
+        mLeftDrawerHelper = new LeftDrawerHelper(this, this, mDrawerLayout, mMyProfilePicListener);
         mLeftDrawerHelper.setup(navigationView);
 
         RecyclerView recyclerView = (RecyclerView) drawerRecyclerView.findViewById(R.id.drawerRecyclerView);
@@ -745,7 +752,7 @@ public class GroupChatActivity extends BaseActivity implements
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        mChatsRecyclerViewAdapter = new ChatSummariesRecyclerAdapter(this);
+        mChatsRecyclerViewAdapter = new ChatSummariesRecyclerAdapter(this, this);
         recyclerView.setAdapter(mChatsRecyclerViewAdapter);
         mChatsRecyclerViewAdapter.populateData();
     }
@@ -782,7 +789,7 @@ public class GroupChatActivity extends BaseActivity implements
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        mGroupChatUsersRecyclerAdapter = new GroupChatUsersRecyclerAdapter(this, this, mGroupId);
+        mGroupChatUsersRecyclerAdapter = new GroupChatUsersRecyclerAdapter(this, this, this, mGroupId);
         recyclerView.setAdapter(mGroupChatUsersRecyclerAdapter);
         mGroupChatUsersRecyclerAdapter.populateData();
     }
@@ -911,7 +918,7 @@ public class GroupChatActivity extends BaseActivity implements
                 MessageViewHolder.class,
                 mFirebaseDatabaseReference.child(mDatabaseRoot).limitToLast(Constants.MAX_MESSAGE_HISTORY));
         mFirebaseAdapter.setDatabaseRoot(mDatabaseRoot);
-        mFirebaseAdapter.setActivity(this);
+        mFirebaseAdapter.setActivity(this, this);
         mFirebaseAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {
             @Override
             public void onViewHolderPopulated() {

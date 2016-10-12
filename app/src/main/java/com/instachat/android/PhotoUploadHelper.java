@@ -22,6 +22,8 @@ import com.instachat.android.util.LocalFileUtils;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.ThreadWrapper;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -40,6 +42,7 @@ public class PhotoUploadHelper {
     private Uri mTargetFileUri = null;
     private File mTargetFile = null;
     private Activity mActivity;
+    private ActivityState mActivityState;
     private UploadListener mListener;
     private StorageReference mStorageRef;
     private String mStorageRefString;
@@ -50,8 +53,9 @@ public class PhotoUploadHelper {
         chatRoomPhoto, userProfilePhoto
     }
 
-    PhotoUploadHelper(Activity activity) {
+    PhotoUploadHelper(@NotNull Activity activity, @NonNull ActivityState activityState) {
         mActivity = activity;
+        mActivityState = activityState;
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mTempPhotoUploadDir = new File(Environment.getExternalStorageDirectory() + "/photos");
         ThreadWrapper.executeInWorkerThread(new Runnable() {
@@ -199,12 +203,12 @@ public class PhotoUploadHelper {
                     }
                     final Bitmap bitmap = ImageUtils.getBitmap(mActivity, mTargetFileUri, maxSizeBytes);
                     ImageUtils.writeBitmapToFile(bitmap, mTargetFile);
-                    if (isActivityDestroyed())
+                    if (mActivityState.isActivityDestroyed())
                         return;
                     mActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (isActivityDestroyed())
+                            if (mActivityState.isActivityDestroyed())
                                 return;
                             uploadFromUri(mTargetFileUri);
                         }
@@ -230,7 +234,7 @@ public class PhotoUploadHelper {
                 .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                        if (isActivityDestroyed())
+                        if (mActivityState.isActivityDestroyed())
                             return;
                         mListener.onPhotoUploadProgress((int) taskSnapshot.getTotalByteCount() / 1024,
                                 (int) taskSnapshot.getBytesTransferred() / 1024);
@@ -239,7 +243,7 @@ public class PhotoUploadHelper {
                 .addOnSuccessListener(mActivity, new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        if (isActivityDestroyed())
+                        if (mActivityState.isActivityDestroyed())
                             return;
                         mListener.onPhotoUploadSuccess(mTargetFileUri.getLastPathSegment(), taskSnapshot.getDownloadUrl().toString());
                     }
@@ -247,14 +251,10 @@ public class PhotoUploadHelper {
                 .addOnFailureListener(mActivity, new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
-                        if (isActivityDestroyed())
+                        if (mActivityState.isActivityDestroyed())
                             return;
                         mListener.onPhotoUploadError(exception);
                     }
                 });
-    }
-
-    private boolean isActivityDestroyed() {
-        return mActivity == null || mActivity.isFinishing();
     }
 }

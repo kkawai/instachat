@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 /**
  * Created by kevin on 8/9/2016.
  */
-public class BaseActivity extends AppCompatActivity {
+public class BaseActivity extends AppCompatActivity implements ActivityState {
     private boolean mIsDestroyed;
 
     @Override
@@ -24,7 +24,8 @@ public class BaseActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    protected boolean isActivityDestroyed() {
+    @Override
+    public boolean isActivityDestroyed() {
         if (Build.VERSION.SDK_INT >= 17)
             return isDestroyed() || isFinishing();
         return mIsDestroyed || isFinishing();

@@ -21,13 +21,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.instachat.android.ActivityState;
 import com.instachat.android.Constants;
 import com.instachat.android.MyApp;
 import com.instachat.android.R;
 import com.instachat.android.model.FriendlyMessage;
-import com.instachat.android.model.User;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.Preferences;
 import com.instachat.android.util.StringUtil;
 import com.instachat.android.view.ThemedAlertDialog;
 
@@ -47,6 +46,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private StorageReference mStorageRef;
     private DatabaseReference mFirebaseDatabaseReference;
     private WeakReference<Activity> mActivity;
+    private ActivityState mActivityState;
     private AdapterPopulateHolderListener mAdapterPopulateHolderListener;
     private MessageTextClickedListener mMessageTextClickedListener;
     private UserClickedListener mUserClickedListener;
@@ -63,8 +63,9 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         mDatabaseRoot = root;
     }
 
-    public void setActivity(Activity activity) {
+    public void setActivity(@NonNull Activity activity, @NonNull ActivityState activityState) {
         mActivity = new WeakReference<>(activity);
+        mActivityState = activityState;
     }
 
     public void setAdapterPopulateHolderListener(AdapterPopulateHolderListener listener) {
@@ -230,7 +231,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
                 @Override
                 public void onComplete(@NonNull Task<Uri> task) {
-                    if (isActivityDestroyed())
+                    if (mActivityState.isActivityDestroyed())
                         return;
                     try {
                         if (!task.isSuccessful()) {
@@ -266,10 +267,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         mUserClickedListener = null;
         mAdapterPopulateHolderListener = null;
         mMessageTextClickedListener = null;
-    }
-
-    private boolean isActivityDestroyed() {
-        return (mActivity == null || mActivity.get() == null || mActivity.get().isFinishing());
     }
 
     public void sendFriendlyMessage(final FriendlyMessage friendlyMessage) {

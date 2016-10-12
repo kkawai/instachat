@@ -9,6 +9,11 @@ import android.support.v4.app.Fragment;
 public class BaseFragment extends Fragment {
 
     public boolean isActivityDestroyed() {
+
+        if (getActivity() != null && getActivity() instanceof ActivityState) {
+            return ((ActivityState)getActivity()).isActivityDestroyed();
+        }
+
         if (Build.VERSION.SDK_INT >= 17)
             return getActivity() == null || getActivity().isDestroyed() || getActivity().isFinishing();
         return getActivity() == null || getActivity().isFinishing();
