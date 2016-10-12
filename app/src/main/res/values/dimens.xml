@@ -25,6 +25,8 @@
 
     <dimen name="right_drawer_top_padding">36dp</dimen>
 
+    <dimen name="dialog_options_title_padding">16dp</dimen>
+
     <integer name="max_bio">256</integer>
 
 </resources>
