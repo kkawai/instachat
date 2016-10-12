@@ -64,6 +64,11 @@
         <item name="android:typeface">sans</item>
     </style>
 
+    <style name="drawer_tooltip_non_cancellable" parent="drawer_tooltip">
+        <item name="cancelable">false</item>
+        <item name="dismissOnClick">false</item>
+    </style>
+
     <!--  Tooltip attributes
     <attr name="cancelable" format="boolean"/> - dismiss on outside touch. Default is false
     <attr name="dismissOnClick" format="boolean"/> - dismiss on inside toush. Default is false

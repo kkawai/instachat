@@ -32,6 +32,8 @@ import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.model.User;
 import com.instachat.android.util.MLog;
+import com.instachat.android.util.Preferences;
+import com.tooltip.Tooltip;
 
 import org.json.JSONObject;
 
@@ -124,6 +126,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                     mIsAppBarExpanded = true;
                 } else if (Math.abs(verticalOffset) + getToolbarHeight() == appBarLayout.getHeight()) {
                     mIsAppBarExpanded = false;
+                    checkIfSeenToolbarProfileTooltip(profilePic);
                 }
             }
         });
@@ -138,6 +141,25 @@ public class PrivateChatActivity extends GroupChatActivity {
         //findViewById(R.id.toolbar).setOnClickListener(appBarOnClickListener);
         //bio.setOnClickListener(appBarOnClickListener);
         //profilePic.setOnClickListener(appBarOnClickListener);
+    }
+
+    private void checkIfSeenToolbarProfileTooltip(View anchor) {
+        if (Preferences.getInstance().hasShownToolbarProfileTooltip())
+            return;
+        Preferences.getInstance().setShownToolbarProfileTooltip(true);
+        final Tooltip tooltip = new Tooltip.Builder(anchor, R.style.drawer_tooltip_non_cancellable)
+                .setText(getString(R.string.toolbar_user_profile_tooltip))
+                .show();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isActivityDestroyed())
+                    return;
+                if (tooltip.isShowing())
+                    tooltip.dismiss();
+            }
+        }, 2500);
+
     }
 
     private void toggleAppbar() {

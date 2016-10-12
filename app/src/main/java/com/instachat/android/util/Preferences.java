@@ -297,4 +297,12 @@ public final class Preferences {
     public void setShownUsernameTooltip(boolean shown) {
         mPrefs.edit().putBoolean("shown_username_tooltip", shown).apply();
     }
+
+    public boolean hasShownToolbarProfileTooltip() {
+        return mPrefs.getBoolean("shown_toolbar_profile_tooltip", false);
+    }
+
+    public void setShownToolbarProfileTooltip(boolean shown) {
+        mPrefs.edit().putBoolean("shown_toolbar_profile_tooltip", shown).apply();
+    }
 }
