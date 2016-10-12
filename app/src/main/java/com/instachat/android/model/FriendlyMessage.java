@@ -132,13 +132,15 @@ public class FriendlyMessage implements Parcelable {
      * @return
      */
     private boolean canAppend(FriendlyMessage friendlyMessage) {
-        if (imageUrl != null && friendlyMessage.imageUrl != null) {
+        if (this.imageUrl != null && friendlyMessage.imageUrl != null)
             return false;
-        }
-        if (text != null && (URLUtil.isHttpUrl(text) || URLUtil.isHttpsUrl(text))) {
+        if (isPureUrl(this.text) || isPureUrl(friendlyMessage.getText()))
             return false;
-        }
         return true;
+    }
+
+    private boolean isPureUrl(String text) {
+        return text != null && (URLUtil.isHttpUrl(text) || URLUtil.isHttpsUrl(text));
     }
 
     /**
