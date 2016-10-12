@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.instachat.android.R;
 
+import com.instachat.android.font.FontUtil;
 import com.pnikosis.materialishprogress.ProgressWheel;
 
 import java.util.List;
@@ -163,7 +164,10 @@ public class SweetAlertDialog extends Dialog implements View.OnClickListener {
         setCancelText(mCancelText);
         setConfirmText(mConfirmText);
         changeAlertType(mAlertType, true);
-
+        FontUtil.setTextViewFont(mTitleTextView);
+        FontUtil.setTextViewFont(mContentTextView);
+        FontUtil.setTextViewFont(mConfirmButton);
+        FontUtil.setTextViewFont(mCancelButton);
     }
 
     private void restore () {
