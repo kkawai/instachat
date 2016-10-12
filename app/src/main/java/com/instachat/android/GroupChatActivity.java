@@ -135,6 +135,7 @@ public class GroupChatActivity extends BaseActivity implements
     private Uri mSharePhotoUri;
     private String mShareText;
     private long mGroupId = Constants.DEFAULT_PUBLIC_GROUP_ID;
+    private long mNewTargetGroupId = 0;
 
     protected int getLayout() {
         return R.layout.activity_main;
@@ -343,7 +344,8 @@ public class GroupChatActivity extends BaseActivity implements
 
     @Override
     public void onDestroy() {
-        removeUserPresence();
+        if (mNewTargetGroupId != mGroupId)
+            removeUserPresence();
         if (mPhotoUploadHelper != null)
             mPhotoUploadHelper.cleanup();
         if (mFirebaseAdapter != null)
@@ -1171,6 +1173,7 @@ public class GroupChatActivity extends BaseActivity implements
 
     @Override
     public void onGroupChatClicked(GroupChatSummary groupChatSummary) {
+        mNewTargetGroupId = groupChatSummary.getId();
         closeBothDrawers();
         startGroupChatActivity(this, groupChatSummary.getId(), groupChatSummary.getName(),
                 mSharePhotoUri, mShareText);
