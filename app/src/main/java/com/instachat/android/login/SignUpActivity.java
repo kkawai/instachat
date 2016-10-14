@@ -183,7 +183,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         user.setEmail(email);
         user.setPassword(password);
         user.setUsername(username);
-        user.setInstagramId(email);
         if (thirdPartyProfilePicUrl != null)
             user.setProfilePicUrl(thirdPartyProfilePicUrl);
         NetworkApi.saveUser(this, user, new Response.Listener<String>() {

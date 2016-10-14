@@ -112,7 +112,6 @@
             </intent-filter>
         </service>
 
-
         <receiver
             android:name=".gcm.GCMBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND">

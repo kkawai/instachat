@@ -288,6 +288,7 @@ public class GroupChatActivity extends BaseActivity implements
             getIntent().removeExtra(Constants.KEY_SHARE_MESSAGE);
         }
         addUserPresence();
+        new PresenceHelper().logPresence();
     }
 
     private long prevInputTime;
@@ -345,8 +346,12 @@ public class GroupChatActivity extends BaseActivity implements
 
     @Override
     public void onDestroy() {
-        if (mNewTargetGroupId != mGroupId)
+        if (mNewTargetGroupId != mGroupId) {
             removeUserPresence();
+            MLog.w(TAG, "onDestroy() (PresenceHelper) user presence removed from: " + mGroupId);
+        } else {
+            MLog.w(TAG, "onDestroy() (PresenceHelper) user presence not removed from: " + mGroupId);
+        }
         if (mPhotoUploadHelper != null)
             mPhotoUploadHelper.cleanup();
         if (mFirebaseAdapter != null)
@@ -373,6 +378,7 @@ public class GroupChatActivity extends BaseActivity implements
             mGroupId = Constants.DEFAULT_PUBLIC_GROUP_ID;
             databaseRef = Constants.GROUP_CHAT_REF(Constants.DEFAULT_PUBLIC_GROUP_ID);
         }
+        Preferences.getInstance().setLastGroupChatRoomVisited(mGroupId);
         setDatabaseRoot(databaseRef);
     }
 
@@ -860,6 +866,7 @@ public class GroupChatActivity extends BaseActivity implements
             getSupportFragmentManager().popBackStack();
             return;
         }
+        removeUserPresence();
         super.onBackPressed();
     }
 
@@ -1261,15 +1268,14 @@ public class GroupChatActivity extends BaseActivity implements
     }
 
     protected void addUserPresence() {
-        MLog.d(TAG, "addUserPresence() mGroupId: ", mGroupId, " username: ", myUsername());
+        MLog.d(TAG, "addUserPresence() sGroupId: ", mGroupId, " username: ", myUsername());
         User me = Preferences.getInstance().getUser();
         mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(mGroupId)).
                 child(myUserid() + "").updateChildren(me.getPresenceMap());
-
     }
 
     protected void removeUserPresence() {
-        MLog.d(TAG, "removeUserPresence() mGroupId: ", mGroupId, " username: ", myUsername());
+        MLog.d(TAG, "removeUserPresence() sGroupId: ", mGroupId, " username: ", myUsername());
         mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(mGroupId)).
                 child(myUserid() + "").removeValue();
     }
@@ -1288,9 +1294,11 @@ public class GroupChatActivity extends BaseActivity implements
         mFirebaseAuth.signOut();
         //Auth.GoogleSignInApi.signOut(mGoogleApiClient);
         //mFirebaseUser = null;
+        removeUserPresence();
         GCMHelper.unregister(Preferences.getInstance().getUserId() + "");
         Preferences.getInstance().saveUser(null);
         startActivity(new Intent(this, SignInActivity.class));
         finish();
     }
+
 }

@@ -305,4 +305,12 @@ public final class Preferences {
     public void setShownToolbarProfileTooltip(boolean shown) {
         mPrefs.edit().putBoolean("shown_toolbar_profile_tooltip", shown).apply();
     }
+
+    public long getLastGroupChatRoomVisited() {
+        return mPrefs.getLong("last_group_chat_room",0);
+    }
+
+    public void setLastGroupChatRoomVisited(long groupid) {
+        mPrefs.edit().putLong("last_group_chat_room",groupid).apply();
+    }
 }
