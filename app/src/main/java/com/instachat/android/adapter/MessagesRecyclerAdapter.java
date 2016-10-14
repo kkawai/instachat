@@ -15,9 +15,11 @@ import android.webkit.URLUtil;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
@@ -26,6 +28,7 @@ import com.google.firebase.storage.StorageReference;
 import com.instachat.android.ActivityState;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
+import com.instachat.android.blocks.BlockedUser;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.options.MessageOptionsDialogHelper;
 import com.instachat.android.util.MLog;
@@ -34,6 +37,7 @@ import com.instachat.android.util.StringUtil;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
 
@@ -42,7 +46,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 /**
  * Created by kevin on 8/23/2016.
  */
-public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> extends FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> {
+public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> extends BaseMessagesAdapter<FriendlyMessage, MessageViewHolder> {
 
     public static final String TAG = "MessagesRecyclerAdapter";
 
@@ -63,6 +67,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         super(modelClass, modelLayout, viewHolderClass, ref);
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
+        listenForBlockedUsers();
     }
 
     public void setDatabaseRoot(String root) {
@@ -94,10 +99,23 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     public int getItemViewType(int position) {
         FriendlyMessage friendlyMessage = getItem(position);
         String text = friendlyMessage.getText() + "";
+
         if (URLUtil.isHttpUrl(text) || URLUtil.isHttpsUrl(text)) {
             return ITEM_VIEW_TYPE_WEB_LINK;
         }
         return ITEM_VIEW_TYPE_STANDARD_MESSAGE;
+    }
+
+    public void blockUser(int userid) {
+        synchronized (this) {
+            int count = getData().size() - 1;
+            for (int i = count; i >= 0; i--) {
+                FriendlyMessage m = getItem(i);
+                if (m.getUserid() == userid) {
+                    removeItemLocally(i);
+                }
+            }
+        }
     }
 
     private MessageViewHolder createMessageViewHolder(ViewGroup parent, int viewType) {
@@ -128,6 +146,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         final MessageViewHolder holder = createMessageViewHolder(parent, viewType);
+
         holder.messengerImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
@@ -135,7 +154,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 if (TextUtils.isEmpty(friendlyMessage.getName())) {
                     return;
                 }
-                mUserClickedListener.onUserClicked(friendlyMessage.getUserid());
+                mUserClickedListener.onUserClicked(friendlyMessage.getUserid(), friendlyMessage.getName());
             }
         });
         final View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -193,24 +212,22 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                                     photoRef.delete();
                                     MLog.d(TAG, "deleted photo " + friendlyMessage.getImageId());
                                 }
-                                DatabaseReference ref = mFirebaseDatabaseReference.child(mDatabaseRoot + "/" + friendlyMessage.getId());
-                                if (ref != null)
-                                    ref.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()) {
-                                                new SweetAlertDialog(mActivity.get(), SweetAlertDialog.SUCCESS_TYPE)
-                                                        .setTitleText(mActivity.get().getString(R.string.success_exclamation))
-                                                        .setContentText(mActivity.get().getString(R.string.message_delete_success))
-                                                        .show();
-                                            } else {
-                                                new SweetAlertDialog(mActivity.get(), SweetAlertDialog.ERROR_TYPE)
-                                                        .setTitleText(mActivity.get().getString(R.string.oops_exclamation))
-                                                        .setContentText(mActivity.get().getString(R.string.message_delete_failed))
-                                                        .show();
-                                            }
+                                removeItemRemotely(mDatabaseRoot + "/" + friendlyMessage.getId(), new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            new SweetAlertDialog(mActivity.get(), SweetAlertDialog.SUCCESS_TYPE)
+                                                    .setTitleText(mActivity.get().getString(R.string.success_exclamation))
+                                                    .setContentText(mActivity.get().getString(R.string.message_delete_success))
+                                                    .show();
+                                        } else {
+                                            new SweetAlertDialog(mActivity.get(), SweetAlertDialog.ERROR_TYPE)
+                                                    .setTitleText(mActivity.get().getString(R.string.oops_exclamation))
+                                                    .setContentText(mActivity.get().getString(R.string.message_delete_failed))
+                                                    .show();
                                         }
-                                    });
+                                    }
+                                });
                             }
                         }).show();
                     }
@@ -250,6 +267,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                                                     .setTitleText(mActivity.get().getString(R.string.success_exclamation))
                                                     .setContentText(mActivity.get().getString(R.string.block_person_success, friendlyMessage.getName()))
                                                     .show();
+                                            blockUser(friendlyMessage.getUserid());
                                         } else {
                                             new SweetAlertDialog(mActivity.get(), SweetAlertDialog.ERROR_TYPE)
                                                     .setTitleText(mActivity.get().getString(R.string.oops_exclamation))
@@ -369,6 +387,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         mUserClickedListener = null;
         mAdapterPopulateHolderListener = null;
         mMessageTextClickedListener = null;
+        mFirebaseDatabaseReference.child(Constants.BLOCKS_REF()).removeEventListener(mBlockedUsersListener);
     }
 
     public void sendFriendlyMessage(final FriendlyMessage friendlyMessage) {
@@ -411,5 +430,48 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 }
             }
         });
+    }
+
+    @Override
+    protected boolean isNewItemAllowed(FriendlyMessage model) {
+        return !mBlockedUsers.containsKey(model.getUserid());
+    }
+
+    private ChildEventListener mBlockedUsersListener;
+    private Map<Integer, Boolean> mBlockedUsers = new Hashtable<>(20);
+
+    private void listenForBlockedUsers() {
+        mBlockedUsersListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                BlockedUser blockedUser = dataSnapshot.getValue(BlockedUser.class);
+                blockedUser.id = Integer.parseInt(dataSnapshot.getKey());
+                mBlockedUsers.put(blockedUser.id, false);
+                blockUser(blockedUser.id);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                BlockedUser blockedUser = dataSnapshot.getValue(BlockedUser.class);
+                blockedUser.id = Integer.parseInt(dataSnapshot.getKey());
+                mBlockedUsers.remove(blockedUser.id);
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        mFirebaseDatabaseReference.child(Constants.BLOCKS_REF()).addChildEventListener(mBlockedUsersListener);
     }
 }

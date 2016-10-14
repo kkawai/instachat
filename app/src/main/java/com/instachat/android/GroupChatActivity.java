@@ -1155,7 +1155,7 @@ public class GroupChatActivity extends BaseActivity implements
     }
 
     @Override
-    public void onUserClicked(int userid) {
+    public void onUserClicked(int userid, String username) {
         closeBothDrawers();
         ScreenUtil.hideVirtualKeyboard(mMessageEditText);
         PrivateChatActivity.startPrivateChatActivity(this, userid, null, null);

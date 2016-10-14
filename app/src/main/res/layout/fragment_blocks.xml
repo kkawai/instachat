@@ -7,6 +7,7 @@
     android:background="@android:color/background_light"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
+    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.instachat.android.GroupChatActivity">
     <!--
         <android.support.design.widget.AppBarLayout

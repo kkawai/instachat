@@ -41,6 +41,8 @@ public class FriendlyMessage implements Parcelable {
     private String imageId;
     private long time;
 
+    private boolean isBlocked; //NOT persisted, volatile
+
     public FriendlyMessage() {
     }
 
@@ -269,8 +271,27 @@ public class FriendlyMessage implements Parcelable {
         return imageId;
     }
 
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    public void setBlocked(boolean isBlocked) {
+        this.isBlocked = isBlocked;
+    }
+
     @Override
     public String toString() {
         return "text: " + text + " dpid: " + dpid + " image id: " + imageId + " name: " + name + " user id: " + userid + "  message id: " + id + " imageUrl: " + imageUrl;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        FriendlyMessage other = (FriendlyMessage)obj;
+        return this.getId().equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getId().hashCode();
     }
 }

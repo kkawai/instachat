@@ -16,9 +16,15 @@
     <string name="login_with_google">Log in with Google</string>
     <string name="delete_message_question">Delete message?</string>
     <string name="block_person_title">Block %s?</string>
-    <string name="block_person_question">Are you sure you want this?  %s will not be able to send you direct messages and you will not see any more of his or her posts in any of the chat rooms.  If you wish, you can unblock them later.</string>
+    <string name="block_person_question">Are you sure you want this?  %s will not be able to send you direct messages and you will not see any more of his or her posts in any of the chat rooms.  If you wish, you can unblock later.</string>
     <string name="block_person_failed">Oops!  We could not block %s.  Please try again.</string>
     <string name="block_person_success">You have blocked %s</string>
+
+    <string name="unblock_person_title">Unblock %s?</string>
+    <string name="unblock_person_question">Are you sure you want this?  %s will be able to send you direct messages and you can start seeing his or her posts in any of the chat rooms.  If you wish, you can block again.</string>
+    <string name="unblock_person_failed">Oops!  We could not unblock %s.  Please try again.</string>
+    <string name="unblock_person_success">You have unblocked %s</string>
+
     <string name="block_cannot_block_yourself">You cannot block yourself silly!</string>
     <string name="message_delete_title">Delete message?</string>
     <string name="message_delete_question">Are you sure you want to delete this message?  Nobody will be able to see it again.  It will be gone forever.</string>

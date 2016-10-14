@@ -16,8 +16,11 @@ import android.text.TextUtils;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.instachat.android.Constants;
@@ -67,40 +70,26 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                             return;
                     }
 
-                    incrementPrivateUnreadMessages(friendlyMessage);
-
-                    Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
+                    final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.BLOCKS_REF() + friendlyMessage.getUserid());
+                    ref.addValueEventListener(new ValueEventListener() {
                         @Override
-                        public void onComplete(final @NonNull Task<Uri> task) {
-                            try {
-                                if (!task.isSuccessful()) {
-                                    showNotification(friendlyMessage, null);
-                                    return;
-                                }
-                                ThreadWrapper.executeInWorkerThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            Bitmap bitmap = Glide.
-                                                    with(MyApp.getInstance()).
-                                                    load(task.getResult().toString()).
-                                                    asBitmap().
-                                                    into(thumbSize(), thumbSize()). // Width and height
-                                                    get();
-                                            showNotification(friendlyMessage, bitmap);
-                                        } catch (Exception e) {
-                                            MLog.e(TAG, "", e); //todo better error handling/message
-                                            showNotification(friendlyMessage, null);
-                                        }
-                                    }
-                                });
-
-                            } catch (Exception e) {
-                                MLog.e(TAG, "", e); //todo better error handling/message
-                                showNotification(friendlyMessage, null);
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            MLog.d(TAG, "onDataChange() snapshot: " + dataSnapshot, " ref: ", ref);
+                            if (dataSnapshot.getValue() == null) {
+                                MLog.d(TAG, "user ", friendlyMessage.getName(), " is not blocked.  consume message now. ");
+                                consumeFriendlyMessage(friendlyMessage);
+                            } else {
+                                MLog.d(TAG, "user ", friendlyMessage.getName(), " is blocked.  do not consume. ");
                             }
+                            ref.removeEventListener(this);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            ref.removeEventListener(this);
                         }
                     });
+
                 }
             }
         } catch (Exception e) {
@@ -108,6 +97,43 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
 
         //Glide.with(MyApp.getInstance()).loa
+    }
+
+    private void consumeFriendlyMessage(final FriendlyMessage friendlyMessage) {
+        incrementPrivateUnreadMessages(friendlyMessage);
+
+        Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(final @NonNull Task<Uri> task) {
+                try {
+                    if (!task.isSuccessful()) {
+                        showNotification(friendlyMessage, null);
+                        return;
+                    }
+                    ThreadWrapper.executeInWorkerThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Bitmap bitmap = Glide.
+                                        with(MyApp.getInstance()).
+                                        load(task.getResult().toString()).
+                                        asBitmap().
+                                        into(thumbSize(), thumbSize()). // Width and height
+                                        get();
+                                showNotification(friendlyMessage, bitmap);
+                            } catch (Exception e) {
+                                MLog.e(TAG, "", e); //todo better error handling/message
+                                showNotification(friendlyMessage, null);
+                            }
+                        }
+                    });
+
+                } catch (Exception e) {
+                    MLog.e(TAG, "", e); //todo better error handling/message
+                    showNotification(friendlyMessage, null);
+                }
+            }
+        });
     }
 
     private void showNotification(FriendlyMessage friendlyMessage, Bitmap bitmap) {
