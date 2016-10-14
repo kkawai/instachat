@@ -45,6 +45,7 @@ public class BlocksFragment extends BaseFragment {
         DatabaseReference userBlocksRef = FirebaseDatabase.getInstance().getReference(Constants.BLOCKS_REF());
         mBlocksAdapter = new BlocksAdapter(BlockedUser.class, R.layout.item_person, BlocksViewHolder.class, userBlocksRef);
         mBlocksAdapter.setActivity(getActivity(), this);
+        mBlocksAdapter.setUserClickedListener(mUserClickedListener);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mBlocksRecyclerView.setLayoutManager(linearLayoutManager);

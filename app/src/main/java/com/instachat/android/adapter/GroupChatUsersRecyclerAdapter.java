@@ -123,6 +123,7 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
         if (mActivity != null)
             mActivity.clear();
         mActivity = null;
+        mActivityState = null;
     }
 
     private synchronized void addPublicGroupChatPresenceReference(final long groupid) {

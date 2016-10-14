@@ -389,6 +389,7 @@ public class LeftDrawerHelper {
     }
 
     public void cleanup() {
+        mActivityState = null;
         mActivity = null;
         mDrawerLayout = null;
         mMyProfilePicListener = null;

@@ -90,4 +90,12 @@ public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends 
         blockedUser.id = Integer.parseInt(snapshot.getKey());
         return blockedUser;
     }
+
+    @Override
+    public void cleanup() {
+        mUserClickedListener = null;
+        mActivity = null;
+        mActivityState = null;
+        super.cleanup();
+    }
 }

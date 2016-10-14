@@ -383,6 +383,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
             pair.ref.removeEventListener(pair.listener);
         }
         publicGroupChatPresenceReferences.clear();
+        activityState = null;
     }
 
     private synchronized void addPublicGroupChatPresenceReference(final long groupid) {

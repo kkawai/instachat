@@ -365,6 +365,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         if (mActivity != null)
             mActivity.clear();
         mActivity = null;
+        mActivityState = null;
         mUserClickedListener = null;
         mAdapterPopulateHolderListener = null;
         mMessageTextClickedListener = null;

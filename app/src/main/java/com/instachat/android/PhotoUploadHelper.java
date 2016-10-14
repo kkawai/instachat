@@ -83,6 +83,7 @@ public class PhotoUploadHelper {
     }
 
     public void cleanup() {
+        mActivityState = null;
         mActivity = null;
         mListener = null;
     }
