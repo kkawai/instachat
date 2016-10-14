@@ -268,6 +268,9 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                                                     .setContentText(mActivity.get().getString(R.string.block_person_success, friendlyMessage.getName()))
                                                     .show();
                                             blockUser(friendlyMessage.getUserid());
+                                            mFirebaseDatabaseReference.child(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF())
+                                                    .child(friendlyMessage.getUserid() + "")
+                                                    .removeValue();
                                         } else {
                                             new SweetAlertDialog(mActivity.get(), SweetAlertDialog.ERROR_TYPE)
                                                     .setTitleText(mActivity.get().getString(R.string.oops_exclamation))
