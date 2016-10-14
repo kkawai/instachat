@@ -53,7 +53,7 @@
     <string name="wrong_password">Wrong password.  Try again.</string>
     <string name="menu_choose_photo">Choose Photo</string>
     <string name="menu_take_photo">Take Photo</string>
-    <string name="message_hint">Send a friendly message...</string>
+    <string name="message_hint">Send a friendly message…</string>
     <string name="error_send_photo">Sorry, could not upload photo. Please try again.</string>
     <string name="is_your_new_username">%s is your new username</string>
     <string name="username_changed_dialog_title">Username Changed!</string>
@@ -72,19 +72,19 @@
     <string name="could_not_send_message">Sorry!  Could not send message.  Please try again.</string>
     <string name="please_upload_photo">Please upload a display photo to start chatting</string>
     <string name="bio">Bio</string>
-    <string name="hint_write_something_about_yourself">Write something about yourself...</string>
+    <string name="hint_write_something_about_yourself">Write something about yourself…</string>
 
     <!-- sweet alert dialog -->
     <string name="sweet_alert_dialog_default_title"> </string>
     <string name="sweet_alert_dialog_ok">@android:string/ok</string>
     <string name="sweet_alert_dialog_cancel">@android:string/cancel</string>
-    <string name="sweet_alert_loading_message">Loading...</string>
+    <string name="sweet_alert_loading_message">Loading…</string>
 
     <string name="save_username">Save</string>
     <string name="share_message">Share Message</string>
     <string name="share_photo">Share Photo</string>
     <string name="please_choose_person_or_group">Please choose person or group</string>
-    <string name="people_in_group">See People in Group</string>
+    <string name="people_in_group">See Who's Online</string>
     <string name="view_profile">View Profile</string>
     <string name="options">Options</string>
     <string name="display_photo">Before you can post messages, please add a display photo of yourself</string>
