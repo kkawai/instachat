@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Created by kevin on 9/24/2016.
  */
-public class PrivateChatSummary {
+public class PrivateChatSummary implements Comparable {
 
     private static final String TAG = "PrivateChatSummary";
 
@@ -22,7 +22,7 @@ public class PrivateChatSummary {
     private String name;
     private String dpid;
     private String imageUrl;
-    private long lastMessageTime;
+    private long lastMessageSentTimestamp;
     private String lastMessage;
     private int unreadMessageCount = -1;
 
@@ -58,12 +58,12 @@ public class PrivateChatSummary {
         this.imageUrl = imageUrl;
     }
 
-    public long getLastMessageTime() {
-        return lastMessageTime;
+    public long getLastMessageSentTimestamp() {
+        return lastMessageSentTimestamp;
     }
 
-    public void setLastMessageTime(long lastMessageTime) {
-        this.lastMessageTime = lastMessageTime;
+    public void setLastMessageSentTimestamp(long timestamp) {
+        this.lastMessageSentTimestamp = timestamp;
     }
 
     public String getLastMessage() {
@@ -96,12 +96,29 @@ public class PrivateChatSummary {
             map.put("imageUrl", privateChatSummary.getImageUrl());
         if (privateChatSummary.getLastMessage() != null)
             map.put("lastMessage", privateChatSummary.getLastMessage());
-        if (privateChatSummary.getLastMessageTime() != 0) {
-            map.put("lastMessageTime", privateChatSummary.getLastMessageTime());
+        if (privateChatSummary.getLastMessageSentTimestamp() != 0) {
+            map.put("lastMessageSentTimestamp", privateChatSummary.getLastMessageSentTimestamp());
         }
         if (privateChatSummary.getUnreadMessageCount() >= 0) {
             map.put("unreadMessageCount", privateChatSummary.getUnreadMessageCount());
         }
         return map;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        PrivateChatSummary other = (PrivateChatSummary)o;
+
+        if (getLastMessageSentTimestamp() != 0 || other.getLastMessageSentTimestamp() != 0) {
+            if (getLastMessageSentTimestamp() > other.getLastMessageSentTimestamp()) {
+                return -1;
+            } else if (getLastMessageSentTimestamp() < other.getLastMessageSentTimestamp()) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            return getName().compareTo(other.getName());
+        }
     }
 }

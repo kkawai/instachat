@@ -86,7 +86,8 @@
     <string name="please_choose_person_or_group">Please choose person or group</string>
     <string name="people_in_group">People in group</string>
     <string name="view_profile">View profile</string>
-    <string name="options">Options</string>
+    <string name="message_options_title">Message Options</string>
+    <string name="blocked_user_options_title">Blocked User Options</string>
     <string name="display_photo">Before you can post messages, please add a display photo of yourself</string>
     <string name="display_photo_title">Add display photo</string>
     <string name="display_photo_tooltip">Tap here to upload a display photo of yourself</string>
@@ -95,11 +96,17 @@
     <string name="message_copied_to_clipboard">Message copied to clipboard</string>
     <string name="manage_blocks">Manage blocks</string>
 
-    <!-- do not change the following hard-coded message options ordering! -->
+    <!-- do not change the following ordering! -->
     <string-array name="message_options">
         <item>Copy text</item>
         <item>Delete message</item>
-        <item>Block person</item>
-        <item>Report person</item>
+        <item>Block</item>
+        <item>Report</item>
+    </string-array>
+
+    <!-- do not change the following ordering! -->
+    <string-array name="blocked_user_options">
+        <item>Unblock</item>
+        <item>Report</item>
     </string-array>
 </resources>

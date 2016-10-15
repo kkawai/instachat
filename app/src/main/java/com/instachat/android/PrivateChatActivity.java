@@ -37,6 +37,9 @@ import com.tooltip.Tooltip;
 
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by kevin on 9/16/2016.
  * The difference between Private and Group Chat:
@@ -181,6 +184,13 @@ public class PrivateChatActivity extends GroupChatActivity {
         ref.child(mToUser.getId() + "").updateChildren(PrivateChatSummary.toMap(summary));
     }
 
+    private void updatePrivateChatSummaryLastMessageSentTimestamp() {
+        Map<String, Object> map = new HashMap<>(1);
+        map.put("lastMessageSentTimestamp", System.currentTimeMillis());
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
+        ref.child(mToUser.getId() + "").updateChildren(map);
+    }
+
     @Override
     public void onResume() {
         sIsActive = true;
@@ -218,6 +228,7 @@ public class PrivateChatActivity extends GroupChatActivity {
             final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
             appBarLayout.setExpanded(false, true);
         }
+        updatePrivateChatSummaryLastMessageSentTimestamp();
     }
 
     @Override
