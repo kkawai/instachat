@@ -6,7 +6,7 @@
     <string name="welcome_msg">Welcome!</string>
     <string name="sign_out">Sign Out</string>
     <string name="contacts_permission_rationale">Access to account information is required to sign in.</string>
-    <string name="invite_menu_label">Invite</string>
+    <string name="invite_menu_label">Invite Friends</string>
     <string name="sign_in">Log In</string>
     <string name="forgot_your_password">Forgot your password?</string>
     <string name="forgot_password">Forgot Password</string>
@@ -26,7 +26,7 @@
     <string name="unblock_person_success">You have unblocked %s</string>
 
     <string name="block_cannot_block_yourself">You cannot block yourself silly!</string>
-    <string name="message_delete_title">Delete message?</string>
+    <string name="message_delete_title">Delete Message?</string>
     <string name="message_delete_question">Are you sure you want to delete this message?  Nobody will be able to see it again.  It will be gone forever.</string>
     <string name="message_delete_success">Successfully deleted message from conversation</string>
     <string name="message_delete_failed">Could not delete message from conversation.  It may have already been deleted.  If not, try again.</string>
@@ -41,8 +41,8 @@
     <string name="hint_email_or_username">Username or Email</string>
     <string name="hint_password">Password</string>
     <string name="invalid_email">Invalid Email</string>
-    <string name="invalid_password">Invalid password</string>
-    <string name="invalid_username">Invalid username</string>
+    <string name="invalid_password">Invalid Password</string>
+    <string name="invalid_username">Invalid Username</string>
     <string name="create_account">Create Account</string>
     <string name="fresh_config">Fresh Config</string>
     <string name="cause_crash">Cause Crash</string>
@@ -53,17 +53,17 @@
     <string name="wrong_password">Wrong password.  Try again.</string>
     <string name="menu_choose_photo">Choose Photo</string>
     <string name="menu_take_photo">Take Photo</string>
-    <string name="message_hint">Send a friendly message...</string>
+    <string name="message_hint">Send a friendly message…</string>
     <string name="error_send_photo">Sorry, could not upload photo. Please try again.</string>
     <string name="is_your_new_username">%s is your new username</string>
-    <string name="username_changed_dialog_title">Username changed!</string>
-    <string name="title_update_my_pic">Update my photo</string>
+    <string name="username_changed_dialog_title">Username Changed!</string>
+    <string name="title_update_my_pic">Update My Photo</string>
     <string name="sent_via">Sent via %s</string>
 
     <string name="preview_area">Preview Area</string>
     <string name="post_area">Post Area</string>
-    <string name="no_thumbnail">No thumbnail</string>
-    <string name="choose_thumbnail">Choose a thumbnail</string>
+    <string name="no_thumbnail">No Thumbnail</string>
+    <string name="choose_thumbnail">Choose a Thumbnail</string>
     <string name="post">Post</string>
     <string name="photo">Photo</string>
     <string name="group_chat_header">LIVE</string>
@@ -72,41 +72,34 @@
     <string name="could_not_send_message">Sorry!  Could not send message.  Please try again.</string>
     <string name="please_upload_photo">Please upload a display photo to start chatting</string>
     <string name="bio">Bio</string>
-    <string name="hint_write_something_about_yourself">Write something about yourself...</string>
+    <string name="hint_write_something_about_yourself">Write something about yourself…</string>
 
     <!-- sweet alert dialog -->
     <string name="sweet_alert_dialog_default_title"> </string>
     <string name="sweet_alert_dialog_ok">@android:string/ok</string>
     <string name="sweet_alert_dialog_cancel">@android:string/cancel</string>
-    <string name="sweet_alert_loading_message">Loading...</string>
+    <string name="sweet_alert_loading_message">Loading…</string>
 
     <string name="save_username">Save</string>
-    <string name="share_message">Share message</string>
-    <string name="share_photo">Share photo</string>
+    <string name="share_message">Share Message</string>
+    <string name="share_photo">Share Photo</string>
     <string name="please_choose_person_or_group">Please choose person or group</string>
-    <string name="people_in_group">People in group</string>
-    <string name="view_profile">View profile</string>
-    <string name="message_options_title">Message Options</string>
-    <string name="blocked_user_options_title">Blocked User Options</string>
+    <string name="people_in_group">See Who\'s Online</string>
+    <string name="view_profile">View Profile</string>
+    <string name="options">Options</string>
     <string name="display_photo">Before you can post messages, please add a display photo of yourself</string>
     <string name="display_photo_title">Add display photo</string>
     <string name="display_photo_tooltip">Tap here to upload a display photo of yourself</string>
     <string name="toolbar_user_profile_tooltip">Tap here to see the profile again</string>
     <string name="change_username_tooltip">If you wish, you can change your username here</string>
     <string name="message_copied_to_clipboard">Message copied to clipboard</string>
-    <string name="manage_blocks">Manage blocks</string>
+    <string name="manage_blocks">Manage Blocks</string>
 
-    <!-- do not change the following ordering! -->
+    <!-- do not change the following hard-coded message options ordering! -->
     <string-array name="message_options">
         <item>Copy text</item>
         <item>Delete message</item>
-        <item>Block</item>
-        <item>Report</item>
-    </string-array>
-
-    <!-- do not change the following ordering! -->
-    <string-array name="blocked_user_options">
-        <item>Unblock</item>
-        <item>Report</item>
+        <item>Block person</item>
+        <item>Report person</item>
     </string-array>
 </resources>
