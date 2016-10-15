@@ -168,67 +168,77 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
     }
 
     private void updateGroupChatSummary(GroupChatSummary groupChatSummary) {
-        for (int i = 0; i < data.size(); i++) {
-            Object o = data.get(i);
-            if (o instanceof GroupChatSummary) {
-                GroupChatSummary existingGroupChatSummary = (GroupChatSummary) o;
-                if (existingGroupChatSummary.getId() == groupChatSummary.getId()) {
-                    data.set(i, groupChatSummary);
-                    notifyItemChanged(i);
-                    break;
+        synchronized (this) {
+            for (int i = 0; i < data.size(); i++) {
+                Object o = data.get(i);
+                if (o instanceof GroupChatSummary) {
+                    GroupChatSummary existingGroupChatSummary = (GroupChatSummary) o;
+                    if (existingGroupChatSummary.getId() == groupChatSummary.getId()) {
+                        data.set(i, groupChatSummary);
+                        notifyItemChanged(i);
+                        break;
+                    }
                 }
             }
         }
     }
 
     private void removeGroupChatSummary(GroupChatSummary groupChatSummary) {
-        for (int i = 0; i < data.size(); i++) {
-            Object o = data.get(i);
-            if (o instanceof GroupChatSummary) {
-                GroupChatSummary existingGroupChatSummary = (GroupChatSummary) o;
-                if (existingGroupChatSummary.getId() == groupChatSummary.getId()) {
-                    data.remove(i);
-                    notifyItemRemoved(i);
-                    break;
+        synchronized (this) {
+            for (int i = 0; i < data.size(); i++) {
+                Object o = data.get(i);
+                if (o instanceof GroupChatSummary) {
+                    GroupChatSummary existingGroupChatSummary = (GroupChatSummary) o;
+                    if (existingGroupChatSummary.getId() == groupChatSummary.getId()) {
+                        data.remove(i);
+                        notifyItemRemoved(i);
+                        break;
+                    }
                 }
             }
         }
     }
 
     private void insertPrivateChatSummary(PrivateChatSummary privateChatSummary) {
-        for (int i = 0; i < data.size(); i++) {
-            Object o = data.get(i);
-            if (o instanceof PrivateChatHeader) {
-                data.add(i + 1, privateChatSummary);
-                notifyItemInserted(i + 1);
-                break;
-            }
-        }
-    }
-
-    private void updatePrivateChatSummary(PrivateChatSummary privateChatSummary) {
-        for (int i = 0; i < data.size(); i++) {
-            Object o = data.get(i);
-            if (o instanceof PrivateChatSummary) {
-                PrivateChatSummary existingPrivateChatSummary = (PrivateChatSummary) o;
-                if (existingPrivateChatSummary.getId().equals(privateChatSummary.getId())) {
-                    data.set(i, privateChatSummary);
-                    notifyItemChanged(i);
+        synchronized (this) {
+            for (int i = 0; i < data.size(); i++) {
+                Object o = data.get(i);
+                if (o instanceof PrivateChatHeader) {
+                    data.add(i + 1, privateChatSummary);
+                    notifyItemInserted(i + 1);
                     break;
                 }
             }
         }
     }
 
+    private void updatePrivateChatSummary(PrivateChatSummary privateChatSummary) {
+        synchronized (this) {
+            for (int i = 0; i < data.size(); i++) {
+                Object o = data.get(i);
+                if (o instanceof PrivateChatSummary) {
+                    PrivateChatSummary existingPrivateChatSummary = (PrivateChatSummary) o;
+                    if (existingPrivateChatSummary.getId().equals(privateChatSummary.getId())) {
+                        data.set(i, privateChatSummary);
+                        notifyItemChanged(i);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     private void removePrivateChatSummary(PrivateChatSummary privateChatSummary) {
-        for (int i = 0; i < data.size(); i++) {
-            Object o = data.get(i);
-            if (o instanceof PrivateChatSummary) {
-                PrivateChatSummary existingPrivateChatSummary = (PrivateChatSummary) o;
-                if (existingPrivateChatSummary.getId().equals(privateChatSummary.getId())) {
-                    data.remove(i);
-                    notifyItemRemoved(i);
-                    break;
+        synchronized (this) {
+            for (int i = 0; i < data.size(); i++) {
+                Object o = data.get(i);
+                if (o instanceof PrivateChatSummary) {
+                    PrivateChatSummary existingPrivateChatSummary = (PrivateChatSummary) o;
+                    if (existingPrivateChatSummary.getId().equals(privateChatSummary.getId())) {
+                        data.remove(i);
+                        notifyItemRemoved(i);
+                        break;
+                    }
                 }
             }
         }
@@ -236,38 +246,40 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
 
     private void insertGroupChatSummary(GroupChatSummary groupChatSummary) {
         int groupHeaderIndex = -1;
-        for (int i = 0; i < data.size(); i++) {
-            Object o = data.get(i);
-            if (o instanceof GroupChatHeader) {
-                groupHeaderIndex = i;
+        synchronized (this) {
+            for (int i = 0; i < data.size(); i++) {
+                Object o = data.get(i);
+                if (o instanceof GroupChatHeader) {
+                    groupHeaderIndex = i;
 
-                //handle case where GroupChatHeader is the only
-                //or last item in the data set
-                if (groupHeaderIndex + 1 == data.size()) {
-                    data.add(i + 1, groupChatSummary);
-                    notifyItemInserted(i + 1);
-                    break;
-                } else {
-                    continue;
+                    //handle case where GroupChatHeader is the only
+                    //or last item in the data set
+                    if (groupHeaderIndex + 1 == data.size()) {
+                        data.add(i + 1, groupChatSummary);
+                        notifyItemInserted(i + 1);
+                        break;
+                    } else {
+                        continue;
+                    }
                 }
-            }
 
-            if (groupHeaderIndex == -1)
-                continue;//keep iterating thru the data set until we find the GroupChatHeader
+                if (groupHeaderIndex == -1)
+                    continue;//keep iterating thru the data set until we find the GroupChatHeader
 
-            if (o instanceof GroupChatSummary) {
-                GroupChatSummary summary = (GroupChatSummary) o;
-                if (groupChatSummary.compareTo(summary) < 0) {
+                if (o instanceof GroupChatSummary) {
+                    GroupChatSummary summary = (GroupChatSummary) o;
+                    if (groupChatSummary.compareTo(summary) < 0) {
+                        data.add(i, groupChatSummary);
+                        notifyItemInserted(i);
+                        break;
+                    }
+                } else {
                     data.add(i, groupChatSummary);
                     notifyItemInserted(i);
                     break;
                 }
-            } else {
-                data.add(i, groupChatSummary);
-                notifyItemInserted(i);
-                break;
-            }
 
+            }
         }
     }
 
@@ -433,28 +445,32 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
     }
 
     private void removeUserFromPublicGroupChat(long groupid) {
-        for (int i = 0; i < data.size(); i++) {
-            Object o = data.get(i);
-            if (o instanceof GroupChatSummary) {
-                GroupChatSummary groupChatSummary = (GroupChatSummary) o;
-                if (groupChatSummary.getId() == groupid && groupChatSummary.getUsersInRoomCount() > 0) {
-                    groupChatSummary.setUsersInRoomCount(groupChatSummary.getUsersInRoomCount() - 1);
-                    notifyItemChanged(i);
-                    break;
+        synchronized (this) {
+            for (int i = 0; i < data.size(); i++) {
+                Object o = data.get(i);
+                if (o instanceof GroupChatSummary) {
+                    GroupChatSummary groupChatSummary = (GroupChatSummary) o;
+                    if (groupChatSummary.getId() == groupid && groupChatSummary.getUsersInRoomCount() > 0) {
+                        groupChatSummary.setUsersInRoomCount(groupChatSummary.getUsersInRoomCount() - 1);
+                        notifyItemChanged(i);
+                        break;
+                    }
                 }
             }
         }
     }
 
     private void addUserToPublicGroupChat(long groupid) {
-        for (int i = 0; i < data.size(); i++) {
-            Object o = data.get(i);
-            if (o instanceof GroupChatSummary) {
-                GroupChatSummary groupChatSummary = (GroupChatSummary) o;
-                if (groupChatSummary.getId() == groupid) {
-                    groupChatSummary.setUsersInRoomCount(groupChatSummary.getUsersInRoomCount() + 1);
-                    notifyItemChanged(i);
-                    break;
+        synchronized (this) {
+            for (int i = 0; i < data.size(); i++) {
+                Object o = data.get(i);
+                if (o instanceof GroupChatSummary) {
+                    GroupChatSummary groupChatSummary = (GroupChatSummary) o;
+                    if (groupChatSummary.getId() == groupid) {
+                        groupChatSummary.setUsersInRoomCount(groupChatSummary.getUsersInRoomCount() + 1);
+                        notifyItemChanged(i);
+                        break;
+                    }
                 }
             }
         }
