@@ -70,7 +70,7 @@ public class ADMReceiver extends ADMMessageHandlerBase {
         new Thread() {
             public void run() {
                 try {
-					/*
+                    /*
 					 * VERY Important: the prepended ' ' character signifies to
 					 * server that this is for ADM, not GCM 
 					 */

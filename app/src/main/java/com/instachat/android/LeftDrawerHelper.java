@@ -49,10 +49,10 @@ public class LeftDrawerHelper {
     private Tooltip mTooltip;
     private ActivityState mActivityState;
 
-    public LeftDrawerHelper(@NotNull Activity activity,
+    public LeftDrawerHelper(@NonNull Activity activity,
                             @NonNull ActivityState activityState,
-                            @NotNull DrawerLayout drawerLayout,
-                            @NotNull MyProfilePicListener listener) {
+                            @NonNull DrawerLayout drawerLayout,
+                            @NonNull MyProfilePicListener listener) {
         mActivity = activity;
         mActivityState = activityState;
         mDrawerLayout = drawerLayout;
@@ -257,7 +257,7 @@ public class LeftDrawerHelper {
                                 NetworkApi.saveUser(mActivity, user, new Response.Listener<String>() {
                                     @Override
                                     public void onResponse(String response) {
-                                        MLog.d(TAG,"response: ",response);
+                                        MLog.d(TAG, "response: ", response);
                                         if (mActivityState.isActivityDestroyed())
                                             return;
                                         try {
@@ -276,7 +276,7 @@ public class LeftDrawerHelper {
                                 }, new Response.ErrorListener() {
                                     @Override
                                     public void onErrorResponse(VolleyError error) {
-                                        MLog.d(TAG,"error response: ",error);
+                                        MLog.d(TAG, "error response: ", error);
                                         username.setText(existing);
                                     }
                                 });

@@ -72,7 +72,7 @@ public final class FileUploadApi {
         });
 
         try {
-            final Pair<String,String> pair = NetworkApi.pair();
+            final Pair<String, String> pair = NetworkApi.pair();
             //MLog.i(TAG, "amz s: "+ InstagramApp.sAmzSecKey + " a: " + InstagramApp.sAmzAccKey);
             final AmazonS3Client s3Client = new AmazonS3Client(new BasicAWSCredentials(pair.first, pair.second));
             final PutObjectRequest request = new PutObjectRequest(targetBucket, filename, file);
@@ -84,8 +84,8 @@ public final class FileUploadApi {
                     ThreadWrapper.executeInUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            counter.set(counter.intValue()+(int)progressEvent.getBytesTransferred());
-                            listener.onPhotoUploadProgress((int) file.length()/1024, counter.intValue()/1024);
+                            counter.set(counter.intValue() + (int) progressEvent.getBytesTransferred());
+                            listener.onPhotoUploadProgress((int) file.length() / 1024, counter.intValue() / 1024);
                         }
                     });
                 }
@@ -165,7 +165,7 @@ public final class FileUploadApi {
                 ThreadWrapper.executeInUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        listener.onPhotoUploadProgress((int) file.length()/1024, finalTotal/1024);
+                        listener.onPhotoUploadProgress((int) file.length() / 1024, finalTotal / 1024);
                     }
                 });
 

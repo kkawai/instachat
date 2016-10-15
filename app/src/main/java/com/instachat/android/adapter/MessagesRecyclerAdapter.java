@@ -28,7 +28,9 @@ import com.google.firebase.storage.StorageReference;
 import com.instachat.android.ActivityState;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
+import com.instachat.android.blocks.BlockUserDialogHelper;
 import com.instachat.android.blocks.BlockedUser;
+import com.instachat.android.blocks.BlockedUserListener;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.options.MessageOptionsDialogHelper;
 import com.instachat.android.util.MLog;
@@ -36,7 +38,6 @@ import com.instachat.android.util.Preferences;
 import com.instachat.android.util.StringUtil;
 
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
@@ -61,6 +62,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private MessageTextClickedListener mMessageTextClickedListener;
     private UserClickedListener mUserClickedListener;
     private FriendlyMessageListener mFriendlyMessageListener;
+    private BlockedUserListener mBlockedUserListener;
     private String mDatabaseRoot;
 
     public MessagesRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref) {
@@ -95,6 +97,18 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         mFriendlyMessageListener = listener;
     }
 
+    public void setBlockedUserListener(BlockedUserListener listener) {
+        mBlockedUserListener = listener;
+    }
+
+    private BlockedUserListener mInternalBlockedUserListener = new BlockedUserListener() {
+        @Override
+        public void onUserBlocked(int userid) {
+            blockUser(userid);
+            mBlockedUserListener.onUserBlocked(userid);
+        }
+    };
+
     @Override
     public int getItemViewType(int position) {
         FriendlyMessage friendlyMessage = getItem(position);
@@ -106,7 +120,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         return ITEM_VIEW_TYPE_STANDARD_MESSAGE;
     }
 
-    public void blockUser(int userid) {
+    private void blockUser(int userid) {
         synchronized (this) {
             int count = getData().size() - 1;
             for (int i = count; i >= 0; i--) {
@@ -154,7 +168,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 if (TextUtils.isEmpty(friendlyMessage.getName())) {
                     return;
                 }
-                mUserClickedListener.onUserClicked(friendlyMessage.getUserid(), friendlyMessage.getName());
+                mUserClickedListener.onUserClicked(friendlyMessage.getUserid(), friendlyMessage.getName(), friendlyMessage.getDpid());
             }
         });
         final View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -234,53 +248,12 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
                     @Override
                     public void onBlockPersonRequested(final FriendlyMessage friendlyMessage) {
-                        if (Preferences.getInstance().getUserId() == friendlyMessage.getUserid()) {
-                            Toast.makeText(mActivity.get(), R.string.block_cannot_block_yourself, Toast.LENGTH_SHORT).show();
-                            return; //cannot block yourself dummy!
-                        }
-                        new SweetAlertDialog(mActivity.get(), SweetAlertDialog.WARNING_TYPE)
-                                .setTitleText(mActivity.get().getString(R.string.block_person_title, friendlyMessage.getName()))
-                                .setContentText(mActivity.get().getString(R.string.block_person_question, friendlyMessage.getName()))
-                                .setCancelText(mActivity.get().getString(android.R.string.no))
-                                .setConfirmText(mActivity.get().getString(android.R.string.yes))
-                                .showCancelButton(true)
-                                .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                    @Override
-                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                        sweetAlertDialog.cancel();
-                                    }
-                                }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                            @Override
-                            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        new BlockUserDialogHelper().showBlockUserQuestionDialog(mActivity.get(),
+                                friendlyMessage.getUserid(),
+                                friendlyMessage.getName(),
+                                friendlyMessage.getDpid(),
+                                mInternalBlockedUserListener);
 
-                                sweetAlertDialog.dismiss();
-                                Map<String, Object> map = new HashMap<>(2);
-                                map.put("name", friendlyMessage.getName());
-                                if (!TextUtils.isEmpty(friendlyMessage.getDpid()))
-                                    map.put("dpid", friendlyMessage.getDpid());
-                                mFirebaseDatabaseReference.child(Constants.BLOCKS_REF()).
-                                        child(friendlyMessage.getUserid() + "").updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            new SweetAlertDialog(mActivity.get(), SweetAlertDialog.SUCCESS_TYPE)
-                                                    .setTitleText(mActivity.get().getString(R.string.success_exclamation))
-                                                    .setContentText(mActivity.get().getString(R.string.block_person_success, friendlyMessage.getName()))
-                                                    .show();
-                                            blockUser(friendlyMessage.getUserid());
-                                            mFirebaseDatabaseReference.child(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF())
-                                                    .child(friendlyMessage.getUserid() + "")
-                                                    .removeValue();
-                                        } else {
-                                            new SweetAlertDialog(mActivity.get(), SweetAlertDialog.ERROR_TYPE)
-                                                    .setTitleText(mActivity.get().getString(R.string.oops_exclamation))
-                                                    .setContentText(mActivity.get().getString(R.string.block_person_failed, friendlyMessage.getName()))
-                                                    .show();
-                                        }
-                                    }
-                                });
-                            }
-                        }).show();
                     }
 
                     @Override
@@ -368,7 +341,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 }
             });
         }
-
     }
 
     private String limitString(final String s, final int limit) {
@@ -390,6 +362,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         mUserClickedListener = null;
         mAdapterPopulateHolderListener = null;
         mMessageTextClickedListener = null;
+        mBlockedUserListener = null;
         mFirebaseDatabaseReference.child(Constants.BLOCKS_REF()).removeEventListener(mBlockedUsersListener);
     }
 

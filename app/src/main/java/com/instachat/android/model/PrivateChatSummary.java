@@ -107,7 +107,7 @@ public class PrivateChatSummary implements Comparable {
 
     @Override
     public int compareTo(Object o) {
-        PrivateChatSummary other = (PrivateChatSummary)o;
+        PrivateChatSummary other = (PrivateChatSummary) o;
 
         if (getLastMessageSentTimestamp() != 0 || other.getLastMessageSentTimestamp() != 0) {
             if (getLastMessageSentTimestamp() > other.getLastMessageSentTimestamp()) {

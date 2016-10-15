@@ -33,7 +33,10 @@ import java.io.File;
 public class CacheUtils {
     public static final int IO_BUFFER_SIZE = 8 * 1024;
 
-    private CacheUtils() {};
+    private CacheUtils() {
+    }
+
+    ;
 
     /**
      * Workaround for bug pre-Froyo, see here for more info:
@@ -48,6 +51,7 @@ public class CacheUtils {
 
     /**
      * Get the size in bytes of a bitmap.
+     *
      * @param bitmap
      * @return size in bytes
      */
@@ -109,37 +113,36 @@ public class CacheUtils {
 
     /**
      * If external storage exists, use it!
-     * 
+     *
      * @param context
      * @return
      */
-	public static File getCacheDir(final Context context) {
-		return context.getCacheDir();
-	}    
-	
-	/**
-	 * Attempts to use "/sdcard/Android/persistent/<packagename>/keep" which is our own custom thing AFTER "/sdcard/Android/"
-	 * 
-	 * If that folder is not available, will just return <getCacheDir>
-	 * 
-	 * This is permanent, not temporary; it will still be there AFTER you uninstall the app.
-	 * 
-	 * 
-	 * @param context
-	 * @return
-	 */
-	@SuppressLint("SdCardPath")
-	public static File getPermanentExternalDir(final Context context) {
+    public static File getCacheDir(final Context context) {
+        return context.getCacheDir();
+    }
+
+    /**
+     * Attempts to use "/sdcard/Android/persistent/<packagename>/keep" which is our own custom thing AFTER "/sdcard/Android/"
+     * <p>
+     * If that folder is not available, will just return <getCacheDir>
+     * <p>
+     * This is permanent, not temporary; it will still be there AFTER you uninstall the app.
+     *
+     * @param context
+     * @return
+     */
+    @SuppressLint("SdCardPath")
+    public static File getPermanentExternalDir(final Context context) {
         return context.getFilesDir();
-	}
-	
-	@SuppressLint("SdCardPath")
+    }
+
+    @SuppressLint("SdCardPath")
     /**
      * See file_provider_paths.xml
      */
-	public static File getPermanentPhotoDir(final Context context) {
-        final File dir = new File(context.getFilesDir().getPath()+ Constants.FILE_PROVIDER_IMAGES_SUBDIR);
+    public static File getPermanentPhotoDir(final Context context) {
+        final File dir = new File(context.getFilesDir().getPath() + Constants.FILE_PROVIDER_IMAGES_SUBDIR);
         dir.mkdirs();
         return dir;
-	}
+    }
 }

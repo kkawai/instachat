@@ -51,7 +51,7 @@ public class HttpMessageHelper {
         URL url = new URL("https://api.instachat.us/ih/settings");
         //URL url = new URL("https://certs.cac.washington.edu/CAtest/");
         HttpsURLConnection urlConnection =
-                (HttpsURLConnection)url.openConnection();
+                (HttpsURLConnection) url.openConnection();
         //urlConnection.setSSLSocketFactory(context.getSocketFactory());
 
         InputStream in = urlConnection.getInputStream();
@@ -61,7 +61,7 @@ public class HttpMessageHelper {
         while ((read = in.read(buf)) != -1) {
             sb.append(new String(buf, 0, read, "UTF-8"));
         }
-        System.out.println("yyyy response: "+sb.toString());
+        System.out.println("yyyy response: " + sb.toString());
         in.close();
 
     }

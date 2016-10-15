@@ -14,10 +14,11 @@ public class GroupChatSummaryViewHolder extends RecyclerView.ViewHolder {
 
     public TextView name, unreadMessageCount;
     public ImageView status;
+
     public GroupChatSummaryViewHolder(View itemView) {
         super(itemView);
-        name = (TextView)itemView.findViewById(R.id.name);
-        unreadMessageCount = (TextView)itemView.findViewById(R.id.unread_message_count);
-        status = (ImageView)itemView.findViewById(R.id.status);
+        name = (TextView) itemView.findViewById(R.id.name);
+        unreadMessageCount = (TextView) itemView.findViewById(R.id.unread_message_count);
+        status = (ImageView) itemView.findViewById(R.id.status);
     }
 }

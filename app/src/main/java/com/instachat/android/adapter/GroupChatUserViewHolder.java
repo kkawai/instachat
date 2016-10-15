@@ -14,9 +14,10 @@ public class GroupChatUserViewHolder extends RecyclerView.ViewHolder {
 
     public TextView username;
     public ImageView userPic;
+
     public GroupChatUserViewHolder(View view) {
         super(view);
-        username = (TextView)view.findViewById(R.id.username);
-        userPic = (ImageView)view.findViewById(R.id.userPic);
+        username = (TextView) view.findViewById(R.id.username);
+        userPic = (ImageView) view.findViewById(R.id.userPic);
     }
 }

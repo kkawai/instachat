@@ -7,5 +7,6 @@ public class GroupChatHeader {
     public GroupChatHeader(String name) {
         this.name = name;
     }
+
     public String name;
 }

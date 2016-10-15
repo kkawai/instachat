@@ -144,13 +144,14 @@ public class User extends DomainObject {
     /**
      * Return a map of only the attributes necessary for
      * indicating user presence in a group chat context
+     *
      * @return
      */
     public Map<String, Object> getPresenceMap() {
         Map<String, Object> map = new HashMap<>(1);
         map.put("username", username);
         map.put("profilePicUrl", profilePicUrl);
-        map.put("id",id);
+        map.put("id", id);
         return map;
     }
 

@@ -7,6 +7,8 @@ import com.instachat.android.model.FriendlyMessage;
  */
 public interface FriendlyMessageContainer {
     FriendlyMessage getFriendlyMessage(int position);
+
     int getFriendlyMessageCount();
+
     void setCurrentFriendlyMessage(int position);
 }

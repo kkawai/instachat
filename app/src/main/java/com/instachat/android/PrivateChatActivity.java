@@ -25,9 +25,13 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.instachat.android.api.NetworkApi;
+import com.instachat.android.blocks.BlockUserDialogHelper;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.model.User;
@@ -89,7 +93,7 @@ public class PrivateChatActivity extends GroupChatActivity {
             public void onResponse(JSONObject response) {
                 try {
                     mToUser = User.fromResponse(response);
-                    initPrivateChatSummaryIfNecessary();
+                    createPrivateChatSummary();
                     populateUserProfile();
                     getSupportActionBar().setTitle(mToUser.getUsername());
                 } catch (Exception e) {
@@ -175,8 +179,7 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     private boolean mIsAppBarExpanded = true; //initially it's expanded
 
-    private void initPrivateChatSummaryIfNecessary() {
-
+    private void createPrivateChatSummary() {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
         PrivateChatSummary summary = new PrivateChatSummary();
         summary.setName(mToUser.getUsername());
@@ -246,8 +249,31 @@ public class PrivateChatActivity extends GroupChatActivity {
         }
     }
 
-    public static void startPrivateChatActivity(Context context, int userid,
-                                                Uri sharePhotoUri, String shareMessage) {
+    public static void startPrivateChatActivity(final Context context, final int userid,
+                                                final Uri sharePhotoUri, final String shareMessage) {
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.BLOCKS_REF() + userid);
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                MLog.d(TAG, "onDataChange() snapshot: " + dataSnapshot, " ref: ", ref);
+                ref.removeEventListener(this);
+                if (dataSnapshot.getValue() == null) {
+                    startPrivateChatActivityInternal(context, userid, sharePhotoUri, shareMessage);
+                } else {
+                    Toast.makeText(context, R.string.cannot_chat_you_blocked_them, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                ref.removeEventListener(this);
+                Toast.makeText(context, context.getString(R.string.general_api_error, "(c)"), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private static void startPrivateChatActivityInternal(Context context, int userid,
+                                                         Uri sharePhotoUri, String shareMessage) {
         Intent intent = newIntent(context, userid);
         if (sharePhotoUri != null)
             intent.putExtra(Constants.KEY_SHARE_PHOTO_URI, sharePhotoUri);
@@ -400,6 +426,14 @@ public class PrivateChatActivity extends GroupChatActivity {
             case R.id.invite_menu:
                 sendInvitation();
                 return true;
+            case R.id.block:
+                new BlockUserDialogHelper().showBlockUserQuestionDialog(this, mToUser.getId(),
+                        mToUser.getUsername(),
+                        mToUser.getProfilePicUrl(),
+                        getBlockedUserListener());
+                return true;
+            case R.id.report:
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -413,5 +447,14 @@ public class PrivateChatActivity extends GroupChatActivity {
                 toggleAppbar();
             }
         });
+    }
+
+    @Override
+    protected void onUserBlocked(int userid) {
+        if (isActivityDestroyed())
+            return;
+        if (userid == getActiveUserid()) {
+            finish();
+        }
     }
 }

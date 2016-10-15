@@ -2,6 +2,7 @@ package com.instachat.android.options;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.widget.TextView;
 
@@ -28,15 +29,17 @@ public class MessageOptionsDialogHelper {
         void onReportPersonRequested(FriendlyMessage friendlyMessage);
     }
 
-    public AlertDialog showMessageOptions(@NotNull final Context context,
-                                          @NotNull final FriendlyMessage friendlyMessage,
-                                          @NotNull final MessageOptionsListener listener) {
+    public AlertDialog showMessageOptions(@NonNull final Context context,
+                                          @NonNull final FriendlyMessage friendlyMessage,
+                                          @NonNull final MessageOptionsListener listener) {
         final TextView title = new TextView(context);
-        title.setTextAppearance(context,R.style.MessageOptionsDialogTitle);
+        title.setTextAppearance(context, R.style.MessageOptionsDialogTitle);
         FontUtil.setTextViewFont(title);
         int padding = context.getResources().getDimensionPixelSize(R.dimen.dialog_options_title_padding);
         title.setPadding(padding, padding, padding, 0);
         final String[] messageOptions = context.getResources().getStringArray(R.array.message_options);
+        messageOptions[2] = messageOptions[2] + " " + friendlyMessage.getName();
+        messageOptions[3] = messageOptions[3] + " " + friendlyMessage.getName();
         title.setText(R.string.message_options_title);
         AlertDialog dialog = new ThemedAlertDialog.Builder(context).
                 setCancelable(true).

@@ -70,6 +70,7 @@ import com.instachat.android.adapter.MessagesRecyclerAdapter;
 import com.instachat.android.adapter.UserClickedListener;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.api.UploadListener;
+import com.instachat.android.blocks.BlockedUserListener;
 import com.instachat.android.blocks.BlocksFragment;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.fullscreen.FriendlyMessageContainer;
@@ -366,6 +367,7 @@ public class GroupChatActivity extends BaseActivity implements
             mExternalSendIntentConsumer.cleanup();
         if (mGroupChatUsersRecyclerAdapter != null)
             mGroupChatUsersRecyclerAdapter.cleanup();
+        mBlockedUserListener = null;
         super.onDestroy();
     }
 
@@ -934,6 +936,17 @@ public class GroupChatActivity extends BaseActivity implements
     public void onPermissionsDenied(int requestCode, List<String> perms) {
     }
 
+    private BlockedUserListener mBlockedUserListener = new BlockedUserListener() {
+        @Override
+        public void onUserBlocked(int userid) {
+            GroupChatActivity.this.onUserBlocked(userid);
+        }
+    };
+
+    protected void onUserBlocked(int userid) {
+
+    }
+
     private void initFirebaseAdapter() {
         mFirebaseAdapter = new MessagesRecyclerAdapter<>(
                 FriendlyMessage.class,
@@ -954,6 +967,7 @@ public class GroupChatActivity extends BaseActivity implements
                 openFullScreenTextView(position);
             }
         });
+        mFirebaseAdapter.setBlockedUserListener(mBlockedUserListener);
         mFirebaseAdapter.setFriendlyMessageListener(this);
         mFirebaseAdapter.setUserThumbClickedListener(this);
         mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
@@ -1155,7 +1169,7 @@ public class GroupChatActivity extends BaseActivity implements
     }
 
     @Override
-    public void onUserClicked(int userid, String username) {
+    public void onUserClicked(int userid, String username, String dpid) {
         closeBothDrawers();
         ScreenUtil.hideVirtualKeyboard(mMessageEditText);
         PrivateChatActivity.startPrivateChatActivity(this, userid, null, null);
@@ -1301,4 +1315,7 @@ public class GroupChatActivity extends BaseActivity implements
         finish();
     }
 
+    protected BlockedUserListener getBlockedUserListener() {
+        return mBlockedUserListener;
+    }
 }

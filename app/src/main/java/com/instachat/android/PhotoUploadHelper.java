@@ -53,7 +53,7 @@ public class PhotoUploadHelper {
         chatRoomPhoto, userProfilePhoto
     }
 
-    PhotoUploadHelper(@NotNull Activity activity, @NonNull ActivityState activityState) {
+    PhotoUploadHelper(@NonNull Activity activity, @NonNull ActivityState activityState) {
         mActivity = activity;
         mActivityState = activityState;
         mStorageRef = FirebaseStorage.getInstance().getReference();

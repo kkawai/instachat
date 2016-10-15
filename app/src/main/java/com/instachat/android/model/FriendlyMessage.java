@@ -286,7 +286,7 @@ public class FriendlyMessage implements Parcelable {
 
     @Override
     public boolean equals(Object obj) {
-        FriendlyMessage other = (FriendlyMessage)obj;
+        FriendlyMessage other = (FriendlyMessage) obj;
         return this.getId().equals(other.getId());
     }
 

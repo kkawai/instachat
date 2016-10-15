@@ -48,7 +48,7 @@ public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends 
             @Override
             public void onClick(View view) {
                 BlockedUser blockedUser = getItem(holder.getAdapterPosition());
-                mUserClickedListener.onUserClicked(blockedUser.id,blockedUser.getName());
+                mUserClickedListener.onUserClicked(blockedUser.id, blockedUser.getName(), blockedUser.getDpid());
             }
         });
         return holder;

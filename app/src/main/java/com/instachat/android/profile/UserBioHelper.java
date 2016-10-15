@@ -42,13 +42,13 @@ public class UserBioHelper {
                         NetworkApi.saveUser(activity, user, new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
-                                MLog.d("UserBioHelper","response: ",response);
+                                MLog.d("UserBioHelper", "response: ", response);
                                 Preferences.getInstance().saveUser(user);
                             }
                         }, new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-                                MLog.d("UserBioHelper","error response: ",error);
+                                MLog.d("UserBioHelper", "error response: ", error);
                             }
                         });
                     }

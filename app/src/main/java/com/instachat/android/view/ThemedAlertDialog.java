@@ -13,35 +13,35 @@ import com.instachat.android.R;
  */
 public final class ThemedAlertDialog extends AlertDialog {
 
-   public ThemedAlertDialog(Context context) {
-      super(context);
-   }
+    public ThemedAlertDialog(Context context) {
+        super(context);
+    }
 
-   public static class Builder extends AlertDialog.Builder {
-      Context mContext;
+    public static class Builder extends AlertDialog.Builder {
+        Context mContext;
 
-      /**
-       * Use the given theme for most Material Design AlertDialogs. Alter width and height of the dialog to match the mockups.
-       *
-       * @param context
-       */
-      public Builder(Context context, int theme) {
-         super(context, theme);
-         mContext = context;
-      }
+        /**
+         * Use the given theme for most Material Design AlertDialogs. Alter width and height of the dialog to match the mockups.
+         *
+         * @param context
+         */
+        public Builder(Context context, int theme) {
+            super(context, theme);
+            mContext = context;
+        }
 
-      /**
-       * Use the project's theme for most Material Design AlertDialogs. Alter width and height of the dialog to match the mockups.
-       *
-       * @param context
-       */
-      public Builder(Context context) {
-         this(context, Build.VERSION.SDK_INT >= 21 ? android.R.style.Theme_Material_Light_Dialog_NoActionBar : R.style.AppCompatAlertDialog);
-      }
+        /**
+         * Use the project's theme for most Material Design AlertDialogs. Alter width and height of the dialog to match the mockups.
+         *
+         * @param context
+         */
+        public Builder(Context context) {
+            this(context, Build.VERSION.SDK_INT >= 21 ? android.R.style.Theme_Material_Light_Dialog_NoActionBar : R.style.AppCompatAlertDialog);
+        }
 
-      /**
-       * @return An AlertDialog with a width and height matching the Material Design mockups.
-       */
+        /**
+         * @return An AlertDialog with a width and height matching the Material Design mockups.
+         */
       /*  This only applied to V4.  let's go with stock for V5+
 
       @Override
@@ -54,5 +54,5 @@ public final class ThemedAlertDialog extends AlertDialog {
          return dialog;
       }
       */
-   }
+    }
 }

@@ -8,5 +8,6 @@ import com.instachat.android.model.PrivateChatSummary;
  */
 public interface ChatsItemClickedListener {
     void onPrivateChatClicked(PrivateChatSummary privateChatSummary);
+
     void onGroupChatClicked(GroupChatSummary groupChatSummary);
 }

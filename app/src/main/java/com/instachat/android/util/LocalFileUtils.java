@@ -44,7 +44,7 @@ public final class LocalFileUtils {
                 }
             } catch (final Exception e) {
                 /*
-				 * the pre and post suffixes must be >= 3 chars or it will throw
+                 * the pre and post suffixes must be >= 3 chars or it will throw
 				 * exception
 				 */
                 final File tmp = File.createTempFile("touch", "tmp", f.getParentFile());
@@ -92,12 +92,14 @@ public final class LocalFileUtils {
             if (in != null) {
                 try {
                     in.close();
-                }catch(IOException e){}
+                } catch (IOException e) {
+                }
             }
             if (out != null) {
                 try {
                     out.close();
-                }catch(IOException e){}
+                } catch (IOException e) {
+                }
             }
         }
     }

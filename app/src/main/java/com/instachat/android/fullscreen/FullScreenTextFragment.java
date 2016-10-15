@@ -28,15 +28,15 @@ public class FullScreenTextFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_fullscreen,container,false);
+        final View view = inflater.inflate(R.layout.fragment_fullscreen, container, false);
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        final ViewPager viewPager = (ViewPager)getView().findViewById(R.id.view_pager);
-        FuelInjector.ignite(getActivity(),this);
+        final ViewPager viewPager = (ViewPager) getView().findViewById(R.id.view_pager);
+        FuelInjector.ignite(getActivity(), this);
         mPagerAdapter = new FragmentStatePagerAdapter(getChildFragmentManager()) {
             @Override
             public Fragment getItem(final int position) {
@@ -44,7 +44,7 @@ public class FullScreenTextFragment extends Fragment {
                 final Bundle args = new Bundle();
                 FriendlyMessage friendlyMessage = mFriendlyMessageContainer.getFriendlyMessage(position);
                 MLog.d(TAG, "onActivityCreated() friendlyMessage: " + friendlyMessage.toString());
-                args.putParcelable(Constants.KEY_FRIENDLY_MESSAGE,friendlyMessage);
+                args.putParcelable(Constants.KEY_FRIENDLY_MESSAGE, friendlyMessage);
                 fragment.setArguments(args);
                 return fragment;
             }
@@ -56,7 +56,7 @@ public class FullScreenTextFragment extends Fragment {
         };
         viewPager.setAdapter(mPagerAdapter);
         mLastPos = getStartingPos();
-        viewPager.setCurrentItem(mLastPos,true);
+        viewPager.setCurrentItem(mLastPos, true);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -67,7 +67,7 @@ public class FullScreenTextFragment extends Fragment {
             public void onPageSelected(int position) {
                 mLastPos = position;
                 FriendlyMessage friendlyMessage = mFriendlyMessageContainer.getFriendlyMessage(position);
-                MLog.d(TAG,"onPageSelected: "+position + " " + friendlyMessage);
+                MLog.d(TAG, "onPageSelected: " + position + " " + friendlyMessage);
             }
 
             @Override
@@ -78,11 +78,11 @@ public class FullScreenTextFragment extends Fragment {
     }
 
     private int getStartingPos() {
-        final int startingPos = getArguments().getInt(Constants.KEY_STARTING_POS,-1);
-        if (startingPos > -1 && startingPos <= mFriendlyMessageContainer.getFriendlyMessageCount()-1) {
+        final int startingPos = getArguments().getInt(Constants.KEY_STARTING_POS, -1);
+        if (startingPos > -1 && startingPos <= mFriendlyMessageContainer.getFriendlyMessageCount() - 1) {
             return startingPos;
         } else {
-            return mFriendlyMessageContainer.getFriendlyMessageCount()-1;
+            return mFriendlyMessageContainer.getFriendlyMessageCount() - 1;
         }
     }
 
@@ -92,7 +92,7 @@ public class FullScreenTextFragment extends Fragment {
 
     public void notifyDataSetChanged() {
         mPagerAdapter.notifyDataSetChanged();
-        MLog.i(TAG,"notifyDataSetChanged()");
+        MLog.i(TAG, "notifyDataSetChanged()");
     }
 
     @Override

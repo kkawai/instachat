@@ -53,8 +53,8 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
     private ActivityState mActivityState;
     private Map<Long, Pair> publicGroupChatPresenceReferences = new HashMap<>();
 
-    public GroupChatUsersRecyclerAdapter(@NotNull Activity activity,
-                                         @NotNull ActivityState activityState,
+    public GroupChatUsersRecyclerAdapter(@NonNull Activity activity,
+                                         @NonNull ActivityState activityState,
                                          @NonNull UserClickedListener userClickedListener,
                                          long groupid) {
         mActivity = new WeakReference<>(activity);
@@ -75,7 +75,7 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
             @Override
             public void onClick(View view) {
                 User user = data.get(holder.getAdapterPosition());
-                userClickedListener.onUserClicked(user.getId(), user.getUsername());
+                userClickedListener.onUserClicked(user.getId(), user.getUsername(), user.getProfilePicUrl());
             }
         });
         return holder;

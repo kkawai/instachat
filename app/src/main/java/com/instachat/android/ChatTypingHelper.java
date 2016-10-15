@@ -14,7 +14,7 @@ public class ChatTypingHelper extends BroadcastReceiver {
     private IntentFilter mFilter = new IntentFilter(Constants.ACTION_USER_TYPING);
     private UserTypingListener mListener;
 
-    public interface UserTypingListener{
+    public interface UserTypingListener {
         void onRemoteUserTyping(int userid);
     }
 
@@ -24,12 +24,12 @@ public class ChatTypingHelper extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        int userid = intent.getIntExtra(Constants.KEY_USERID,0);
+        int userid = intent.getIntExtra(Constants.KEY_USERID, 0);
         mListener.onRemoteUserTyping(userid);
     }
 
     public void register() {
-        LocalBroadcastManager.getInstance(MyApp.getInstance()).registerReceiver(this,mFilter);
+        LocalBroadcastManager.getInstance(MyApp.getInstance()).registerReceiver(this, mFilter);
     }
 
     public void unregister() {

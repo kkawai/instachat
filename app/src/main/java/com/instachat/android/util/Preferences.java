@@ -307,10 +307,10 @@ public final class Preferences {
     }
 
     public long getLastGroupChatRoomVisited() {
-        return mPrefs.getLong("last_group_chat_room",0);
+        return mPrefs.getLong("last_group_chat_room", 0);
     }
 
     public void setLastGroupChatRoomVisited(long groupid) {
-        mPrefs.edit().putLong("last_group_chat_room",groupid).apply();
+        mPrefs.edit().putLong("last_group_chat_room", groupid).apply();
     }
 }

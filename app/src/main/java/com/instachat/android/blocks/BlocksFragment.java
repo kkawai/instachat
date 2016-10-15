@@ -17,6 +17,7 @@ import com.instachat.android.BaseFragment;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.adapter.UserClickedListener;
+import com.instachat.android.model.PrivateChatSummary;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -43,7 +44,7 @@ public class BlocksFragment extends BaseFragment {
         super.onActivityCreated(savedInstanceState);
         mUserClickedListener = new UserClickedListener() {
             @Override
-            public void onUserClicked(final int userid, final String username) {
+            public void onUserClicked(final int userid, final String username, final String dpid) {
 
                 new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
                         .setTitleText(getActivity().getString(R.string.unblock_person_title, username))
@@ -66,6 +67,7 @@ public class BlocksFragment extends BaseFragment {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
+                                    createPrivateChatSummary(userid, username, dpid);
                                     new SweetAlertDialog(getActivity(), SweetAlertDialog.SUCCESS_TYPE)
                                             .setTitleText(getActivity().getString(R.string.success_exclamation))
                                             .setContentText(getActivity().getString(R.string.unblock_person_success, username))
@@ -90,6 +92,14 @@ public class BlocksFragment extends BaseFragment {
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mBlocksRecyclerView.setLayoutManager(linearLayoutManager);
         mBlocksRecyclerView.setAdapter(mBlocksAdapter);
+    }
+
+    private void createPrivateChatSummary(int userid, String username, String dpid) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
+        PrivateChatSummary summary = new PrivateChatSummary();
+        summary.setName(username);
+        summary.setDpid(dpid);
+        ref.child(userid + "").updateChildren(PrivateChatSummary.toMap(summary));
     }
 
     @Override

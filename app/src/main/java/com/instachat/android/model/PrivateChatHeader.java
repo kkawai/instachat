@@ -7,5 +7,6 @@ public class PrivateChatHeader {
     public PrivateChatHeader(String name) {
         this.name = name;
     }
+
     public String name;
 }

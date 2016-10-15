@@ -12,8 +12,9 @@ import com.instachat.android.R;
 public class ChatHeaderViewHolder extends RecyclerView.ViewHolder {
 
     public TextView name;
+
     public ChatHeaderViewHolder(View view) {
         super(view);
-        name = (TextView)view.findViewById(R.id.name);
+        name = (TextView) view.findViewById(R.id.name);
     }
 }
