@@ -350,9 +350,10 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
             ((ChatHeaderViewHolder) holder).name.setText(privateChatHeader.name);
 
         } else if (viewType == TYPE_GROUP_SUMMARY) {
-
+            Resources res = ((GroupChatSummaryViewHolder) holder).name.getContext().getResources();
             GroupChatSummary groupChatSummary = (GroupChatSummary) data.get(position);
             ((GroupChatSummaryViewHolder) holder).name.setText(groupChatSummary.getName());
+            ((GroupChatSummaryViewHolder) holder).name.setTextColor(res.getColor(R.color.left_drawer_list_room_name_text_color));
             ((GroupChatSummaryViewHolder) holder).status.setVisibility(View.INVISIBLE);
             /**
              * Note!  In the beginning stages of this app, we don't have group notifications
@@ -361,7 +362,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
              */
             if (groupChatSummary.getUsersInRoomCount() > 0) {
                 ((GroupChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.VISIBLE);
-                ((GroupChatSummaryViewHolder) holder).unreadMessageCount.setText(" " + groupChatSummary.getUsersInRoomCount() + " ");
+                ((GroupChatSummaryViewHolder) holder).unreadMessageCount.setText("  " + groupChatSummary.getUsersInRoomCount() + "  ");
             } else
                 ((GroupChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.INVISIBLE);
 
@@ -373,11 +374,11 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
             Resources res = ((PrivateChatSummaryViewHolder) holder).name.getContext().getResources();
             if (privateChatSummary.getUnreadMessageCount() > 0) {
                 ((PrivateChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.VISIBLE);
-                ((PrivateChatSummaryViewHolder) holder).unreadMessageCount.setText(" " + privateChatSummary.getUnreadMessageCount() + " ");
-                ((PrivateChatSummaryViewHolder) holder).name.setTextColor(res.getColor(android.R.color.white));
+                ((PrivateChatSummaryViewHolder) holder).unreadMessageCount.setText("  " + privateChatSummary.getUnreadMessageCount() + "  ");
+                ((PrivateChatSummaryViewHolder) holder).name.setTextColor(res.getColor(R.color.left_drawer_list_name_new_messages_text_color));
             } else {
                 ((PrivateChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.INVISIBLE);
-                ((PrivateChatSummaryViewHolder) holder).name.setTextColor(res.getColor(R.color.defaultChatSummaryNameColor));
+                ((PrivateChatSummaryViewHolder) holder).name.setTextColor(res.getColor(R.color.left_drawer_list_name_text_color));
             }
         }
     }

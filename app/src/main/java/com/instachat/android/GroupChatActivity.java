@@ -765,9 +765,9 @@ public class GroupChatActivity extends BaseActivity implements
         if (navigationView == null)
             return;
         View headerView = getLayoutInflater().inflate(R.layout.nav_header, navigationView, false);
-        View drawerRecyclerView = getLayoutInflater().inflate(R.layout.drawer_layout, navigationView, false);
+        View drawerRecyclerView = getLayoutInflater().inflate(R.layout.left_drawer_layout, navigationView, false);
+        navigationView.addView(drawerRecyclerView);
         navigationView.addHeaderView(headerView);
-        navigationView.addHeaderView(drawerRecyclerView);
         mLeftDrawerHelper = new LeftDrawerHelper(this, this, mDrawerLayout, mMyProfilePicListener);
         mLeftDrawerHelper.setup(navigationView);
 
@@ -788,7 +788,7 @@ public class GroupChatActivity extends BaseActivity implements
             return;
         }
         //View headerView = getLayoutInflater().inflate(R.layout.nav_header, navigationView, false);
-        View drawerRecyclerView = getLayoutInflater().inflate(R.layout.drawer_layout, navigationView, false);
+        View drawerRecyclerView = getLayoutInflater().inflate(R.layout.right_drawer_layout, navigationView, false);
         final View headerView = getLayoutInflater().inflate(R.layout.right_nav_header, navigationView, false);
 
         FirebaseDatabase.getInstance().getReference(Constants.PUBLIC_CHATS_SUMMARY_PARENT_REF).child(mGroupId + "").

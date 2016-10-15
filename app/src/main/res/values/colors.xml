@@ -30,6 +30,13 @@
     <color name="soft_grey_split">#d0d0d0</color>
     <color name="soft_grey_choose">#aaa</color>
 
+    <!-- left drawer list text and background colors -->
+    <color name="left_drawer_list_background_color">#FEFEFA</color>
+    <color name="left_drawer_list_name_text_color">#575757</color>
+    <color name="left_drawer_list_name_new_messages_text_color">#ff21272b</color>
+    <color name="left_drawer_list_headers_text_color">#ff37474f</color>
+    <color name="left_drawer_list_room_name_text_color">#ff263238</color>
+
     <!-- sweet alert dialog -->
     <color name="float_transparent">#00000000</color>
     <color name="sweet_dialog_bg_color">#FFFFFF</color>
