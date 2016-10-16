@@ -339,19 +339,21 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        int viewType = getItemViewType(position);
+        final Resources res = holder.itemView.getResources();
+        final int viewType = getItemViewType(position);
         if (viewType == TYPE_GROUP_HEADER) {
 
             GroupChatHeader groupChatHeader = (GroupChatHeader) data.get(position);
             ((ChatHeaderViewHolder) holder).name.setText(groupChatHeader.name);
+            ((ChatHeaderViewHolder) holder).name.setTextColor(res.getColor(R.color.left_drawer_groups_label_text_color));
 
         } else if (viewType == TYPE_PRIVATE_HEADER) {
 
             PrivateChatHeader privateChatHeader = (PrivateChatHeader) data.get(position);
             ((ChatHeaderViewHolder) holder).name.setText(privateChatHeader.name);
+            ((ChatHeaderViewHolder) holder).name.setTextColor(res.getColor(R.color.left_drawer_privates_label_text_color));
 
         } else if (viewType == TYPE_GROUP_SUMMARY) {
-            Resources res = ((GroupChatSummaryViewHolder) holder).name.getContext().getResources();
             GroupChatSummary groupChatSummary = (GroupChatSummary) data.get(position);
             ((GroupChatSummaryViewHolder) holder).name.setText(groupChatSummary.getName());
             ((GroupChatSummaryViewHolder) holder).name.setTextColor(res.getColor(R.color.left_drawer_list_room_name_text_color));
@@ -372,7 +374,6 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
             PrivateChatSummary privateChatSummary = (PrivateChatSummary) data.get(position);
             ((PrivateChatSummaryViewHolder) holder).name.setText(privateChatSummary.getName());
             ((PrivateChatSummaryViewHolder) holder).status.setVisibility(View.VISIBLE);
-            Resources res = ((PrivateChatSummaryViewHolder) holder).name.getContext().getResources();
             if (privateChatSummary.getUnreadMessageCount() > 0) {
                 ((PrivateChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.VISIBLE);
                 ((PrivateChatSummaryViewHolder) holder).unreadMessageCount.setText("  " + privateChatSummary.getUnreadMessageCount() + "  ");

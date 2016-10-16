@@ -30,11 +30,15 @@
     <color name="soft_grey_split">#d0d0d0</color>
     <color name="soft_grey_choose">#aaa</color>
 
+    <color name="light_turquoise">#71efc5</color>
+
     <!-- left drawer list text and background colors -->
     <color name="left_drawer_list_background_color">#FEFEFA</color>
     <color name="left_drawer_list_name_text_color">#73757e</color>
     <color name="left_drawer_list_name_new_messages_text_color">#ff21272b</color>
     <color name="left_drawer_list_headers_text_color">#384449</color>
+    <color name="left_drawer_groups_label_text_color">@color/colorPrimaryDark</color>
+    <color name="left_drawer_privates_label_text_color">@color/light_turquoise</color>
     <color name="left_drawer_list_room_name_text_color">#696f71</color>
 
     <!-- sweet alert dialog -->
