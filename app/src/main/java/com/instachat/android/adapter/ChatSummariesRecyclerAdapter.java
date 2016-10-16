@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.brandongogetap.stickyheaders.exposed.StickyHeaderHandler;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,7 +35,7 @@ import java.util.Map;
  * GroupChatSummary, PrivateChatHeader, and GroupChatHeader
  * objects in an array list;
  */
-public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter {
+public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implements StickyHeaderHandler {
 
     public static final String TAG = "ChatSummariesRecyclerAdapter";
 
@@ -483,5 +484,10 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
             pair.ref.removeEventListener(pair.listener);
             publicGroupChatPresenceReferences.remove(groupid);
         }
+    }
+
+    @Override
+    public List<?> getAdapterData() {
+        return data;
     }
 }

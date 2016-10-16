@@ -40,6 +40,7 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.ath.fuel.FuelInjector;
+import com.brandongogetap.stickyheaders.StickyLayoutManager;
 import com.github.rubensousa.bottomsheetbuilder.BottomSheetBuilder;
 import com.github.rubensousa.bottomsheetbuilder.BottomSheetMenuDialog;
 import com.github.rubensousa.bottomsheetbuilder.adapter.BottomSheetItemClickListener;
@@ -765,18 +766,15 @@ public class GroupChatActivity extends BaseActivity implements
         if (navigationView == null)
             return;
         View headerView = getLayoutInflater().inflate(R.layout.nav_header, navigationView, false);
-        View drawerRecyclerView = getLayoutInflater().inflate(R.layout.left_drawer_layout, navigationView, false);
-        navigationView.addView(drawerRecyclerView);
+        View drawerView = getLayoutInflater().inflate(R.layout.left_drawer_layout, navigationView, false);
+        navigationView.addView(drawerView);
         navigationView.addHeaderView(headerView);
         mLeftDrawerHelper = new LeftDrawerHelper(this, this, mDrawerLayout, mMyProfilePicListener);
         mLeftDrawerHelper.setup(navigationView);
 
-        RecyclerView recyclerView = (RecyclerView) drawerRecyclerView.findViewById(R.id.drawerRecyclerView);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(linearLayoutManager);
-
         mChatsRecyclerViewAdapter = new ChatSummariesRecyclerAdapter(this, this);
+        RecyclerView recyclerView = (RecyclerView) drawerView.findViewById(R.id.drawerRecyclerView);
+        recyclerView.setLayoutManager(new StickyLayoutManager(this, mChatsRecyclerViewAdapter));
         recyclerView.setAdapter(mChatsRecyclerViewAdapter);
         mChatsRecyclerViewAdapter.populateData();
     }
@@ -1318,4 +1316,5 @@ public class GroupChatActivity extends BaseActivity implements
     protected BlockedUserListener getBlockedUserListener() {
         return mBlockedUserListener;
     }
+
 }

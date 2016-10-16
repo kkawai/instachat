@@ -25,7 +25,7 @@
 
     <dimen name="dialog_options_title_padding">16dp</dimen>
 
-    <dimen name="right_drawer_header_height">192dp</dimen>
+    <dimen name="left_drawer_header_height">192dp</dimen>
 
     <integer name="max_bio">256</integer>
 

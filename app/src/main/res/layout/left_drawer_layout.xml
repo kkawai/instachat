@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView
-    android:id="@+id/drawerRecyclerView"
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/right_drawer_header_height"
-    android:background="@color/left_drawer_list_background_color"
-    />
+    android:layout_marginTop="@dimen/left_drawer_header_height">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/drawerRecyclerView"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/left_drawer_list_background_color"
+        />
+</FrameLayout>
