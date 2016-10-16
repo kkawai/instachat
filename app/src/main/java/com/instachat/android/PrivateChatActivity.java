@@ -37,10 +37,12 @@ import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.model.User;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
+import com.instachat.android.util.TimeUtil;
 import com.tooltip.Tooltip;
 
 import org.json.JSONObject;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -95,7 +97,29 @@ public class PrivateChatActivity extends GroupChatActivity {
                     mToUser = User.fromResponse(response);
                     createPrivateChatSummary();
                     populateUserProfile();
-                    getSupportActionBar().setTitle(mToUser.getUsername());
+                    //getSupportActionBar().setTitle(mToUser.getUsername());
+
+                    FirebaseDatabase.getInstance().getReference("/users/").
+                            child(toUserid + "").child("lastOnline").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            try {
+                                MLog.d(TAG, "lastOnline dataSnapshot ", dataSnapshot, " active ", TimeUtil.getTimeAgo(new Date((Long) dataSnapshot.getValue())));
+                                if (dataSnapshot.getValue() != null) {
+                                    //getSupportActionBar().setSubtitle(TimeUtil.getTimeAgo(new Date((Long) dataSnapshot.getValue())));
+                                    setCustomTitles(mToUser.getUsername(), TimeUtil.getTimeAgo(new Date((Long) dataSnapshot.getValue())));
+                                }
+                            } catch (Exception e) {
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+
                 } catch (Exception e) {
                     Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, "1"), Toast.LENGTH_SHORT).show();
                 }
@@ -112,6 +136,9 @@ public class PrivateChatActivity extends GroupChatActivity {
         MLog.d(TAG, "Cancelled notification " + toUserid);
         clearPrivateUnreadMessages(toUserid);
 
+        final View customTitlePairInParallax = findViewById(R.id.customTitlePairInParallax);
+        final View customTitlePairInToolbar = findViewById(R.id.customTitlePairInToolbar);
+
         final ImageView toolbarProfileImageView = (ImageView) findViewById(R.id.topCornerUserThumb);
         final TextView bio = (TextView) findViewById(R.id.bio);
         final ImageView profilePic = (ImageView) findViewById(R.id.profile_pic);
@@ -126,7 +153,9 @@ public class PrivateChatActivity extends GroupChatActivity {
                 }
                 bio.setAlpha(alpha);
                 profilePic.setAlpha(alpha);
+                customTitlePairInParallax.setAlpha(alpha);
                 toolbarProfileImageView.setAlpha(1 - alpha);
+                customTitlePairInToolbar.setAlpha(1 - alpha);
 
                 MLog.d(TAG, "appBarLayout.height: " + appBarLayout.getHeight(), " verticalOffset ", verticalOffset, " toolbarHeight ", getToolbarHeight(), " alpha ", alpha);
                 if (verticalOffset == 0) {
@@ -456,5 +485,13 @@ public class PrivateChatActivity extends GroupChatActivity {
         if (userid == getActiveUserid()) {
             finish();
         }
+    }
+
+    private void setCustomTitles(String username, String lastActive) {
+        ((TextView) findViewById(R.id.customTitleInToolbar)).setText(username);
+        ((TextView) findViewById(R.id.customSubtitleInToolbar)).setText(lastActive);
+
+        ((TextView) findViewById(R.id.customTitleInParallax)).setText(username);
+        ((TextView) findViewById(R.id.customSubtitleInParallax)).setText(lastActive);
     }
 }

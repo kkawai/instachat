@@ -12,8 +12,8 @@
     <dimen name="fragment_profile_pic_size">220dp</dimen>
 
     <!-- private chat activity profile -->
-    <dimen name="profile_header_height">285dp</dimen>
-    <dimen name="private_activity_profile_pic_size">160dp</dimen>
+    <dimen name="profile_header_height">360dp</dimen>
+    <dimen name="private_activity_profile_pic_size">200dp</dimen>
     <dimen name="super_small_user_thumb_size">26dp</dimen>
 
     <dimen name="posted_photo_size">320dp</dimen>
@@ -25,7 +25,7 @@
 
     <dimen name="dialog_options_title_padding">16dp</dimen>
 
-    <dimen name="left_drawer_header_height">192dp</dimen>
+    <dimen name="left_drawer_header_height">220dp</dimen>
 
     <integer name="max_bio">256</integer>
 

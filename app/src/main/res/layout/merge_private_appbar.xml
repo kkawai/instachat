@@ -18,7 +18,6 @@
             app:expandedTitleMarginStart="48dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -50,6 +49,44 @@
                     android:textSize="15sp"
                     app:font="Lato-Regular.ttf"
                     />
+
+                <LinearLayout
+                    android:id="@+id/customTitlePairInParallax"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:orientation="horizontal"
+                    android:paddingBottom="@dimen/activity_vertical_margin">
+
+                    <com.instachat.android.view.CustomFontTextView
+                        android:id="@+id/customTitleInParallax"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:text="MyUsername"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        app:font="Lato-Bold.ttf"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="  •  "/>
+
+                    <com.instachat.android.view.CustomFontTextView
+                        android:id="@+id/customSubtitleInParallax"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="active 1 minute ago"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:font="Lato-SemiboldItalic.ttf"
+                        />
+                </LinearLayout>
             </RelativeLayout>
 
 
@@ -67,6 +104,39 @@
                     android:layout_gravity="left|center_vertical"
                     android:src="@drawable/ic_account_circle_black_36dp"
                     />
+
+                <LinearLayout
+                    android:id="@+id/customTitlePairInToolbar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:paddingLeft="8dp">
+
+                    <com.instachat.android.view.CustomFontTextView
+                        android:id="@+id/customTitleInToolbar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="MyUsername"
+                        android:textSize="21sp"
+                        android:textStyle="bold"
+                        app:font="Lato-Bold.ttf"
+                        />
+
+                    <com.instachat.android.view.CustomFontTextView
+                        android:id="@+id/customSubtitleInToolbar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="active 1m"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:font="Lato-SemiboldItalic.ttf"
+                        />
+                </LinearLayout>
 
             </android.support.v7.widget.Toolbar>
 
