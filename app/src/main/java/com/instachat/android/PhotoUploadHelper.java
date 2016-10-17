@@ -2,6 +2,8 @@ package com.instachat.android;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
@@ -141,8 +143,15 @@ public class PhotoUploadHelper {
 
         // Create content:// URI for file, required since Android N
         // See: https://developer.android.com/reference/android/support/v4/content/FileProvider.html
+        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         mTargetFileUri = FileProvider.getUriForFile(mActivity,
                 mActivity.getPackageName() + ".fileprovider", mTargetFile);
+        List<ResolveInfo> resInfoList = MyApp.getInstance().getPackageManager().queryIntentActivities(cameraIntent, PackageManager.MATCH_DEFAULT_ONLY);
+        for (ResolveInfo resolveInfo : resInfoList) {
+            String packageName = resolveInfo.activityInfo.packageName;
+            MyApp.getInstance().grantUriPermission(packageName, mTargetFileUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            MLog.d(TAG,"granted app ", packageName, " permission to internal file uri: ", mTargetFileUri);
+        }
     }
 
     /**
