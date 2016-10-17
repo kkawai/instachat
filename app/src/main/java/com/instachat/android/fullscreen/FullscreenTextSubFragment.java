@@ -1,6 +1,5 @@
 package com.instachat.android.fullscreen;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -8,6 +7,8 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -77,6 +78,7 @@ public class FullscreenTextSubFragment extends Fragment implements ZoomImageList
             @Override
             public void onClick(View view) {
                 mZoomableImageView.rotate();
+                animateRotateButton();
             }
         });
 
@@ -92,9 +94,39 @@ public class FullscreenTextSubFragment extends Fragment implements ZoomImageList
 
     }
 
+    private boolean mHasShownInitialScaleInAnimation;
+
     @Override
     public void onSetImageBitmap() {
         mRotateButton.setVisibility(View.VISIBLE);
-        AnimationUtil.scaleInFromCenter(mRotateButton);
+        if (!mHasShownInitialScaleInAnimation) {
+            mHasShownInitialScaleInAnimation = true;
+            AnimationUtil.scaleInFromCenter(mRotateButton);
+        }
+    }
+
+    private void animateRotateButton() {
+        RotateAnimation anim = new RotateAnimation(0f, -90f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        anim.setDuration(300);
+        //AnimationUtil.scaleInFromCenter(mRotateButton);
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                RotateAnimation anim = new RotateAnimation(-90, -0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                anim.setDuration(300);
+                mRotateButton.startAnimation(anim);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mRotateButton.startAnimation(anim);
     }
 }

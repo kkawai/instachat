@@ -234,7 +234,8 @@ public final class ZoomableImageView extends MyNetworkImageView {
 
         if (mZoomableImageListener != null) {
             try {
-                mZoomableImageListener.onSetImageBitmap();
+                if (bitmap.getWidth() > 0 && bitmap.getHeight() > 0)
+                    mZoomableImageListener.onSetImageBitmap();
             } catch (final Throwable t) {
             }
         }
@@ -681,7 +682,7 @@ public final class ZoomableImageView extends MyNetworkImageView {
                 return;
             }
             final Matrix matrix = new Matrix();
-            matrix.postRotate(90);
+            matrix.postRotate(-90);
             final Bitmap rotatedBitmap = Bitmap.createBitmap(mBitmap, 0, 0,
                     mBitmap.getWidth(), mBitmap.getHeight(), matrix, true);
             setImageBitmap(rotatedBitmap);
