@@ -208,12 +208,30 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     private boolean mIsAppBarExpanded = true; //initially it's expanded
 
+    /**
+     * If the relationship has already been established, don't
+     * create it.  Otherwise, create it.
+     */
     private void createPrivateChatSummary() {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
-        PrivateChatSummary summary = new PrivateChatSummary();
-        summary.setName(mToUser.getUsername());
-        summary.setDpid(mToUser.getProfilePicUrl());
-        ref.child(mToUser.getId() + "").updateChildren(PrivateChatSummary.toMap(summary));
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF())
+                .child(mToUser.getId() + "");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() == null) {
+                    ref.removeEventListener(this);
+                    PrivateChatSummary summary = new PrivateChatSummary();
+                    summary.setName(mToUser.getUsername());
+                    summary.setDpid(mToUser.getProfilePicUrl());
+                    ref.updateChildren(PrivateChatSummary.toMap(summary));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void updatePrivateChatSummaryLastMessageSentTimestamp() {

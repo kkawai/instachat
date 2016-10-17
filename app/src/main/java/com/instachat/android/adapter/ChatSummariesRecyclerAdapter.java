@@ -205,13 +205,68 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
             for (int i = 0; i < data.size(); i++) {
                 Object o = data.get(i);
                 if (o instanceof PrivateChatHeader) {
-                    data.add(i + 1, privateChatSummary);
-                    notifyItemInserted(i + 1);
+
+                    boolean inserted = false;
+                    for (int j = i + 1; j < data.size(); j++) {
+                        Object n = data.get(j);
+                        if (n instanceof PrivateChatSummary) {
+                            PrivateChatSummary curr = (PrivateChatSummary) n;
+                            if (privateChatSummary.compareTo(curr) < 0) {
+                                data.add(j, privateChatSummary);
+                                notifyItemInserted(j);
+                                inserted = true;
+                                break;
+                            }
+                        } else {
+                            data.add(j, privateChatSummary);
+                            notifyItemInserted(j);
+                            inserted = true;
+                            break;
+                        }
+                    }
+                    if (!inserted) {
+                        data.add(privateChatSummary);
+                        notifyItemInserted(data.size() - 1);
+                    }
                     break;
                 }
             }
         }
     }
+
+    /*private void sortPrivateChatSummaries() {
+        int startIndex = -1;
+        int endIndex = -1;
+        ArrayList<PrivateChatSummary> list = new ArrayList<>(data.size());
+        for (int i = 0; i < data.size(); i++) {
+            Object object = data.get(i);
+            if (object instanceof PrivateChatSummary) {
+                if (startIndex == -1) {
+                    startIndex = i;
+                }
+                list.add((PrivateChatSummary) object);
+            } else if (startIndex != -1 && !(object instanceof PrivateChatSummary)) {
+                endIndex = i - 1;
+                break;
+            }
+        }
+        if (endIndex == -1) {
+            endIndex = data.size() - 1;
+        }
+        if (list.size() <= 1) {
+            notifyItemChanged(endIndex);
+            return;
+        }
+        for (int i = endIndex; i >= startIndex; i--) {
+            data.remove(i);
+        }
+        Collections.sort(list);
+        for (PrivateChatSummary s : list) {
+            MLog.d(TAG, "sorted summary: " + s.getName(), "  ", s.getLastMessageSentTimestamp());
+        }
+        data.addAll(list);
+        notifyItemRangeChanged(startIndex, endIndex);
+    }*/
 
     private void updatePrivateChatSummary(PrivateChatSummary privateChatSummary) {
         synchronized (this) {
@@ -301,7 +356,6 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        //to-do add on click listeners
         if (viewType == TYPE_GROUP_HEADER) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_header_item, parent, false);
             ChatHeaderViewHolder holder = new ChatHeaderViewHolder(view);
