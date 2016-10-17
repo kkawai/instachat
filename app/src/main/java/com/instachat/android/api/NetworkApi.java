@@ -190,6 +190,10 @@ public final class NetworkApi {
 
     }
 
+    public static int gcmcount(final int userid) throws Exception {
+        return new HttpMessage(Constants.API_BASE_URL + "/gcmcount?iid=" + userid).getInt();
+    }
+
     public static void gcmreg(final Context context, final String regid) throws Exception {
 
         final String androidId = DeviceUtil.getAndroidId(context);

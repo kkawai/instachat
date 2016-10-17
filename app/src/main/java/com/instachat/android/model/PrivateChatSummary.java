@@ -25,6 +25,8 @@ public class PrivateChatSummary implements Comparable {
     private long lastMessageSentTimestamp;
     private String lastMessage;
     private int unreadMessageCount = -1;
+    private int onlineStatus = -1;
+    private long lastOnline;
 
     public String getId() {
         return id;
@@ -82,6 +84,22 @@ public class PrivateChatSummary implements Comparable {
         this.unreadMessageCount = unreadMessageCount;
     }
 
+    public int getOnlineStatus() {
+        return onlineStatus;
+    }
+
+    public void setOnlineStatus(int onlineStatus) {
+        this.onlineStatus = onlineStatus;
+    }
+
+    public long getLastOnline() {
+        return lastOnline;
+    }
+
+    public void setLastOnline(long lastOnline) {
+        this.lastOnline = lastOnline;
+    }
+
     /**
      * @return returns only the fields you want
      * to update in cloud database
@@ -102,7 +120,24 @@ public class PrivateChatSummary implements Comparable {
         if (privateChatSummary.getUnreadMessageCount() >= 0) {
             map.put("unreadMessageCount", privateChatSummary.getUnreadMessageCount());
         }
+        if (privateChatSummary.getOnlineStatus() >= 0) {
+            map.put("onlineStatus", privateChatSummary.getOnlineStatus());
+        }
         return map;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof PrivateChatSummary)) {
+            return false;
+        }
+        PrivateChatSummary other = (PrivateChatSummary)obj;
+        return id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.parseInt(id);
     }
 
     @Override

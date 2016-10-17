@@ -1,6 +1,7 @@
 package com.instachat.android.adapter;
 
 import android.content.res.Resources;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,20 +14,24 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.instachat.android.ActivityState;
 import com.instachat.android.Constants;
 import com.instachat.android.MyApp;
 import com.instachat.android.R;
+import com.instachat.android.api.NetworkApi;
 import com.instachat.android.model.GroupChatHeader;
 import com.instachat.android.model.GroupChatSummary;
 import com.instachat.android.model.PrivateChatHeader;
 import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.util.MLog;
+import com.instachat.android.util.ThreadWrapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * Created by kevin on 9/26/2016.
@@ -49,12 +54,19 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
         ChildEventListener listener;
     }
 
-    private List<Object> data = new ArrayList<>(40);
+    private static final class ValueEventPair {
+        DatabaseReference ref;
+        ValueEventListener listener;
+    }
+
+    private List<Object> data = new ArrayList<>(128);
     private ChildEventListener privateChatsSummaryListener, publicGroupChatsSummaryListener;
     private DatabaseReference privateChatsSummaryReference, publicGroupChatsSummaryReference;
     private ChatsItemClickedListener chatsItemClickedListener;
     private Map<Long, Pair> publicGroupChatPresenceReferences = new HashMap<>();
     private ActivityState activityState;
+    private Vector<ValueEventPair> lastOnlineRefs = new Vector<>(128);
+    private Handler handler = new Handler();
 
     public ChatSummariesRecyclerAdapter(@NonNull ChatsItemClickedListener chatsItemClickedListener,
                                         @NonNull ActivityState activityState) {
@@ -232,6 +244,73 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
                 }
             }
         }
+        getLastSeenTimestamp(privateChatSummary);
+    }
+
+    private void getLastSeenTimestamp(final PrivateChatSummary privateChatSummary) {
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("/users/").
+                child(privateChatSummary.getId()).child("lastOnline");
+        ValueEventListener eventListener = ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (activityState == null || activityState.isActivityDestroyed())
+                    return;
+                try {
+                    if (dataSnapshot.getValue() != null) {
+                        privateChatSummary.setLastOnline((Long) dataSnapshot.getValue());
+                    }
+                    getGcmStatus(privateChatSummary);
+                } catch (Exception e) {
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        ValueEventPair pair = new ValueEventPair();
+        pair.listener = eventListener;
+        pair.ref = ref;
+        lastOnlineRefs.add(pair);
+    }
+
+    private void getGcmStatus(final PrivateChatSummary privateChatSummary) {
+        ThreadWrapper.executeInWorkerThread(new Runnable() {
+            @Override
+            public void run() {
+                if (activityState == null || activityState.isActivityDestroyed())
+                    return;
+                try {
+                    if (NetworkApi.gcmcount(Integer.parseInt(privateChatSummary.getId())) > 0) {
+                        if (System.currentTimeMillis() - privateChatSummary.getLastOnline() > Constants.TWELVE_HOURS) {
+                            privateChatSummary.setOnlineStatus(Constants.USER_AWAY);
+                        } else {
+                            privateChatSummary.setOnlineStatus(Constants.USER_ONLINE);
+                        }
+                    } else {
+                        privateChatSummary.setOnlineStatus(Constants.USER_OFFLINE);
+                    }
+                    if (activityState == null || activityState.isActivityDestroyed())
+                        return;
+                    synchronized (ChatSummariesRecyclerAdapter.this) {
+                        final int index = data.indexOf(privateChatSummary);
+                        if (index != -1) {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    notifyItemChanged(index);
+                                }
+                            });
+
+                        }
+                    }
+                } catch (Exception e) {
+                    MLog.e(TAG, "", e);
+                }
+            }
+        });
     }
 
     /*private void sortPrivateChatSummaries() {
@@ -436,6 +515,15 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
                 ((PrivateChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.INVISIBLE);
                 ((PrivateChatSummaryViewHolder) holder).name.setTextColor(res.getColor(R.color.left_drawer_list_name_text_color));
             }
+            if (privateChatSummary.getOnlineStatus() == Constants.USER_ONLINE) {
+                ((PrivateChatSummaryViewHolder) holder).status.setImageResource(R.drawable.presence_green);
+            } else if (privateChatSummary.getOnlineStatus() == Constants.USER_AWAY) {
+                ((PrivateChatSummaryViewHolder) holder).status.setImageResource(R.drawable.presence_away);
+            } else if (privateChatSummary.getOnlineStatus() == Constants.USER_OFFLINE) {
+                ((PrivateChatSummaryViewHolder) holder).status.setImageResource(R.drawable.presence_gone);
+            } else {
+                ((PrivateChatSummaryViewHolder) holder).status.setImageResource(R.drawable.presence_green);
+            }
         }
     }
 
@@ -451,8 +539,12 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
             Pair pair = publicGroupChatPresenceReferences.get(groupid);
             pair.ref.removeEventListener(pair.listener);
         }
-        publicGroupChatPresenceReferences.clear();
+        publicGroupChatPresenceReferences = null;
         activityState = null;
+        for (ValueEventPair pair : lastOnlineRefs) {
+            pair.ref.removeEventListener(pair.listener);
+        }
+        lastOnlineRefs = null;
     }
 
     private synchronized void addPublicGroupChatPresenceReference(final long groupid) {

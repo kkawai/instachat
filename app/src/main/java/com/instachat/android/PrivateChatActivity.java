@@ -64,6 +64,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     private static int sToUserid;
     private ChatTypingHelper mTypingHelper;
     private long mLastTypingTime;
+    private ValueEventListener mLastOnlineValueEventListener = null;
 
     @Override
     protected int getLayout() {
@@ -100,14 +101,12 @@ public class PrivateChatActivity extends GroupChatActivity {
                     populateUserProfile();
                     //getSupportActionBar().setTitle(mToUser.getUsername());
 
-                    FirebaseDatabase.getInstance().getReference("/users/").
+                    mLastOnlineValueEventListener = FirebaseDatabase.getInstance().getReference("/users/").
                             child(toUserid + "").child("lastOnline").addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             try {
-                                MLog.d(TAG, "lastOnline dataSnapshot ", dataSnapshot, " active ", TimeUtil.getTimeAgo(new Date((Long) dataSnapshot.getValue())));
                                 if (dataSnapshot.getValue() != null) {
-                                    //getSupportActionBar().setSubtitle(TimeUtil.getTimeAgo(new Date((Long) dataSnapshot.getValue())));
                                     setCustomTitles(mToUser.getUsername(), TimeUtil.getTimeAgo(new Date((Long) dataSnapshot.getValue())));
                                 }
                             } catch (Exception e) {
@@ -257,6 +256,19 @@ public class PrivateChatActivity extends GroupChatActivity {
         super.onPause();
         if (mTypingHelper != null)
             mTypingHelper.unregister();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mLastOnlineValueEventListener != null) {
+            try {
+                FirebaseDatabase.getInstance().getReference("/users/").
+                        child(sToUserid + "").child("lastOnline").removeEventListener(mLastOnlineValueEventListener);
+            } catch (Exception e) {
+                MLog.e(TAG, "", e);
+            }
+        }
+        super.onDestroy();
     }
 
     @Override
