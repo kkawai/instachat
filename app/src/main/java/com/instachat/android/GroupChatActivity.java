@@ -136,8 +136,7 @@ public class GroupChatActivity extends BaseActivity implements
     private ExternalSendIntentConsumer mExternalSendIntentConsumer;
     private Uri mSharePhotoUri;
     private String mShareText;
-    private long mGroupId = Constants.DEFAULT_PUBLIC_GROUP_ID;
-    private long mNewTargetGroupId = 0;
+    private static long sGroupId = Constants.DEFAULT_PUBLIC_GROUP_ID;
 
     protected int getLayout() {
         return R.layout.activity_main;
@@ -347,12 +346,6 @@ public class GroupChatActivity extends BaseActivity implements
 
     @Override
     public void onDestroy() {
-        if (mNewTargetGroupId != mGroupId) {
-            removeUserPresence();
-            MLog.w(TAG, "onDestroy() (PresenceHelper) user presence removed from: " + mGroupId);
-        } else {
-            MLog.w(TAG, "onDestroy() (PresenceHelper) user presence not removed from: " + mGroupId);
-        }
         if (mPhotoUploadHelper != null)
             mPhotoUploadHelper.cleanup();
         if (mFirebaseAdapter != null)
@@ -374,13 +367,13 @@ public class GroupChatActivity extends BaseActivity implements
     void initDatabaseRef() {
         String databaseRef;
         if (getIntent() != null && getIntent().hasExtra(Constants.KEY_GROUPID)) {
-            mGroupId = getIntent().getLongExtra(Constants.KEY_GROUPID, Constants.DEFAULT_PUBLIC_GROUP_ID);
-            databaseRef = Constants.GROUP_CHAT_REF(mGroupId);
+            sGroupId = getIntent().getLongExtra(Constants.KEY_GROUPID, Constants.DEFAULT_PUBLIC_GROUP_ID);
+            databaseRef = Constants.GROUP_CHAT_REF(sGroupId);
         } else {
-            mGroupId = Constants.DEFAULT_PUBLIC_GROUP_ID;
+            sGroupId = Constants.DEFAULT_PUBLIC_GROUP_ID;
             databaseRef = Constants.GROUP_CHAT_REF(Constants.DEFAULT_PUBLIC_GROUP_ID);
         }
-        Preferences.getInstance().setLastGroupChatRoomVisited(mGroupId);
+        Preferences.getInstance().setLastGroupChatRoomVisited(sGroupId);
         setDatabaseRoot(databaseRef);
     }
 
@@ -788,7 +781,7 @@ public class GroupChatActivity extends BaseActivity implements
         View drawerRecyclerView = getLayoutInflater().inflate(R.layout.right_drawer_layout, navigationView, false);
         final View headerView = getLayoutInflater().inflate(R.layout.right_nav_header, navigationView, false);
 
-        FirebaseDatabase.getInstance().getReference(Constants.PUBLIC_CHATS_SUMMARY_PARENT_REF).child(mGroupId + "").
+        FirebaseDatabase.getInstance().getReference(Constants.PUBLIC_CHATS_SUMMARY_PARENT_REF).child(sGroupId + "").
                 addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -810,7 +803,7 @@ public class GroupChatActivity extends BaseActivity implements
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        mGroupChatUsersRecyclerAdapter = new GroupChatUsersRecyclerAdapter(this, this, this, mGroupId);
+        mGroupChatUsersRecyclerAdapter = new GroupChatUsersRecyclerAdapter(this, this, this, sGroupId);
         recyclerView.setAdapter(mGroupChatUsersRecyclerAdapter);
         mGroupChatUsersRecyclerAdapter.populateData();
     }
@@ -1232,7 +1225,10 @@ public class GroupChatActivity extends BaseActivity implements
 
     @Override
     public void onGroupChatClicked(GroupChatSummary groupChatSummary) {
-        mNewTargetGroupId = groupChatSummary.getId();
+        if (sGroupId == groupChatSummary.getId()) {
+            return;//already in that room
+        }
+        removeUserPresence();
         closeBothDrawers();
         startGroupChatActivity(this, groupChatSummary.getId(), groupChatSummary.getName(),
                 mSharePhotoUri, mShareText);
@@ -1299,15 +1295,15 @@ public class GroupChatActivity extends BaseActivity implements
     }
 
     protected void addUserPresence() {
-        MLog.d(TAG, "addUserPresence() sGroupId: ", mGroupId, " username: ", myUsername());
+        MLog.d(TAG, "addUserPresence() sGroupId: ", sGroupId, " username: ", myUsername());
         User me = Preferences.getInstance().getUser();
-        mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(mGroupId)).
+        mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(sGroupId)).
                 child(myUserid() + "").updateChildren(me.getPresenceMap());
     }
 
     protected void removeUserPresence() {
-        MLog.d(TAG, "removeUserPresence() sGroupId: ", mGroupId, " username: ", myUsername());
-        mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(mGroupId)).
+        MLog.d(TAG, "removeUserPresence() sGroupId: ", sGroupId, " username: ", myUsername());
+        mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(sGroupId)).
                 child(myUserid() + "").removeValue();
     }
 
@@ -1344,5 +1340,8 @@ public class GroupChatActivity extends BaseActivity implements
         return getString(R.string.send_photo_to_group_or_person, room);
     }
 
+    protected static final long getCurrentGroupId() {
+        return sGroupId;
+    }
 
 }

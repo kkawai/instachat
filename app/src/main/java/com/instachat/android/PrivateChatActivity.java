@@ -34,6 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.blocks.BlockUserDialogHelper;
 import com.instachat.android.model.FriendlyMessage;
+import com.instachat.android.model.GroupChatSummary;
 import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.model.User;
 import com.instachat.android.util.MLog;
@@ -532,5 +533,14 @@ public class PrivateChatActivity extends GroupChatActivity {
         if (TextUtils.isEmpty(username))
             username = getString(R.string.anonymous_user);
         return getString(R.string.send_photo_to_group_or_person, username);
+    }
+
+    @Override
+    public void onGroupChatClicked(GroupChatSummary groupChatSummary) {
+        if (getCurrentGroupId() == groupChatSummary.getId()) {
+            finish();
+            return;
+        }
+        super.onGroupChatClicked(groupChatSummary);
     }
 }
