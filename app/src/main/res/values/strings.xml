@@ -100,6 +100,7 @@
     <string name="cannot_chat_you_blocked_them">You have blocked this person.  You should unblock.</string>
 
     <!-- time ago -->
+    <string name="just_now">just now</string>
     <string name="less_than_one_minute_ago">less than 1 minute ago</string>
     <string name="some_minutes_ago">%s minutes ago</string>
     <string name="one_hour_ago">1 hour ago</string>

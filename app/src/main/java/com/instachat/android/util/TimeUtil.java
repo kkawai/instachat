@@ -59,7 +59,7 @@ public final class TimeUtil {
         int day = hour * 24;
 
         if (duration < (minute * 2)) {
-            return MyApp.getInstance().getString(R.string.less_than_one_minute_ago);
+            return MyApp.getInstance().getString(R.string.just_now);
             //return "less than 1 minute ago";
         }
 

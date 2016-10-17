@@ -81,16 +81,6 @@
         android:src="@drawable/doubletap_heart"
         android:visibility="gone"/>
 
-    <ImageView
-        android:id="@+id/rotate90"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|right"
-        android:layout_marginTop="16dip"
-        android:layout_marginRight="16dip"
-        android:background="@null"
-        android:src="@drawable/ic_rotate_90_degrees_ccw_black_36dp"/>
-
     <!--
     <ImageView
         android:id="@+id/playVideo"
@@ -118,5 +108,43 @@
         android:layout_gravity="top|start"
         android:layout_margin="4dip"
         android:text=""/>
+
+    <!-- if you want elevation in the toolbar, surround Toolbar with AppbarLayout (see fragment_blocks)
+    However, in this full screen photo fragment, we don't want that.  -->
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@null"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|left"
+            android:src="@drawable/ic_arrow_back_white_24dp"/>
+
+        <com.instachat.android.view.CustomFontTextView
+            android:id="@+id/customFragmentToolbarTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            app:font="Lato-Normal.ttf"/>
+
+        <ImageView
+            android:id="@+id/rotate90"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|right"
+            android:background="@null"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:src="@drawable/ic_rotate_90_degrees_ccw_black_36dp"/>
+
+    </android.support.v7.widget.Toolbar>
+
 
 </FrameLayout>

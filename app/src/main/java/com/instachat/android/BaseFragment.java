@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.View;
+import android.widget.TextView;
+
+import com.instachat.android.util.MLog;
 
 /**
  * Created by kevin on 9/13/2016.
@@ -19,10 +22,17 @@ public class BaseFragment extends Fragment implements ActivityState {
             backArrow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    MLog.d("BaseFragment", "back pressed");
                     getActivity().onBackPressed();
                 }
             });
         }
+    }
+
+    public void setCustomFragmentToolbarTitle(String title) {
+        TextView textView = (TextView)getView().findViewById(R.id.customFragmentToolbarTitle);
+        if (textView != null)
+            textView.setText(title);
     }
 
     @Override

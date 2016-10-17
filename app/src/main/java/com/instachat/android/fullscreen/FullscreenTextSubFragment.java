@@ -2,7 +2,6 @@ package com.instachat.android.fullscreen;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +11,9 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.instachat.android.BaseFragment;
 import com.instachat.android.Constants;
+import com.instachat.android.PrivateChatActivity;
 import com.instachat.android.R;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.FriendlyMessage;
@@ -24,7 +25,7 @@ import com.instachat.android.view.ZoomableImageView;
 /**
  * Created by kevin on 8/21/2016.
  */
-public class FullscreenTextSubFragment extends Fragment implements ZoomImageListener {
+public class FullscreenTextSubFragment extends BaseFragment implements ZoomImageListener {
 
     public static final String TAG = "FullscreenTextSubFragment";
     private FriendlyMessage mFriendlyMessage;
@@ -48,6 +49,15 @@ public class FullscreenTextSubFragment extends Fragment implements ZoomImageList
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mFriendlyMessage = getArguments().getParcelable(Constants.KEY_FRIENDLY_MESSAGE);
+
+        setCustomFragmentToolbarTitle(mFriendlyMessage.getName());
+
+        getView().findViewById(R.id.toolbar).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PrivateChatActivity.startPrivateChatActivity(getActivity(), mFriendlyMessage.getUserid(), null, null);
+            }
+        });
 
         MLog.d(TAG, "onActivityCreated() friendlyMessage: " + mFriendlyMessage.toString());
 
