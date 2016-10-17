@@ -211,7 +211,7 @@ public class PhotoUploadHelper {
                }
                final Bitmap bitmap = ImageUtils.getBitmap(mActivity, mTargetFileUri, maxSizeBytes);
                ImageUtils.writeBitmapToFile(bitmap, mTargetFile);
-               fixRotate(mTargetFile);
+               //fixRotate(mTargetFile);
                if (mActivityState == null || mActivityState.isActivityDestroyed())
                   return;
                mActivity.runOnUiThread(new Runnable() {
