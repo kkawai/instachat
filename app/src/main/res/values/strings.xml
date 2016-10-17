@@ -109,6 +109,9 @@
     <string name="some_months_ago">%s month(s) ago</string>
     <string name="more_than_one_year_ago">more than 1 year ago</string>
 
+    <string name="send_photo_to_group_or_person">Send photo to %s</string>
+    <string name="anonymous_user">user</string>
+
     <!-- do not change the following hard-coded message options ordering! -->
     <string-array name="message_options">
         <item>Copy text</item>

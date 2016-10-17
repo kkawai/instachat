@@ -65,7 +65,7 @@ public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends 
         Constants.DP_URL(model.id, model.getDpid(), new OnCompleteListener<Uri>() {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
-                if (mActivityState.isActivityDestroyed())
+                if (mActivityState == null || mActivityState.isActivityDestroyed())
                     return;
                 try {
                     if (!task.isSuccessful()) {

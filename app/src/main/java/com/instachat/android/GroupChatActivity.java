@@ -3,6 +3,7 @@ package com.instachat.android;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -41,9 +42,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.ath.fuel.FuelInjector;
 import com.brandongogetap.stickyheaders.StickyLayoutManager;
-import com.github.rubensousa.bottomsheetbuilder.BottomSheetBuilder;
-import com.github.rubensousa.bottomsheetbuilder.BottomSheetMenuDialog;
-import com.github.rubensousa.bottomsheetbuilder.adapter.BottomSheetItemClickListener;
+import com.cocosw.bottomsheet.BottomSheet;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.common.ConnectionResult;
@@ -1038,7 +1037,8 @@ public class GroupChatActivity extends BaseActivity implements
     }
 
     private void showBottomDialog() {
-        final BottomSheetMenuDialog dialog = new BottomSheetBuilder(this, R.style.AppTheme_BottomSheetDialog)
+
+        /*final BottomSheetMenuDialog dialog = new BottomSheetBuilder(this, R.style.AppTheme_BottomSheetDialog)
                 .setMode(BottomSheetBuilder.MODE_LIST)
                 .setMenu(R.menu.file_upload_options)
                 .setItemClickListener(new BottomSheetItemClickListener() {
@@ -1055,7 +1055,26 @@ public class GroupChatActivity extends BaseActivity implements
                 })
                 .createDialog();
 
-        dialog.show();
+        dialog.show();*/
+        new BottomSheet.Builder(this).title(getPhotoUploadDialogTitle()).sheet(R.menu.file_upload_options).listener(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case R.id.menu_choose_photo:
+                        mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.chatRoomPhoto);
+                        mPhotoUploadHelper.setStorageRefString(mDatabaseRoot);
+                        mPhotoUploadHelper.launchCamera(true);
+                        break;
+                    case R.id.menu_take_photo:
+                        mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.chatRoomPhoto);
+                        mPhotoUploadHelper.setStorageRefString(mDatabaseRoot);
+                        mPhotoUploadHelper.launchCamera(false);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }).show();
     }
 
     @Override
@@ -1316,5 +1335,14 @@ public class GroupChatActivity extends BaseActivity implements
     protected BlockedUserListener getBlockedUserListener() {
         return mBlockedUserListener;
     }
+
+    protected String getPhotoUploadDialogTitle() {
+        String room = getString(R.string.app_name);
+        if (getIntent() != null && getIntent().hasExtra(Constants.KEY_GROUP_NAME)) {
+            room = getIntent().getStringExtra(Constants.KEY_GROUP_NAME);
+        }
+        return getString(R.string.send_photo_to_group_or_person, room);
+    }
+
 
 }

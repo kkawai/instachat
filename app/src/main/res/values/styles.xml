@@ -9,7 +9,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-
+        <item name="bs_bottomSheetStyle">@style/BottomSheet.StyleDialog</item>
         <!--
         <item name="android:colorButtonNormal">@drawable/button_selector</item>
         <item name="colorButtonNormal">@drawable/button_selector</item>
@@ -95,5 +95,19 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <!--
+    <item name="bs_listStyle">@style/BottomSheet.StyleList</item>
+    -->
+    <style name="BottomSheet.StyleDialog" parent="BottomSheet.Dialog">
+        <item name="android:backgroundDimAmount">0.2</item>
+        <item name="android:windowAnimationStyle">@style/BottomSheet.Animation</item>
+        <item name="android:textColorPrimary">@color/colorPrimaryDark</item>
+        <item name="android:textColorSecondary">@color/material_deep_teal_50</item>
+        <item name="android:textColorHint">@color/material_deep_teal_50</item>
+        <item name="bs_dialogBackground">@color/colorPrimary</item>
+        <item name="bs_dividerColor">@android:color/transparent</item>
+        <item name="bs_numColumns">4</item>
     </style>
 </resources>

@@ -326,7 +326,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
                 @Override
                 public void onComplete(@NonNull Task<Uri> task) {
-                    if (mActivityState.isActivityDestroyed())
+                    if (mActivityState == null || mActivityState.isActivityDestroyed())
                         return;
                     try {
                         if (!task.isSuccessful()) {

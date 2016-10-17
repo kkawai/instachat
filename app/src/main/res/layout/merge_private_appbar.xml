@@ -63,17 +63,13 @@
                         android:id="@+id/customTitleInParallax"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="MyUsername"
+                        android:text=""
                         android:textSize="20sp"
                         android:textStyle="bold"
                         app:font="Lato-Bold.ttf"
                         />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="  •  "/>
 
                     <com.instachat.android.view.CustomFontTextView
                         android:id="@+id/customSubtitleInParallax"
@@ -81,7 +77,7 @@
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="active 1 minute ago"
+                        android:text=""
                         android:textSize="14sp"
                         android:textStyle="bold"
                         app:font="Lato-SemiboldItalic.ttf"
@@ -119,7 +115,7 @@
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="MyUsername"
+                        android:text=""
                         android:textSize="21sp"
                         android:textStyle="bold"
                         app:font="Lato-Bold.ttf"
@@ -131,7 +127,7 @@
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text="active 1m"
+                        android:text=""
                         android:textSize="14sp"
                         android:textStyle="bold"
                         app:font="Lato-SemiboldItalic.ttf"

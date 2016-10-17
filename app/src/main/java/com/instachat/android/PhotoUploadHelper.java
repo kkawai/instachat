@@ -204,12 +204,12 @@ public class PhotoUploadHelper {
                     }
                     final Bitmap bitmap = ImageUtils.getBitmap(mActivity, mTargetFileUri, maxSizeBytes);
                     ImageUtils.writeBitmapToFile(bitmap, mTargetFile);
-                    if (mActivityState.isActivityDestroyed())
+                    if (mActivityState == null || mActivityState.isActivityDestroyed())
                         return;
                     mActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (mActivityState.isActivityDestroyed())
+                            if (mActivityState == null || mActivityState.isActivityDestroyed())
                                 return;
                             uploadFromUri(mTargetFileUri);
                         }
@@ -235,7 +235,7 @@ public class PhotoUploadHelper {
                 .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                        if (mActivityState.isActivityDestroyed())
+                        if (mActivityState == null || mActivityState.isActivityDestroyed())
                             return;
                         mListener.onPhotoUploadProgress((int) taskSnapshot.getTotalByteCount() / 1024,
                                 (int) taskSnapshot.getBytesTransferred() / 1024);
@@ -244,7 +244,7 @@ public class PhotoUploadHelper {
                 .addOnSuccessListener(mActivity, new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        if (mActivityState.isActivityDestroyed())
+                        if (mActivityState == null || mActivityState.isActivityDestroyed())
                             return;
                         mListener.onPhotoUploadSuccess(mTargetFileUri.getLastPathSegment(), taskSnapshot.getDownloadUrl().toString());
                     }
@@ -252,7 +252,7 @@ public class PhotoUploadHelper {
                 .addOnFailureListener(mActivity, new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
-                        if (mActivityState.isActivityDestroyed())
+                        if (mActivityState == null || mActivityState.isActivityDestroyed())
                             return;
                         mListener.onPhotoUploadError(exception);
                     }

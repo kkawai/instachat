@@ -70,7 +70,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
         privateChatsSummaryListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if (activityState.isActivityDestroyed())
+                if (activityState == null || activityState.isActivityDestroyed())
                     return;
                 MLog.d(TAG, "onChildAdded() dataSnapshot: " + dataSnapshot.toString());
                 PrivateChatSummary privateChatSummary = getPrivateChatSummary(dataSnapshot);
@@ -80,7 +80,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 //todo to-user might have changed their name or sent a message that is unread by you
-                if (activityState.isActivityDestroyed())
+                if (activityState == null || activityState.isActivityDestroyed())
                     return;
                 MLog.d(TAG, "onChildChanged() dataSnapshot: " + dataSnapshot.toString());
                 PrivateChatSummary privateChatSummary = getPrivateChatSummary(dataSnapshot);
@@ -90,7 +90,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 //todo user can remove this summary
-                if (activityState.isActivityDestroyed())
+                if (activityState == null || activityState.isActivityDestroyed())
                     return;
                 MLog.d(TAG, "onChildRemoved() dataSnapshot: " + dataSnapshot.toString());
                 PrivateChatSummary privateChatSummary = getPrivateChatSummary(dataSnapshot);
@@ -115,7 +115,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
         publicGroupChatsSummaryListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if (activityState.isActivityDestroyed())
+                if (activityState == null || activityState.isActivityDestroyed())
                     return;
                 GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
                 groupChatSummary.setId(Long.parseLong(dataSnapshot.getKey()));
@@ -125,7 +125,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                if (activityState.isActivityDestroyed())
+                if (activityState == null || activityState.isActivityDestroyed())
                     return;
                 GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
                 groupChatSummary.setId(Long.parseLong(dataSnapshot.getKey()));
@@ -134,7 +134,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                if (activityState.isActivityDestroyed())
+                if (activityState == null || activityState.isActivityDestroyed())
                     return;
                 GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
                 groupChatSummary.setId(Long.parseLong(dataSnapshot.getKey()));
@@ -468,7 +468,7 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
         pair.listener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if (activityState.isActivityDestroyed())
+                if (activityState == null || activityState.isActivityDestroyed())
                     return;
                 MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildAdded() dataSnapshot: " + dataSnapshot);
                 addUserToPublicGroupChat(groupid);
@@ -481,7 +481,7 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                if (activityState.isActivityDestroyed())
+                if (activityState == null || activityState.isActivityDestroyed())
                     return;
                 MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildRemoved() dataSnapshot: " + dataSnapshot);
                 removeUserFromPublicGroupChat(groupid);

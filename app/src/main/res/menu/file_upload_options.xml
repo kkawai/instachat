@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    >
     <item
         android:id="@+id/menu_choose_photo"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:title="@string/menu_choose_photo"
         android:textColor="@color/jonPink"
-        android:icon="@drawable/ic_photo_library_black_36dp"/>
+        android:title="@string/menu_choose_photo"/>
     <item
         android:id="@+id/menu_take_photo"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:title="@string/menu_take_photo"
         android:textColor="@color/jonGreen"
-        android:icon="@drawable/ic_photo_camera_black_36dp"/>
+        android:title="@string/menu_take_photo"/>
 </menu>

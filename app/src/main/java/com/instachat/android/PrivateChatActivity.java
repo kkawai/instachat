@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -510,6 +511,14 @@ public class PrivateChatActivity extends GroupChatActivity {
         ((TextView) findViewById(R.id.customSubtitleInToolbar)).setText(lastActive);
 
         ((TextView) findViewById(R.id.customTitleInParallax)).setText(username);
-        ((TextView) findViewById(R.id.customSubtitleInParallax)).setText(lastActive);
+        ((TextView) findViewById(R.id.customSubtitleInParallax)).setText("  •  " + lastActive);
+    }
+
+    @Override
+    protected String getPhotoUploadDialogTitle() {
+        String username = mToUser != null ? mToUser.getUsername() : "";
+        if (TextUtils.isEmpty(username))
+            username = getString(R.string.anonymous_user);
+        return getString(R.string.send_photo_to_group_or_person, username);
     }
 }

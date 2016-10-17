@@ -90,7 +90,7 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
         Constants.DP_URL(user.getId(), user.getProfilePicUrl(), new OnCompleteListener<Uri>() {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
-                if (mActivityState.isActivityDestroyed())
+                if (mActivityState == null || mActivityState.isActivityDestroyed())
                     return;
                 try {
                     if (!task.isSuccessful()) {
