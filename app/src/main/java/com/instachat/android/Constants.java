@@ -211,4 +211,6 @@ public final class Constants {
     public static final int USER_OFFLINE = 1;
     public static final int USER_AWAY = 2;
     public static final long TWELVE_HOURS = 1000 * 60 * 60 * 12L;
+
+    public static String KEY_TEXT_REPLY = "key_text_reply";
 }

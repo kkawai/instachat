@@ -1,18 +1,3 @@
-/**
- * Copyright Google Inc. All Rights Reserved.
- * <p/>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p/>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.instachat.android.model;
 
 import android.os.Parcel;
@@ -30,6 +15,9 @@ import java.util.Map;
 
 public class FriendlyMessage implements Parcelable {
 
+    public static final int MESSAGE_TYPE_NORMAL = 0;
+    public static final int MESSAGE_TYPE_DISAPPEARING = 1;
+
     private static final String TAG = "FriendlyMessage";
 
     private String id;
@@ -40,6 +28,7 @@ public class FriendlyMessage implements Parcelable {
     private String imageUrl;
     private String imageId;
     private long time;
+    private int messageType;
 
     private boolean isBlocked; //NOT persisted, volatile
 
@@ -64,6 +53,7 @@ public class FriendlyMessage implements Parcelable {
             map.put("userid", friendlyMessage.getUserid());
         if (friendlyMessage.getTime() != 0)
             map.put("time", friendlyMessage.getTime());
+        map.put("messageType", friendlyMessage.getMessageType());
         return map;
     }
 
@@ -93,6 +83,7 @@ public class FriendlyMessage implements Parcelable {
         if (dpid != null) {
             o.put("dpid", dpid);
         }
+        o.put("messageType", messageType);
         return o;
     }
 
@@ -114,6 +105,7 @@ public class FriendlyMessage implements Parcelable {
         if (dpid != null) {
             o.put("dpid", dpid);
         }
+        o.put("messageType", messageType);
         return o;
     }
 
@@ -134,6 +126,8 @@ public class FriendlyMessage implements Parcelable {
      * @return
      */
     private boolean canAppend(FriendlyMessage friendlyMessage) {
+        if (messageType != MESSAGE_TYPE_NORMAL || friendlyMessage.messageType != MESSAGE_TYPE_NORMAL)
+            return false;
         if (this.imageUrl != null && friendlyMessage.imageUrl != null)
             return false;
         if (isPureUrl(this.text) || isPureUrl(friendlyMessage.getText()))
@@ -181,6 +175,7 @@ public class FriendlyMessage implements Parcelable {
             friendlyMessage.text = o.optString("text");
             friendlyMessage.id = o.optString("id");
             friendlyMessage.dpid = o.optString("dpid");
+            friendlyMessage.messageType = o.optInt("messageType");
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
         }
@@ -210,6 +205,7 @@ public class FriendlyMessage implements Parcelable {
             text = friendlyMessage.text;
             id = friendlyMessage.id;
             dpid = friendlyMessage.dpid;
+            messageType = friendlyMessage.messageType;
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
         }
@@ -277,6 +273,14 @@ public class FriendlyMessage implements Parcelable {
 
     public void setBlocked(boolean isBlocked) {
         this.isBlocked = isBlocked;
+    }
+
+    public int getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(int messageType) {
+        this.messageType = messageType;
     }
 
     @Override

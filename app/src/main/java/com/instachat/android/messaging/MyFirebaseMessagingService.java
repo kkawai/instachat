@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.app.RemoteInput;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
@@ -138,15 +139,29 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private void showNotification(FriendlyMessage friendlyMessage, Bitmap bitmap) {
 
+        String replyLabel = "Type your reply here...";
+        RemoteInput remoteInput =
+                new RemoteInput.Builder(Constants.KEY_TEXT_REPLY)
+                        .setLabel(replyLabel)
+                        .build();
+
+        // This intent is fired when notification is clicked
+        Intent intent = DirectReplyActivity.newIntent(this, friendlyMessage.getUserid());
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, friendlyMessage.getUserid(), intent, 0);
+
+        NotificationCompat.Action replyAction =
+                new NotificationCompat.Action.Builder(
+                        android.R.drawable.ic_dialog_email,
+                        "Reply", pendingIntent)
+                        .addRemoteInput(remoteInput)
+                        .build();
+
         // Use NotificationCompat.Builder to set up our notification.
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        builder.addAction(replyAction);
 
         //icon appears in device notification bar and right hand corner of notification
         builder.setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp);
-
-        // This intent is fired when notification is clicked
-        Intent intent = PrivateChatActivity.newIntent(MyApp.getInstance(), friendlyMessage.getUserid());
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, friendlyMessage.getUserid(), intent, 0);
 
         // Set the intent that will fire when the user taps the notification.
         builder.setContentIntent(pendingIntent);
