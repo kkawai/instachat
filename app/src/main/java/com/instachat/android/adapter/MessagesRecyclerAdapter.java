@@ -3,15 +3,18 @@ package com.instachat.android.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -65,6 +68,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private FriendlyMessageListener mFriendlyMessageListener;
     private BlockedUserListener mBlockedUserListener;
     private String mDatabaseRoot;
+    private FrameLayout mEntireScreenFrameLayout;
 
     public MessagesRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref) {
         super(modelClass, modelLayout, viewHolderClass, ref);
@@ -80,6 +84,8 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     public void setActivity(@NonNull Activity activity, @NonNull ActivityState activityState) {
         mActivity = new WeakReference<>(activity);
         mActivityState = activityState;
+        mEntireScreenFrameLayout = (FrameLayout) activity.findViewById(R.id.fragment_content);
+        mEntireScreenFrameLayout.setOnTouchListener(onTouchListener);
     }
 
     public void setAdapterPopulateHolderListener(AdapterPopulateHolderListener listener) {
@@ -187,79 +193,20 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
+                final FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
                 if (TextUtils.isEmpty(friendlyMessage.getName())) {
                     return true;
                 }
-                new MessageOptionsDialogHelper().showMessageOptions(mActivity.get(), friendlyMessage, new MessageOptionsDialogHelper.MessageOptionsListener() {
+                final View tempAnchorView = new View(mActivity.get());
+                tempAnchorView.setBackgroundColor(Color.TRANSPARENT);
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(20, 20);
+                params.leftMargin = x;
+                params.topMargin = y;
+                mEntireScreenFrameLayout.addView(tempAnchorView, params);
+                mEntireScreenFrameLayout.post(new Runnable() {
                     @Override
-                    public void onCopyTextRequested(FriendlyMessage friendlyMessage) {
-                        final ClipboardManager cm = (ClipboardManager) mActivity.get()
-                                .getSystemService(Context.CLIPBOARD_SERVICE);
-                        cm.setText(friendlyMessage.getText());
-                        Toast.makeText(mActivity.get(), R.string.message_copied_to_clipboard, Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onDeleteMessageRequested(final FriendlyMessage friendlyMessage) {
-                        MLog.d(TAG, " msg.getImageUrl(): " + friendlyMessage.getImageUrl() + " " + friendlyMessage.getImageId());
-                        new SweetAlertDialog(mActivity.get(), SweetAlertDialog.WARNING_TYPE)
-                                .setTitleText(mActivity.get().getString(R.string.message_delete_title))
-                                .setContentText(mActivity.get().getString(R.string.message_delete_question))
-                                .setCancelText(mActivity.get().getString(android.R.string.no))
-                                .setConfirmText(mActivity.get().getString(android.R.string.yes))
-                                .showCancelButton(true)
-                                .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                    @Override
-                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                        sweetAlertDialog.cancel();
-                                    }
-                                }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                            @Override
-                            public void onClick(SweetAlertDialog sweetAlertDialog) {
-
-                                sweetAlertDialog.dismiss();
-                                if (friendlyMessage.getImageUrl() != null && friendlyMessage.getImageId() != null) {
-                                    final StorageReference photoRef = mStorageRef.child(mDatabaseRoot).child(friendlyMessage.getImageId());
-                                    photoRef.delete();
-                                    MLog.d(TAG, "deleted photo " + friendlyMessage.getImageId());
-                                }
-                                removeItemRemotely(mDatabaseRoot + "/" + friendlyMessage.getId(), new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            new SweetAlertDialog(mActivity.get(), SweetAlertDialog.SUCCESS_TYPE)
-                                                    .setTitleText(mActivity.get().getString(R.string.success_exclamation))
-                                                    .setContentText(mActivity.get().getString(R.string.message_delete_success))
-                                                    .show();
-                                        } else {
-                                            new SweetAlertDialog(mActivity.get(), SweetAlertDialog.ERROR_TYPE)
-                                                    .setTitleText(mActivity.get().getString(R.string.oops_exclamation))
-                                                    .setContentText(mActivity.get().getString(R.string.message_delete_failed))
-                                                    .show();
-                                        }
-                                    }
-                                });
-                            }
-                        }).show();
-                    }
-
-                    @Override
-                    public void onBlockPersonRequested(final FriendlyMessage friendlyMessage) {
-                        new BlockUserDialogHelper().showBlockUserQuestionDialog(mActivity.get(),
-                                friendlyMessage.getUserid(),
-                                friendlyMessage.getName(),
-                                friendlyMessage.getDpid(),
-                                mInternalBlockedUserListener);
-
-                    }
-
-                    @Override
-                    public void onReportPersonRequested(FriendlyMessage friendlyMessage) {
-                        if (Preferences.getInstance().getUserId() == friendlyMessage.getUserid()) {
-                            //todo
-                            return; //cannot report yourself dummy!
-                        }
+                    public void run() {
+                        showMessageOptions(tempAnchorView, friendlyMessage);
                     }
                 });
                 return true;
@@ -267,7 +214,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         };
 
         holder.itemView.setOnLongClickListener(onLongClickListener);
-
+        holder.messengerImageView.setOnLongClickListener(onLongClickListener);
         if (holder.webLinkContent != null) {
             holder.webLinkContent.setOnLongClickListener(onLongClickListener);
             holder.webLinkUrl.setOnLongClickListener(onLongClickListener);
@@ -277,6 +224,96 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         }
         return holder;
     }
+
+    private void showMessageOptions(final View tempAnchorView, FriendlyMessage friendlyMessage) {
+        new MessageOptionsDialogHelper().showMessageOptions(mActivity.get(), tempAnchorView, friendlyMessage, new MessageOptionsDialogHelper.MessageOptionsListener() {
+
+            @Override
+            public void onMessageOptionsDismissed() {
+                mEntireScreenFrameLayout.removeView(tempAnchorView);
+            }
+
+            @Override
+            public void onCopyTextRequested(FriendlyMessage friendlyMessage) {
+                final ClipboardManager cm = (ClipboardManager) mActivity.get()
+                        .getSystemService(Context.CLIPBOARD_SERVICE);
+                cm.setText(friendlyMessage.getText());
+                Toast.makeText(mActivity.get(), R.string.message_copied_to_clipboard, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onDeleteMessageRequested(final FriendlyMessage friendlyMessage) {
+                MLog.d(TAG, " msg.getImageUrl(): " + friendlyMessage.getImageUrl() + " " + friendlyMessage.getImageId());
+                new SweetAlertDialog(mActivity.get(), SweetAlertDialog.WARNING_TYPE)
+                        .setTitleText(mActivity.get().getString(R.string.message_delete_title))
+                        .setContentText(mActivity.get().getString(R.string.message_delete_question))
+                        .setCancelText(mActivity.get().getString(android.R.string.no))
+                        .setConfirmText(mActivity.get().getString(android.R.string.yes))
+                        .showCancelButton(true)
+                        .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                            @Override
+                            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                sweetAlertDialog.cancel();
+                            }
+                        }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+
+                        sweetAlertDialog.dismiss();
+                        if (friendlyMessage.getImageUrl() != null && friendlyMessage.getImageId() != null) {
+                            final StorageReference photoRef = mStorageRef.child(mDatabaseRoot).child(friendlyMessage.getImageId());
+                            photoRef.delete();
+                            MLog.d(TAG, "deleted photo " + friendlyMessage.getImageId());
+                        }
+                        removeItemRemotely(mDatabaseRoot + "/" + friendlyMessage.getId(), new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    new SweetAlertDialog(mActivity.get(), SweetAlertDialog.SUCCESS_TYPE)
+                                            .setTitleText(mActivity.get().getString(R.string.success_exclamation))
+                                            .setContentText(mActivity.get().getString(R.string.message_delete_success))
+                                            .show();
+                                } else {
+                                    new SweetAlertDialog(mActivity.get(), SweetAlertDialog.ERROR_TYPE)
+                                            .setTitleText(mActivity.get().getString(R.string.oops_exclamation))
+                                            .setContentText(mActivity.get().getString(R.string.message_delete_failed))
+                                            .show();
+                                }
+                            }
+                        });
+                    }
+                }).show();
+            }
+
+            @Override
+            public void onBlockPersonRequested(final FriendlyMessage friendlyMessage) {
+                new BlockUserDialogHelper().showBlockUserQuestionDialog(mActivity.get(),
+                        friendlyMessage.getUserid(),
+                        friendlyMessage.getName(),
+                        friendlyMessage.getDpid(),
+                        mInternalBlockedUserListener);
+
+            }
+
+            @Override
+            public void onReportPersonRequested(FriendlyMessage friendlyMessage) {
+                if (Preferences.getInstance().getUserId() == friendlyMessage.getUserid()) {
+                    //todo
+                    return; //cannot report yourself dummy!
+                }
+            }
+        });
+    }
+
+    private View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            x = (int) motionEvent.getX();
+            y = (int) motionEvent.getY();
+            return false;
+        }
+    };
+    private int x, y;
 
     @Override
     protected void populateViewHolder(final MessageViewHolder viewHolder, final FriendlyMessage friendlyMessage, int position) {

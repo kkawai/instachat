@@ -24,7 +24,7 @@ Document differences between activity_main.xml here:
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context="com.instachat.GroupChatActivity">
+            tools:context="com.instachat.PrivateChatActivity">
 
             <!--
             <com.google.android.gms.ads.AdView
@@ -37,12 +37,12 @@ Document differences between activity_main.xml here:
                 ads:adUnitId="@string/banner_ad_unit_id">
             </com.google.android.gms.ads.AdView> -->
 
-            <android.support.design.widget.CoordinatorLayout android:id="@+id/main_content"
-                                                             xmlns:android="http://schemas.android.com/apk/res/android"
-                                                             xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                             android:layout_width="match_parent"
-                                                             android:layout_height="match_parent"
-                                                             android:layout_above="@+id/linearLayout">
+            <android.support.design.widget.CoordinatorLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/linearLayout">
 
                 <include layout="@layout/merge_private_appbar"/>
 
@@ -170,7 +170,6 @@ Document differences between activity_main.xml here:
 
                 </LinearLayout>
             </LinearLayout>
-
 
             <FrameLayout
                 android:id="@+id/fragment_content"

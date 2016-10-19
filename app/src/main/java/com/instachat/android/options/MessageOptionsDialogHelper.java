@@ -3,10 +3,9 @@ package com.instachat.android.options;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
-import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
-import android.view.Gravity;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -30,6 +29,8 @@ public class MessageOptionsDialogHelper {
         void onBlockPersonRequested(FriendlyMessage friendlyMessage);
 
         void onReportPersonRequested(FriendlyMessage friendlyMessage);
+
+        void onMessageOptionsDismissed();
     }
 
     public void showMessageOptions(
@@ -40,6 +41,12 @@ public class MessageOptionsDialogHelper {
 
         PopupMenu popupMenu = new PopupMenu(context, anchor);
         popupMenu.inflate(R.menu.message_options);
+        if (TextUtils.isEmpty(friendlyMessage.getText())) {
+            popupMenu.getMenu().removeItem(R.id.menu_copy_text);
+        }
+        if (!TextUtils.isEmpty(friendlyMessage.getImageUrl()) && TextUtils.isEmpty(friendlyMessage.getText())) {
+            popupMenu.getMenu().findItem(R.id.menu_delete_message).setTitle(R.string.delete_photo);
+        }
         popupMenu.getMenu().findItem(R.id.menu_block_user).setTitle(context.getString(R.string.block) + " " + friendlyMessage.getName());
         popupMenu.getMenu().findItem(R.id.menu_report_user).setTitle(context.getString(R.string.report) + " " + friendlyMessage.getName());
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -62,6 +69,12 @@ public class MessageOptionsDialogHelper {
                         break;
                 }
                 return true;
+            }
+        });
+        popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
+            @Override
+            public void onDismiss(PopupMenu menu) {
+                listener.onMessageOptionsDismissed();
             }
         });
         popupMenu.show();
