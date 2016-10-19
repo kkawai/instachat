@@ -183,10 +183,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             }
         };
         holder.itemView.setOnClickListener(onClickListener);
-        holder.messageTimeTextView.setOnClickListener(onClickListener);
-        if (holder.messageTextView != null)
-            holder.messageTextView.setOnClickListener(onClickListener);
-        holder.messengerTextView.setOnClickListener(onClickListener);
 
         View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
             @Override
@@ -271,20 +267,13 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         };
 
         holder.itemView.setOnLongClickListener(onLongClickListener);
-        holder.messageTimeTextView.setOnLongClickListener(onLongClickListener);
-        if (holder.messageTextView != null)
-            holder.messageTextView.setOnLongClickListener(onLongClickListener);
-        holder.messengerTextView.setOnLongClickListener(onLongClickListener);
+
         if (holder.webLinkContent != null) {
             holder.webLinkContent.setOnLongClickListener(onLongClickListener);
             holder.webLinkUrl.setOnLongClickListener(onLongClickListener);
             holder.webLinkTitle.setOnLongClickListener(onLongClickListener);
             holder.webLinkDescription.setOnLongClickListener(onLongClickListener);
             holder.webLinkImageView.setOnLongClickListener(onLongClickListener);
-        }
-        if (holder.messagePhotoView != null) {
-            holder.messagePhotoView.setOnClickListener(onClickListener);
-            holder.messagePhotoView.setOnLongClickListener(onLongClickListener);
         }
         return holder;
     }

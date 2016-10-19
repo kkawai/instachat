@@ -64,7 +64,6 @@ public class MessageOptionsDialogHelper {
                 return true;
             }
         });
-        popupMenu.setGravity(Gravity.CENTER);
         popupMenu.show();
 
     }
