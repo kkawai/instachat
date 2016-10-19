@@ -100,7 +100,7 @@
     <string name="cannot_chat_you_blocked_them">You have blocked this person.  You should unblock.</string>
 
     <!-- time ago -->
-    <string name="just_now">just now</string>
+    <string name="just_now">online now</string>
     <string name="less_than_one_minute_ago">less than 1 minute ago</string>
     <string name="some_minutes_ago">%s minutes ago</string>
     <string name="one_hour_ago">1 hour ago</string>
@@ -115,8 +115,8 @@
 
     <!-- do not change the following hard-coded message options ordering! -->
     <string-array name="message_options">
-        <item>Copy text</item>
-        <item>Delete message</item>
+        <item>Copy Text</item>
+        <item>Delete Message</item>
         <item>Block</item>
         <item>Report</item>
     </string-array>
