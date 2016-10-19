@@ -126,4 +126,7 @@
         <item>Block</item>
         <item>Report</item>
     </string-array>
+
+    <string name="logout_title">Logout</string>
+    <string name="logout_question">Sure you want to logout now?  It does not consume your phone battery or other resources to stay logged in.</string>
 </resources>

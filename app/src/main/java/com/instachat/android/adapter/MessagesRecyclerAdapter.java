@@ -46,8 +46,6 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
-
 /**
  * Created by kevin on 8/23/2016.
  */
@@ -67,7 +65,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private UserClickedListener mUserClickedListener;
     private FriendlyMessageListener mFriendlyMessageListener;
     private BlockedUserListener mBlockedUserListener;
-    private String mDatabaseRoot;
+    private String mDatabaseRef;
     private FrameLayout mEntireScreenFrameLayout;
 
     public MessagesRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref) {
@@ -78,7 +76,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     }
 
     public void setDatabaseRoot(String root) {
-        mDatabaseRoot = root;
+        mDatabaseRef = root;
     }
 
     public void setActivity(@NonNull Activity activity,
@@ -246,45 +244,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             @Override
             public void onDeleteMessageRequested(final FriendlyMessage friendlyMessage) {
                 MLog.d(TAG, " msg.getImageUrl(): " + friendlyMessage.getImageUrl() + " " + friendlyMessage.getImageId());
-                new SweetAlertDialog(mActivity.get(), SweetAlertDialog.WARNING_TYPE)
-                        .setTitleText(mActivity.get().getString(R.string.message_delete_title))
-                        .setContentText(mActivity.get().getString(R.string.message_delete_question))
-                        .setCancelText(mActivity.get().getString(android.R.string.no))
-                        .setConfirmText(mActivity.get().getString(android.R.string.yes))
-                        .showCancelButton(true)
-                        .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                            @Override
-                            public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                sweetAlertDialog.cancel();
-                            }
-                        }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-
-                        sweetAlertDialog.dismiss();
-                        if (friendlyMessage.getImageUrl() != null && friendlyMessage.getImageId() != null) {
-                            final StorageReference photoRef = mStorageRef.child(mDatabaseRoot).child(friendlyMessage.getImageId());
-                            photoRef.delete();
-                            MLog.d(TAG, "deleted photo " + friendlyMessage.getImageId());
-                        }
-                        removeItemRemotely(mDatabaseRoot + "/" + friendlyMessage.getId(), new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    new SweetAlertDialog(mActivity.get(), SweetAlertDialog.SUCCESS_TYPE)
-                                            .setTitleText(mActivity.get().getString(R.string.success_exclamation))
-                                            .setContentText(mActivity.get().getString(R.string.message_delete_success))
-                                            .show();
-                                } else {
-                                    new SweetAlertDialog(mActivity.get(), SweetAlertDialog.ERROR_TYPE)
-                                            .setTitleText(mActivity.get().getString(R.string.oops_exclamation))
-                                            .setContentText(mActivity.get().getString(R.string.message_delete_failed))
-                                            .show();
-                                }
-                            }
-                        });
-                    }
-                }).show();
+                new MessagesDialogHelper().showDeleteMessageDialog(mActivity.get(), friendlyMessage, mStorageRef, mDatabaseRef);
             }
 
             @Override
@@ -407,7 +367,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
                     if (lastFriendlyMessage.append(friendlyMessage)) {
                         friendlyMessage.setId(lastFriendlyMessage.getId());
-                        mFirebaseDatabaseReference.child(mDatabaseRoot).child(lastFriendlyMessage.getId()).updateChildren(FriendlyMessage.toMap(lastFriendlyMessage)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        mFirebaseDatabaseReference.child(mDatabaseRef).child(lastFriendlyMessage.getId()).updateChildren(FriendlyMessage.toMap(lastFriendlyMessage)).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
@@ -424,13 +384,13 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             }
         }
 
-        mFirebaseDatabaseReference.child(mDatabaseRoot).push().addListenerForSingleValueEvent(new ValueEventListener() {
+        mFirebaseDatabaseReference.child(mDatabaseRef).push().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (mActivityState == null || mActivityState.isActivityDestroyed())
                     return;
                 friendlyMessage.setId(dataSnapshot.getKey());
-                mFirebaseDatabaseReference.child(mDatabaseRoot).child(friendlyMessage.getId()).setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
+                mFirebaseDatabaseReference.child(mDatabaseRef).child(friendlyMessage.getId()).setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {

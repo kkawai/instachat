@@ -77,6 +77,7 @@ import com.instachat.android.font.FontUtil;
 import com.instachat.android.fullscreen.FriendlyMessageContainer;
 import com.instachat.android.fullscreen.FullScreenTextFragment;
 import com.instachat.android.gcm.GCMHelper;
+import com.instachat.android.login.LogoutDialogHelper;
 import com.instachat.android.login.SignInActivity;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.model.GroupChatSummary;
@@ -1275,15 +1276,19 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         openRightDrawer();
     }
 
-    protected void signout() {
-        mFirebaseAuth.signOut();
-        //Auth.GoogleSignInApi.signOut(mGoogleApiClient);
-        //mFirebaseUser = null;
-        removeUserPresence();
-        GCMHelper.unregister(Preferences.getInstance().getUserId() + "");
-        Preferences.getInstance().saveUser(null);
-        startActivity(new Intent(this, SignInActivity.class));
-        finish();
+    private void signout() {
+
+        new LogoutDialogHelper().showLogoutDialog(this, new LogoutDialogHelper.LogoutListener() {
+            @Override
+            public void onConfirmLogout() {
+                mFirebaseAuth.signOut();
+                removeUserPresence();
+                GCMHelper.unregister(Preferences.getInstance().getUserId() + "");
+                Preferences.getInstance().saveUser(null);
+                startActivity(new Intent(GroupChatActivity.this, SignInActivity.class));
+                finish();
+            }
+        });
     }
 
     protected BlockedUserListener getBlockedUserListener() {
