@@ -3,15 +3,18 @@ package com.instachat.android.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -23,6 +26,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.instachat.android.ActivityState;
@@ -41,8 +45,6 @@ import java.lang.ref.WeakReference;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
-
-import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
  * Created by kevin on 8/23/2016.
@@ -63,7 +65,8 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private UserClickedListener mUserClickedListener;
     private FriendlyMessageListener mFriendlyMessageListener;
     private BlockedUserListener mBlockedUserListener;
-    private String mDatabaseRoot;
+    private String mDatabaseRef;
+    private FrameLayout mEntireScreenFrameLayout;
 
     public MessagesRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref) {
         super(modelClass, modelLayout, viewHolderClass, ref);
@@ -73,12 +76,16 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     }
 
     public void setDatabaseRoot(String root) {
-        mDatabaseRoot = root;
+        mDatabaseRef = root;
     }
 
-    public void setActivity(@NonNull Activity activity, @NonNull ActivityState activityState) {
+    public void setActivity(@NonNull Activity activity,
+                            @NonNull ActivityState activityState,
+                            @NonNull FrameLayout entireScreenLayout) {
         mActivity = new WeakReference<>(activity);
         mActivityState = activityState;
+        mEntireScreenFrameLayout = entireScreenLayout;
+        mEntireScreenFrameLayout.setOnTouchListener(mOnTouchListener);
     }
 
     public void setAdapterPopulateHolderListener(AdapterPopulateHolderListener listener) {
@@ -134,7 +141,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
     private MessageViewHolder createMessageViewHolder(ViewGroup parent, int viewType) {
         if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_content, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.web_clipping_content, parent, false);
             final MessageViewHolder holder = new MessageViewHolder(view);
             View.OnClickListener webLinkClickListener = new View.OnClickListener() {
                 @Override
@@ -181,97 +188,33 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 mMessageTextClickedListener.onMessageClicked(holder.getAdapterPosition());
             }
         };
-        holder.messageTimeTextView.setOnClickListener(onClickListener);
-        if (holder.messageTextView != null)
-            holder.messageTextView.setOnClickListener(onClickListener);
-        holder.messengerTextView.setOnClickListener(onClickListener);
+        holder.itemView.setOnClickListener(onClickListener);
 
         View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
+                final FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
                 if (TextUtils.isEmpty(friendlyMessage.getName())) {
                     return true;
                 }
-                new MessageOptionsDialogHelper().showMessageOptions(mActivity.get(), friendlyMessage, new MessageOptionsDialogHelper.MessageOptionsListener() {
+                final View tempAnchorView = new View(mActivity.get());
+                tempAnchorView.setBackgroundColor(Color.TRANSPARENT);
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(10, 10);
+                params.leftMargin = (int) x;
+                params.topMargin = (int) y;
+                mEntireScreenFrameLayout.addView(tempAnchorView, params);
+                mEntireScreenFrameLayout.post(new Runnable() {
                     @Override
-                    public void onCopyTextRequested(FriendlyMessage friendlyMessage) {
-                        final ClipboardManager cm = (ClipboardManager) mActivity.get()
-                                .getSystemService(Context.CLIPBOARD_SERVICE);
-                        cm.setText(friendlyMessage.getText());
-                        Toast.makeText(mActivity.get(), R.string.message_copied_to_clipboard, Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onDeleteMessageRequested(final FriendlyMessage friendlyMessage) {
-                        MLog.d(TAG, " msg.getImageUrl(): " + friendlyMessage.getImageUrl() + " " + friendlyMessage.getImageId());
-                        new SweetAlertDialog(mActivity.get(), SweetAlertDialog.WARNING_TYPE)
-                                .setTitleText(mActivity.get().getString(R.string.message_delete_title))
-                                .setContentText(mActivity.get().getString(R.string.message_delete_question))
-                                .setCancelText(mActivity.get().getString(android.R.string.no))
-                                .setConfirmText(mActivity.get().getString(android.R.string.yes))
-                                .showCancelButton(true)
-                                .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                    @Override
-                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                        sweetAlertDialog.cancel();
-                                    }
-                                }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                            @Override
-                            public void onClick(SweetAlertDialog sweetAlertDialog) {
-
-                                sweetAlertDialog.dismiss();
-                                if (friendlyMessage.getImageUrl() != null && friendlyMessage.getImageId() != null) {
-                                    final StorageReference photoRef = mStorageRef.child(mDatabaseRoot).child(friendlyMessage.getImageId());
-                                    photoRef.delete();
-                                    MLog.d(TAG, "deleted photo " + friendlyMessage.getImageId());
-                                }
-                                removeItemRemotely(mDatabaseRoot + "/" + friendlyMessage.getId(), new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            new SweetAlertDialog(mActivity.get(), SweetAlertDialog.SUCCESS_TYPE)
-                                                    .setTitleText(mActivity.get().getString(R.string.success_exclamation))
-                                                    .setContentText(mActivity.get().getString(R.string.message_delete_success))
-                                                    .show();
-                                        } else {
-                                            new SweetAlertDialog(mActivity.get(), SweetAlertDialog.ERROR_TYPE)
-                                                    .setTitleText(mActivity.get().getString(R.string.oops_exclamation))
-                                                    .setContentText(mActivity.get().getString(R.string.message_delete_failed))
-                                                    .show();
-                                        }
-                                    }
-                                });
-                            }
-                        }).show();
-                    }
-
-                    @Override
-                    public void onBlockPersonRequested(final FriendlyMessage friendlyMessage) {
-                        new BlockUserDialogHelper().showBlockUserQuestionDialog(mActivity.get(),
-                                friendlyMessage.getUserid(),
-                                friendlyMessage.getName(),
-                                friendlyMessage.getDpid(),
-                                mInternalBlockedUserListener);
-
-                    }
-
-                    @Override
-                    public void onReportPersonRequested(FriendlyMessage friendlyMessage) {
-                        if (Preferences.getInstance().getUserId() == friendlyMessage.getUserid()) {
-                            //todo
-                            return; //cannot report yourself dummy!
-                        }
+                    public void run() {
+                        showMessageOptions(tempAnchorView, friendlyMessage);
                     }
                 });
                 return true;
             }
         };
 
-        holder.messageTimeTextView.setOnLongClickListener(onLongClickListener);
-        if (holder.messageTextView != null)
-            holder.messageTextView.setOnLongClickListener(onLongClickListener);
-        holder.messengerTextView.setOnLongClickListener(onLongClickListener);
+        holder.itemView.setOnLongClickListener(onLongClickListener);
+        holder.messengerImageView.setOnLongClickListener(onLongClickListener);
         if (holder.webLinkContent != null) {
             holder.webLinkContent.setOnLongClickListener(onLongClickListener);
             holder.webLinkUrl.setOnLongClickListener(onLongClickListener);
@@ -279,12 +222,60 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             holder.webLinkDescription.setOnLongClickListener(onLongClickListener);
             holder.webLinkImageView.setOnLongClickListener(onLongClickListener);
         }
-        if (holder.messagePhotoView != null) {
-            holder.messagePhotoView.setOnClickListener(onClickListener);
-            holder.messagePhotoView.setOnLongClickListener(onLongClickListener);
-        }
         return holder;
     }
+
+    private void showMessageOptions(final View tempAnchorView, FriendlyMessage friendlyMessage) {
+        new MessageOptionsDialogHelper().showMessageOptions(mActivity.get(), tempAnchorView, friendlyMessage, new MessageOptionsDialogHelper.MessageOptionsListener() {
+
+            @Override
+            public void onMessageOptionsDismissed() {
+                mEntireScreenFrameLayout.removeView(tempAnchorView);
+            }
+
+            @Override
+            public void onCopyTextRequested(FriendlyMessage friendlyMessage) {
+                final ClipboardManager cm = (ClipboardManager) mActivity.get()
+                        .getSystemService(Context.CLIPBOARD_SERVICE);
+                cm.setText(friendlyMessage.getText());
+                Toast.makeText(mActivity.get(), R.string.message_copied_to_clipboard, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onDeleteMessageRequested(final FriendlyMessage friendlyMessage) {
+                MLog.d(TAG, " msg.getImageUrl(): " + friendlyMessage.getImageUrl() + " " + friendlyMessage.getImageId());
+                new MessagesDialogHelper().showDeleteMessageDialog(mActivity.get(), friendlyMessage, mStorageRef, mDatabaseRef);
+            }
+
+            @Override
+            public void onBlockPersonRequested(final FriendlyMessage friendlyMessage) {
+                new BlockUserDialogHelper().showBlockUserQuestionDialog(mActivity.get(),
+                        friendlyMessage.getUserid(),
+                        friendlyMessage.getName(),
+                        friendlyMessage.getDpid(),
+                        mInternalBlockedUserListener);
+
+            }
+
+            @Override
+            public void onReportPersonRequested(FriendlyMessage friendlyMessage) {
+                if (Preferences.getInstance().getUserId() == friendlyMessage.getUserid()) {
+                    //todo
+                    return; //cannot report yourself dummy!
+                }
+            }
+        });
+    }
+
+    private View.OnTouchListener mOnTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            x = motionEvent.getX();
+            y = motionEvent.getY();
+            return false;
+        }
+    };
+    private float x, y;
 
     @Override
     protected void populateViewHolder(final MessageViewHolder viewHolder, final FriendlyMessage friendlyMessage, int position) {
@@ -376,7 +367,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
                     if (lastFriendlyMessage.append(friendlyMessage)) {
                         friendlyMessage.setId(lastFriendlyMessage.getId());
-                        mFirebaseDatabaseReference.child(mDatabaseRoot).child(lastFriendlyMessage.getId()).updateChildren(FriendlyMessage.toMap(lastFriendlyMessage)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        mFirebaseDatabaseReference.child(mDatabaseRef).child(lastFriendlyMessage.getId()).updateChildren(FriendlyMessage.toMap(lastFriendlyMessage)).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
@@ -393,19 +384,33 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             }
         }
 
-        final String key = mFirebaseDatabaseReference.child(mDatabaseRoot).push().getKey();
-        friendlyMessage.setId(key);
-
-        mFirebaseDatabaseReference.child(mDatabaseRoot).child(friendlyMessage.getId()).setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
+        mFirebaseDatabaseReference.child(mDatabaseRef).push().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    mFriendlyMessageListener.onFriendlyMessageSuccess(friendlyMessage);
-                } else {
-                    mFriendlyMessageListener.onFriendlyMessageFail(friendlyMessage);
-                }
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (mActivityState == null || mActivityState.isActivityDestroyed())
+                    return;
+                friendlyMessage.setId(dataSnapshot.getKey());
+                mFirebaseDatabaseReference.child(mDatabaseRef).child(friendlyMessage.getId()).setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            mFriendlyMessageListener.onFriendlyMessageSuccess(friendlyMessage);
+                        } else {
+                            mFriendlyMessageListener.onFriendlyMessageFail(friendlyMessage);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                if (mActivityState == null || mActivityState.isActivityDestroyed())
+                    return;
+                mFriendlyMessageListener.onFriendlyMessageFail(friendlyMessage);
+                MLog.e(TAG, "could not send message. ", databaseError);
             }
         });
+
     }
 
     @Override

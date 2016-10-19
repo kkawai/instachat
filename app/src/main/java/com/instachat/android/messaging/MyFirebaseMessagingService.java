@@ -139,7 +139,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private void showNotification(FriendlyMessage friendlyMessage, Bitmap bitmap) {
 
-        String replyLabel = "Type your reply here...";
+        String replyLabel = getString(R.string.type_your_reply_here);
         RemoteInput remoteInput =
                 new RemoteInput.Builder(Constants.KEY_TEXT_REPLY)
                         .setLabel(replyLabel)

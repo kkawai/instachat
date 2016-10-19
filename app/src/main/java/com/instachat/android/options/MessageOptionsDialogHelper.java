@@ -4,14 +4,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.PopupMenu;
+import android.text.TextUtils;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.instachat.android.R;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.view.ThemedAlertDialog;
-
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by kevin on 10/11/2016.
@@ -27,6 +29,56 @@ public class MessageOptionsDialogHelper {
         void onBlockPersonRequested(FriendlyMessage friendlyMessage);
 
         void onReportPersonRequested(FriendlyMessage friendlyMessage);
+
+        void onMessageOptionsDismissed();
+    }
+
+    public void showMessageOptions(
+            @NonNull final Context context,
+            @NonNull final View anchor,
+            @NonNull final FriendlyMessage friendlyMessage,
+            @NonNull final MessageOptionsListener listener) {
+
+        PopupMenu popupMenu = new PopupMenu(context, anchor);
+        popupMenu.inflate(R.menu.message_options);
+        if (TextUtils.isEmpty(friendlyMessage.getText())) {
+            popupMenu.getMenu().removeItem(R.id.menu_copy_text);
+        }
+        if (!TextUtils.isEmpty(friendlyMessage.getImageUrl()) && TextUtils.isEmpty(friendlyMessage.getText())) {
+            popupMenu.getMenu().findItem(R.id.menu_delete_message).setTitle(R.string.delete_photo);
+        }
+        popupMenu.getMenu().findItem(R.id.menu_block_user).setTitle(context.getString(R.string.block) + " " + friendlyMessage.getName());
+        popupMenu.getMenu().findItem(R.id.menu_report_user).setTitle(context.getString(R.string.report) + " " + friendlyMessage.getName());
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.menu_copy_text:
+                        listener.onCopyTextRequested(friendlyMessage);
+                        break;
+                    case R.id.menu_delete_message:
+                        listener.onDeleteMessageRequested(friendlyMessage);
+                        break;
+                    case R.id.menu_block_user:
+                        listener.onBlockPersonRequested(friendlyMessage);
+                        break;
+                    case R.id.menu_report_user:
+                        listener.onReportPersonRequested(friendlyMessage);
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
+        popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
+            @Override
+            public void onDismiss(PopupMenu menu) {
+                listener.onMessageOptionsDismissed();
+            }
+        });
+        popupMenu.show();
+
     }
 
     public AlertDialog showMessageOptions(@NonNull final Context context,

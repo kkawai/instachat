@@ -2,19 +2,8 @@ package com.instachat.android.login;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.FirebaseDatabase;
-import com.instachat.android.Constants;
 import com.instachat.android.R;
-import com.instachat.android.blocks.BlockedUserListener;
-import com.instachat.android.util.Preferences;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -24,20 +13,15 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class LogoutDialogHelper {
 
-    public void showLogoutDialog(final Activity activity,
-                                            final int userid,
-                                            @NonNull final String username,
-                                            final String dpid,
-                                            @NonNull final BlockedUserListener listener) {
+    public interface LogoutListener {
+        void onConfirmLogout();
+    }
 
-        if (Preferences.getInstance().getUserId() == userid) {
-            Toast.makeText(activity, R.string.block_cannot_block_yourself, Toast.LENGTH_SHORT).show();
-            return; //cannot block yourself dummy!
-        }
+    public void showLogoutDialog(final Activity activity, @NonNull final LogoutListener listener) {
 
         new SweetAlertDialog(activity, SweetAlertDialog.WARNING_TYPE)
-                .setTitleText(activity.getString(R.string.block_person_title, username))
-                .setContentText(activity.getString(R.string.block_person_question, username))
+                .setTitleText(activity.getString(R.string.logout_title))
+                .setContentText(activity.getString(R.string.logout_question))
                 .setCancelText(activity.getString(android.R.string.no))
                 .setConfirmText(activity.getString(android.R.string.yes))
                 .showCancelButton(true)
@@ -49,33 +33,8 @@ public class LogoutDialogHelper {
                 }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
             @Override
             public void onClick(SweetAlertDialog sweetAlertDialog) {
-
                 sweetAlertDialog.dismiss();
-                Map<String, Object> map = new HashMap<>(2);
-                map.put("name", username);
-                if (!TextUtils.isEmpty(dpid))
-                    map.put("dpid", dpid);
-                FirebaseDatabase.getInstance().getReference(Constants.BLOCKS_REF()).
-                        child(userid + "").updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            new SweetAlertDialog(activity, SweetAlertDialog.SUCCESS_TYPE)
-                                    .setTitleText(activity.getString(R.string.success_exclamation))
-                                    .setContentText(activity.getString(R.string.block_person_success, username))
-                                    .show();
-                            listener.onUserBlocked(userid);
-                            FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF())
-                                    .child(userid + "")
-                                    .removeValue();
-                        } else {
-                            new SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
-                                    .setTitleText(activity.getString(R.string.oops_exclamation))
-                                    .setContentText(activity.getString(R.string.block_person_failed, username))
-                                    .show();
-                        }
-                    }
-                });
+                listener.onConfirmLogout();
             }
         }).show();
     }
