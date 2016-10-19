@@ -34,6 +34,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -914,7 +915,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private void initFirebaseAdapter() {
         mFirebaseAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class, R.layout.item_message, MessageViewHolder.class, mFirebaseDatabaseReference.child(mDatabaseRoot).limitToLast(Constants.MAX_MESSAGE_HISTORY));
         mFirebaseAdapter.setDatabaseRoot(mDatabaseRoot);
-        mFirebaseAdapter.setActivity(this, this);
+        mFirebaseAdapter.setActivity(this, this, (FrameLayout) findViewById(R.id.fragment_content));
         mFirebaseAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {
             @Override
             public void onViewHolderPopulated() {

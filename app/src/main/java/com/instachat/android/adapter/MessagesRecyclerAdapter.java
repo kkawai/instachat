@@ -81,11 +81,13 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         mDatabaseRoot = root;
     }
 
-    public void setActivity(@NonNull Activity activity, @NonNull ActivityState activityState) {
+    public void setActivity(@NonNull Activity activity,
+                            @NonNull ActivityState activityState,
+                            @NonNull FrameLayout entireScreenLayout) {
         mActivity = new WeakReference<>(activity);
         mActivityState = activityState;
-        mEntireScreenFrameLayout = (FrameLayout) activity.findViewById(R.id.fragment_content);
-        mEntireScreenFrameLayout.setOnTouchListener(onTouchListener);
+        mEntireScreenFrameLayout = entireScreenLayout;
+        mEntireScreenFrameLayout.setOnTouchListener(mOnTouchListener);
     }
 
     public void setAdapterPopulateHolderListener(AdapterPopulateHolderListener listener) {
@@ -199,9 +201,9 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 }
                 final View tempAnchorView = new View(mActivity.get());
                 tempAnchorView.setBackgroundColor(Color.TRANSPARENT);
-                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(20, 20);
-                params.leftMargin = x;
-                params.topMargin = y;
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(10, 10);
+                params.leftMargin = (int) x;
+                params.topMargin = (int) y;
                 mEntireScreenFrameLayout.addView(tempAnchorView, params);
                 mEntireScreenFrameLayout.post(new Runnable() {
                     @Override
@@ -305,15 +307,15 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         });
     }
 
-    private View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+    private View.OnTouchListener mOnTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
-            x = (int) motionEvent.getX();
-            y = (int) motionEvent.getY();
+            x = motionEvent.getX();
+            y = motionEvent.getY();
             return false;
         }
     };
-    private int x, y;
+    private float x, y;
 
     @Override
     protected void populateViewHolder(final MessageViewHolder viewHolder, final FriendlyMessage friendlyMessage, int position) {
