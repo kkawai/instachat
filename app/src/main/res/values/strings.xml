@@ -116,6 +116,9 @@
     <string name="type_your_reply_here">Type your reply here...</string>
 
     <!-- do not change the following hard-coded message options ordering! -->
+    <string name="copy_text_">Copy Text</string>
+    <string name="delete_message">Delete Message</string>
+
     <string-array name="message_options">
         <item>Copy text</item>
         <item>Delete message</item>

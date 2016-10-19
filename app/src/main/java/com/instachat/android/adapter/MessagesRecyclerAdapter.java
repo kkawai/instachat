@@ -182,6 +182,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 mMessageTextClickedListener.onMessageClicked(holder.getAdapterPosition());
             }
         };
+        holder.itemView.setOnClickListener(onClickListener);
         holder.messageTimeTextView.setOnClickListener(onClickListener);
         if (holder.messageTextView != null)
             holder.messageTextView.setOnClickListener(onClickListener);
@@ -269,6 +270,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             }
         };
 
+        holder.itemView.setOnLongClickListener(onLongClickListener);
         holder.messageTimeTextView.setOnLongClickListener(onLongClickListener);
         if (holder.messageTextView != null)
             holder.messageTextView.setOnLongClickListener(onLongClickListener);
