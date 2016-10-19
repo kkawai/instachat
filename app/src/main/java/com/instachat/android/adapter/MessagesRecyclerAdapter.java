@@ -23,6 +23,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.instachat.android.ActivityState;
@@ -393,19 +394,33 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             }
         }
 
-        final String key = mFirebaseDatabaseReference.child(mDatabaseRoot).push().getKey();
-        friendlyMessage.setId(key);
-
-        mFirebaseDatabaseReference.child(mDatabaseRoot).child(friendlyMessage.getId()).setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
+        mFirebaseDatabaseReference.child(mDatabaseRoot).push().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    mFriendlyMessageListener.onFriendlyMessageSuccess(friendlyMessage);
-                } else {
-                    mFriendlyMessageListener.onFriendlyMessageFail(friendlyMessage);
-                }
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (mActivityState == null || mActivityState.isActivityDestroyed())
+                    return;
+                friendlyMessage.setId(dataSnapshot.getKey());
+                mFirebaseDatabaseReference.child(mDatabaseRoot).child(friendlyMessage.getId()).setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            mFriendlyMessageListener.onFriendlyMessageSuccess(friendlyMessage);
+                        } else {
+                            mFriendlyMessageListener.onFriendlyMessageFail(friendlyMessage);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                if (mActivityState == null || mActivityState.isActivityDestroyed())
+                    return;
+                mFriendlyMessageListener.onFriendlyMessageFail(friendlyMessage);
+                MLog.e(TAG, "could not send message. ", databaseError);
             }
         });
+
     }
 
     @Override

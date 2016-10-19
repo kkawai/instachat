@@ -113,6 +113,8 @@
     <string name="send_photo_to_group_or_person">Send photo to %s</string>
     <string name="anonymous_user">user</string>
 
+    <string name="type_your_reply_here">Type your reply here...</string>
+
     <!-- do not change the following hard-coded message options ordering! -->
     <string-array name="message_options">
         <item>Copy text</item>
