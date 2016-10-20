@@ -385,6 +385,11 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
+                                    /**
+                                     * since we are appending to an existing friendly message, we need
+                                     * to give this friendly message a fake unique id in order for it
+                                     * to be stored correctly as a potential 'unread' message
+                                     */
                                     friendlyMessage.setId(UUID.randomUUID().toString());
                                     mFriendlyMessageListener.onFriendlyMessageSuccess(friendlyMessage);
                                 } else {
