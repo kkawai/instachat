@@ -101,6 +101,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                     createPrivateChatSummary();
                     populateUserProfile();
                     //getSupportActionBar().setTitle(mToUser.getUsername());
+                    setCustomTitles(mToUser.getUsername(), mToUser.getLastOnline());
 
                     mUserInfoValueEventListener = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(sToUserid)).addValueEventListener(new ValueEventListener() {
                         @Override
