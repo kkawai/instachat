@@ -62,7 +62,7 @@ public class BlocksFragment extends BaseFragment {
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
 
                         sweetAlertDialog.dismiss();
-                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.BLOCKS_REF());
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF());
                         ref.child(userid + "").removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
@@ -84,7 +84,7 @@ public class BlocksFragment extends BaseFragment {
                 }).show();
             }
         };
-        DatabaseReference userBlocksRef = FirebaseDatabase.getInstance().getReference(Constants.BLOCKS_REF());
+        DatabaseReference userBlocksRef = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF());
         mBlocksAdapter = new BlocksAdapter(BlockedUser.class, R.layout.item_person, BlocksViewHolder.class, userBlocksRef);
         mBlocksAdapter.setActivity(getActivity(), this);
         mBlocksAdapter.setUserClickedListener(mUserClickedListener);
@@ -95,7 +95,7 @@ public class BlocksFragment extends BaseFragment {
     }
 
     private void createPrivateChatSummary(int userid, String username, String dpid) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
         PrivateChatSummary summary = new PrivateChatSummary();
         summary.setName(username);
         summary.setDpid(dpid);

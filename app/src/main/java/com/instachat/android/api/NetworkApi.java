@@ -12,6 +12,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -124,6 +125,9 @@ public final class NetworkApi {
         final ApiPostRequest request = new ApiPostRequest(params, Constants.API_BASE_URL + "/saveuser2", responder, errorListener);
         request.setTag(tag);
         MyApp.getInstance().getRequestQueue().add(request);
+
+        if (user.getId() != 0)
+            FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(user.getId())).updateChildren(user.getUsernameMap());
     }
 
     public static void forgotPassword(final Object tag, final String usernameOrEmail, final Response.Listener<String> responder, Response.ErrorListener errorListener) {

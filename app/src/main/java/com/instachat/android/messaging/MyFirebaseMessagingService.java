@@ -71,7 +71,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                             return;
                     }
 
-                    final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.BLOCKS_REF() + friendlyMessage.getUserid());
+                    final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF() + friendlyMessage.getUserid());
                     ref.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -204,7 +204,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void incrementPrivateUnreadMessages(final FriendlyMessage friendlyMessage) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
         Map<String, Object> map = new HashMap<>(1);
         map.put("id", friendlyMessage.getId());
         ref.child(friendlyMessage.getUserid() + "").child(Constants.CHILD_UNREAD_MESSAGES).child(friendlyMessage.getId()).updateChildren(map);

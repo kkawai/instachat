@@ -243,6 +243,10 @@ public class FriendlyMessage implements Parcelable {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getImageUrl() {
         return imageUrl;
     }
@@ -253,6 +257,10 @@ public class FriendlyMessage implements Parcelable {
 
     public String getDpid() {
         return dpid;
+    }
+
+    public void setDpid(String dpid) {
+        this.dpid = dpid;
     }
 
     public long getTime() {

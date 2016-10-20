@@ -6,6 +6,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.instachat.android.model.User;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 
@@ -23,7 +24,8 @@ public class PresenceHelper {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
         // stores the timestamp of my last disconnect (the last time I was seen online)
-        final DatabaseReference lastOnlineRef = database.getReference("/users/" + Preferences.getInstance().getUserId() + "/lastOnline");
+        final User me = Preferences.getInstance().getUser();
+        final DatabaseReference userInfoRef = database.getReference(Constants.USER_INFO_REF(me.getId()));
 
         final DatabaseReference connectedRef = database.getReference(".info/connected");
         connectedRef.addValueEventListener(new ValueEventListener() {
@@ -37,9 +39,9 @@ public class PresenceHelper {
                     //myConnectionsRef.setValue(Boolean.TRUE);
 
                     //myConnectionsRef.onDisconnect().removeValue();
-
+                    userInfoRef.updateChildren(me.getPresenceMap());
                     // when I disconnect, update the last time I was seen online
-                    lastOnlineRef.setValue(ServerValue.TIMESTAMP);
+                    userInfoRef.child(Constants.LAST_ONLINE_CHILD).setValue(ServerValue.TIMESTAMP);
                 }
             }
 

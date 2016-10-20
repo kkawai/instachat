@@ -16,13 +16,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.instachat.android.ActivityState;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.model.User;
 import com.instachat.android.util.MLog;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -52,6 +51,7 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
     private WeakReference<Activity> mActivity;
     private ActivityState mActivityState;
     private Map<Long, Pair> publicGroupChatPresenceReferences = new HashMap<>();
+    private List<Map.Entry<DatabaseReference, ValueEventListener>> userInfoChangeListeners = new ArrayList<>(128);
 
     public GroupChatUsersRecyclerAdapter(@NonNull Activity activity,
                                          @NonNull ActivityState activityState,
@@ -124,6 +124,10 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
             mActivity.clear();
         mActivity = null;
         mActivityState = null;
+        for (Map.Entry<DatabaseReference, ValueEventListener> entry : userInfoChangeListeners) {
+            entry.getKey().removeEventListener(entry.getValue());
+        }
+        userInfoChangeListeners = null;
     }
 
     private synchronized void addPublicGroupChatPresenceReference(final long groupid) {
@@ -145,6 +149,7 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
                 synchronized (this) {
                     data.add(user);
                     notifyItemInserted(data.size() - 1);
+                    listenForUserUpdates(user);
                 }
             }
 
@@ -181,5 +186,59 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
         };
         pair.ref.addChildEventListener(pair.listener);
         publicGroupChatPresenceReferences.put(groupid, pair);
+    }
+
+    private void listenForUserUpdates(final User user) {
+
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(Integer.parseInt(user.getId() + "")));
+        final ValueEventListener eventListener = ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (mActivityState == null || mActivityState.isActivityDestroyed())
+                    return;
+                try {
+                    if (dataSnapshot.getValue() != null) {
+                        User user = dataSnapshot.getValue(User.class);
+                        //privateChatSummary.setLastOnline(user.getLastOnline());
+                        //privateChatSummary.setName(user.getUsername());
+                        synchronized (this) {
+                            int index = data.indexOf(user);
+                            if (index != -1) {
+                                User cur = data.get(index);
+                                cur.setUsername(user.getUsername());
+                                cur.setProfilePicUrl(user.getProfilePicUrl());
+                                cur.setLastOnline(user.getLastOnline());
+                                notifyItemChanged(index);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    MLog.e(TAG, "", e);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        Map.Entry<DatabaseReference, ValueEventListener> entry = new Map.Entry<DatabaseReference, ValueEventListener>() {
+            @Override
+            public DatabaseReference getKey() {
+                return ref;
+            }
+
+            @Override
+            public ValueEventListener getValue() {
+                return eventListener;
+            }
+
+            @Override
+            public ValueEventListener setValue(ValueEventListener valueEventListener) {
+                return valueEventListener;
+            }
+        };
+        userInfoChangeListeners.add(entry);
     }
 }

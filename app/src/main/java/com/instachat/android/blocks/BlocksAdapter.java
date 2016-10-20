@@ -13,12 +13,20 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.instachat.android.ActivityState;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.adapter.UserClickedListener;
+import com.instachat.android.model.User;
 import com.instachat.android.util.MLog;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends FirebaseRecyclerAdapter<BlockedUser, BlocksViewHolder> {
 
@@ -27,6 +35,7 @@ public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends 
     private UserClickedListener mUserClickedListener;
     private Activity mActivity;
     private ActivityState mActivityState;
+    private List<Map.Entry<DatabaseReference, ValueEventListener>> mUserInfoChangeListeners = new ArrayList<>();
 
     public BlocksAdapter(Class<BlockedUser> modelClass, int modelLayout, Class<BlocksViewHolder> viewHolderClass, DatabaseReference ref) {
         super(modelClass, modelLayout, viewHolderClass, ref);
@@ -88,6 +97,7 @@ public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends 
         MLog.d(TAG, "BlockedUser: " + snapshot);
         BlockedUser blockedUser = snapshot.getValue(BlockedUser.class);
         blockedUser.id = Integer.parseInt(snapshot.getKey());
+        listenForUserUpdates(blockedUser);
         return blockedUser;
     }
 
@@ -96,6 +106,58 @@ public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends 
         mUserClickedListener = null;
         mActivity = null;
         mActivityState = null;
+        for (Map.Entry<DatabaseReference, ValueEventListener> entry : mUserInfoChangeListeners) {
+            entry.getKey().removeEventListener(entry.getValue());
+        }
+        mUserInfoChangeListeners = null;
         super.cleanup();
+    }
+
+    private void listenForUserUpdates(final BlockedUser blockedUser) {
+
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(Integer.parseInt(blockedUser.id + "")));
+        final ValueEventListener eventListener = ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (mActivityState == null || mActivityState.isActivityDestroyed())
+                    return;
+                try {
+                    if (dataSnapshot.getValue() != null) {
+                        User user = dataSnapshot.getValue(User.class);
+                        BlockedUser blockedUser = new BlockedUser(user.getId(), user.getUsername(), user.getProfilePicUrl());
+                        updateBlockedUser(blockedUser);
+                    }
+                } catch (Exception e) {
+                    MLog.e(TAG, "", e);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        Map.Entry<DatabaseReference, ValueEventListener> entry = new Map.Entry<DatabaseReference, ValueEventListener>() {
+            @Override
+            public DatabaseReference getKey() {
+                return ref;
+            }
+
+            @Override
+            public ValueEventListener getValue() {
+                return eventListener;
+            }
+
+            @Override
+            public ValueEventListener setValue(ValueEventListener valueEventListener) {
+                return null;
+            }
+        };
+        mUserInfoChangeListeners.add(entry);
+    }
+
+    private void updateBlockedUser(BlockedUser blockedUser) {
+        FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF()).child(blockedUser.id + "").updateChildren(blockedUser.getUpdateMap());
     }
 }

@@ -24,6 +24,7 @@ import com.instachat.android.model.GroupChatHeader;
 import com.instachat.android.model.GroupChatSummary;
 import com.instachat.android.model.PrivateChatHeader;
 import com.instachat.android.model.PrivateChatSummary;
+import com.instachat.android.model.User;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.ThreadWrapper;
 
@@ -65,7 +66,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
     private ChatsItemClickedListener chatsItemClickedListener;
     private Map<Long, Pair> publicGroupChatPresenceReferences = new HashMap<>();
     private ActivityState activityState;
-    private Vector<ValueEventPair> lastOnlineRefs = new Vector<>(128);
+    private Vector<ValueEventPair> userInfoRefs = new Vector<>(128);
     private Handler handler = new Handler();
 
     public ChatSummariesRecyclerAdapter(@NonNull ChatsItemClickedListener chatsItemClickedListener,
@@ -78,7 +79,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
 
         data.add(new GroupChatHeader(MyApp.getInstance().getString(R.string.group_chat_header)));
         data.add(new PrivateChatHeader(MyApp.getInstance().getString(R.string.private_chat_header)));
-        privateChatsSummaryReference = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
+        privateChatsSummaryReference = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
         privateChatsSummaryListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -244,13 +245,12 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
                 }
             }
         }
-        getLastSeenTimestamp(privateChatSummary);
+        listenForUserUpdates(privateChatSummary);
     }
 
-    private void getLastSeenTimestamp(final PrivateChatSummary privateChatSummary) {
+    private void listenForUserUpdates(final PrivateChatSummary privateChatSummary) {
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("/users/").
-                child(privateChatSummary.getId()).child("lastOnline");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(Integer.parseInt(privateChatSummary.getId())));
         ValueEventListener eventListener = ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -258,8 +258,11 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
                     return;
                 try {
                     if (dataSnapshot.getValue() != null) {
-                        privateChatSummary.setLastOnline((Long) dataSnapshot.getValue());
+                        User user = dataSnapshot.getValue(User.class);
+                        privateChatSummary.setLastOnline(user.getLastOnline());
+                        privateChatSummary.setName(user.getUsername());
                     }
+                    MLog.d(TAG, "debug user info. dataSnapshot: ", dataSnapshot);
                     getGcmStatus(privateChatSummary);
                 } catch (Exception e) {
                 }
@@ -273,7 +276,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
         ValueEventPair pair = new ValueEventPair();
         pair.listener = eventListener;
         pair.ref = ref;
-        lastOnlineRefs.add(pair);
+        userInfoRefs.add(pair);
     }
 
     private void getGcmStatus(final PrivateChatSummary privateChatSummary) {
@@ -541,10 +544,10 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
         }
         publicGroupChatPresenceReferences = null;
         activityState = null;
-        for (ValueEventPair pair : lastOnlineRefs) {
+        for (ValueEventPair pair : userInfoRefs) {
             pair.ref.removeEventListener(pair.listener);
         }
-        lastOnlineRefs = null;
+        userInfoRefs = null;
     }
 
     private synchronized void addPublicGroupChatPresenceReference(final long groupid) {

@@ -65,7 +65,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     private static int sToUserid;
     private ChatTypingHelper mTypingHelper;
     private long mLastTypingTime;
-    private ValueEventListener mLastOnlineValueEventListener = null;
+    private ValueEventListener mUserInfoValueEventListener = null;
 
     @Override
     protected int getLayout() {
@@ -102,13 +102,13 @@ public class PrivateChatActivity extends GroupChatActivity {
                     populateUserProfile();
                     //getSupportActionBar().setTitle(mToUser.getUsername());
 
-                    mLastOnlineValueEventListener = FirebaseDatabase.getInstance().getReference("/users/").
-                            child(toUserid + "").child("lastOnline").addValueEventListener(new ValueEventListener() {
+                    mUserInfoValueEventListener = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(sToUserid)).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             try {
                                 if (dataSnapshot.getValue() != null) {
-                                    setCustomTitles(mToUser.getUsername(), TimeUtil.getTimeAgo(new Date((Long) dataSnapshot.getValue())));
+                                    User user = dataSnapshot.getValue(User.class);
+                                    setCustomTitles(user.getUsername(), user.getLastOnline());
                                 }
                             } catch (Exception e) {
                             }
@@ -214,7 +214,7 @@ public class PrivateChatActivity extends GroupChatActivity {
      * create it.  Otherwise, create it.
      */
     private void createPrivateChatSummary() {
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF())
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF())
                 .child(mToUser.getId() + "");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -238,7 +238,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     private void updatePrivateChatSummaryLastMessageSentTimestamp() {
         Map<String, Object> map = new HashMap<>(1);
         map.put("lastMessageSentTimestamp", System.currentTimeMillis());
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
         ref.child(mToUser.getId() + "").updateChildren(map);
     }
 
@@ -261,10 +261,9 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     @Override
     public void onDestroy() {
-        if (mLastOnlineValueEventListener != null) {
+        if (mUserInfoValueEventListener != null) {
             try {
-                FirebaseDatabase.getInstance().getReference("/users/").
-                        child(sToUserid + "").child("lastOnline").removeEventListener(mLastOnlineValueEventListener);
+                FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(sToUserid)).removeEventListener(mUserInfoValueEventListener);
             } catch (Exception e) {
                 MLog.e(TAG, "", e);
             }
@@ -312,7 +311,7 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     public static void startPrivateChatActivity(final Context context, final int userid,
                                                 final Uri sharePhotoUri, final String shareMessage) {
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.BLOCKS_REF() + userid);
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF() + userid);
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -445,7 +444,7 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     private void clearPrivateUnreadMessages(int toUserid) {
         try {
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF());
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
             ref.child(toUserid + "").child(Constants.CHILD_UNREAD_MESSAGES).removeValue();
         } catch (Exception e) {
             MLog.e(TAG, "", e);
@@ -519,12 +518,18 @@ public class PrivateChatActivity extends GroupChatActivity {
         }
     }
 
-    private void setCustomTitles(String username, String lastActive) {
+    private void setCustomTitles(String username, long lastOnline) {
+        String lastActive = "";
+        if (lastOnline != 0) {
+            lastActive = TimeUtil.getTimeAgo(new Date(lastOnline));
+        }
         ((TextView) findViewById(R.id.customTitleInToolbar)).setText(username);
-        ((TextView) findViewById(R.id.customSubtitleInToolbar)).setText(lastActive);
-
         ((TextView) findViewById(R.id.customTitleInParallax)).setText(username);
-        ((TextView) findViewById(R.id.customSubtitleInParallax)).setText("  •  " + lastActive);
+
+        if (!TextUtils.isEmpty(lastActive)) {
+            ((TextView) findViewById(R.id.customSubtitleInParallax)).setText("  •  " + lastActive);
+            ((TextView) findViewById(R.id.customSubtitleInToolbar)).setText(lastActive);
+        }
     }
 
     @Override

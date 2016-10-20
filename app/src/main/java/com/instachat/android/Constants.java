@@ -147,16 +147,22 @@ public final class Constants {
         storageReference.child(DP_STORAGE_BASE(userid) + dpid).getDownloadUrl().addOnCompleteListener(onCompleteListener);
     }
 
+    public static String USER_INFO_REF(int userid) {
+        return "/users/" + userid + "/info";
+    }
+
+    public static final String LAST_ONLINE_CHILD = "lastOnline";
+
     public static String PRIVATE_CHAT_REF(int toUserid) {
         final int myUserid = Preferences.getInstance().getUserId();
         return "/directs/" + (toUserid > myUserid ? (myUserid + "_" + toUserid) : (toUserid + "_" + myUserid));
     }
 
-    public static String PRIVATE_CHATS_SUMMARY_PARENT_REF() {
+    public static String MY_PRIVATE_CHATS_SUMMARY_PARENT_REF() {
         return "/users/" + Preferences.getInstance().getUserId() + "/private_summaries/";
     }
 
-    public static String BLOCKS_REF() {
+    public static String MY_BLOCKS_REF() {
         return "/users/" + Preferences.getInstance().getUserId() + "/blocks/";
     }
 

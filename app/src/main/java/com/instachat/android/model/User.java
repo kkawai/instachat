@@ -2,6 +2,8 @@ package com.instachat.android.model;
 
 import android.content.ContentValues;
 
+import com.google.firebase.database.ServerValue;
+import com.instachat.android.Constants;
 import com.instachat.android.model.UserManager.UserColumns;
 
 import org.json.JSONObject;
@@ -46,6 +48,7 @@ public class User extends DomainObject {
     private boolean isOnline;
     private transient boolean transientAddedToRoster;
     private transient ArrayList<StatusChangeListener> statusChangeListeners;
+    private long lastOnline;
 
     private int mediaCounts;
     private int followsCount;
@@ -152,6 +155,13 @@ public class User extends DomainObject {
         map.put("username", username);
         map.put("profilePicUrl", profilePicUrl);
         map.put("id", id);
+        map.put(Constants.LAST_ONLINE_CHILD, ServerValue.TIMESTAMP);
+        return map;
+    }
+
+    public Map<String, Object> getUsernameMap() {
+        Map<String, Object> map = new HashMap<>(1);
+        map.put("username", username);
         return map;
     }
 
@@ -545,5 +555,13 @@ public class User extends DomainObject {
         final User remote = new User();
         remote.copyFrom(data, null);
         return remote;
+    }
+
+    public long getLastOnline() {
+        return lastOnline;
+    }
+
+    public void setLastOnline(long lastOnline) {
+        this.lastOnline = lastOnline;
     }
 }

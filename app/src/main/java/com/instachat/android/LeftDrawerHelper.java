@@ -32,7 +32,6 @@ import com.instachat.android.util.StringUtil;
 import com.tooltip.OnDismissListener;
 import com.tooltip.Tooltip;
 
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;

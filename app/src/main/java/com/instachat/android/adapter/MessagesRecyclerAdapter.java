@@ -354,7 +354,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         mAdapterPopulateHolderListener = null;
         mMessageTextClickedListener = null;
         mBlockedUserListener = null;
-        mFirebaseDatabaseReference.child(Constants.BLOCKS_REF()).removeEventListener(mBlockedUsersListener);
+        mFirebaseDatabaseReference.child(Constants.MY_BLOCKS_REF()).removeEventListener(mBlockedUsersListener);
     }
 
     public void sendFriendlyMessage(final FriendlyMessage friendlyMessage) {
@@ -367,6 +367,20 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
                     if (lastFriendlyMessage.append(friendlyMessage)) {
                         friendlyMessage.setId(lastFriendlyMessage.getId());
+
+                        /**
+                         * now check if the user sending this message has changed their name
+                         * or user profile pic.  if so, change the last friendly message
+                         * so that it gets updated.
+                         */
+                        if (!friendlyMessage.getName().equals(lastFriendlyMessage.getName())) {
+                            lastFriendlyMessage.setName(friendlyMessage.getName());
+                        }
+                        String lastdpid = lastFriendlyMessage.getDpid() + "";
+                        String currdpid = friendlyMessage.getDpid() + "";
+                        if (!currdpid.equals(lastdpid)) {
+                            lastFriendlyMessage.setDpid(currdpid);
+                        }
                         mFirebaseDatabaseReference.child(mDatabaseRef).child(lastFriendlyMessage.getId()).updateChildren(FriendlyMessage.toMap(lastFriendlyMessage)).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
@@ -453,6 +467,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
             }
         };
-        mFirebaseDatabaseReference.child(Constants.BLOCKS_REF()).addChildEventListener(mBlockedUsersListener);
+        mFirebaseDatabaseReference.child(Constants.MY_BLOCKS_REF()).addChildEventListener(mBlockedUsersListener);
     }
 }

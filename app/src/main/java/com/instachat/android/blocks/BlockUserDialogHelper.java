@@ -54,7 +54,7 @@ public class BlockUserDialogHelper {
                 map.put("name", username);
                 if (!TextUtils.isEmpty(dpid))
                     map.put("dpid", dpid);
-                FirebaseDatabase.getInstance().getReference(Constants.BLOCKS_REF()).
+                FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF()).
                         child(userid + "").updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -64,7 +64,7 @@ public class BlockUserDialogHelper {
                                     .setContentText(activity.getString(R.string.block_person_success, username))
                                     .show();
                             listener.onUserBlocked(userid);
-                            FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHATS_SUMMARY_PARENT_REF())
+                            FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF())
                                     .child(userid + "")
                                     .removeValue();
                         } else {
