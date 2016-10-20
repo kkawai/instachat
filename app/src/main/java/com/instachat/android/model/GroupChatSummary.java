@@ -121,6 +121,20 @@ public class GroupChatSummary implements Comparable<GroupChatSummary> {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof GroupChatSummary)) {
+            return false;
+        }
+        GroupChatSummary other = (GroupChatSummary)obj;
+        return id == other.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int)id;
+    }
+
+    @Override
     public int compareTo(GroupChatSummary groupChatSummary) {
         if (this.order < groupChatSummary.order) {
             return -1;

@@ -1,7 +1,6 @@
 package com.instachat.android.adapter;
 
 import android.content.res.Resources;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -50,24 +49,13 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
     private static final int TYPE_PRIVATE_HEADER = 2;
     private static final int TYPE_GROUP_HEADER = 3;
 
-    private static final class Pair {
-        DatabaseReference ref;
-        ChildEventListener listener;
-    }
-
-    private static final class ValueEventPair {
-        DatabaseReference ref;
-        ValueEventListener listener;
-    }
-
     private List<Object> data = new ArrayList<>(128);
     private ChildEventListener privateChatsSummaryListener, publicGroupChatsSummaryListener;
     private DatabaseReference privateChatsSummaryReference, publicGroupChatsSummaryReference;
     private ChatsItemClickedListener chatsItemClickedListener;
-    private Map<Long, Pair> publicGroupChatPresenceReferences = new HashMap<>();
+    private Map<Long, Map.Entry<DatabaseReference, ChildEventListener>> publicGroupChatPresenceReferences = new HashMap<>();
     private ActivityState activityState;
-    private Vector<ValueEventPair> userInfoRefs = new Vector<>(128);
-    private Handler handler = new Handler();
+    private List<Map.Entry<DatabaseReference, ValueEventListener>> userInfoRefs = new Vector<>(128);
 
     public ChatSummariesRecyclerAdapter(@NonNull ChatsItemClickedListener chatsItemClickedListener,
                                         @NonNull ActivityState activityState) {
@@ -183,32 +171,21 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
 
     private void updateGroupChatSummary(GroupChatSummary groupChatSummary) {
         synchronized (this) {
-            for (int i = 0; i < data.size(); i++) {
-                Object o = data.get(i);
-                if (o instanceof GroupChatSummary) {
-                    GroupChatSummary existingGroupChatSummary = (GroupChatSummary) o;
-                    if (existingGroupChatSummary.getId() == groupChatSummary.getId()) {
-                        data.set(i, groupChatSummary);
-                        notifyItemChanged(i);
-                        break;
-                    }
-                }
+            int index = data.indexOf(groupChatSummary);
+            if (index != -1) {
+                data.set(index, groupChatSummary);
+                notifyItemChanged(index);
             }
         }
     }
 
     private void removeGroupChatSummary(GroupChatSummary groupChatSummary) {
         synchronized (this) {
-            for (int i = 0; i < data.size(); i++) {
-                Object o = data.get(i);
-                if (o instanceof GroupChatSummary) {
-                    GroupChatSummary existingGroupChatSummary = (GroupChatSummary) o;
-                    if (existingGroupChatSummary.getId() == groupChatSummary.getId()) {
-                        data.remove(i);
-                        notifyItemRemoved(i);
-                        break;
-                    }
-                }
+
+            int index = data.indexOf(groupChatSummary);
+            if (index != -1) {
+                data.remove(index);
+                notifyItemRemoved(index);
             }
         }
     }
@@ -250,8 +227,8 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
 
     private void listenForUserUpdates(final PrivateChatSummary privateChatSummary) {
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(Integer.parseInt(privateChatSummary.getId())));
-        ValueEventListener eventListener = ref.addValueEventListener(new ValueEventListener() {
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(Integer.parseInt(privateChatSummary.getId())));
+        final ValueEventListener eventListener = ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (activityState == null || activityState.isActivityDestroyed())
@@ -273,10 +250,24 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
 
             }
         });
-        ValueEventPair pair = new ValueEventPair();
-        pair.listener = eventListener;
-        pair.ref = ref;
-        userInfoRefs.add(pair);
+        Map.Entry<DatabaseReference, ValueEventListener> entry = new Map.Entry<DatabaseReference, ValueEventListener>() {
+            @Override
+            public ValueEventListener getValue() {
+                return eventListener;
+            }
+
+            @Override
+            public DatabaseReference getKey() {
+                return ref;
+            }
+
+            @Override
+            public ValueEventListener setValue(ValueEventListener valueEventListener) {
+                return null;
+            }
+        };
+        ref.addValueEventListener(eventListener);
+        userInfoRefs.add(entry);
     }
 
     private void getGcmStatus(final PrivateChatSummary privateChatSummary) {
@@ -343,32 +334,20 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
 
     private void updatePrivateChatSummary(PrivateChatSummary privateChatSummary) {
         synchronized (this) {
-            for (int i = 0; i < data.size(); i++) {
-                Object o = data.get(i);
-                if (o instanceof PrivateChatSummary) {
-                    PrivateChatSummary existingPrivateChatSummary = (PrivateChatSummary) o;
-                    if (existingPrivateChatSummary.getId().equals(privateChatSummary.getId())) {
-                        data.set(i, privateChatSummary);
-                        notifyItemChanged(i);
-                        break;
-                    }
-                }
+            int i = data.indexOf(privateChatSummary);
+            if (i != -1) {
+                data.set(i, privateChatSummary);
+                notifyItemChanged(i);
             }
         }
     }
 
     private void removePrivateChatSummary(PrivateChatSummary privateChatSummary) {
         synchronized (this) {
-            for (int i = 0; i < data.size(); i++) {
-                Object o = data.get(i);
-                if (o instanceof PrivateChatSummary) {
-                    PrivateChatSummary existingPrivateChatSummary = (PrivateChatSummary) o;
-                    if (existingPrivateChatSummary.getId().equals(privateChatSummary.getId())) {
-                        data.remove(i);
-                        notifyItemRemoved(i);
-                        break;
-                    }
-                }
+            int i = data.indexOf(privateChatSummary);
+            if (i != -1) {
+                data.remove(i);
+                notifyItemRemoved(i);
             }
         }
     }
@@ -530,13 +509,13 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
         privateChatsSummaryReference.removeEventListener(privateChatsSummaryListener);
         publicGroupChatsSummaryReference.removeEventListener(publicGroupChatsSummaryListener);
         for (long groupid : publicGroupChatPresenceReferences.keySet()) {
-            Pair pair = publicGroupChatPresenceReferences.get(groupid);
-            pair.ref.removeEventListener(pair.listener);
+            Map.Entry<DatabaseReference, ChildEventListener> entry = publicGroupChatPresenceReferences.get(groupid);
+            entry.getKey().removeEventListener(entry.getValue());
         }
         publicGroupChatPresenceReferences = null;
         activityState = null;
-        for (ValueEventPair pair : userInfoRefs) {
-            pair.ref.removeEventListener(pair.listener);
+        for (Map.Entry<DatabaseReference, ValueEventListener> entry : userInfoRefs) {
+            entry.getKey().removeEventListener(entry.getValue());
         }
         userInfoRefs = null;
     }
@@ -549,9 +528,8 @@ onChildAdded() dataSnapshot: DataSnapshot { key = 3733523, value = {username=kev
 onChildAdded() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {username=CoolistUserInWorld, id=234fakeUserid, profilePicUrl=blahblahblah} }
 onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {username=CoolistUserInWorld, id=234fakeUserid, profilePicUrl=blahblahblah} }
          */
-        Pair pair = new Pair();
-        pair.ref = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(groupid));
-        pair.listener = new ChildEventListener() {
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(groupid));
+        final ChildEventListener listener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (activityState == null || activityState.isActivityDestroyed())
@@ -583,46 +561,57 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
 
             }
         };
-        pair.ref.addChildEventListener(pair.listener);
-        publicGroupChatPresenceReferences.put(groupid, pair);
+        ref.addChildEventListener(listener);
+        Map.Entry<DatabaseReference, ChildEventListener> entry = new Map.Entry<DatabaseReference, ChildEventListener>() {
+            @Override
+            public DatabaseReference getKey() {
+                return ref;
+            }
+
+            @Override
+            public ChildEventListener getValue() {
+                return listener;
+            }
+
+            @Override
+            public ChildEventListener setValue(ChildEventListener childEventListener) {
+                return null;
+            }
+        };
+        publicGroupChatPresenceReferences.put(groupid, entry);
     }
 
     private void removeUserFromPublicGroupChat(long groupid) {
         synchronized (this) {
-            for (int i = 0; i < data.size(); i++) {
-                Object o = data.get(i);
-                if (o instanceof GroupChatSummary) {
-                    GroupChatSummary groupChatSummary = (GroupChatSummary) o;
-                    if (groupChatSummary.getId() == groupid && groupChatSummary.getUsersInRoomCount() > 0) {
-                        groupChatSummary.setUsersInRoomCount(groupChatSummary.getUsersInRoomCount() - 1);
-                        notifyItemChanged(i);
-                        break;
-                    }
-                }
+            GroupChatSummary temp = new GroupChatSummary();
+            temp.setId(groupid);
+            int i = data.indexOf(temp);
+            if (i != -1) {
+                GroupChatSummary groupChatSummary = (GroupChatSummary) data.get(i);
+                groupChatSummary.setUsersInRoomCount(groupChatSummary.getUsersInRoomCount() - 1);
+                notifyItemChanged(i);
             }
         }
     }
 
     private void addUserToPublicGroupChat(long groupid) {
         synchronized (this) {
-            for (int i = 0; i < data.size(); i++) {
-                Object o = data.get(i);
-                if (o instanceof GroupChatSummary) {
-                    GroupChatSummary groupChatSummary = (GroupChatSummary) o;
-                    if (groupChatSummary.getId() == groupid) {
-                        groupChatSummary.setUsersInRoomCount(groupChatSummary.getUsersInRoomCount() + 1);
-                        notifyItemChanged(i);
-                        break;
-                    }
-                }
+
+            GroupChatSummary temp = new GroupChatSummary();
+            temp.setId(groupid);
+            int i = data.indexOf(temp);
+            if (i != -1) {
+                GroupChatSummary groupChatSummary = (GroupChatSummary) data.get(i);
+                groupChatSummary.setUsersInRoomCount(groupChatSummary.getUsersInRoomCount() + 1);
+                notifyItemChanged(i);
             }
         }
     }
 
     private synchronized void removePublicGroupChatPresenceReference(final long groupid) {
-        Pair pair = publicGroupChatPresenceReferences.get(groupid);
-        if (pair != null) {
-            pair.ref.removeEventListener(pair.listener);
+        Map.Entry<DatabaseReference, ChildEventListener> entry = publicGroupChatPresenceReferences.get(groupid);
+        if (entry != null) {
+            entry.getKey().removeEventListener(entry.getValue());
             publicGroupChatPresenceReferences.remove(groupid);
         }
     }

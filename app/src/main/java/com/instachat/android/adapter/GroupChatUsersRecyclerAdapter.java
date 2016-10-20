@@ -40,17 +40,12 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
 
     public static final String TAG = "ChatSummariesRecyclerAdapter";
 
-    private static final class Pair {
-        DatabaseReference ref;
-        ChildEventListener listener;
-    }
-
     private List<User> data = new ArrayList<>(40);
     private long groupid;
     private UserClickedListener userClickedListener;
     private WeakReference<Activity> mActivity;
     private ActivityState mActivityState;
-    private Map<Long, Pair> publicGroupChatPresenceReferences = new HashMap<>();
+    private Map<Long, Map.Entry<DatabaseReference, ChildEventListener>> publicGroupChatPresenceReferences = new HashMap<>();
     private List<Map.Entry<DatabaseReference, ValueEventListener>> userInfoChangeListeners = new ArrayList<>(128);
 
     public GroupChatUsersRecyclerAdapter(@NonNull Activity activity,
@@ -116,8 +111,8 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
 
     public void cleanup() {
         for (long groupid : publicGroupChatPresenceReferences.keySet()) {
-            Pair pair = publicGroupChatPresenceReferences.get(groupid);
-            pair.ref.removeEventListener(pair.listener);
+            Map.Entry<DatabaseReference, ChildEventListener> entry = publicGroupChatPresenceReferences.get(groupid);
+            entry.getKey().removeEventListener(entry.getValue());
         }
         publicGroupChatPresenceReferences.clear();
         if (mActivity != null)
@@ -138,9 +133,8 @@ onChildAdded() dataSnapshot: DataSnapshot { key = 3733523, value = {username=kev
 onChildAdded() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {username=CoolistUserInWorld, id=234fakeUserid, profilePicUrl=blahblahblah} }
 onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {username=CoolistUserInWorld, id=234fakeUserid, profilePicUrl=blahblahblah} }
          */
-        Pair pair = new Pair();
-        pair.ref = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(groupid));
-        pair.listener = new ChildEventListener() {
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(groupid));
+        final ChildEventListener listener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildAdded() dataSnapshot: " + dataSnapshot);
@@ -161,9 +155,7 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
                 synchronized (this) {
                     int index = data.indexOf(user);
                     if (index != -1) {
-                        User u = data.get(index);
-                        u.setUsername(user.getUsername());
-                        u.setProfilePicUrl(user.getProfilePicUrl());
+                        data.set(index, user);
                         notifyItemChanged(index);
                     }
                 }
@@ -194,8 +186,25 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
 
             }
         };
-        pair.ref.addChildEventListener(pair.listener);
-        publicGroupChatPresenceReferences.put(groupid, pair);
+
+        Map.Entry<DatabaseReference, ChildEventListener> entry = new Map.Entry<DatabaseReference, ChildEventListener>() {
+            @Override
+            public DatabaseReference getKey() {
+                return ref;
+            }
+
+            @Override
+            public ChildEventListener getValue() {
+                return listener;
+            }
+
+            @Override
+            public ChildEventListener setValue(ChildEventListener childEventListener) {
+                return null;
+            }
+        };
+        ref.addChildEventListener(listener);
+        publicGroupChatPresenceReferences.put(groupid, entry);
     }
 
     private void listenForUserUpdates(final User user, final long groupid) {
@@ -238,6 +247,7 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
                 return valueEventListener;
             }
         };
+        ref.addValueEventListener(eventListener);
         userInfoChangeListeners.add(entry);
     }
 }
