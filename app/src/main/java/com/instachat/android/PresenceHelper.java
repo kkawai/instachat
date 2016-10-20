@@ -39,9 +39,8 @@ public class PresenceHelper {
                     //myConnectionsRef.setValue(Boolean.TRUE);
 
                     //myConnectionsRef.onDisconnect().removeValue();
-                    userInfoRef.updateChildren(me.getPresenceMap());
+                    userInfoRef.updateChildren(me.getPresenceMap(true));
                     // when I disconnect, update the last time I was seen online
-                    userInfoRef.child(Constants.LAST_ONLINE_CHILD).setValue(ServerValue.TIMESTAMP);
                 }
             }
 

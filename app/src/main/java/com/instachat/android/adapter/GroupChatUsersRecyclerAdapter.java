@@ -149,7 +149,7 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
                 synchronized (this) {
                     data.add(user);
                     notifyItemInserted(data.size() - 1);
-                    listenForUserUpdates(user);
+                    listenForUserUpdates(user, groupid);
                 }
             }
 
@@ -188,7 +188,7 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
         publicGroupChatPresenceReferences.put(groupid, pair);
     }
 
-    private void listenForUserUpdates(final User user) {
+    private void listenForUserUpdates(final User user, final long groupid) {
 
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(Integer.parseInt(user.getId() + "")));
         final ValueEventListener eventListener = ref.addValueEventListener(new ValueEventListener() {
@@ -199,18 +199,7 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
                 try {
                     if (dataSnapshot.getValue() != null) {
                         User user = dataSnapshot.getValue(User.class);
-                        //privateChatSummary.setLastOnline(user.getLastOnline());
-                        //privateChatSummary.setName(user.getUsername());
-                        synchronized (this) {
-                            int index = data.indexOf(user);
-                            if (index != -1) {
-                                User cur = data.get(index);
-                                cur.setUsername(user.getUsername());
-                                cur.setProfilePicUrl(user.getProfilePicUrl());
-                                cur.setLastOnline(user.getLastOnline());
-                                notifyItemChanged(index);
-                            }
-                        }
+                        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(groupid)).child(user.getId() + "").updateChildren(user.getPresenceMap(false));
                     }
                 } catch (Exception e) {
                     MLog.e(TAG, "", e);

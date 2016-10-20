@@ -297,18 +297,9 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
                     }
                     if (activityState == null || activityState.isActivityDestroyed())
                         return;
-                    synchronized (ChatSummariesRecyclerAdapter.this) {
-                        final int index = data.indexOf(privateChatSummary);
-                        if (index != -1) {
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    notifyItemChanged(index);
-                                }
-                            });
-
-                        }
-                    }
+                    FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF()).
+                            child(privateChatSummary.getId()).
+                            updateChildren(PrivateChatSummary.toMap(privateChatSummary));
                 } catch (Exception e) {
                     MLog.e(TAG, "", e);
                 }
