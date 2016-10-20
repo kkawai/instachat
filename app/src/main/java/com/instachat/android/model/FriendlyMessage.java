@@ -126,6 +126,11 @@ public class FriendlyMessage implements Parcelable {
      * @return
      */
     private boolean canAppend(FriendlyMessage friendlyMessage) {
+
+        if (System.currentTimeMillis() - friendlyMessage.getTime() > 1000*60*5L) {
+            return false;
+        }
+
         if (messageType != MESSAGE_TYPE_NORMAL || friendlyMessage.messageType != MESSAGE_TYPE_NORMAL)
             return false;
         if (this.imageUrl != null && friendlyMessage.imageUrl != null)

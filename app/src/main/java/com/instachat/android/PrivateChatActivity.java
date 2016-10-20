@@ -551,7 +551,7 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     @Override
     public void onGroupChatClicked(GroupChatSummary groupChatSummary) {
-        if (getCurrentGroupId() == groupChatSummary.getId()) {
+        if (Preferences.getInstance().getLastGroupChatRoomVisited() == groupChatSummary.getId()) {
             finish();
             return;
         }

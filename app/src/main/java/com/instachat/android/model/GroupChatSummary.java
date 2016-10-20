@@ -94,6 +94,8 @@ public class GroupChatSummary implements Comparable<GroupChatSummary> {
     }
 
     public void setUsersInRoomCount(int usersInRoomCount) {
+        if (usersInRoomCount < 0)
+            return;
         this.usersInRoomCount = usersInRoomCount;
     }
 

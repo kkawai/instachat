@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
+import com.instachat.android.Constants;
 import com.instachat.android.MyApp;
 import com.instachat.android.model.User;
 
@@ -307,7 +308,7 @@ public final class Preferences {
     }
 
     public long getLastGroupChatRoomVisited() {
-        return mPrefs.getLong("last_group_chat_room", 0);
+        return mPrefs.getLong("last_group_chat_room", Constants.DEFAULT_PUBLIC_GROUP_ID);
     }
 
     public void setLastGroupChatRoomVisited(long groupid) {

@@ -590,6 +590,7 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
                 GroupChatSummary groupChatSummary = (GroupChatSummary) data.get(i);
                 groupChatSummary.setUsersInRoomCount(groupChatSummary.getUsersInRoomCount() - 1);
                 notifyItemChanged(i);
+                MLog.d(TAG, "removeUserFromPublicGroupChat() groupid ", groupid);
             }
         }
     }
