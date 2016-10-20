@@ -109,7 +109,11 @@ public class PrivateChatActivity extends GroupChatActivity {
                             try {
                                 if (dataSnapshot.getValue() != null) {
                                     User user = dataSnapshot.getValue(User.class);
+                                    mToUser.setProfilePicUrl(user.getProfilePicUrl());
+                                    mToUser.setBio(user.getBio());
+                                    mToUser.setUsername(user.getUsername());
                                     setCustomTitles(user.getUsername(), user.getLastOnline());
+                                    populateUserProfile();
                                 }
                             } catch (Exception e) {
                             }

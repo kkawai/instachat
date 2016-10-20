@@ -4,7 +4,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.instachat.android.model.User;
 import com.instachat.android.util.MLog;
@@ -39,7 +38,7 @@ public class PresenceHelper {
                     //myConnectionsRef.setValue(Boolean.TRUE);
 
                     //myConnectionsRef.onDisconnect().removeValue();
-                    userInfoRef.updateChildren(me.getPresenceMap(true));
+                    userInfoRef.updateChildren(me.getMap(true));
                     // when I disconnect, update the last time I was seen online
                 }
             }

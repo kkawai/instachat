@@ -1257,7 +1257,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         MLog.d(TAG, "addUserPresence() sGroupId: ", sGroupId, " username: ", myUsername());
         User me = Preferences.getInstance().getUser();
         mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(sGroupId)).
-                child(myUserid() + "").updateChildren(me.getPresenceMap(true));
+                child(myUserid() + "").updateChildren(me.getMap(true));
     }
 
     protected void removeUserPresence() {

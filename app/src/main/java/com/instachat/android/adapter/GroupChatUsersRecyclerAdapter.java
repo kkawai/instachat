@@ -218,7 +218,7 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
                 try {
                     if (dataSnapshot.getValue() != null) {
                         User user = dataSnapshot.getValue(User.class);
-                        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(groupid)).child(user.getId() + "").updateChildren(user.getPresenceMap(false));
+                        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(groupid)).child(user.getId() + "").updateChildren(user.getMap(false));
                     }
                 } catch (Exception e) {
                     MLog.e(TAG, "", e);

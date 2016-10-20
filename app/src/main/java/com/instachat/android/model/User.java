@@ -150,12 +150,14 @@ public class User extends DomainObject {
      *
      * @return
      */
-    public Map<String, Object> getPresenceMap(boolean includeTimestamp) {
+    public Map<String, Object> getMap(boolean includeTimestamp) {
         Map<String, Object> map = new HashMap<>(1);
         map.put("username", username);
         if (profilePicUrl != null)
             map.put("profilePicUrl", profilePicUrl);
         map.put("id", id);
+        if (bio != null)
+            map.put("bio",bio);
         if (includeTimestamp)
             map.put(Constants.LAST_ONLINE_CHILD, ServerValue.TIMESTAMP);
         return map;
