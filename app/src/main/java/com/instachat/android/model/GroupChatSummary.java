@@ -22,6 +22,7 @@ public class GroupChatSummary implements Comparable<GroupChatSummary> {
     private String lastMessage;
     private int unreadMessageCount = -1;
     private int usersInRoomCount;
+    private String description;
     private int order;
 
     public long getId() {
@@ -94,6 +95,14 @@ public class GroupChatSummary implements Comparable<GroupChatSummary> {
 
     public void setUsersInRoomCount(int usersInRoomCount) {
         this.usersInRoomCount = usersInRoomCount;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     /**
