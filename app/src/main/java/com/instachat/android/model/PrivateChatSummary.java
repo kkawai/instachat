@@ -1,5 +1,7 @@
 package com.instachat.android.model;
 
+import com.instachat.android.Constants;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -115,7 +117,7 @@ public class PrivateChatSummary implements Comparable {
         if (privateChatSummary.getLastMessage() != null)
             map.put("lastMessage", privateChatSummary.getLastMessage());
         if (privateChatSummary.getLastMessageSentTimestamp() != 0) {
-            map.put("lastMessageSentTimestamp", privateChatSummary.getLastMessageSentTimestamp());
+            map.put(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP, privateChatSummary.getLastMessageSentTimestamp());
         }
         if (privateChatSummary.getUnreadMessageCount() >= 0) {
             map.put("unreadMessageCount", privateChatSummary.getUnreadMessageCount());
@@ -131,7 +133,7 @@ public class PrivateChatSummary implements Comparable {
         if (!(obj instanceof PrivateChatSummary)) {
             return false;
         }
-        PrivateChatSummary other = (PrivateChatSummary)obj;
+        PrivateChatSummary other = (PrivateChatSummary) obj;
         return id.equals(other.id);
     }
 

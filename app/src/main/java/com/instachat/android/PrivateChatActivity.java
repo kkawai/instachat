@@ -242,7 +242,7 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     private void updatePrivateChatSummaryLastMessageSentTimestamp() {
         Map<String, Object> map = new HashMap<>(1);
-        map.put("lastMessageSentTimestamp", System.currentTimeMillis());
+        map.put(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP, System.currentTimeMillis());
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
         ref.child(mToUser.getId() + "").updateChildren(map);
     }
@@ -457,12 +457,12 @@ public class PrivateChatActivity extends GroupChatActivity {
     }
 
     @Override
-    protected void addUserPresence() {
+    protected void addUserPresenceToGroup() {
         //user presence does not apply in private chat situations
     }
 
     @Override
-    protected void removeUserPresence() {
+    protected void removeUserPresenceFromGroup() {
         //user presence does not apply in private chat situations
     }
 
@@ -523,18 +523,22 @@ public class PrivateChatActivity extends GroupChatActivity {
         }
     }
 
+    private long mLastOnlineTimestamp = 0;
+
     private void setCustomTitles(String username, long lastOnline) {
-        String lastActive = "";
-        if (lastOnline != 0) {
+
+        if (lastOnline > mLastOnlineTimestamp) {
+            String lastActive = "";
             lastActive = TimeUtil.getTimeAgo(new Date(lastOnline));
+            mLastOnlineTimestamp = lastOnline;
+            if (!TextUtils.isEmpty(lastActive)) {
+                ((TextView) findViewById(R.id.customSubtitleInParallax)).setText("  •  " + lastActive);
+                ((TextView) findViewById(R.id.customSubtitleInToolbar)).setText(lastActive);
+            }
         }
+
         ((TextView) findViewById(R.id.customTitleInToolbar)).setText(username);
         ((TextView) findViewById(R.id.customTitleInParallax)).setText(username);
-
-        if (!TextUtils.isEmpty(lastActive)) {
-            ((TextView) findViewById(R.id.customSubtitleInParallax)).setText("  •  " + lastActive);
-            ((TextView) findViewById(R.id.customSubtitleInToolbar)).setText(lastActive);
-        }
     }
 
     @Override

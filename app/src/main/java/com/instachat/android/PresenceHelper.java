@@ -17,7 +17,7 @@ public class PresenceHelper {
 
     private static final String TAG = "PresenceHelper";
 
-    public void logPresence() {
+    public void updateLastActiveTimestamp() {
         // since I can connect from multiple devices, we store each connection instance separately
         // any time that connectionsRef's value is null (i.e. has no children) I am offline
         final FirebaseDatabase database = FirebaseDatabase.getInstance();

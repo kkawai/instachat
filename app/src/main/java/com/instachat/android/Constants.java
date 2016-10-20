@@ -219,4 +219,6 @@ public final class Constants {
     public static final long TWELVE_HOURS = 1000 * 60 * 60 * 12L;
 
     public static String KEY_TEXT_REPLY = "key_text_reply";
+    public static String FIELD_LAST_MESSAGE_SENT_TIMESTAMP = "lastMessageSentTimestamp";
+
 }
