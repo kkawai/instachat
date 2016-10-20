@@ -156,20 +156,30 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildChanged() dataSnapshot: " + dataSnapshot);
+                User user = dataSnapshot.getValue(User.class);
+                user.setId(Integer.parseInt(dataSnapshot.getKey()));
+                synchronized (this) {
+                    int index = data.indexOf(user);
+                    if (index != -1) {
+                        User u = data.get(index);
+                        u.setUsername(user.getUsername());
+                        u.setProfilePicUrl(user.getProfilePicUrl());
+                        notifyItemChanged(index);
+                    }
+                }
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildRemoved() dataSnapshot: " + dataSnapshot);
                 final int userid = Integer.parseInt(dataSnapshot.getKey());
+                User user = new User();
+                user.setId(userid);
                 synchronized (this) {
-                    for (int i = 0; i < data.size(); i++) {
-                        User user = data.get(i);
-                        if (user.getId() == userid) {
-                            data.remove(i);
-                            notifyItemRemoved(i);
-                            break;
-                        }
+                    int index = data.indexOf(user);
+                    if (index != -1) {
+                        data.remove(index);
+                        notifyItemRemoved(index);
                     }
                 }
             }
