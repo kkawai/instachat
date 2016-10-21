@@ -1292,6 +1292,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             public void run() {
                 if (isActivityDestroyed())
                     return;
+                if (mChatsRecyclerViewAdapter != null)
+                    mChatsRecyclerViewAdapter.removeUserFromAllGroups(myUserid(),mGroupId);
                 MLog.d(TAG, "addUserPresenceToGroup() mGroupId: ", mGroupId, " username: ", myUsername());
                 User me = Preferences.getInstance().getUser();
                 mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(mGroupId)).

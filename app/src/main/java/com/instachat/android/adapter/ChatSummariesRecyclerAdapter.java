@@ -621,4 +621,34 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
     public List<?> getAdapterData() {
         return data;
     }
+
+    /**
+     * Remove given user from all public group chat rooms EXCEPT
+     * for exceptionGroupId.  Call this when the user enters
+     * any room, passing in the room they are about to enter
+     * as the exceptionGroupId.
+     * If the user is not about to enter any room, pass in 0
+     * for the exceptionGroupId.
+     *
+     * @param userid
+     * @param exceptionGroupId
+     */
+    public void removeUserFromAllGroups(int userid, long exceptionGroupId) {
+        synchronized (this) {
+            for (int i = 0; i < data.size(); i++) {
+                Object o = data.get(i);
+                if (o instanceof GroupChatHeader)
+                    continue;
+                if (o instanceof GroupChatSummary) {
+                    GroupChatSummary groupChatSummary = (GroupChatSummary) o;
+                    if (exceptionGroupId != 0)
+                        FirebaseDatabase.getInstance().
+                                getReference(Constants.GROUP_CHAT_USERS_REF(groupChatSummary.getId())).
+                                child(userid + "").removeValue();
+                } else {
+                    break;
+                }
+            }
+        }
+    }
 }
