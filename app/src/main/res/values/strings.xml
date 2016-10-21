@@ -129,4 +129,5 @@
 
     <string name="logout_title">Logout</string>
     <string name="logout_question">Sure you want to logout now?  It does not consume your phone battery or other resources to stay logged in.</string>
+    <string name="user_active_in_group">Active in %s</string>
 </resources>

@@ -220,5 +220,6 @@ public final class Constants {
 
     public static String KEY_TEXT_REPLY = "key_text_reply";
     public static String FIELD_LAST_MESSAGE_SENT_TIMESTAMP = "lastMessageSentTimestamp";
-
+    public static String FIELD_CURRENT_GROUP_ID = "currentGroupId";
+    public static String FIELD_CURRENT_GROUP_NAME = "currentGroupName";
 }

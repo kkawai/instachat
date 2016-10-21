@@ -112,6 +112,8 @@ public class PrivateChatActivity extends GroupChatActivity {
                                     mToUser.setProfilePicUrl(user.getProfilePicUrl());
                                     mToUser.setBio(user.getBio());
                                     mToUser.setUsername(user.getUsername());
+                                    mToUser.setCurrentGroupName(user.getCurrentGroupName());
+                                    mToUser.setCurrentGroupId(user.getCurrentGroupId());
                                     setCustomTitles(user.getUsername(), user.getLastOnline());
                                     populateUserProfile();
                                 }
@@ -180,6 +182,7 @@ public class PrivateChatActivity extends GroupChatActivity {
             }
         };
         appBarLayout.setOnClickListener(appBarOnClickListener);
+        new PresenceHelper().updateLastActiveTimestamp();
         //findViewById(R.id.toolbar).setOnClickListener(appBarOnClickListener);
         //bio.setOnClickListener(appBarOnClickListener);
         //profilePic.setOnClickListener(appBarOnClickListener);
@@ -430,7 +433,24 @@ public class PrivateChatActivity extends GroupChatActivity {
                 }
             }
         });
+        bio.setVisibility(TextUtils.isEmpty(mToUser.getBio()) ? View.GONE : View.VISIBLE);
         bio.setText(mToUser.getBio() + "");
+        TextView activeGroup = (TextView) findViewById(R.id.activeGroup);
+        if (mToUser.getCurrentGroupId() != 0 && !TextUtils.isEmpty(mToUser.getCurrentGroupName())) {
+            activeGroup.setVisibility(View.VISIBLE);
+            activeGroup.setText(getString(R.string.user_active_in_group, mToUser.getCurrentGroupName()));
+            activeGroup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    GroupChatSummary groupChatSummary = new GroupChatSummary();
+                    groupChatSummary.setId(mToUser.getCurrentGroupId());
+                    groupChatSummary.setName(mToUser.getCurrentGroupName());
+                    onGroupChatClicked(groupChatSummary);
+                }
+            });
+        } else {
+            activeGroup.setVisibility(View.GONE);
+        }
 
     }
 

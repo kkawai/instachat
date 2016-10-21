@@ -641,10 +641,11 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
                     continue;
                 if (o instanceof GroupChatSummary) {
                     GroupChatSummary groupChatSummary = (GroupChatSummary) o;
-                    if (exceptionGroupId != 0)
+                    if (exceptionGroupId != groupChatSummary.getId() || exceptionGroupId == 0) {
                         FirebaseDatabase.getInstance().
                                 getReference(Constants.GROUP_CHAT_USERS_REF(groupChatSummary.getId())).
                                 child(userid + "").removeValue();
+                    }
                 } else {
                     break;
                 }

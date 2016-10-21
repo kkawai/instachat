@@ -49,6 +49,8 @@ public class User extends DomainObject {
     private transient boolean transientAddedToRoster;
     private transient ArrayList<StatusChangeListener> statusChangeListeners;
     private long lastOnline;
+    private String currentGroupName;
+    private long currentGroupId;
 
     private int mediaCounts;
     private int followsCount;
@@ -157,9 +159,13 @@ public class User extends DomainObject {
             map.put("profilePicUrl", profilePicUrl);
         map.put("id", id);
         if (bio != null)
-            map.put("bio",bio);
+            map.put("bio", bio);
         if (includeTimestamp)
             map.put(Constants.LAST_ONLINE_CHILD, ServerValue.TIMESTAMP);
+        if (currentGroupName != null) {
+            map.put(Constants.FIELD_CURRENT_GROUP_NAME, currentGroupName);
+            map.put(Constants.FIELD_CURRENT_GROUP_ID, currentGroupId);
+        }
         return map;
     }
 
@@ -561,5 +567,21 @@ public class User extends DomainObject {
 
     public void setLastOnline(long lastOnline) {
         this.lastOnline = lastOnline;
+    }
+
+    public long getCurrentGroupId() {
+        return currentGroupId;
+    }
+
+    public void setCurrentGroupId(long currentGroupId) {
+        this.currentGroupId = currentGroupId;
+    }
+
+    public String getCurrentGroupName() {
+        return currentGroupName;
+    }
+
+    public void setCurrentGroupName(String currentGroupName) {
+        this.currentGroupName = currentGroupName;
     }
 }

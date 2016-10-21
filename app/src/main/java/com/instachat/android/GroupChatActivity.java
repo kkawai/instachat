@@ -283,31 +283,10 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             getIntent().removeExtra(Constants.KEY_SHARE_MESSAGE);
         }
         addUserPresenceToGroup();
-        new PresenceHelper().updateLastActiveTimestamp();
     }
 
     private DatabaseReference mGroupSummaryRef;
     private ValueEventListener mGroupSummaryListener;
-
-    private void addGroupInfoListener() {
-        mGroupSummaryRef = FirebaseDatabase.getInstance().getReference(Constants.PUBLIC_CHATS_SUMMARY_PARENT_REF).
-                child(mGroupId + "");
-        mGroupSummaryListener = mGroupSummaryRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChildren()) {
-                    GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
-                    getSupportActionBar().setTitle(groupChatSummary.getName());
-                    getSupportActionBar().setSubtitle(R.string.app_name);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
 
     private void removeGroupInfoListener() {
         if (mGroupSummaryRef != null && mGroupSummaryListener != null) {
@@ -1280,33 +1259,57 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     }
 
     protected void addUserPresenceToGroup() {
-        addGroupInfoListener();
-        /**
-         * run this delayed, if the user re-enters
-         * the same room (for a variety of reasons)
-         * give them some time to remove themself
-         * before immediately adding them back again.
-         */
-        new Handler().postDelayed(new Runnable() {
+
+        mGroupSummaryRef = FirebaseDatabase.getInstance().getReference(Constants.PUBLIC_CHATS_SUMMARY_PARENT_REF).
+                child(mGroupId + "");
+        mGroupSummaryListener = mGroupSummaryRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void run() {
-                if (isActivityDestroyed())
-                    return;
-                if (mChatsRecyclerViewAdapter != null)
-                    mChatsRecyclerViewAdapter.removeUserFromAllGroups(myUserid(),mGroupId);
-                MLog.d(TAG, "addUserPresenceToGroup() mGroupId: ", mGroupId, " username: ", myUsername());
-                User me = Preferences.getInstance().getUser();
-                mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(mGroupId)).
-                        child(myUserid() + "").updateChildren(me.getMap(true));
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChildren()) {
+                    final GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
+                    getSupportActionBar().setTitle(groupChatSummary.getName());
+                    getSupportActionBar().setSubtitle(R.string.app_name);
+
+                    /**
+                     * run this delayed, if the user re-enters
+                     * the same room (for a variety of reasons)
+                     * give them some time to remove themself
+                     * before immediately adding them back again.
+                     */
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (isActivityDestroyed())
+                                return;
+                            if (mChatsRecyclerViewAdapter != null)
+                                mChatsRecyclerViewAdapter.removeUserFromAllGroups(myUserid(), mGroupId);
+                            MLog.d(TAG, "addUserPresenceToGroup() mGroupId: ", mGroupId, " username: ", myUsername());
+                            User me = Preferences.getInstance().getUser();
+                            mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(mGroupId)).
+                                    child(myUserid() + "").updateChildren(me.getMap(true));
+
+                            me.setCurrentGroupId(groupChatSummary.getId());
+                            me.setCurrentGroupName(groupChatSummary.getName());
+                            mFirebaseDatabaseReference.child(Constants.USER_INFO_REF(myUserid())).updateChildren(me.getMap(true));
+
+                        }
+                    }, 3000);
+                }
             }
-        }, 3000);
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     protected void removeUserPresenceFromGroup() {
         removeGroupInfoListener();
         MLog.d(TAG, "removeUserPresenceFromGroup() mGroupId: ", mGroupId, " username: ", myUsername());
-        mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(mGroupId)).
-                child(myUserid() + "").removeValue();
+        mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(mGroupId)).child(myUserid() + "").removeValue();
+        mFirebaseDatabaseReference.child(Constants.USER_INFO_REF(myUserid())).child(Constants.FIELD_CURRENT_GROUP_ID).removeValue();
+        mFirebaseDatabaseReference.child(Constants.USER_INFO_REF(myUserid())).child(Constants.FIELD_CURRENT_GROUP_NAME).removeValue();
     }
 
     private void toggleRightDrawer() {
