@@ -29,6 +29,9 @@ public class FriendlyMessage implements Parcelable {
     private String imageId;
     private long time;
     private int messageType;
+    private long groupId;
+    private String groupName;
+    private int likesCount;
 
     private boolean isBlocked; //NOT persisted, volatile
 
@@ -53,6 +56,15 @@ public class FriendlyMessage implements Parcelable {
             map.put("userid", friendlyMessage.getUserid());
         if (friendlyMessage.getTime() != 0)
             map.put("time", friendlyMessage.getTime());
+        if (friendlyMessage.groupId != 0) {
+            map.put("groupId", friendlyMessage.groupId);
+        }
+        if (friendlyMessage.groupName != null) {
+            map.put("groupName", friendlyMessage.groupName);
+        }
+        if (friendlyMessage.likesCount != 0) {
+            map.put("likesCount", friendlyMessage.likesCount);
+        }
         map.put("messageType", friendlyMessage.getMessageType());
         return map;
     }
@@ -83,6 +95,12 @@ public class FriendlyMessage implements Parcelable {
         if (dpid != null) {
             o.put("dpid", dpid);
         }
+        if (groupId != 0)
+            o.put("groupId", groupId);
+        if (groupName != null)
+            o.put("groupName", groupName);
+        if (likesCount != 0)
+            o.put("likesCount", likesCount);
         o.put("messageType", messageType);
         return o;
     }
@@ -181,6 +199,9 @@ public class FriendlyMessage implements Parcelable {
             friendlyMessage.id = o.optString("id");
             friendlyMessage.dpid = o.optString("dpid");
             friendlyMessage.messageType = o.optInt("messageType");
+            friendlyMessage.groupName = o.optString("groupName");
+            friendlyMessage.groupId = o.optLong("groupId");
+            friendlyMessage.likesCount = o.optInt("likesCount");
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
         }
@@ -210,6 +231,8 @@ public class FriendlyMessage implements Parcelable {
             text = friendlyMessage.text;
             id = friendlyMessage.id;
             dpid = friendlyMessage.dpid;
+            groupName = friendlyMessage.groupName;
+            groupId = friendlyMessage.groupId;
             messageType = friendlyMessage.messageType;
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
@@ -294,6 +317,30 @@ public class FriendlyMessage implements Parcelable {
 
     public void setMessageType(int messageType) {
         this.messageType = messageType;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
+    }
+
+    public int getLikesCount() {
+        return likesCount;
+    }
+
+    public void setLikesCount(int likesCount) {
+        this.likesCount = likesCount;
     }
 
     @Override

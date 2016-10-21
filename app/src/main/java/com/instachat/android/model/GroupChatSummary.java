@@ -23,6 +23,7 @@ public class GroupChatSummary implements Comparable<GroupChatSummary> {
     private int unreadMessageCount = -1;
     private int usersInRoomCount;
     private String description;
+    private int totalLikes;
     private int order;
 
     public long getId() {
@@ -128,7 +129,17 @@ public class GroupChatSummary implements Comparable<GroupChatSummary> {
             map.put("unreadMessageCount", getUnreadMessageCount());
         }
         map.put("usersInRoomCount", usersInRoomCount);
+        if (totalLikes != 0)
+            map.put("totalLikes", totalLikes);
         return map;
+    }
+
+    public int getTotalLikes() {
+        return totalLikes;
+    }
+
+    public void setTotalLikes(int totalLikes) {
+        this.totalLikes = totalLikes;
     }
 
     @Override

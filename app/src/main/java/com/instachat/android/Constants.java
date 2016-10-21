@@ -144,7 +144,7 @@ public final class Constants {
 
     public static void DP_URL(int userid, String dpid, OnCompleteListener<Uri> onCompleteListener) {
         StorageReference storageReference = FirebaseStorage.getInstance().getReference();
-        storageReference.child(DP_STORAGE_BASE(userid) + dpid).getDownloadUrl().addOnCompleteListener(onCompleteListener);
+        storageReference.child(DP_STORAGE_BASE_REF(userid) + dpid).getDownloadUrl().addOnCompleteListener(onCompleteListener);
     }
 
     public static String USER_INFO_REF(int userid) {
@@ -176,7 +176,46 @@ public final class Constants {
 
     public static String PUBLIC_CHATS_SUMMARY_PARENT_REF = "/public_group_summaries/";
 
-    public static String DP_STORAGE_BASE(int userid) {
+    /**
+     * use-case: list of users that liked the given message
+     *
+     * @param friendlyMessageId
+     * @return
+     */
+    public static final String MESSAGE_LIKES_REF(String friendlyMessageId) {
+        return "/message_likes/" + friendlyMessageId + "/";  //users will be children
+    }
+
+    /**
+     * use-case: lifetime total of how many likes a given user issued
+     *
+     * @param userid
+     * @return
+     */
+    public static final String USER_TOTAL_GIVEN_LIKES_REF(int userid) {
+        return "/users/" + userid + "/total_likes_given/"; //some integer
+    }
+
+    /**
+     * use-case: lifetime total of how many likes a given user issued
+     *
+     * @param userid
+     * @return
+     */
+    public static final String USER_TOTAL_LIKES_RECEIVED_REF(int userid) {
+        return "/users/" + userid + "/total_likes_received/"; //some integer
+    }
+
+
+
+/*
+    Keep track of users who liked a public message:
+            /public_likes/<message_id>/<users>  (userid,likeCountOnMessage{for this message), profilePicUrl, username)
+
+        Keep track of all the public messages that a user liked
+                /users/<userid>/public_likes/<messages> (likeCount on this message)*/
+
+    public static String DP_STORAGE_BASE_REF(int userid) {
         return "/users/" + userid + "/dp/";
     }
 
