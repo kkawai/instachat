@@ -165,7 +165,7 @@ public final class NetworkApi {
                     LocalFileUtils.downloadFile(thirdPartyProfilePicUrl, file, null, null);
 
                     StorageReference storageReference = FirebaseStorage.getInstance().getReference();
-                    String childRef = Constants.DP_STORAGE_BASE(Preferences.getInstance().getUserId());
+                    String childRef = Constants.DP_STORAGE_BASE_REF(Preferences.getInstance().getUserId());
                     storageReference = storageReference.child(childRef).child(fileUri.getLastPathSegment());
                     storageReference.putFile(fileUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override

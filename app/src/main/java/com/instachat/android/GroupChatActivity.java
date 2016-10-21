@@ -737,7 +737,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     private void onProfilePicChangeRequest(boolean isLaunchCamera) {
         mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.userProfilePhoto);
-        mPhotoUploadHelper.setStorageRefString(Constants.DP_STORAGE_BASE(myUserid()));
+        mPhotoUploadHelper.setStorageRefString(Constants.DP_STORAGE_BASE_REF(myUserid()));
         mPhotoUploadHelper.launchCamera(isLaunchCamera);
     }
 
