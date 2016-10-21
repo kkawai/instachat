@@ -46,6 +46,10 @@ public final class TimeUtil {
         NOW_POST_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
+    public static String getTimeAgo(final long timeMillis) {
+        return getTimeAgo(new Date(timeMillis));
+    }
+
     public static String getTimeAgo(final Date created) {
         // today
         Date today = new Date();

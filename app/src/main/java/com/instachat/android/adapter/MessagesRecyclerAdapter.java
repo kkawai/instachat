@@ -40,6 +40,7 @@ import com.instachat.android.options.MessageOptionsDialogHelper;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.StringUtil;
+import com.instachat.android.util.TimeUtil;
 
 import java.lang.ref.WeakReference;
 import java.util.Hashtable;
@@ -296,7 +297,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         viewHolder.messengerTextView.setText(friendlyMessage.getName());
         if (friendlyMessage.getTime() != 0) {
             viewHolder.messageTimeTextView.setVisibility(View.VISIBLE);
-            viewHolder.messageTimeTextView.setText(StringUtil.getHour(friendlyMessage.getTime()));
+            viewHolder.messageTimeTextView.setText(TimeUtil.getTimeAgo(friendlyMessage.getTime()));
         } else {
             viewHolder.messageTimeTextView.setVisibility(View.INVISIBLE);
         }
@@ -332,7 +333,24 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 }
             });
         }
+
+        if (viewHolder.periscopeLayout != null) {
+            if (position == getItemCount() - 1) {
+                viewHolder.periscopeLayout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //viewHolder.periscopeLayout.getLayoutParams().height = viewHolder.itemView.getHeight();
+                        MLog.d(TAG, "dynamic periscope height: ", viewHolder.periscopeLayout.getLayoutParams().height, " getHeight() ", viewHolder.periscopeLayout.getHeight());
+                        for (int i = 0; i < 10; i++) {
+                            viewHolder.periscopeLayout.addHeart();
+                        }
+                    }
+                }, 1000);
+            }
+        }
     }
+
+    boolean show = false;
 
     private String limitString(final String s, final int limit) {
         if (StringUtil.isEmpty(s)) {

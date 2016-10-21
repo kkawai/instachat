@@ -286,6 +286,35 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         new PresenceHelper().updateLastActiveTimestamp();
     }
 
+    private DatabaseReference mGroupSummaryRef;
+    private ValueEventListener mGroupSummaryListener;
+
+    private void addGroupInfoListener() {
+        mGroupSummaryRef = FirebaseDatabase.getInstance().getReference(Constants.PUBLIC_CHATS_SUMMARY_PARENT_REF).
+                child(mGroupId + "");
+        mGroupSummaryListener = mGroupSummaryRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChildren()) {
+                    GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
+                    getSupportActionBar().setTitle(groupChatSummary.getName());
+                    getSupportActionBar().setSubtitle(R.string.app_name);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void removeGroupInfoListener() {
+        if (mGroupSummaryRef != null && mGroupSummaryListener != null) {
+            mGroupSummaryRef.removeEventListener(mGroupSummaryListener);
+        }
+    }
+
     private long prevInputTime;
     private int prevInputCount;
 
@@ -1251,7 +1280,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     }
 
     protected void addUserPresenceToGroup() {
-
+        addGroupInfoListener();
         /**
          * run this delayed, if the user re-enters
          * the same room (for a variety of reasons)
@@ -1272,6 +1301,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     }
 
     protected void removeUserPresenceFromGroup() {
+        removeGroupInfoListener();
         MLog.d(TAG, "removeUserPresenceFromGroup() mGroupId: ", mGroupId, " username: ", myUsername());
         mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(mGroupId)).
                 child(myUserid() + "").removeValue();

@@ -8,6 +8,7 @@ import android.widget.TextView;
 import com.instachat.android.R;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import me.yifeiyuan.library.PeriscopeLayout;
 
 /**
  * Created by kevin on 9/3/2016.
@@ -18,6 +19,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
     public TextView messageTimeTextView;
     public ImageView messagePhotoView;
     public CircleImageView messengerImageView;
+    public PeriscopeLayout periscopeLayout;
 
     /*
      * Web link content
@@ -35,6 +37,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         messengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);
         messageTimeTextView = (TextView) itemView.findViewById(R.id.messageTimeTextView);
         messagePhotoView = (ImageView) itemView.findViewById(R.id.messagePhotoView);
+        periscopeLayout = (PeriscopeLayout) itemView.findViewById(R.id.periscope);
 
         webLinkContent = (TextView) itemView.findViewById(R.id.post_content);
         webLinkImageView = (ImageView) itemView.findViewById(R.id.image_post);

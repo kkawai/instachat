@@ -162,10 +162,11 @@ Document differences between activity_main.xml here:
                         android:layout_height="@dimen/send_button_size"
                         android:layout_gravity="bottom"
                         android:src="@drawable/ic_send_black_24dp"
+                        app:fab_colorDisabled="@color/send_button_disabled_color"
                         app:fab_size="mini"
-                        fab:fab_colorNormal="@color/colorPrimary"
-                        fab:fab_colorPressed="@color/colorPrimaryDark"
-                        fab:fab_colorRipple="@color/colorAccent"
+                        fab:fab_colorNormal="@color/send_button_normal_color"
+                        fab:fab_colorPressed="@color/send_button_pressed_color"
+                        fab:fab_colorRipple="@color/send_button_ripple_color"
                         />
 
                 </LinearLayout>
