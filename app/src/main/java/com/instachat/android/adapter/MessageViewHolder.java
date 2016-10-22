@@ -2,6 +2,7 @@ package com.instachat.android.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,6 +19,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
     public TextView messengerTextView;
     public TextView messageTimeTextView;
     public ImageView messagePhotoView;
+    public FrameLayout messagePhotoViewParent;
     public CircleImageView messengerImageView;
     public PeriscopeLayout periscopeLayout;
 
@@ -37,6 +39,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         messengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);
         messageTimeTextView = (TextView) itemView.findViewById(R.id.messageTimeTextView);
         messagePhotoView = (ImageView) itemView.findViewById(R.id.messagePhotoView);
+        messagePhotoViewParent = (FrameLayout) itemView.findViewById(R.id.messagePhotoViewParent);
         periscopeLayout = (PeriscopeLayout) itemView.findViewById(R.id.periscope);
 
         webLinkContent = (TextView) itemView.findViewById(R.id.post_content);

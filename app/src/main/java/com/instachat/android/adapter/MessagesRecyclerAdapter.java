@@ -302,11 +302,13 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             viewHolder.messageTimeTextView.setVisibility(View.INVISIBLE);
         }
 
-        if (viewHolder.messagePhotoView != null) {
+        if (viewHolder.messagePhotoViewParent != null) {
             if (friendlyMessage.getImageUrl() != null) {
                 Glide.with(mActivity.get()).load(friendlyMessage.getImageUrl()).crossFade().into(viewHolder.messagePhotoView);
+                viewHolder.messagePhotoViewParent.setVisibility(View.VISIBLE);
                 viewHolder.messagePhotoView.setVisibility(View.VISIBLE);
             } else {
+                viewHolder.messagePhotoViewParent.setVisibility(View.GONE);
                 viewHolder.messagePhotoView.setVisibility(View.GONE);
             }
         }

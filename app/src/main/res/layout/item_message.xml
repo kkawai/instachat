@@ -50,13 +50,25 @@
 
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/messagePhotoView"
+            <FrameLayout
+                android:id="@+id/messagePhotoViewParent"
                 android:layout_width="@dimen/posted_photo_size"
-                android:layout_height="@dimen/posted_photo_size"
-                android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
-                />
+                android:layout_height="@dimen/posted_photo_size">
+
+                <ImageView
+                    android:id="@+id/messagePhotoView"
+                    android:layout_width="@dimen/posted_photo_size"
+                    android:layout_height="@dimen/posted_photo_size"
+                    android:adjustViewBounds="true"
+                    android:padding="6dp"
+                    android:scaleType="centerCrop"
+                    />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/rounded_corner_photo"/>
+            </FrameLayout>
 
             <com.instachat.android.view.CustomFontTextView
                 android:id="@+id/messageTextView"

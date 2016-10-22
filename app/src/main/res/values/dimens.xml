@@ -16,7 +16,7 @@
     <dimen name="private_activity_profile_pic_size">200dp</dimen>
     <dimen name="super_small_user_thumb_size">26dp</dimen>
 
-    <dimen name="posted_photo_size">320dp</dimen>
+    <dimen name="posted_photo_size">250dp</dimen>
 
     <!-- sweet alert dialog -->
     <dimen name="alert_width">290dp</dimen>
