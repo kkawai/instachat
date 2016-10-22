@@ -83,7 +83,7 @@
         </LinearLayout>
 
         <FrameLayout
-            android:id="@+id/likesParent"
+            android:id="@+id/periscopeParent"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="end|bottom">

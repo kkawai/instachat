@@ -22,6 +22,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
     public FrameLayout messagePhotoViewParent;
     public CircleImageView messengerImageView;
     public PeriscopeLayout periscopeLayout;
+    public View periscopeParent;
 
     /*
      * Web link content
@@ -40,6 +41,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         messageTimeTextView = (TextView) itemView.findViewById(R.id.messageTimeTextView);
         messagePhotoView = (ImageView) itemView.findViewById(R.id.messagePhotoView);
         messagePhotoViewParent = (FrameLayout) itemView.findViewById(R.id.messagePhotoViewParent);
+        periscopeParent = itemView.findViewById(R.id.periscopeParent);
         periscopeLayout = (PeriscopeLayout) itemView.findViewById(R.id.periscope);
 
         webLinkContent = (TextView) itemView.findViewById(R.id.post_content);

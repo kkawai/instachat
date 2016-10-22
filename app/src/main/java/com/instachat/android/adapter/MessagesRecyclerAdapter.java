@@ -336,7 +336,9 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             });
         }
 
-        if (viewHolder.periscopeLayout != null) {
+        viewHolder.periscopeParent.setVisibility(View.GONE);
+
+        /*if (viewHolder.periscopeLayout != null) {
             if (position == getItemCount() - 1) {
                 viewHolder.periscopeLayout.postDelayed(new Runnable() {
                     @Override
@@ -349,19 +351,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                     }
                 }, 1000);
             }
-        }
-    }
-
-    boolean show = false;
-
-    private String limitString(final String s, final int limit) {
-        if (StringUtil.isEmpty(s)) {
-            return "";
-        }
-        if (s.length() <= limit) {
-            return " (" + s + ")";
-        }
-        return " (" + s.substring(0, limit) + "...)";
+        }*/
     }
 
     public void cleanup() {
