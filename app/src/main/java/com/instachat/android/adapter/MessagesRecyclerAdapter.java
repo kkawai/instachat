@@ -142,7 +142,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
     private MessageViewHolder createMessageViewHolder(ViewGroup parent, int viewType) {
         if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.web_clipping_content, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_web_clipping, parent, false);
             final MessageViewHolder holder = new MessageViewHolder(view);
             View.OnClickListener webLinkClickListener = new View.OnClickListener() {
                 @Override
