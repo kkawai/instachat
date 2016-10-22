@@ -39,6 +39,9 @@
 
     <color name="light_turquoise">#71efc5</color>
 
+    <!-- chat background screen color -->
+    <color name="chat_background_screen_color">@android:color/white</color>
+
     <!-- left drawer list text and background colors -->
     <color name="left_drawer_list_background_color">#FEFEFA</color>
     <color name="left_drawer_list_name_text_color">#73757e</color>

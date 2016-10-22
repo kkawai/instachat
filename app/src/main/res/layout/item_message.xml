@@ -60,7 +60,7 @@
                     android:layout_width="@dimen/posted_photo_size"
                     android:layout_height="@dimen/posted_photo_size"
                     android:adjustViewBounds="true"
-                    android:padding="6dp"
+                    android:padding="@dimen/posted_photo_rounded_corner_padding"
                     android:scaleType="centerCrop"
                     />
 

@@ -24,6 +24,7 @@ Document differences between activity_main.xml here:
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/chat_background_screen_color"
             tools:context="com.instachat.PrivateChatActivity">
 
             <!--
