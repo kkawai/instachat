@@ -178,6 +178,7 @@ public final class Constants {
 
     /**
      * use-case: list of users that liked the given message
+     * captures the like count
      *
      * @param friendlyMessageId
      * @return
@@ -206,14 +207,15 @@ public final class Constants {
         return "/users/" + userid + "/total_likes_received/"; //some integer
     }
 
+    //keep track of what users liked a given user
+    public static final String USER_RECEIVED_LIKES_REF(int userid) {
+        return "/users/" + userid + "/received_user_likes/"; //unique users
+    }
 
-
-/*
-    Keep track of users who liked a public message:
-            /public_likes/<message_id>/<users>  (userid,likeCountOnMessage{for this message), profilePicUrl, username)
-
-        Keep track of all the public messages that a user liked
-                /users/<userid>/public_likes/<messages> (likeCount on this message)*/
+    //keep track of users that liked a given user
+    public static final String USER_GIVEN_LIKES_REF(int userid) {
+        return "/users/" + userid + "/given_user_likes/"; //unique users
+    }
 
     public static String DP_STORAGE_BASE_REF(int userid) {
         return "/users/" + userid + "/dp/";

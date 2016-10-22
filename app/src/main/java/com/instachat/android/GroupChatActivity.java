@@ -48,8 +48,10 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.crash.FirebaseCrash;
@@ -111,7 +113,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private LinearLayoutManager mLinearLayoutManager;
     private MessagesRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
     private ProgressBar mProgressBar;
-    private DatabaseReference mFirebaseDatabaseReference;
     private FirebaseAuth mFirebaseAuth;
     //private FirebaseUser mFirebaseUser;
     private FirebaseAnalytics mFirebaseAnalytics;
@@ -179,8 +180,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         } catch (Exception e) {
             //MLog.e(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) failed: " + e);
         }
-
-        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
         initFirebaseAdapter();
 
@@ -922,7 +921,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     }
 
     private void initFirebaseAdapter() {
-        mFirebaseAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class, R.layout.item_message, MessageViewHolder.class, mFirebaseDatabaseReference.child(mDatabaseRoot).limitToLast(Constants.MAX_MESSAGE_HISTORY));
+        mFirebaseAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class, R.layout.item_message, MessageViewHolder.class, FirebaseDatabase.getInstance().getReference(mDatabaseRoot).limitToLast(Constants.MAX_MESSAGE_HISTORY));
         mFirebaseAdapter.setDatabaseRoot(mDatabaseRoot);
         mFirebaseAdapter.setActivity(this, this, (FrameLayout) findViewById(R.id.fragment_content));
         mFirebaseAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {
@@ -1281,16 +1280,22 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                         public void run() {
                             if (isActivityDestroyed())
                                 return;
-                            if (mChatsRecyclerViewAdapter != null)
-                                mChatsRecyclerViewAdapter.removeUserFromAllGroups(myUserid(), mGroupId);
+
                             MLog.d(TAG, "addUserPresenceToGroup() mGroupId: ", mGroupId, " username: ", myUsername());
                             User me = Preferences.getInstance().getUser();
-                            mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(mGroupId)).
-                                    child(myUserid() + "").updateChildren(me.getMap(true));
+                            final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(mGroupId)).
+                                    child(myUserid() + "");
+                            ref.updateChildren(me.getMap(true)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (mChatsRecyclerViewAdapter != null)
+                                        mChatsRecyclerViewAdapter.removeUserFromAllGroups(myUserid(), mGroupId);
+                                }
+                            });
 
                             me.setCurrentGroupId(groupChatSummary.getId());
                             me.setCurrentGroupName(groupChatSummary.getName());
-                            mFirebaseDatabaseReference.child(Constants.USER_INFO_REF(myUserid())).updateChildren(me.getMap(true));
+                            FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(myUserid())).updateChildren(me.getMap(true));
 
                         }
                     }, 3000);
@@ -1307,9 +1312,9 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     protected void removeUserPresenceFromGroup() {
         removeGroupInfoListener();
         MLog.d(TAG, "removeUserPresenceFromGroup() mGroupId: ", mGroupId, " username: ", myUsername());
-        mFirebaseDatabaseReference.child(Constants.GROUP_CHAT_USERS_REF(mGroupId)).child(myUserid() + "").removeValue();
-        mFirebaseDatabaseReference.child(Constants.USER_INFO_REF(myUserid())).child(Constants.FIELD_CURRENT_GROUP_ID).removeValue();
-        mFirebaseDatabaseReference.child(Constants.USER_INFO_REF(myUserid())).child(Constants.FIELD_CURRENT_GROUP_NAME).removeValue();
+        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(mGroupId)).child(myUserid() + "").removeValue();
+        FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(myUserid())).child(Constants.FIELD_CURRENT_GROUP_ID).removeValue();
+        FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(myUserid())).child(Constants.FIELD_CURRENT_GROUP_NAME).removeValue();
     }
 
     private void toggleRightDrawer() {

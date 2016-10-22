@@ -534,20 +534,20 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (activityState == null || activityState.isActivityDestroyed())
                     return;
-                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildAdded() dataSnapshot: " + dataSnapshot);
+                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildAdded() dataSnapshot: " + dataSnapshot, " groupid: ", groupid);
                 addUserToPublicGroupChat(groupid);
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildChanged() dataSnapshot: " + dataSnapshot);
+                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildChanged() dataSnapshot: " + dataSnapshot, " groupid: ", groupid);
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 if (activityState == null || activityState.isActivityDestroyed())
                     return;
-                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildRemoved() dataSnapshot: " + dataSnapshot);
+                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildRemoved() dataSnapshot: " + dataSnapshot, " groupid: ", groupid);
                 removeUserFromPublicGroupChat(groupid);
             }
 

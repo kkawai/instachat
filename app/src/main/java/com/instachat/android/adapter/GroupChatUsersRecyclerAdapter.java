@@ -25,7 +25,6 @@ import com.instachat.android.util.MLog;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +44,8 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
     private UserClickedListener userClickedListener;
     private WeakReference<Activity> mActivity;
     private ActivityState mActivityState;
-    private Map<Long, Map.Entry<DatabaseReference, ChildEventListener>> publicGroupChatPresenceReferences = new HashMap<>();
+    private DatabaseReference ref;
+    private ChildEventListener listener;
     private List<Map.Entry<DatabaseReference, ValueEventListener>> userInfoChangeListeners = new ArrayList<>(128);
 
     public GroupChatUsersRecyclerAdapter(@NonNull Activity activity,
@@ -59,7 +59,77 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
     }
 
     public void populateData() {
-        addPublicGroupChatPresenceReference(groupid);
+        ref = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(groupid));
+        listener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildAdded() dataSnapshot: " + dataSnapshot);
+                User user = dataSnapshot.getValue(User.class);
+                user.setId(Integer.parseInt(dataSnapshot.getKey()));
+                synchronized (GroupChatUsersRecyclerAdapter.this) {
+                    data.add(user);
+                    notifyItemInserted(data.size() - 1);
+                    listenForUserUpdates(user);
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildChanged() dataSnapshot: " + dataSnapshot);
+                User user = dataSnapshot.getValue(User.class);
+                user.setId(Integer.parseInt(dataSnapshot.getKey()));
+                synchronized (GroupChatUsersRecyclerAdapter.this) {
+                    int index = data.indexOf(user);
+                    if (index != -1) {
+                        data.set(index, user);
+                        notifyItemChanged(index);
+                    }
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildRemoved() dataSnapshot: " + dataSnapshot);
+                final int userid = Integer.parseInt(dataSnapshot.getKey());
+                User user = new User();
+                user.setId(userid);
+                synchronized (GroupChatUsersRecyclerAdapter.this) {
+                    int index = data.indexOf(user);
+                    if (index != -1) {
+                        data.remove(index);
+                        notifyItemRemoved(index);
+                    }
+                }
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildMoved() dataSnapshot: " + dataSnapshot);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        Map.Entry<DatabaseReference, ChildEventListener> entry = new Map.Entry<DatabaseReference, ChildEventListener>() {
+            @Override
+            public DatabaseReference getKey() {
+                return ref;
+            }
+
+            @Override
+            public ChildEventListener getValue() {
+                return listener;
+            }
+
+            @Override
+            public ChildEventListener setValue(ChildEventListener childEventListener) {
+                return null;
+            }
+        };
+        ref.addChildEventListener(listener);
     }
 
     @Override
@@ -110,11 +180,8 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
     }
 
     public void cleanup() {
-        for (long groupid : publicGroupChatPresenceReferences.keySet()) {
-            Map.Entry<DatabaseReference, ChildEventListener> entry = publicGroupChatPresenceReferences.get(groupid);
-            entry.getKey().removeEventListener(entry.getValue());
-        }
-        publicGroupChatPresenceReferences.clear();
+        if (ref != null)
+            ref.removeEventListener(listener);
         if (mActivity != null)
             mActivity.clear();
         mActivity = null;
@@ -125,89 +192,7 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
         userInfoChangeListeners = null;
     }
 
-    private synchronized void addPublicGroupChatPresenceReference(final long groupid) {
-        if (publicGroupChatPresenceReferences.containsKey(groupid))
-            return;
-        /*
-onChildAdded() dataSnapshot: DataSnapshot { key = 3733523, value = {username=kevintrevor, id=3733523, profilePicUrl=ea34ff82-066a-413f-9efe-a816d59863a7.jpg} }
-onChildAdded() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {username=CoolistUserInWorld, id=234fakeUserid, profilePicUrl=blahblahblah} }
-onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {username=CoolistUserInWorld, id=234fakeUserid, profilePicUrl=blahblahblah} }
-         */
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(groupid));
-        final ChildEventListener listener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildAdded() dataSnapshot: " + dataSnapshot);
-                User user = dataSnapshot.getValue(User.class);
-                user.setId(Integer.parseInt(dataSnapshot.getKey()));
-                synchronized (this) {
-                    data.add(user);
-                    notifyItemInserted(data.size() - 1);
-                    listenForUserUpdates(user, groupid);
-                }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildChanged() dataSnapshot: " + dataSnapshot);
-                User user = dataSnapshot.getValue(User.class);
-                user.setId(Integer.parseInt(dataSnapshot.getKey()));
-                synchronized (this) {
-                    int index = data.indexOf(user);
-                    if (index != -1) {
-                        data.set(index, user);
-                        notifyItemChanged(index);
-                    }
-                }
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildRemoved() dataSnapshot: " + dataSnapshot);
-                final int userid = Integer.parseInt(dataSnapshot.getKey());
-                User user = new User();
-                user.setId(userid);
-                synchronized (this) {
-                    int index = data.indexOf(user);
-                    if (index != -1) {
-                        data.remove(index);
-                        notifyItemRemoved(index);
-                    }
-                }
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                MLog.d(TAG, "addPublicGroupChatPresenceReference() onChildMoved() dataSnapshot: " + dataSnapshot);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-
-        Map.Entry<DatabaseReference, ChildEventListener> entry = new Map.Entry<DatabaseReference, ChildEventListener>() {
-            @Override
-            public DatabaseReference getKey() {
-                return ref;
-            }
-
-            @Override
-            public ChildEventListener getValue() {
-                return listener;
-            }
-
-            @Override
-            public ChildEventListener setValue(ChildEventListener childEventListener) {
-                return null;
-            }
-        };
-        ref.addChildEventListener(listener);
-        publicGroupChatPresenceReferences.put(groupid, entry);
-    }
-
-    private void listenForUserUpdates(final User user, final long groupid) {
+    private void listenForUserUpdates(final User user) {
 
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(Integer.parseInt(user.getId() + "")));
         final ValueEventListener eventListener = ref.addValueEventListener(new ValueEventListener() {
@@ -217,8 +202,14 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
                     return;
                 try {
                     if (dataSnapshot.getValue() != null) {
-                        User user = dataSnapshot.getValue(User.class);
-                        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(groupid)).child(user.getId() + "").updateChildren(user.getMap(false));
+                        final User user = dataSnapshot.getValue(User.class);
+                        synchronized (GroupChatUsersRecyclerAdapter.this) {
+                            int i = data.indexOf(user);
+                            if (i != -1) {
+                                data.set(i, user);
+                                notifyItemChanged(i);
+                            }
+                        }
                     }
                 } catch (Exception e) {
                     MLog.e(TAG, "", e);
