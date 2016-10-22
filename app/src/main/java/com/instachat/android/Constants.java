@@ -178,7 +178,7 @@ public final class Constants {
 
     /**
      * use-case: list of users that liked the given message
-     * captures the like count
+     * captures the like count in each user stored at this location
      *
      * @param friendlyMessageId
      * @return
@@ -207,12 +207,12 @@ public final class Constants {
         return "/users/" + userid + "/total_likes_received/"; //some integer
     }
 
-    //keep track of what users liked a given user
+    //keep track of users a given user received likes from
     public static final String USER_RECEIVED_LIKES_REF(int userid) {
         return "/users/" + userid + "/received_user_likes/"; //unique users
     }
 
-    //keep track of users that liked a given user
+    //keep track of users that gave likes to a given user
     public static final String USER_GIVEN_LIKES_REF(int userid) {
         return "/users/" + userid + "/given_user_likes/"; //unique users
     }

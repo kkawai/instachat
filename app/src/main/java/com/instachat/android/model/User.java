@@ -51,6 +51,7 @@ public class User extends DomainObject {
     private long lastOnline;
     private String currentGroupName;
     private long currentGroupId;
+    private int likes;
 
     private int mediaCounts;
     private int followsCount;
@@ -165,6 +166,21 @@ public class User extends DomainObject {
         if (currentGroupName != null) {
             map.put(Constants.FIELD_CURRENT_GROUP_NAME, currentGroupName);
             map.put(Constants.FIELD_CURRENT_GROUP_ID, currentGroupId);
+        }
+        if (likes != 0) {
+            map.put("likes", likes);
+        }
+        return map;
+    }
+
+    public Map<String, Object> getLikesMap() {
+        Map<String, Object> map = new HashMap<>(1);
+        map.put("username", username);
+        if (profilePicUrl != null)
+            map.put("profilePicUrl", profilePicUrl);
+        map.put("id", id);
+        if (likes != 0) {
+            map.put("likes", likes);
         }
         return map;
     }
@@ -583,5 +599,17 @@ public class User extends DomainObject {
 
     public void setCurrentGroupName(String currentGroupName) {
         this.currentGroupName = currentGroupName;
+    }
+
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
+
+    public void incrementLikes() {
+        likes++;
     }
 }

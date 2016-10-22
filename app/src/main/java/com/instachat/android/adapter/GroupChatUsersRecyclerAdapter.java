@@ -180,7 +180,7 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
     }
 
     public void cleanup() {
-        if (ref != null)
+        if (ref != null && listener != null)
             ref.removeEventListener(listener);
         if (mActivity != null)
             mActivity.clear();

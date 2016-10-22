@@ -38,6 +38,17 @@ public class FriendlyMessage implements Parcelable {
     public FriendlyMessage() {
     }
 
+    public Map<String, Object> getUserMap() {
+        Map<String, Object> map = new HashMap<>(8);
+        if (getName() != null)
+            map.put("username", getName());
+        if (getDpid() != null)
+            map.put("profilePicUrl", getDpid());
+        map.put("id", getUserid());
+        map.put("likes",1);
+        return map;
+    }
+
     public static Map<String, Object> toMap(FriendlyMessage friendlyMessage) {
         Map<String, Object> map = new HashMap<>(8);
         if (friendlyMessage.getName() != null)
