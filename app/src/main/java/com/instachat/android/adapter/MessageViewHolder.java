@@ -16,6 +16,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by kevin on 9/3/2016.
  */
 public class MessageViewHolder extends RecyclerView.ViewHolder {
+    public View messageTextParent;
     public TextView messageTextView;
     public TextView messengerTextView;
     public TextView messageTimeTextView;
@@ -35,9 +36,11 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
     public TextView webLinkTitle;
     public TextView webLinkUrl;
     public TextView webLinkDescription;
+    public View webLinkParent;
 
     public MessageViewHolder(View v) {
         super(v);
+        messageTextParent = itemView.findViewById(R.id.messageTextParent);
         messageTextView = (TextView) itemView.findViewById(R.id.messageTextView);
         messengerTextView = (TextView) itemView.findViewById(R.id.messengerTextView);
         messengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);
@@ -49,6 +52,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         likesButton = (ShineButton) itemView.findViewById(R.id.likeButton);
         likesCount = (TextView) itemView.findViewById(R.id.likesCount);
 
+        webLinkParent = itemView.findViewById(R.id.web_clipping_parent);
         webLinkContent = (TextView) itemView.findViewById(R.id.web_clipping_orginal_url);
         webLinkImageView = (ImageView) itemView.findViewById(R.id.image_post);
         webLinkTitle = (TextView) itemView.findViewById(R.id.title);

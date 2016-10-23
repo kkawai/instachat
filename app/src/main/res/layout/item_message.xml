@@ -18,7 +18,8 @@
             android:transitionName="image"/>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/messageTextParent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_weight="1"
@@ -43,7 +44,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:layout_weight="0"
                     android:textColor="@color/chat_time_message_sent"
                     android:textSize="13sp"
                     app:font="Lato-Regular.ttf"/>
@@ -72,9 +72,8 @@
 
             <com.instachat.android.view.CustomFontTextView
                 android:id="@+id/messageTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="0"
                 android:autoLink="web|map|email|phone"
                 android:textColor="@color/chat_message_color"
                 android:textSize="15sp"

@@ -180,7 +180,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                     mMessageTextClickedListener.onMessageClicked(holder.getAdapterPosition());
                 }
             };
-            holder.itemView.setOnClickListener(onClickListener);
+            holder.messageTextParent.setOnClickListener(onClickListener);
         } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
             View.OnClickListener webLinkClickListener = new View.OnClickListener() {
                 @Override
@@ -190,7 +190,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                     mActivity.get().startActivity(new Intent(Intent.ACTION_VIEW, uri));
                 }
             };
-            holder.itemView.setOnClickListener(webLinkClickListener);
+            holder.webLinkParent.setOnClickListener(webLinkClickListener);
         } else {
             throw new IllegalArgumentException("unknown viewType");
         }
