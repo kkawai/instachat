@@ -240,13 +240,12 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
         if (friendlyMessage.getLikes() > 0) {
             viewHolder.periscopeParent.setVisibility(View.VISIBLE);
-            //int count = friendlyMessage.getLikes() > mMaxPeriscopesPerItem ? mMaxPeriscopesPerItem : friendlyMessage.getLikes();
+            final int count = friendlyMessage.getLikes() > mMaxPeriscopesPerItem ? mMaxPeriscopesPerItem : friendlyMessage.getLikes();
             viewHolder.periscopeParent.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     if (mActivityState == null || mActivityState.isActivityDestroyed())
                         return;
-                    int count = 3;
                     for (int i = 0; i < count; i++) {
                         viewHolder.periscopeLayout.addHeart();
                     }
