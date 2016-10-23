@@ -513,12 +513,19 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         });
     }
 
+    private PresenceHelper mPresenceHelper = new PresenceHelper();
+
+    protected final void updateLastActiveTimestamp() {
+        mPresenceHelper.updateLastActiveTimestamp();
+    }
+
     @Override
     public void onFriendlyMessageSuccess(FriendlyMessage friendlyMessage) {
         try {
             if (isActivityDestroyed())
                 return;
             mMessageRecyclerView.scrollToPosition(mFirebaseAdapter.getItemCount() - 1);
+            updateLastActiveTimestamp();
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
         }

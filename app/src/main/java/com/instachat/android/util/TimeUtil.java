@@ -47,15 +47,11 @@ public final class TimeUtil {
     }
 
     public static String getTimeAgo(final long timeMillis) {
-        return getTimeAgo(new Date(timeMillis));
-    }
-
-    public static String getTimeAgo(final Date created) {
         // today
         Date today = new Date();
 
         // how much time since (ms)
-        long duration = today.getTime() - created.getTime();
+        long duration = today.getTime() - timeMillis;
 
         int second = 1000;
         int minute = second * 60;
@@ -113,7 +109,7 @@ public final class TimeUtil {
             return "";
         }
 
-        return getTimeAgo(created);
+        return getTimeAgo(created.getTime());
     }
 
     /**

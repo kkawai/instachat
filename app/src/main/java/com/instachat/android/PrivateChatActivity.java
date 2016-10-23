@@ -30,6 +30,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.api.NetworkApi;
@@ -44,10 +45,6 @@ import com.instachat.android.util.TimeUtil;
 import com.tooltip.Tooltip;
 
 import org.json.JSONObject;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by kevin on 9/16/2016.
@@ -185,7 +182,7 @@ public class PrivateChatActivity extends GroupChatActivity {
             }
         };
         appBarLayout.setOnClickListener(appBarOnClickListener);
-        new PresenceHelper().updateLastActiveTimestamp();
+        updateLastActiveTimestamp();
         //findViewById(R.id.toolbar).setOnClickListener(appBarOnClickListener);
         //bio.setOnClickListener(appBarOnClickListener);
         //profilePic.setOnClickListener(appBarOnClickListener);
@@ -247,10 +244,8 @@ public class PrivateChatActivity extends GroupChatActivity {
     }
 
     private void updatePrivateChatSummaryLastMessageSentTimestamp() {
-        Map<String, Object> map = new HashMap<>(1);
-        map.put(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP, System.currentTimeMillis());
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
-        ref.child(mToUser.getId() + "").updateChildren(map);
+        ref.child(mToUser.getId() + "").child(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP).setValue(ServerValue.TIMESTAMP);
     }
 
     @Override
@@ -552,9 +547,12 @@ public class PrivateChatActivity extends GroupChatActivity {
 
         if (lastOnline > mLastOnlineTimestamp) {
             String lastActive = "";
-            lastActive = TimeUtil.getTimeAgo(new Date(lastOnline));
+            lastActive = TimeUtil.getTimeAgo(lastOnline);
             mLastOnlineTimestamp = lastOnline;
             if (!TextUtils.isEmpty(lastActive)) {
+                if (lastActive.equals(getString(R.string.just_now))) {
+                    lastActive = getString(R.string.online_now);
+                }
                 ((TextView) findViewById(R.id.customSubtitleInParallax)).setText("  •  " + lastActive);
                 ((TextView) findViewById(R.id.customSubtitleInToolbar)).setText(lastActive);
             }

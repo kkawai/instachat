@@ -160,6 +160,29 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
         final MessageViewHolder holder = createMessageViewHolder(parent, viewType);
 
+        View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                final FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
+                if (TextUtils.isEmpty(friendlyMessage.getName())) {
+                    return true;
+                }
+                final View tempAnchorView = new View(mActivity.get());
+                tempAnchorView.setBackgroundColor(Color.TRANSPARENT);
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(10, 10);
+                params.leftMargin = (int) x;
+                params.topMargin = (int) y;
+                mEntireScreenFrameLayout.addView(tempAnchorView, params);
+                mEntireScreenFrameLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        showMessageOptions(tempAnchorView, friendlyMessage);
+                    }
+                });
+                return true;
+            }
+        };
+
         holder.messengerImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
@@ -183,6 +206,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 }
             };
             holder.messageTextParent.setOnClickListener(onClickListener);
+            holder.messageTextParent.setOnLongClickListener(onLongClickListener);
         } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
             View.OnClickListener webLinkClickListener = new View.OnClickListener() {
                 @Override
@@ -193,33 +217,10 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 }
             };
             holder.webLinkParent.setOnClickListener(webLinkClickListener);
+            holder.webLinkParent.setOnLongClickListener(onLongClickListener);
         } else {
             throw new IllegalArgumentException("unknown viewType");
         }
-
-        View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                final FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
-                if (TextUtils.isEmpty(friendlyMessage.getName())) {
-                    return true;
-                }
-                final View tempAnchorView = new View(mActivity.get());
-                tempAnchorView.setBackgroundColor(Color.TRANSPARENT);
-                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(10, 10);
-                params.leftMargin = (int) x;
-                params.topMargin = (int) y;
-                mEntireScreenFrameLayout.addView(tempAnchorView, params);
-                mEntireScreenFrameLayout.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        showMessageOptions(tempAnchorView, friendlyMessage);
-                    }
-                });
-                return true;
-            }
-        };
-        holder.itemView.setOnLongClickListener(onLongClickListener);
 
         holder.likesButton.setOnClickListener(new View.OnClickListener() {
             @Override

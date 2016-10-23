@@ -7,8 +7,6 @@ import com.instachat.android.db.RssDb;
 import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.TimeUtil;
 
-import java.util.Date;
-
 /**
  * Created by kevin on 1/10/2016.
  */
@@ -143,7 +141,7 @@ public class Rss {
 
     public String getTimeAgo() {
         if (pubDate == 0) return "now";
-        return TimeUtil.getTimeAgo(new Date(pubDate));
+        return TimeUtil.getTimeAgo(pubDate);
     }
 
     public String getBasicLink() {
