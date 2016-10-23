@@ -354,6 +354,10 @@ public class FriendlyMessage implements Parcelable {
         this.likesCount = likesCount;
     }
 
+    public void incrementLikesCount() {
+        likesCount++;
+    }
+
     @Override
     public String toString() {
         return "text: " + text + " dpid: " + dpid + " image id: " + imageId + " name: " + name + " user id: " + userid + "  message id: " + id + " imageUrl: " + imageUrl;

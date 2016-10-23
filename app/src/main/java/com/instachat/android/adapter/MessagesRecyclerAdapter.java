@@ -144,12 +144,13 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     }
 
     private MessageViewHolder createMessageViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
+        if (viewType == ITEM_VIEW_TYPE_STANDARD_MESSAGE) {
+            return super.onCreateViewHolder(parent, viewType);
+        } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_web_clipping, parent, false);
             return new MessageViewHolder(view);
-        } else {
-            return super.onCreateViewHolder(parent, viewType);
         }
+        throw new IllegalArgumentException("unknown viewType");
     }
 
     @Override
@@ -190,6 +191,8 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 }
             };
             holder.itemView.setOnClickListener(webLinkClickListener);
+        } else {
+            throw new IllegalArgumentException("unknown viewType");
         }
 
         View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
@@ -215,60 +218,18 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             }
         };
         holder.itemView.setOnLongClickListener(onLongClickListener);
-        return holder;
-    }
 
-    private void showMessageOptions(final View tempAnchorView, FriendlyMessage friendlyMessage) {
-        new MessageOptionsDialogHelper().showMessageOptions(mActivity.get(), tempAnchorView, friendlyMessage, new MessageOptionsDialogHelper.MessageOptionsListener() {
-
+        holder.likesButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onMessageOptionsDismissed() {
-                mEntireScreenFrameLayout.removeView(tempAnchorView);
-            }
-
-            @Override
-            public void onCopyTextRequested(FriendlyMessage friendlyMessage) {
-                final ClipboardManager cm = (ClipboardManager) mActivity.get()
-                        .getSystemService(Context.CLIPBOARD_SERVICE);
-                cm.setText(friendlyMessage.getText());
-                Toast.makeText(mActivity.get(), R.string.message_copied_to_clipboard, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onDeleteMessageRequested(final FriendlyMessage friendlyMessage) {
-                MLog.d(TAG, " msg.getImageUrl(): " + friendlyMessage.getImageUrl() + " " + friendlyMessage.getImageId());
-                new MessagesDialogHelper().showDeleteMessageDialog(mActivity.get(), friendlyMessage, mStorageRef, mDatabaseRef);
-            }
-
-            @Override
-            public void onBlockPersonRequested(final FriendlyMessage friendlyMessage) {
-                new BlockUserDialogHelper().showBlockUserQuestionDialog(mActivity.get(),
-                        friendlyMessage.getUserid(),
-                        friendlyMessage.getName(),
-                        friendlyMessage.getDpid(),
-                        mInternalBlockedUserListener);
-
-            }
-
-            @Override
-            public void onReportPersonRequested(FriendlyMessage friendlyMessage) {
-                if (Preferences.getInstance().getUserId() == friendlyMessage.getUserid()) {
-                    //todo
-                    return; //cannot report yourself dummy!
-                }
+            public void onClick(View view) {
+                FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
+                friendlyMessage.incrementLikesCount();
+                notifyItemChanged(holder.getAdapterPosition());
             }
         });
-    }
 
-    private View.OnTouchListener mOnTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            x = motionEvent.getX();
-            y = motionEvent.getY();
-            return false;
-        }
-    };
-    private float x, y;
+        return holder;
+    }
 
     @Override
     protected void populateViewHolder(final MessageViewHolder viewHolder, final FriendlyMessage friendlyMessage, int position) {
@@ -328,15 +289,25 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             });
         }
 
-//        if (friendlyMessage.getLikesCount() > 0) {
-//            viewHolder.periscopeParent.setVisibility(View.VISIBLE);
-//            int count = friendlyMessage.getLikesCount() > mMaxPeriscopesPerItem ? mMaxPeriscopesPerItem : friendlyMessage.getLikesCount();
-//            for (int i = 0; i < count; i++) {
-//                viewHolder.periscopeLayout.addHeart();
-//            }
-//        } else {
-//            viewHolder.periscopeParent.setVisibility(View.GONE);
-//        }
+        if (friendlyMessage.getLikesCount() > 0) {
+            viewHolder.periscopeParent.setVisibility(View.VISIBLE);
+            //int count = friendlyMessage.getLikesCount() > mMaxPeriscopesPerItem ? mMaxPeriscopesPerItem : friendlyMessage.getLikesCount();
+            viewHolder.periscopeParent.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    int count = 5;
+                    for (int i = 0; i < count; i++) {
+                        viewHolder.periscopeLayout.addHeart();
+                    }
+                }
+            }, 500);
+            viewHolder.likesButton.setChecked(true);
+            viewHolder.likesCount.setText(" " + friendlyMessage.getLikesCount() + " ");
+
+        } else {
+            viewHolder.periscopeParent.setVisibility(View.GONE);
+            viewHolder.likesButton.setChecked(false);
+        }
     }
 
     public void cleanup() {
@@ -469,4 +440,56 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         };
         mFirebaseDatabaseReference.child(Constants.MY_BLOCKS_REF()).addChildEventListener(mBlockedUsersListener);
     }
+
+    private void showMessageOptions(final View tempAnchorView, FriendlyMessage friendlyMessage) {
+        new MessageOptionsDialogHelper().showMessageOptions(mActivity.get(), tempAnchorView, friendlyMessage, new MessageOptionsDialogHelper.MessageOptionsListener() {
+
+            @Override
+            public void onMessageOptionsDismissed() {
+                mEntireScreenFrameLayout.removeView(tempAnchorView);
+            }
+
+            @Override
+            public void onCopyTextRequested(FriendlyMessage friendlyMessage) {
+                final ClipboardManager cm = (ClipboardManager) mActivity.get()
+                        .getSystemService(Context.CLIPBOARD_SERVICE);
+                cm.setText(friendlyMessage.getText());
+                Toast.makeText(mActivity.get(), R.string.message_copied_to_clipboard, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onDeleteMessageRequested(final FriendlyMessage friendlyMessage) {
+                MLog.d(TAG, " msg.getImageUrl(): " + friendlyMessage.getImageUrl() + " " + friendlyMessage.getImageId());
+                new MessagesDialogHelper().showDeleteMessageDialog(mActivity.get(), friendlyMessage, mStorageRef, mDatabaseRef);
+            }
+
+            @Override
+            public void onBlockPersonRequested(final FriendlyMessage friendlyMessage) {
+                new BlockUserDialogHelper().showBlockUserQuestionDialog(mActivity.get(),
+                        friendlyMessage.getUserid(),
+                        friendlyMessage.getName(),
+                        friendlyMessage.getDpid(),
+                        mInternalBlockedUserListener);
+
+            }
+
+            @Override
+            public void onReportPersonRequested(FriendlyMessage friendlyMessage) {
+                if (Preferences.getInstance().getUserId() == friendlyMessage.getUserid()) {
+                    //todo
+                    return; //cannot report yourself dummy!
+                }
+            }
+        });
+    }
+
+    private View.OnTouchListener mOnTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            x = motionEvent.getX();
+            y = motionEvent.getY();
+            return false;
+        }
+    };
+    private float x, y;
 }

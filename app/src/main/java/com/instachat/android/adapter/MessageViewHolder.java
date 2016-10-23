@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.instachat.android.R;
 import com.instachat.android.view.PeriscopeLayout;
+import com.sackcentury.shinebuttonlib.ShineButton;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -23,7 +24,8 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
     public CircleImageView messengerImageView;
     public PeriscopeLayout periscopeLayout;
     public View periscopeParent;
-    public ImageView likesButton;
+    public ShineButton likesButton;
+    public TextView likesCount;
 
     /*
      * Web link content
@@ -44,7 +46,8 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         messagePhotoViewParent = (FrameLayout) itemView.findViewById(R.id.messagePhotoViewParent);
         periscopeParent = itemView.findViewById(R.id.periscopeParent);
         periscopeLayout = (PeriscopeLayout) itemView.findViewById(R.id.periscope);
-        likesButton = (ImageView) itemView.findViewById(R.id.likeButton);
+        likesButton = (ShineButton) itemView.findViewById(R.id.likeButton);
+        likesCount = (TextView) itemView.findViewById(R.id.likesCount);
 
         webLinkContent = (TextView) itemView.findViewById(R.id.web_clipping_orginal_url);
         webLinkImageView = (ImageView) itemView.findViewById(R.id.image_post);

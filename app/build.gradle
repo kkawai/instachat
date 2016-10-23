@@ -95,6 +95,7 @@ dependencies {
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.brandongogetap:stickyheaders:0.3.5'
     compile 'com.cocosw:bottomsheet:1.+@aar'
+    compile 'com.sackcentury:shinebutton:0.1.6'
 }
 
 apply plugin: 'com.google.gms.google-services'

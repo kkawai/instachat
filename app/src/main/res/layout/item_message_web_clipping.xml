@@ -183,14 +183,25 @@
                 app:font="Lato-Bold.ttf"/>
         </FrameLayout>
 
-        <ImageView
+        <com.sackcentury.shinebuttonlib.ShineButton
             android:id="@+id/likeButton"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_gravity="end|bottom"
             android:layout_marginBottom="12dp"
-            android:src="@drawable/ic_heart_button_inactive"
-            />
+            android:src="@android:color/darker_gray"
+            app:allow_random_color="false"
+            app:big_shine_color="#FF6666"
+            app:btn_color="@android:color/darker_gray"
+            app:btn_fill_color="#FF6666"
+            app:click_animation_duration="200"
+            app:enable_flashing="false"
+            app:shine_animation_duration="1500"
+            app:shine_count="8"
+            app:shine_turn_angle="10"
+            app:siShape="@raw/heart"
+            app:small_shine_color="#CC9999"
+            app:small_shine_offset_angle="20"/>
 
     </LinearLayout>
 
