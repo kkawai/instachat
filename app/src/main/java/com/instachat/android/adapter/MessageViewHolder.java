@@ -7,9 +7,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.instachat.android.R;
+import com.instachat.android.view.PeriscopeLayout;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import me.yifeiyuan.library.PeriscopeLayout;
 
 /**
  * Created by kevin on 9/3/2016.

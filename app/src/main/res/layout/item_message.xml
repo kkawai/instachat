@@ -88,7 +88,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="end|bottom">
 
-            <me.yifeiyuan.library.PeriscopeLayout
+            <com.instachat.android.view.PeriscopeLayout
                 android:id="@+id/periscope"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"

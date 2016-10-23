@@ -76,7 +76,6 @@
 -keep class com.pnikosis.** { *; }
 -keep class com.brandongogetap.stickyheaders.** { *; }
 -keep class com.cocosw.** { *; }
--keep class me.yifeiyuan.periscopelayout.** { *; }
 
 # below was necessary for making proguard work with flurry jar
 -keep class com.flurry.** { *; }

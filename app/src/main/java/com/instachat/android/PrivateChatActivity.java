@@ -31,6 +31,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.blocks.BlockUserDialogHelper;
 import com.instachat.android.model.FriendlyMessage;
@@ -66,6 +67,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     private ChatTypingHelper mTypingHelper;
     private long mLastTypingTime;
     private ValueEventListener mUserInfoValueEventListener = null;
+    private FirebaseRemoteConfig mConfig;
 
     @Override
     protected int getLayout() {
@@ -78,6 +80,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         MLog.d(TAG, "onCreate() ");
         onNewIntent(getIntent());
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+        mConfig = FirebaseRemoteConfig.getInstance();
     }
 
     @Override
@@ -203,7 +206,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                 if (tooltip.isShowing())
                     tooltip.dismiss();
             }
-        }, Constants.MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME);
+        }, mConfig.getLong(Constants.KEY_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME));
 
     }
 
@@ -464,7 +467,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                 if (mIsAppBarExpanded)
                     appBarLayout.setExpanded(false, true);
             }
-        }, Constants.COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY);
+        }, mConfig.getLong(Constants.KEY_COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY));
     }
 
     private void clearPrivateUnreadMessages(int toUserid) {
@@ -559,14 +562,6 @@ public class PrivateChatActivity extends GroupChatActivity {
 
         ((TextView) findViewById(R.id.customTitleInToolbar)).setText(username);
         ((TextView) findViewById(R.id.customTitleInParallax)).setText(username);
-    }
-
-    @Override
-    protected String getPhotoUploadDialogTitle() {
-        String username = mToUser != null ? mToUser.getUsername() : "";
-        if (TextUtils.isEmpty(username))
-            username = getString(R.string.anonymous_user);
-        return getString(R.string.send_photo_to_group_or_person, username);
     }
 
     @Override

@@ -14,22 +14,28 @@ public final class Constants {
 
     private Constants() {
     }
-
-    public static final int MAX_MESSAGE_HISTORY = 1000;
-
     public static final int MAX_USERNAME_LENGTH = 50;
     public static final int MIN_USERNAME_LENGTH = 2;
-
     public static final int MAX_EMAIL_LENGTH = 128;
     public static final int MIN_EMAIL_LENGTH = 5;
-
     public static final int MAX_PASSWORD_LENGTH = 10;
     public static final int MIN_PASSWORD_LENGTH = 4;
 
-    public static final int MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS = 3500;
-    public static final int MAX_TYPING_DOTS_DISPLAY_TIME = 3500;
-    public static final int COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY = 1750;
-    public static final int MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME = 4000;
+    //remote configuration with default values
+    public static final int DEFAULT_MAX_MESSAGE_HISTORY = 1000;
+    public static final int DEFAULT_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS = 3500;
+    public static final int DEFAULT_MAX_TYPING_DOTS_DISPLAY_TIME = 3500;
+    public static final int DEFAULT_COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY = 1750;
+    public static final int DEFAULT_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME = 4000;
+    public static final int DEFAULT_MAX_MESSAGE_LENGTH = 256;
+    public static final int DEFAULT_MAX_PERISCOPABLE_LIKES_PER_ITEM = 25;
+    public static String KEY_MAX_MESSAGE_HISTORY = "MAX_MESSAGE_HISTORY";
+    public static String KEY_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS = "MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS";
+    public static String KEY_MAX_TYPING_DOTS_DISPLAY_TIME = "MAX_TYPING_DOTS_DISPLAY_TIME";
+    public static String KEY_COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY = "COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY";
+    public static String KEY_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME = "MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME";
+    public static String KEY_MAX_MESSAGE_LENGTH = "MAX_MESSAGE_LENGTH";
+    public static String KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM = "MAX_PERISCOPABLE_LIKES_PER_ITEM";
 
     /*
      * CHANGE THESE WHEN MAKING PRODUCTION BUILDS
@@ -221,9 +227,6 @@ public final class Constants {
         return "/users/" + userid + "/dp/";
     }
 
-    /**
-     * Firebase database constants
-     */
     public static final long DEFAULT_PUBLIC_GROUP_ID = 1;
     public static final int MAX_PIC_SIZE_BYTES = 512000;
     public static final int MAX_PROFILE_PIC_SIZE_BYTES = 400000;
@@ -241,7 +244,6 @@ public final class Constants {
     }
 
     public static final String ACTION_USER_TYPING = "action_user_typing";
-    public static final String KEY_FRIENDLY_MSG_LENGTH = "friendly_msg_length";
     public static final String KEY_GCM_MESSAGE = "msg";
     public static final String KEY_TO_USERID = "toid";
     public static final String CHILD_UNREAD_MESSAGES = "unread_messages";
@@ -263,4 +265,5 @@ public final class Constants {
     public static String FIELD_LAST_MESSAGE_SENT_TIMESTAMP = "lastMessageSentTimestamp";
     public static String FIELD_CURRENT_GROUP_ID = "currentGroupId";
     public static String FIELD_CURRENT_GROUP_NAME = "currentGroupName";
+
 }

@@ -5,13 +5,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -104,9 +102,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private static final String TAG = "GroupChatActivity";
 
     private static final int REQUEST_INVITE = 1;
-    public static final int DEFAULT_MSG_LENGTH_LIMIT = 140;
     private static final String MESSAGE_SENT_EVENT = "message_sent";
-    private SharedPreferences mSharedPreferences;
 
     private View mSendButton, mAttachButton;
     private RecyclerView mMessageRecyclerView;
@@ -156,7 +152,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         setupDrawers();
         setupToolbar();
         mDotsLoader = (AnimatedDotLoadingView) findViewById(R.id.text_dot_loader);
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -181,6 +176,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             //MLog.e(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) failed: " + e);
         }
 
+        initRemoteConfig();
+        fetchConfig();
         initFirebaseAdapter();
 
         FuelInjector.ignite(this, this);
@@ -194,30 +191,11 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
         */
-
         // Initialize Firebase Measurement.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-        // Initialize Firebase Remote Config.
-        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-
-        // Define Firebase Remote Config Settings.
-        FirebaseRemoteConfigSettings firebaseRemoteConfigSettings = new FirebaseRemoteConfigSettings.Builder().setDeveloperModeEnabled(true).build();
-
-        // Define default config values. Defaults are used when fetched config values are not
-        // available. Eg: if an error occurred fetching values from the server.
-        Map<String, Object> defaultConfigMap = new HashMap<>();
-        defaultConfigMap.put("friendly_msg_length", DEFAULT_MSG_LENGTH_LIMIT);
-
-        // Apply config settings and default values.
-        mFirebaseRemoteConfig.setConfigSettings(firebaseRemoteConfigSettings);
-        mFirebaseRemoteConfig.setDefaults(defaultConfigMap);
-
-        // Fetch remote config.
-        fetchConfig();
-
         mMessageEditText = (EditText) findViewById(R.id.messageEditText);
-        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(mSharedPreferences.getInt(Constants.KEY_FRIENDLY_MSG_LENGTH, DEFAULT_MSG_LENGTH_LIMIT))});
+        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter((int) mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_LENGTH))});
         mMessageEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int before, int count) {
@@ -686,7 +664,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
      * cached values.
      */
     private void applyRetrievedLengthLimit() {
-        Long friendly_msg_length = mFirebaseRemoteConfig.getLong("friendly_msg_length");
+        Long friendly_msg_length = mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_LENGTH);
         mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(friendly_msg_length.intValue())});
         MLog.d(TAG, "FML is: " + friendly_msg_length);
     }
@@ -921,7 +899,10 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     }
 
     private void initFirebaseAdapter() {
-        mFirebaseAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class, R.layout.item_message, MessageViewHolder.class, FirebaseDatabase.getInstance().getReference(mDatabaseRoot).limitToLast(Constants.MAX_MESSAGE_HISTORY));
+        mFirebaseAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class, R.layout.item_message, MessageViewHolder.class,
+                FirebaseDatabase.getInstance().
+                        getReference(mDatabaseRoot).
+                        limitToLast((int) mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)));
         mFirebaseAdapter.setDatabaseRoot(mDatabaseRoot);
         mFirebaseAdapter.setActivity(this, this, (FrameLayout) findViewById(R.id.fragment_content));
         mFirebaseAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {
@@ -971,7 +952,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                     mProgressBar.setVisibility(View.GONE);
                 }
             }
-        }, Constants.MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS);
+        }, mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS));
     }
 
     Integer myUserid() {
@@ -1184,7 +1165,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         showDotsParent(true);
         mDotsLoader.startAnimation();
         mDotsHandler.removeCallbacks(mDotsHideRunner);
-        mDotsHandler.postDelayed(mDotsHideRunner, Constants.MAX_TYPING_DOTS_DISPLAY_TIME);
+        mDotsHandler.postDelayed(mDotsHideRunner, mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_TYPING_DOTS_DISPLAY_TIME));
     }
 
     @Override
@@ -1346,12 +1327,27 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         return mBlockedUserListener;
     }
 
-    protected String getPhotoUploadDialogTitle() {
-        String room = getString(R.string.app_name);
-        if (getIntent() != null && getIntent().hasExtra(Constants.KEY_GROUP_NAME)) {
-            room = getIntent().getStringExtra(Constants.KEY_GROUP_NAME);
-        }
-        return getString(R.string.send_photo_to_group_or_person, room);
+    private void initRemoteConfig() {
+        // Initialize Firebase Remote Config.
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+
+        // Define Firebase Remote Config Settings.
+        FirebaseRemoteConfigSettings firebaseRemoteConfigSettings = new FirebaseRemoteConfigSettings.Builder().setDeveloperModeEnabled(false).build();
+
+        // Define default config values. Defaults are used when fetched config values are not
+        // available. Eg: if an error occurred fetching values from the server.
+        Map<String, Object> defaultConfigMap = new HashMap<>();
+        defaultConfigMap.put(Constants.KEY_MAX_MESSAGE_HISTORY, Constants.DEFAULT_MAX_MESSAGE_HISTORY);
+        defaultConfigMap.put(Constants.KEY_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS, Constants.DEFAULT_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS);
+        defaultConfigMap.put(Constants.KEY_MAX_TYPING_DOTS_DISPLAY_TIME, Constants.DEFAULT_MAX_TYPING_DOTS_DISPLAY_TIME);
+        defaultConfigMap.put(Constants.KEY_COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY, Constants.DEFAULT_COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY);
+        defaultConfigMap.put(Constants.KEY_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME, Constants.DEFAULT_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME);
+        defaultConfigMap.put(Constants.KEY_MAX_MESSAGE_LENGTH, Constants.DEFAULT_MAX_MESSAGE_LENGTH);
+        defaultConfigMap.put(Constants.KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM, Constants.DEFAULT_MAX_PERISCOPABLE_LIKES_PER_ITEM);
+
+        // Apply config settings and default values.
+        mFirebaseRemoteConfig.setConfigSettings(firebaseRemoteConfigSettings);
+        mFirebaseRemoteConfig.setDefaults(defaultConfigMap);
     }
 
 }

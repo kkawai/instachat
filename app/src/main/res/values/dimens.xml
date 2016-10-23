@@ -18,7 +18,7 @@
 
     <dimen name="posted_photo_size">250dp</dimen>
     <dimen name="posted_photo_rounded_corner_padding">6dp</dimen>
-    <dimen name="posted_photo_rounded_corner_radius">12dp</dimen>
+    <dimen name="posted_photo_rounded_corner_radius">18dp</dimen>
     <!-- sweet alert dialog -->
     <dimen name="alert_width">290dp</dimen>
     <dimen name="common_circle_width">3dp</dimen>

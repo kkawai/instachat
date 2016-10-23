@@ -27,6 +27,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.instachat.android.ActivityState;
@@ -68,12 +69,14 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private BlockedUserListener mBlockedUserListener;
     private String mDatabaseRef;
     private FrameLayout mEntireScreenFrameLayout;
+    private int mMaxPeriscopesPerItem;
 
     public MessagesRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref) {
         super(modelClass, modelLayout, viewHolderClass, ref);
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
         listenForBlockedUsers();
+        mMaxPeriscopesPerItem = (int) FirebaseRemoteConfig.getInstance().getLong(Constants.KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM);
     }
 
     public void setDatabaseRoot(String root) {
@@ -336,22 +339,15 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             });
         }
 
-        viewHolder.periscopeParent.setVisibility(View.GONE);
-
-        /*if (viewHolder.periscopeLayout != null) {
-            if (position == getItemCount() - 1) {
-                viewHolder.periscopeLayout.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        //viewHolder.periscopeLayout.getLayoutParams().height = viewHolder.itemView.getHeight();
-                        MLog.d(TAG, "dynamic periscope height: ", viewHolder.periscopeLayout.getLayoutParams().height, " getHeight() ", viewHolder.periscopeLayout.getHeight());
-                        for (int i = 0; i < 10; i++) {
-                            viewHolder.periscopeLayout.addHeart();
-                        }
-                    }
-                }, 1000);
+        if (friendlyMessage.getLikesCount() > 0) {
+            viewHolder.periscopeParent.setVisibility(View.VISIBLE);
+            int count = friendlyMessage.getLikesCount() > mMaxPeriscopesPerItem ? mMaxPeriscopesPerItem : friendlyMessage.getLikesCount();
+            for (int i = 0; i < count; i++) {
+                viewHolder.periscopeLayout.addHeart();
             }
-        }*/
+        } else {
+            viewHolder.periscopeParent.setVisibility(View.GONE);
+        }
     }
 
     public void cleanup() {

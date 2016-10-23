@@ -16,6 +16,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 
 import java.lang.reflect.Constructor;
@@ -85,7 +86,8 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
         mModelClass = modelClass;
         mModelLayout = modelLayout;
         mViewHolderClass = viewHolderClass;
-        mSnapshots = new ArrayList<>(Constants.MAX_MESSAGE_HISTORY);
+        int maxMessageHistory = (int) FirebaseRemoteConfig.getInstance().getLong(Constants.KEY_MAX_MESSAGE_HISTORY);
+        mSnapshots = new ArrayList<>(maxMessageHistory);
         mQuery = ref;
 
         mChildEventListener = ref.addChildEventListener(new ChildEventListener() {
