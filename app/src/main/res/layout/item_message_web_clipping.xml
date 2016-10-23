@@ -68,26 +68,20 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
             <com.instachat.android.view.CustomFontTextView
-                android:id="@+id/web_clipping_content"
-                android:layout_width="wrap_content"
+                android:id="@+id/web_clipping_orginal_url"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:layout_marginLeft="5dp"
                 android:textSize="15sp"
                 app:font="Lato-Regular.ttf"/>
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/empty"
-                android:src="@drawable/dotted"/>
 
             <LinearLayout
                 android:layout_width="match_parent"

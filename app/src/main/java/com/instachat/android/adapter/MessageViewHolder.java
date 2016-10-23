@@ -46,7 +46,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         periscopeLayout = (PeriscopeLayout) itemView.findViewById(R.id.periscope);
         likesButton = (ImageView) itemView.findViewById(R.id.likeButton);
 
-        webLinkContent = (TextView) itemView.findViewById(R.id.web_clipping_content);
+        webLinkContent = (TextView) itemView.findViewById(R.id.web_clipping_orginal_url);
         webLinkImageView = (ImageView) itemView.findViewById(R.id.image_post);
         webLinkTitle = (TextView) itemView.findViewById(R.id.title);
         webLinkUrl = (TextView) itemView.findViewById(R.id.url);

@@ -146,24 +146,9 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private MessageViewHolder createMessageViewHolder(ViewGroup parent, int viewType) {
         if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_web_clipping, parent, false);
-            final MessageViewHolder holder = new MessageViewHolder(view);
-            View.OnClickListener webLinkClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    final FriendlyMessage msg = getItem(holder.getAdapterPosition());
-                    final Uri uri = Uri.parse(msg.getText());
-                    mActivity.get().startActivity(new Intent(Intent.ACTION_VIEW, uri));
-                }
-            };
-            holder.webLinkContent.setOnClickListener(webLinkClickListener);
-            holder.webLinkUrl.setOnClickListener(webLinkClickListener);
-            holder.webLinkTitle.setOnClickListener(webLinkClickListener);
-            holder.webLinkDescription.setOnClickListener(webLinkClickListener);
-            holder.webLinkImageView.setOnClickListener(webLinkClickListener);
-            return holder;
+            return new MessageViewHolder(view);
         } else {
-            MessageViewHolder holder = super.onCreateViewHolder(parent, viewType);
-            return holder;
+            return super.onCreateViewHolder(parent, viewType);
         }
     }
 
@@ -182,17 +167,30 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 mUserClickedListener.onUserClicked(friendlyMessage.getUserid(), friendlyMessage.getName(), friendlyMessage.getDpid());
             }
         });
-        final View.OnClickListener onClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
-                if (TextUtils.isEmpty(friendlyMessage.getName())) {
-                    return;
+
+        if (viewType == ITEM_VIEW_TYPE_STANDARD_MESSAGE) {
+            final View.OnClickListener onClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
+                    if (TextUtils.isEmpty(friendlyMessage.getName())) {
+                        return;
+                    }
+                    mMessageTextClickedListener.onMessageClicked(holder.getAdapterPosition());
                 }
-                mMessageTextClickedListener.onMessageClicked(holder.getAdapterPosition());
-            }
-        };
-        holder.itemView.setOnClickListener(onClickListener);
+            };
+            holder.itemView.setOnClickListener(onClickListener);
+        } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
+            View.OnClickListener webLinkClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final FriendlyMessage msg = getItem(holder.getAdapterPosition());
+                    final Uri uri = Uri.parse(msg.getText());
+                    mActivity.get().startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                }
+            };
+            holder.itemView.setOnClickListener(webLinkClickListener);
+        }
 
         View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
             @Override
@@ -216,17 +214,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 return true;
             }
         };
-
         holder.itemView.setOnLongClickListener(onLongClickListener);
-        holder.messengerImageView.setOnLongClickListener(onLongClickListener);
-        if (holder.webLinkContent != null) {
-            holder.webLinkContent.setOnLongClickListener(onLongClickListener);
-            holder.webLinkUrl.setOnLongClickListener(onLongClickListener);
-            holder.webLinkTitle.setOnLongClickListener(onLongClickListener);
-            holder.webLinkDescription.setOnLongClickListener(onLongClickListener);
-            holder.webLinkImageView.setOnLongClickListener(onLongClickListener);
-        }
-
         return holder;
     }
 
@@ -340,15 +328,15 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             });
         }
 
-        if (friendlyMessage.getLikesCount() > 0) {
-            viewHolder.periscopeParent.setVisibility(View.VISIBLE);
-            int count = friendlyMessage.getLikesCount() > mMaxPeriscopesPerItem ? mMaxPeriscopesPerItem : friendlyMessage.getLikesCount();
-            for (int i = 0; i < count; i++) {
-                viewHolder.periscopeLayout.addHeart();
-            }
-        } else {
-            viewHolder.periscopeParent.setVisibility(View.GONE);
-        }
+//        if (friendlyMessage.getLikesCount() > 0) {
+//            viewHolder.periscopeParent.setVisibility(View.VISIBLE);
+//            int count = friendlyMessage.getLikesCount() > mMaxPeriscopesPerItem ? mMaxPeriscopesPerItem : friendlyMessage.getLikesCount();
+//            for (int i = 0; i < count; i++) {
+//                viewHolder.periscopeLayout.addHeart();
+//            }
+//        } else {
+//            viewHolder.periscopeParent.setVisibility(View.GONE);
+//        }
     }
 
     public void cleanup() {
