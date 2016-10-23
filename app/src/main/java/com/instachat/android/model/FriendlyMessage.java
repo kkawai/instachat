@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import android.webkit.URLUtil;
 
+import com.instachat.android.Constants;
 import com.instachat.android.util.MLog;
 
 import org.json.JSONException;
@@ -31,7 +32,7 @@ public class FriendlyMessage implements Parcelable {
     private int messageType;
     private long groupId;
     private String groupName;
-    private int likesCount;
+    private int likes;
 
     private boolean isBlocked; //NOT persisted, volatile
 
@@ -73,8 +74,8 @@ public class FriendlyMessage implements Parcelable {
         if (friendlyMessage.groupName != null) {
             map.put("groupName", friendlyMessage.groupName);
         }
-        if (friendlyMessage.likesCount != 0) {
-            map.put("likesCount", friendlyMessage.likesCount);
+        if (friendlyMessage.likes != 0) {
+            map.put(Constants.CHILD_LIKES, friendlyMessage.likes);
         }
         map.put("messageType", friendlyMessage.getMessageType());
         return map;
@@ -110,8 +111,8 @@ public class FriendlyMessage implements Parcelable {
             o.put("groupId", groupId);
         if (groupName != null)
             o.put("groupName", groupName);
-        if (likesCount != 0)
-            o.put("likesCount", likesCount);
+        if (likes != 0)
+            o.put(Constants.CHILD_LIKES, likes);
         o.put("messageType", messageType);
         return o;
     }
@@ -212,7 +213,7 @@ public class FriendlyMessage implements Parcelable {
             friendlyMessage.messageType = o.optInt("messageType");
             friendlyMessage.groupName = o.optString("groupName");
             friendlyMessage.groupId = o.optLong("groupId");
-            friendlyMessage.likesCount = o.optInt("likesCount");
+            friendlyMessage.likes = o.optInt(Constants.CHILD_LIKES);
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
         }
@@ -346,16 +347,16 @@ public class FriendlyMessage implements Parcelable {
         this.groupId = groupId;
     }
 
-    public int getLikesCount() {
-        return likesCount;
+    public int getLikes() {
+        return likes;
     }
 
-    public void setLikesCount(int likesCount) {
-        this.likesCount = likesCount;
+    public void setLikes(int likes) {
+        this.likes = likes;
     }
 
-    public void incrementLikesCount() {
-        likesCount++;
+    public void incrementLikes() {
+        likes++;
     }
 
     @Override

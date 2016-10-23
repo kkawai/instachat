@@ -247,6 +247,7 @@ public final class Constants {
     public static final String KEY_GCM_MESSAGE = "msg";
     public static final String KEY_TO_USERID = "toid";
     public static final String CHILD_UNREAD_MESSAGES = "unread_messages";
+    public static final String CHILD_LIKES = "likes";
 
     /**
      * Any message received by a user whose last message

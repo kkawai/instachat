@@ -36,6 +36,7 @@ import com.instachat.android.R;
 import com.instachat.android.blocks.BlockUserDialogHelper;
 import com.instachat.android.blocks.BlockedUser;
 import com.instachat.android.blocks.BlockedUserListener;
+import com.instachat.android.likes.LikesHelper;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.options.MessageOptionsDialogHelper;
 import com.instachat.android.util.MLog;
@@ -224,18 +225,9 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             @Override
             public void onClick(View view) {
                 FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
-                friendlyMessage.incrementLikesCount();
-                /**
-                 * Optimization HACK!
-                 * Pass in 0 (any value will do really)
-                 * to tell the recycler view that the only
-                 * thing that changed here was the like count!
-                 *
-                 * You can pass in any object you want really.
-                 * Even a list of objects.  It causes populateViewHolder
-                 * to pass in List<Object> with a size > 0.
-                 */
-                notifyItemChanged(holder.getAdapterPosition(), 0);
+                //friendlyMessage.incrementLikesCount();
+                DatabaseReference ref = mFirebaseDatabaseReference.child(mDatabaseRef).child(friendlyMessage.getId()).child(Constants.CHILD_LIKES);
+                LikesHelper.getInstance().likeFriendlyMessage(friendlyMessage, ref);
             }
         });
 
@@ -246,9 +238,9 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     protected void populateViewHolder(final MessageViewHolder viewHolder, final FriendlyMessage friendlyMessage,
                                       int position, List<Object> payloads) {
 
-        if (friendlyMessage.getLikesCount() > 0) {
+        if (friendlyMessage.getLikes() > 0) {
             viewHolder.periscopeParent.setVisibility(View.VISIBLE);
-            //int count = friendlyMessage.getLikesCount() > mMaxPeriscopesPerItem ? mMaxPeriscopesPerItem : friendlyMessage.getLikesCount();
+            //int count = friendlyMessage.getLikes() > mMaxPeriscopesPerItem ? mMaxPeriscopesPerItem : friendlyMessage.getLikes();
             viewHolder.periscopeParent.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -262,7 +254,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             }, 500);
             viewHolder.likesButton.setChecked(false);
             viewHolder.likesButton.setBtnColor(viewHolder.likesButton.getContext().getResources().getColor(R.color.chat_like_button_active_state));
-            viewHolder.likesCount.setText(" " + friendlyMessage.getLikesCount() + " ");
+            viewHolder.likesCount.setText(" " + friendlyMessage.getLikes() + " ");
 
         } else {
             viewHolder.periscopeParent.setVisibility(View.GONE);
@@ -520,4 +512,33 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         }
     };
     private float x, y;
+
+    /**
+     * Check the data at the index to see if the
+     * only thing that changed was the like count
+     *
+     * @param index
+     * @param newItem
+     */
+    @Override
+    protected void checkItemBeforeChanging(int index, FriendlyMessage newItem) {
+        FriendlyMessage current = getItem(index);
+        if (current.getLikes() != newItem.getLikes()) {
+            replaceItem(index, newItem);
+            /**
+             * Optimization HACK!
+             * Pass in 0 (any value will do really)
+             * to tell the recycler view that the only
+             * thing that changed here was the like count!
+             *
+             * You can pass in any object you want really.
+             * Even a list of objects.  It causes populateViewHolder
+             * to pass in List<Object> with a size > 0.
+             */
+            notifyItemChanged(index, 0);
+        } else {
+            replaceItem(index, newItem);
+            notifyItemChanged(index);
+        }
+    }
 }

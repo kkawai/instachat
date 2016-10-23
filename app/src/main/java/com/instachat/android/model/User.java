@@ -168,7 +168,7 @@ public class User extends DomainObject {
             map.put(Constants.FIELD_CURRENT_GROUP_ID, currentGroupId);
         }
         if (likes != 0) {
-            map.put("likes", likes);
+            map.put(Constants.CHILD_LIKES, likes);
         }
         return map;
     }
@@ -180,7 +180,7 @@ public class User extends DomainObject {
             map.put("profilePicUrl", profilePicUrl);
         map.put("id", id);
         if (likes != 0) {
-            map.put("likes", likes);
+            map.put(Constants.CHILD_LIKES, likes);
         }
         return map;
     }

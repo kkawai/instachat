@@ -25,7 +25,26 @@ public class LikesHelper {
         return instance;
     }
 
-    public void likeFriendlyMessage(final FriendlyMessage friendlyMessage) {
+    public void likeFriendlyMessage(final FriendlyMessage friendlyMessage,
+                                    final DatabaseReference friendlyMessageRef) {
+
+        friendlyMessageRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                friendlyMessageRef.removeEventListener(this);
+                if (dataSnapshot.getValue() == null) {
+                    friendlyMessageRef.setValue(1);
+                } else {
+                    friendlyMessageRef.setValue((Long) dataSnapshot.getValue() + 1);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                MLog.e(TAG, "likeFriendlyMessage() failed when incrementing like count on the message itself.  databaseError: ", databaseError);
+            }
+        });
+
         final User me = Preferences.getInstance().getUser();
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MESSAGE_LIKES_REF(friendlyMessage.getId())).
                 child(me.getId() + "");
@@ -37,11 +56,10 @@ public class LikesHelper {
                 ref.removeEventListener(this);
                 if (dataSnapshot.getValue() == null) {
                     me.setLikes(1);
-                    ref.updateChildren(me.getLikesMap());
+                    ref.setValue(me.getLikesMap());
                 } else {
                     User user = dataSnapshot.getValue(User.class);
-                    user.incrementLikes();
-                    ref.updateChildren(me.getLikesMap());
+                    ref.child(Constants.CHILD_LIKES).setValue(user.getLikes() + 1);
                 }
             }
 
@@ -60,7 +78,7 @@ public class LikesHelper {
                 if (dataSnapshot.getValue() == null) {
                     likesTotalGivenRef.setValue(1);
                 } else {
-                    likesTotalGivenRef.setValue(((Integer) dataSnapshot.getValue()) + 1);
+                    likesTotalGivenRef.setValue(((Long) dataSnapshot.getValue()) + 1);
                 }
             }
 
@@ -78,7 +96,7 @@ public class LikesHelper {
                 if (dataSnapshot.getValue() == null) {
                     likesTotalReceivedRef.setValue(1);
                 } else {
-                    likesTotalReceivedRef.setValue(((Integer) dataSnapshot.getValue()) + 1);
+                    likesTotalReceivedRef.setValue(((Long) dataSnapshot.getValue()) + 1);
                 }
             }
 
@@ -96,11 +114,11 @@ public class LikesHelper {
                 userReceivedLikesRef.removeEventListener(this);
                 if (dataSnapshot.getValue() == null) {
                     me.setLikes(1);
-                    userReceivedLikesRef.updateChildren(me.getLikesMap());
+                    userReceivedLikesRef.setValue(me.getLikesMap());
                 } else {
                     User user = dataSnapshot.getValue(User.class);
                     user.incrementLikes();
-                    userReceivedLikesRef.updateChildren(user.getLikesMap());
+                    userReceivedLikesRef.child(Constants.CHILD_LIKES).setValue(user.getLikes());
                 }
             }
 
@@ -117,11 +135,11 @@ public class LikesHelper {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 userGivenLikesRef.removeEventListener(this);
                 if (dataSnapshot.getValue() == null) {
-                    userGivenLikesRef.updateChildren(friendlyMessage.getUserMap());
+                    userGivenLikesRef.setValue(friendlyMessage.getUserMap());
                 } else {
                     User user = dataSnapshot.getValue(User.class);
                     user.incrementLikes();
-                    userGivenLikesRef.updateChildren(me.getLikesMap());
+                    userGivenLikesRef.child(Constants.CHILD_LIKES).setValue(user.getLikes());
                 }
             }
 

@@ -108,9 +108,7 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
                 synchronized (BaseMessagesAdapter.this) {
                     int index = mSnapshots.indexOf(t);
                     if (index != -1) {
-                        mSnapshots.remove(index);
-                        mSnapshots.add(index, t);
-                        notifyItemChanged(index);
+                        checkItemBeforeChanging(index, t);
                     }
                 }
             }
@@ -138,6 +136,21 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
             }
         });
     }
+
+    protected final void replaceItem(int index, T item) {
+        mSnapshots.remove(index);
+        mSnapshots.add(index, item);
+    }
+
+    /**
+     * Make sure to call replaceItem() within the implementation
+     * of this method after determining what changed.  Then
+     * call notifyItemChanged() passing in the optional payload
+     * if it's only a partial change!
+     *
+     * @param index
+     */
+    protected abstract void checkItemBeforeChanging(int index, T item);
 
     /**
      * @param modelClass      Firebase will marshall the data at a location into an instance of a class that you provide
