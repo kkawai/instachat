@@ -226,6 +226,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             holder.webLinkDescription.setOnLongClickListener(onLongClickListener);
             holder.webLinkImageView.setOnLongClickListener(onLongClickListener);
         }
+
         return holder;
     }
 

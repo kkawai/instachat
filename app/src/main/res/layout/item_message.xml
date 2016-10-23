@@ -34,7 +34,7 @@
                     android:id="@+id/messengerTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/chat_sender_username"
                     android:textSize="14sp"
                     app:font="Lato-Bold.ttf"/>
 
@@ -44,7 +44,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:layout_weight="0"
-                    android:textColor="#a8a8a8"
+                    android:textColor="@color/chat_time_message_sent"
                     android:textSize="13sp"
                     app:font="Lato-Regular.ttf"/>
 
@@ -76,7 +76,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
                 android:autoLink="web|map|email|phone"
-                android:textColor="@android:color/black"
+                android:textColor="@color/chat_message_color"
                 android:textSize="15sp"
                 app:font="Lato-Regular.ttf"/>
 
@@ -100,8 +100,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center_horizontal"
                 android:layout_marginBottom="10dp"
-                android:text=" 12 "
-                android:textColor="#a8a8a8"
+                android:text=""
+                android:textColor="@color/chat_likes_count"
                 android:textSize="13sp"
                 android:textStyle="bold"
                 app:font="Lato-Bold.ttf"/>

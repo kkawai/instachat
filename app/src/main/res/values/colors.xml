@@ -33,14 +33,16 @@
     <color name="white_baby_powder">#FEFEFA</color>
     <color name="link_color">#ff3f739a</color>
 
-    <color name="aa">#ff007de3</color>
-    <color name="soft_grey_split">#d0d0d0</color>
-    <color name="soft_grey_choose">#aaa</color>
-
     <color name="light_turquoise">#71efc5</color>
 
-    <!-- chat background screen color -->
+    <!-- chat colors! these are very important -->
     <color name="chat_background_screen_color">@android:color/white</color>
+    <color name="chat_sender_username">@android:color/black</color>
+    <color name="chat_time_message_sent">#a8a8a8</color>
+    <color name="chat_message_color">@android:color/black</color>
+    <color name="chat_likes_count">#a8a8a8</color>
+    <color name="chat_web_clipping_article_title">#ff007de3</color>
+    <color name="chat_web_cliping_url">#d0d0d0</color>
 
     <!-- left drawer list text and background colors -->
     <color name="left_drawer_list_background_color">#FEFEFA</color>

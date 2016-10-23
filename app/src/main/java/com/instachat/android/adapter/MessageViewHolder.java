@@ -23,6 +23,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
     public CircleImageView messengerImageView;
     public PeriscopeLayout periscopeLayout;
     public View periscopeParent;
+    public ImageView likesButton;
 
     /*
      * Web link content
@@ -43,8 +44,9 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         messagePhotoViewParent = (FrameLayout) itemView.findViewById(R.id.messagePhotoViewParent);
         periscopeParent = itemView.findViewById(R.id.periscopeParent);
         periscopeLayout = (PeriscopeLayout) itemView.findViewById(R.id.periscope);
+        likesButton = (ImageView) itemView.findViewById(R.id.likeButton);
 
-        webLinkContent = (TextView) itemView.findViewById(R.id.post_content);
+        webLinkContent = (TextView) itemView.findViewById(R.id.web_clipping_content);
         webLinkImageView = (ImageView) itemView.findViewById(R.id.image_post);
         webLinkTitle = (TextView) itemView.findViewById(R.id.title);
         webLinkUrl = (TextView) itemView.findViewById(R.id.url);
