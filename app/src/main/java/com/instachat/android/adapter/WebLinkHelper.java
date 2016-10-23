@@ -1,9 +1,10 @@
 package com.instachat.android.adapter;
 
 import com.bumptech.glide.Glide;
-import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.MyApp;
+import com.instachat.android.R;
 import com.instachat.android.db.RssDb;
+import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.model.Rss;
 import com.instachat.android.util.MLog;
 import com.leocardz.link.preview.library.LinkPreviewCallback;
@@ -23,10 +24,10 @@ public class WebLinkHelper {
     }
 
     public void populateWebLinkPost(final MessageViewHolder viewHolder, final FriendlyMessage friendlyMessage, int position) {
+        viewHolder.messageTextView.setText(R.string.fetching_web_clipping);
         LinkPreviewCallback callback = new LinkPreviewCallback() {
             @Override
             public void onPre() {
-
             }
 
             @Override
@@ -38,6 +39,7 @@ public class WebLinkHelper {
                 rss.setTitle(sourceContent.getTitle());
                 rss.setBasicLink(sourceContent.getCannonicalUrl());
                 rss.setLink(friendlyMessage.getText().trim());
+                viewHolder.messageTextView.setText(R.string.web_clipping);
                 viewHolder.webLinkDescription.setText(sourceContent.getDescription() + "");
                 viewHolder.webLinkTitle.setText(sourceContent.getTitle() + "");
                 viewHolder.webLinkUrl.setText(sourceContent.getCannonicalUrl() + "");
@@ -53,6 +55,7 @@ public class WebLinkHelper {
 
         Rss rss = RssDb.getInstance().getRssByLink(friendlyMessage.getText().trim());
         if (rss != null) {
+            viewHolder.messageTextView.setText(R.string.web_clipping);
             viewHolder.webLinkDescription.setText(rss.getDescr() + "");
             viewHolder.webLinkTitle.setText(rss.getTitle() + "");
             viewHolder.webLinkUrl.setText(rss.getBasicLink() + "");
@@ -61,8 +64,9 @@ public class WebLinkHelper {
                 Glide.with(MyApp.getInstance()).load(rss.getImageUrl()).into(viewHolder.webLinkImageView);
             }
             MLog.d(TAG, "found link in rss db. basic link: " + rss.getBasicLink() + " main rss link: " + rss.getLink());
-            return;
+        } else {
+            //fetch the content from the site
+            mTextCrawler.makePreview(callback, friendlyMessage.getText().trim());
         }
-        mTextCrawler.makePreview(callback, friendlyMessage.getText().trim());
     }
 }

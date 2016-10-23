@@ -200,7 +200,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private int thumbSize() {
-        return MyApp.getInstance().getResources().getDimensionPixelSize(R.dimen.message_thumb_pic_size);
+        return MyApp.getInstance().getResources().getDimensionPixelSize(R.dimen.user_thumb_pic_size);
     }
 
     private void incrementPrivateUnreadMessages(final FriendlyMessage friendlyMessage) {

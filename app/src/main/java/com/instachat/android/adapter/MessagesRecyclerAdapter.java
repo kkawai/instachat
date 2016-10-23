@@ -289,13 +289,13 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
         if (getItemViewType(position) == ITEM_VIEW_TYPE_WEB_LINK) {
             new WebLinkHelper().populateWebLinkPost(viewHolder, friendlyMessage, position);
-        }
-
-        if (viewHolder.messageTextView != null) {
-            if (StringUtil.isNotEmpty(friendlyMessage.getText()))
-                viewHolder.messageTextView.setText(friendlyMessage.getText());
-            else
-                viewHolder.messageTextView.setText("");
+        } else {
+            if (viewHolder.messageTextView != null) {
+                if (StringUtil.isNotEmpty(friendlyMessage.getText()))
+                    viewHolder.messageTextView.setText(friendlyMessage.getText());
+                else
+                    viewHolder.messageTextView.setText("");
+            }
         }
 
         viewHolder.messengerTextView.setText(friendlyMessage.getName());

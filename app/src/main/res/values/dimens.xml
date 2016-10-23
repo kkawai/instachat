@@ -6,7 +6,11 @@
 
     <dimen name="send_button_size">32dp</dimen>
     <dimen name="nav_header_profile_pic_size">72dp</dimen>
-    <dimen name="message_thumb_pic_size">36dp</dimen>
+    <dimen name="user_thumb_pic_size">48dp</dimen>
+    <dimen name="user_thumb_pic_in_titlebar_size">36dp</dimen>
+    <dimen name="super_small_user_thumb_size">26dp</dimen>
+    <dimen name="web_clipping_image_size">100dp</dimen>
+    <dimen name="posted_photo_size">250dp</dimen>
 
     <!-- fragment profile -->
     <dimen name="fragment_profile_pic_size">220dp</dimen>
@@ -14,11 +18,10 @@
     <!-- private chat activity profile -->
     <dimen name="profile_header_height">360dp</dimen>
     <dimen name="private_activity_profile_pic_size">200dp</dimen>
-    <dimen name="super_small_user_thumb_size">26dp</dimen>
 
-    <dimen name="posted_photo_size">250dp</dimen>
     <dimen name="posted_photo_rounded_corner_padding">6dp</dimen>
     <dimen name="posted_photo_rounded_corner_radius">18dp</dimen>
+
     <!-- sweet alert dialog -->
     <dimen name="alert_width">290dp</dimen>
     <dimen name="common_circle_width">3dp</dimen>

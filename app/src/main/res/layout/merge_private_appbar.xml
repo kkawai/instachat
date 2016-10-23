@@ -118,8 +118,8 @@
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/topCornerUserThumb"
-                    android:layout_width="@dimen/message_thumb_pic_size"
-                    android:layout_height="@dimen/message_thumb_pic_size"
+                    android:layout_width="@dimen/user_thumb_pic_in_titlebar_size"
+                    android:layout_height="@dimen/user_thumb_pic_in_titlebar_size"
                     android:layout_gravity="left|center_vertical"
                     android:src="@drawable/ic_account_circle_black_36dp"
                     />
