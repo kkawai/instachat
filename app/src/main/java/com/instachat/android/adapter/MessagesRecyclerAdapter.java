@@ -230,6 +230,10 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                  * Pass in 0 (any value will do really)
                  * to tell the recycler view that the only
                  * thing that changed here was the like count!
+                 *
+                 * You can pass in any object you want really.
+                 * Even a list of objects.  It causes populateViewHolder
+                 * to pass in List<Object> with a size > 0.
                  */
                 notifyItemChanged(holder.getAdapterPosition(), 0);
             }
