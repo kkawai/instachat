@@ -45,6 +45,7 @@ import com.instachat.android.util.TimeUtil;
 
 import java.lang.ref.WeakReference;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -224,7 +225,13 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             public void onClick(View view) {
                 FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
                 friendlyMessage.incrementLikesCount();
-                notifyItemChanged(holder.getAdapterPosition());
+                /**
+                 * Optimization HACK!
+                 * Pass in 0 (any value will do really)
+                 * to tell the recycler view that the only
+                 * thing that changed here was the like count!
+                 */
+                notifyItemChanged(holder.getAdapterPosition(), 0);
             }
         });
 
@@ -232,7 +239,44 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     }
 
     @Override
-    protected void populateViewHolder(final MessageViewHolder viewHolder, final FriendlyMessage friendlyMessage, int position) {
+    protected void populateViewHolder(final MessageViewHolder viewHolder, final FriendlyMessage friendlyMessage,
+                                      int position, List<Object> payloads) {
+
+        if (friendlyMessage.getLikesCount() > 0) {
+            viewHolder.periscopeParent.setVisibility(View.VISIBLE);
+            //int count = friendlyMessage.getLikesCount() > mMaxPeriscopesPerItem ? mMaxPeriscopesPerItem : friendlyMessage.getLikesCount();
+            viewHolder.periscopeParent.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (mActivityState == null || mActivityState.isActivityDestroyed())
+                        return;
+                    int count = 3;
+                    for (int i = 0; i < count; i++) {
+                        viewHolder.periscopeLayout.addHeart();
+                    }
+                }
+            }, 500);
+            viewHolder.likesButton.setChecked(false);
+            viewHolder.likesButton.setBtnColor(viewHolder.likesButton.getContext().getResources().getColor(R.color.chat_like_button_active_state));
+            viewHolder.likesCount.setText(" " + friendlyMessage.getLikesCount() + " ");
+
+        } else {
+            viewHolder.periscopeParent.setVisibility(View.GONE);
+            viewHolder.likesButton.setBtnColor(viewHolder.likesButton.getContext().getResources().getColor(R.color.chat_like_button_inactive_state));
+            viewHolder.likesButton.setChecked(false);
+        }
+
+        /**
+         * Optimzation hack!!
+         * If all I did, as a user, was click on the like button.
+         * If that's the case, then update just that part and get out
+         * because nothing else in the view has been altered.
+         * See where notifyItemChanged(position,0) is called to see what
+         * is going on there.
+         */
+        if (payloads.size() != 0) {
+            return;
+        }
 
         mAdapterPopulateHolderListener.onViewHolderPopulated();
 
@@ -287,26 +331,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                     }
                 }
             });
-        }
-
-        if (friendlyMessage.getLikesCount() > 0) {
-            viewHolder.periscopeParent.setVisibility(View.VISIBLE);
-            //int count = friendlyMessage.getLikesCount() > mMaxPeriscopesPerItem ? mMaxPeriscopesPerItem : friendlyMessage.getLikesCount();
-            viewHolder.periscopeParent.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    int count = 5;
-                    for (int i = 0; i < count; i++) {
-                        viewHolder.periscopeLayout.addHeart();
-                    }
-                }
-            }, 500);
-            viewHolder.likesButton.setChecked(true);
-            viewHolder.likesCount.setText(" " + friendlyMessage.getLikesCount() + " ");
-
-        } else {
-            viewHolder.periscopeParent.setVisibility(View.GONE);
-            viewHolder.likesButton.setChecked(false);
         }
     }
 

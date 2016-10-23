@@ -211,9 +211,15 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
     }
 
     @Override
+    public void onBindViewHolder(VH viewHolder, int position, List<Object> payloads) {
+        T model = getItem(position);
+        populateViewHolder(viewHolder, model, position, payloads);
+    }
+
+    @Override
     public void onBindViewHolder(VH viewHolder, int position) {
         T model = getItem(position);
-        populateViewHolder(viewHolder, model, position);
+        populateViewHolder(viewHolder, model, position, null);
     }
 
     /**
@@ -227,7 +233,7 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
      * @param model      The object containing the data used to populate the view
      * @param position   The position in the list of the view being populated
      */
-    abstract protected void populateViewHolder(VH viewHolder, T model, int position);
+    abstract protected void populateViewHolder(VH viewHolder, T model, int position, List<Object> payloads);
 
     abstract protected boolean isNewItemAllowed(T model);
 

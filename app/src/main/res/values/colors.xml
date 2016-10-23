@@ -36,6 +36,8 @@
     <color name="light_turquoise">#71efc5</color>
 
     <!-- chat colors! these are very important -->
+    <color name="chat_like_button_inactive_state">#edeff1</color>
+    <color name="chat_like_button_active_state">#ed3d53</color>
     <color name="chat_background_screen_color">@android:color/white</color>
     <color name="chat_sender_username">@android:color/black</color>
     <color name="chat_time_message_sent">#a8a8a8</color>
