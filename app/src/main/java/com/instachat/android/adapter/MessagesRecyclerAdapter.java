@@ -267,14 +267,14 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         }
 
         /**
-         * Optimzation hack!!
+         * Optimization hack!!
          * If all I did, as a user, was click on the like button.
          * If that's the case, then update just that part and get out
          * because nothing else in the view has been altered.
          * See where notifyItemChanged(position,0) is called to see what
          * is going on there.
          */
-        if (payloads.size() != 0) {
+        if (payloads != null && payloads.size() != 0) {
             return;
         }
 
