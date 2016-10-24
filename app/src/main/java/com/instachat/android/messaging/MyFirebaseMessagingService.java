@@ -152,7 +152,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationCompat.Action replyAction =
                 new NotificationCompat.Action.Builder(
                         android.R.drawable.ic_dialog_email,
-                        "Reply", pendingIntent)
+                        getString(R.string.reply), pendingIntent)
                         .addRemoteInput(remoteInput)
                         .build();
 

@@ -83,7 +83,10 @@ Document differences between activity_main.xml here:
                         android:layout_width="@dimen/super_small_user_thumb_size"
                         android:layout_height="@dimen/super_small_user_thumb_size"
                         android:layout_marginLeft="16dp"
-                        android:src="@drawable/ic_anon_person_36dp"/>
+                        android:src="@drawable/ic_anon_person_36dp"
+                        app:civ_border_color="@color/colorPrimaryDark"
+                        app:civ_border_overlay="true"
+                        app:civ_border_width="1px"/>
 
                     <com.instachat.android.view.AnimatedDotLoadingView
                         android:id="@+id/text_dot_loader"

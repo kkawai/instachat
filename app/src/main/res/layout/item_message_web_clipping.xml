@@ -15,7 +15,10 @@
             android:id="@+id/messengerImageView"
             android:layout_width="@dimen/user_thumb_pic_size"
             android:layout_height="@dimen/user_thumb_pic_size"
-            android:transitionName="image"/>
+            android:transitionName="image"
+            app:civ_border_color="@color/colorPrimaryDark"
+            app:civ_border_overlay="true"
+            app:civ_border_width="2px"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -36,7 +39,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/chat_sender_username"
-                    android:textSize="14sp"
+                    android:textSize="@dimen/message_sender_name_size"
                     app:font="Lato-Bold.ttf"/>
 
                 <com.instachat.android.view.CustomFontTextView
@@ -46,7 +49,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_weight="0"
                     android:textColor="@color/chat_time_message_sent"
-                    android:textSize="13sp"
+                    android:textSize="@dimen/message_sent_time_ago_size"
                     app:font="Lato-Regular.ttf"/>
             </LinearLayout>
 
@@ -55,7 +58,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/chat_message_color"
-                android:textSize="15sp"
+                android:textSize="@dimen/message_text_size"
                 app:font="Lato-Italic.ttf"/>
         </LinearLayout>
 
@@ -82,7 +85,7 @@
                 android:layout_marginLeft="5dp"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:textSize="15sp"
+                android:textSize="@dimen/web_clipping_original_url_size"
                 app:font="Lato-Regular.ttf"/>
 
             <LinearLayout
@@ -129,7 +132,7 @@
                         android:maxLines="2"
                         android:paddingRight="@dimen/web_clipping_right_text_padding"
                         android:textColor="@color/chat_web_clipping_article_title"
-                        android:textSize="18sp"
+                        android:textSize="@dimen/web_clipping_article_title_size"
                         app:font="Lato-Bold.ttf"/>
 
                     <com.instachat.android.view.CustomFontTextView
@@ -140,7 +143,7 @@
                         android:maxLines="1"
                         android:paddingRight="@dimen/web_clipping_right_text_padding"
                         android:textColor="@color/chat_web_cliping_url"
-                        android:textSize="14sp"
+                        android:textSize="@dimen/web_clipping_short_url_size"
                         app:font="Lato-Regular.ttf"/>
 
                     <com.instachat.android.view.CustomFontTextView
@@ -150,7 +153,7 @@
                         android:ellipsize="end"
                         android:maxLines="5"
                         android:paddingRight="@dimen/web_clipping_right_text_padding"
-                        android:textSize="16sp"
+                        android:textSize="@dimen/web_clipping_short_description_size"
                         app:font="Lato-BoldItalic.ttf"/>
                 </LinearLayout>
             </LinearLayout>
@@ -178,7 +181,7 @@
                 android:layout_marginBottom="10dp"
                 android:text=" 12 "
                 android:textColor="@color/chat_likes_count"
-                android:textSize="13sp"
+                android:textSize="@dimen/message_likes_counter_size"
                 android:textStyle="bold"
                 app:font="Lato-Bold.ttf"/>
         </FrameLayout>
