@@ -97,7 +97,7 @@ import java.util.Map;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class GroupChatActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener, FriendlyMessageContainer, EasyPermissions.PermissionCallbacks, UploadListener, UserClickedListener, ChatTypingHelper.UserTypingListener, ChatsItemClickedListener, FriendlyMessageListener {
+public class GroupChatActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener, FriendlyMessageContainer, EasyPermissions.PermissionCallbacks, UploadListener, UserClickedListener, ChatsItemClickedListener, FriendlyMessageListener {
 
     private static final String TAG = "GroupChatActivity";
 
@@ -274,7 +274,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private long prevInputTime;
     private int prevInputCount;
 
-    void onMeEnteringText() {
+    protected void onMeEnteringText() {
 
     }
 
@@ -1149,8 +1149,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 .addToBackStack(null).commit();*/
     }
 
-    @Override
-    public void onRemoteUserTyping(int userid) {
+    protected void onRemoteUserTyping(int userid) {
         if (isActivityDestroyed()) {
             return;
         }

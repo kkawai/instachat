@@ -61,7 +61,6 @@ public class PrivateChatActivity extends GroupChatActivity {
     private User mToUser;
     private static boolean sIsActive;
     private static int sToUserid;
-    private ChatTypingHelper mTypingHelper;
     private long mLastTypingTime;
     private ValueEventListener mUserInfoValueEventListener = null;
     private FirebaseRemoteConfig mConfig;
@@ -211,6 +210,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         //findViewById(R.id.toolbar).setOnClickListener(appBarOnClickListener);
         //bio.setOnClickListener(appBarOnClickListener);
         //profilePic.setOnClickListener(appBarOnClickListener);
+        listenForPartnerTyping();
     }
 
     private void checkIfSeenToolbarProfileTooltip(View anchor) {
@@ -277,17 +277,12 @@ public class PrivateChatActivity extends GroupChatActivity {
     public void onResume() {
         sIsActive = true;
         super.onResume();
-        mTypingHelper = new ChatTypingHelper();
-        mTypingHelper.setListener(this);
-        mTypingHelper.register();
     }
 
     @Override
     public void onPause() {
         sIsActive = false;
         super.onPause();
-        if (mTypingHelper != null)
-            mTypingHelper.unregister();
     }
 
     @Override
@@ -298,6 +293,9 @@ public class PrivateChatActivity extends GroupChatActivity {
             } catch (Exception e) {
                 MLog.e(TAG, "", e);
             }
+        }
+        if (mTypingValueEventListener != null && mTypingReference != null) {
+            mTypingReference.removeEventListener(mTypingValueEventListener);
         }
         super.onDestroy();
     }
@@ -311,13 +309,6 @@ public class PrivateChatActivity extends GroupChatActivity {
     @Override
     public void onFriendlyMessageSuccess(FriendlyMessage friendlyMessage) {
         super.onFriendlyMessageSuccess(friendlyMessage);
-        try {
-            JSONObject o = friendlyMessage.toLightweightJSONObject();
-            NetworkApi.gcmsend("" + mToUser.getId(), Constants.GcmMessageType.msg, o);
-        } catch (Exception e) {
-            MLog.e(TAG, "onFriendlyMessageSent() failed", e);
-            Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, "3"), Toast.LENGTH_SHORT).show();
-        }
         if (mIsAppBarExpanded) {
             final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
             appBarLayout.setExpanded(false, true);
@@ -326,14 +317,12 @@ public class PrivateChatActivity extends GroupChatActivity {
     }
 
     @Override
-    void onMeEnteringText() {
+    protected void onMeEnteringText() {
         try {
             if (System.currentTimeMillis() - mLastTypingTime < 3000) {
                 return;
             }
-            JSONObject o = new JSONObject();
-            o.put(Constants.KEY_USERID, myUserid());
-            NetworkApi.gcmsend("" + mToUser.getId(), Constants.GcmMessageType.typing, o);
+            FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHAT_TYPING_REF(sToUserid)).child("" + myUserid()).child("isTyping").setValue(true);
             mLastTypingTime = System.currentTimeMillis();
         } catch (Exception e) {
             MLog.e(TAG, "onMeEnteringText() failed", e);
@@ -391,11 +380,11 @@ public class PrivateChatActivity extends GroupChatActivity {
     }
 
     @Override
-    public void onRemoteUserTyping(int userid) {
-        if (!sIsActive || sToUserid != userid || isActivityDestroyed()) {
+    protected void onRemoteUserTyping(int userid) {
+        if (!sIsActive || sToUserid != userid) {
             return;
         }
-        showTypingDots();
+        super.onRemoteUserTyping(userid);
     }
 
     private void populateUserProfile() {
@@ -594,5 +583,41 @@ public class PrivateChatActivity extends GroupChatActivity {
             return;
         }
         super.onGroupChatClicked(groupChatSummary);
+    }
+
+    private DatabaseReference mTypingReference;
+    private ValueEventListener mTypingValueEventListener;
+
+    private void listenForPartnerTyping() {
+        mTypingReference = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHAT_TYPING_REF(sToUserid)).
+                child("" + sToUserid).child("isTyping");
+        mTypingReference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                mTypingValueEventListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (isActivityDestroyed())
+                            return;
+                        MLog.d(TAG, "isTyping: onDataChange() dataSnapshot ", dataSnapshot);
+                        if (dataSnapshot.exists()) {
+                            boolean isTyping = dataSnapshot.getValue(Boolean.class);
+                            MLog.d(TAG, "isTyping: ", isTyping);
+                            if (isTyping) {
+                                onRemoteUserTyping(sToUserid);
+                                mTypingReference.setValue(false);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                };
+                mTypingReference.addValueEventListener(mTypingValueEventListener);
+            }
+        });
+
     }
 }

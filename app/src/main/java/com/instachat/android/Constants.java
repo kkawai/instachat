@@ -164,6 +164,11 @@ public final class Constants {
         return "/directs/" + (toUserid > myUserid ? (myUserid + "_" + toUserid) : (toUserid + "_" + myUserid));
     }
 
+    public static String PRIVATE_CHAT_TYPING_REF(int toUserid) {
+        final int myUserid = Preferences.getInstance().getUserId();
+        return "/direct_typing/" + (toUserid > myUserid ? (myUserid + "_" + toUserid) : (toUserid + "_" + myUserid));
+    }
+
     public static String MY_PRIVATE_CHATS_SUMMARY_PARENT_REF() {
         return "/users/" + Preferences.getInstance().getUserId() + "/private_summaries/";
     }
