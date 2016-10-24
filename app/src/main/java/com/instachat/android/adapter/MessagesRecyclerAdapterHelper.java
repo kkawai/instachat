@@ -10,10 +10,10 @@ import java.util.Map;
  * <p>
  */
 @AppSingleton
-class MessagesRecyclerAdapterHelper {
+public class MessagesRecyclerAdapterHelper {
     private final Map<String, Integer> mConsumedLikesMap = new Hashtable<>(1000);
 
-    Map<String, Integer> getConsumedLikesMap() {
+    public Map<String, Integer> getConsumedLikesMap() {
         return mConsumedLikesMap;
     }
 }

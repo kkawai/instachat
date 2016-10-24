@@ -11,6 +11,7 @@ import com.ath.fuel.FuelInjector;
 import com.ath.fuel.FuelModule;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.instachat.android.adapter.MessagesRecyclerAdapterHelper;
 import com.instachat.android.util.BitmapLruCache;
 import com.instachat.android.util.HttpMessage;
 import com.instachat.android.util.MLog;
@@ -30,6 +31,8 @@ public class MyApp extends MultiDexApplication {
     public static double lat;
     public static double lon;
 
+    private MessagesRecyclerAdapterHelper mMessagesRecyclerAdapterHelper = new MessagesRecyclerAdapterHelper();
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -42,6 +45,7 @@ public class MyApp extends MultiDexApplication {
         initAdm();
         initGcm();
         initVolley();
+        mMessagesRecyclerAdapterHelper = new MessagesRecyclerAdapterHelper();
     }
 
     public static MyApp getInstance() {
@@ -85,5 +89,9 @@ public class MyApp extends MultiDexApplication {
         this.mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache(
                 maxCacheSize));
 
+    }
+
+    public MessagesRecyclerAdapterHelper getMap() {
+        return mMessagesRecyclerAdapterHelper;
     }
 }

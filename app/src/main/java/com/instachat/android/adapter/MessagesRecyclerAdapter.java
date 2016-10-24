@@ -75,11 +75,9 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private String mDatabaseRef;
     private FrameLayout mEntireScreenFrameLayout;
     private int mMaxPeriscopesPerItem;
-    private Lazy<MessagesRecyclerAdapterHelper> messagesRecyclerAdapterHelper = Lazy.attain(this, MessagesRecyclerAdapterHelper.class);
 
     public MessagesRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref) {
         super(modelClass, modelLayout, viewHolderClass, ref);
-        FuelInjector.ignite(MyApp.getInstance(), this);
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
         listenForBlockedUsers();
@@ -93,6 +91,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     public void setActivity(@NonNull Activity activity,
                             @NonNull ActivityState activityState,
                             @NonNull FrameLayout entireScreenLayout) {
+        FuelInjector.ignite(activity, this);
         mActivity = new WeakReference<>(activity);
         mActivityState = activityState;
         mEntireScreenFrameLayout = entireScreenLayout;
@@ -246,8 +245,8 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
         if (friendlyMessage.getLikes() > 0) {
             viewHolder.periscopeParent.setVisibility(View.VISIBLE);
-            final int consumedLikes = messagesRecyclerAdapterHelper.get().getConsumedLikesMap().containsKey(friendlyMessage.getId()) ?
-                    messagesRecyclerAdapterHelper.get().getConsumedLikesMap().get(friendlyMessage.getId()) : 0;
+            final int consumedLikes = MyApp.getInstance().getMap().getConsumedLikesMap().containsKey(friendlyMessage.getId()) ?
+                    MyApp.getInstance().getMap().getConsumedLikesMap().get(friendlyMessage.getId()) : 0;
             final int likesToDisplay = friendlyMessage.getLikes() - consumedLikes;
             final int count = likesToDisplay > mMaxPeriscopesPerItem ? mMaxPeriscopesPerItem : likesToDisplay;
             if (count > 0) { //only show likes periscope for likes that have not been consumed yet
@@ -260,7 +259,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                         for (int i = 0; i < count; i++) {
                             viewHolder.periscopeLayout.addHeart();
                         }
-                        messagesRecyclerAdapterHelper.get().getConsumedLikesMap().put(friendlyMessage.getId(), friendlyMessage.getLikes());
+                        MyApp.getInstance().getMap().getConsumedLikesMap().put(friendlyMessage.getId(), friendlyMessage.getLikes());
                     }
                 }, 500);
             } else {
