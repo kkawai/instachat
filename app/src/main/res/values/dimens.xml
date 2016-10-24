@@ -10,7 +10,11 @@
     <dimen name="super_small_user_thumb_size">26dp</dimen>
     <dimen name="web_clipping_image_size">100dp</dimen>
     <dimen name="posted_photo_size">250dp</dimen>
+    <!-- if likes_button_size is decreased, then you must also decrease likes_count_bottom_margin -->
+    <!-- and the same for increase; the two views are interrelated -->
     <dimen name="likes_button_size">26dp</dimen>
+    <dimen name="likes_count_bottom_margin">5dp</dimen>
+    <dimen name="periscope_width">40dp</dimen>
     <dimen name="nav_header_profile_pic_size">72dp</dimen>
     <dimen name="web_clipping_right_text_padding">30dp</dimen>
 

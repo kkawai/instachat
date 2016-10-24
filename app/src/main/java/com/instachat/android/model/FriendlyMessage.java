@@ -46,7 +46,7 @@ public class FriendlyMessage implements Parcelable {
         if (getDpid() != null)
             map.put("profilePicUrl", getDpid());
         map.put("id", getUserid());
-        map.put("likes",1);
+        map.put("likes", 1);
         return map;
     }
 

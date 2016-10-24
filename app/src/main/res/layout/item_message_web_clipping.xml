@@ -165,11 +165,11 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="end|bottom"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="10dp">
 
             <com.instachat.android.view.PeriscopeLayout
                 android:id="@+id/periscope"
-                android:layout_width="40dp"
+                android:layout_width="@dimen/periscope_width"
                 android:layout_height="match_parent"
                 />
 
@@ -178,7 +178,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center_horizontal"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="@dimen/likes_count_bottom_margin"
                 android:text=" 12 "
                 android:textColor="@color/chat_likes_count"
                 android:textSize="@dimen/message_likes_counter_size"
@@ -188,10 +188,10 @@
 
         <com.sackcentury.shinebuttonlib.ShineButton
             android:id="@+id/likeButton"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="@dimen/likes_button_size"
+            android:layout_height="@dimen/likes_button_size"
             android:layout_gravity="end|bottom"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="10dp"
             android:src="@color/chat_like_button_inactive_state"
             app:allow_random_color="false"
             app:big_shine_color="@color/chat_like_button_active_state"

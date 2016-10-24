@@ -91,8 +91,9 @@
 
             <com.instachat.android.view.PeriscopeLayout
                 android:id="@+id/periscope"
-                android:layout_width="40dp"
+                android:layout_width="@dimen/periscope_width"
                 android:layout_height="match_parent"
+                android:layout_gravity="bottom|center_horizontal"
                 />
 
             <com.instachat.android.view.CustomFontTextView
@@ -100,7 +101,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center_horizontal"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="@dimen/likes_count_bottom_margin"
                 android:textColor="@color/chat_likes_count"
                 android:textSize="@dimen/message_likes_counter_size"
                 android:textStyle="bold"

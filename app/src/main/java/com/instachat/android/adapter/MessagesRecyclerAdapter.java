@@ -17,6 +17,8 @@ import android.webkit.URLUtil;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.ath.fuel.FuelInjector;
+import com.ath.fuel.Lazy;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -32,6 +34,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.instachat.android.ActivityState;
 import com.instachat.android.Constants;
+import com.instachat.android.MyApp;
 import com.instachat.android.R;
 import com.instachat.android.blocks.BlockUserDialogHelper;
 import com.instachat.android.blocks.BlockedUser;
@@ -72,9 +75,11 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private String mDatabaseRef;
     private FrameLayout mEntireScreenFrameLayout;
     private int mMaxPeriscopesPerItem;
+    private Lazy<MessagesRecyclerAdapterHelper> messagesRecyclerAdapterHelper = Lazy.attain(this, MessagesRecyclerAdapterHelper.class);
 
     public MessagesRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref) {
         super(modelClass, modelLayout, viewHolderClass, ref);
+        FuelInjector.ignite(MyApp.getInstance(), this);
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
         listenForBlockedUsers();
@@ -241,17 +246,26 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
         if (friendlyMessage.getLikes() > 0) {
             viewHolder.periscopeParent.setVisibility(View.VISIBLE);
-            final int count = friendlyMessage.getLikes() > mMaxPeriscopesPerItem ? mMaxPeriscopesPerItem : friendlyMessage.getLikes();
-            viewHolder.periscopeParent.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (mActivityState == null || mActivityState.isActivityDestroyed())
-                        return;
-                    for (int i = 0; i < count; i++) {
-                        viewHolder.periscopeLayout.addHeart();
+            final int consumedLikes = messagesRecyclerAdapterHelper.get().getConsumedLikesMap().containsKey(friendlyMessage.getId()) ?
+                    messagesRecyclerAdapterHelper.get().getConsumedLikesMap().get(friendlyMessage.getId()) : 0;
+            final int likesToDisplay = friendlyMessage.getLikes() - consumedLikes;
+            final int count = likesToDisplay > mMaxPeriscopesPerItem ? mMaxPeriscopesPerItem : likesToDisplay;
+            if (count > 0) { //only show likes periscope for likes that have not been consumed yet
+                viewHolder.periscopeLayout.setVisibility(View.VISIBLE);
+                viewHolder.periscopeParent.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mActivityState == null || mActivityState.isActivityDestroyed())
+                            return;
+                        for (int i = 0; i < count; i++) {
+                            viewHolder.periscopeLayout.addHeart();
+                        }
+                        messagesRecyclerAdapterHelper.get().getConsumedLikesMap().put(friendlyMessage.getId(), friendlyMessage.getLikes());
                     }
-                }
-            }, 500);
+                }, 500);
+            } else {
+                viewHolder.periscopeLayout.setVisibility(View.INVISIBLE);
+            }
             viewHolder.likesButton.setChecked(false);
             viewHolder.likesButton.setBtnColor(viewHolder.likesButton.getContext().getResources().getColor(R.color.chat_like_button_active_state));
             viewHolder.likesCount.setText(" " + friendlyMessage.getLikes() + " ");
