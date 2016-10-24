@@ -77,7 +77,7 @@
                         android:layout_width="@dimen/super_small_user_thumb_size"
                         android:layout_height="@dimen/super_small_user_thumb_size"
                         android:layout_marginLeft="16dp"
-                        android:src="@drawable/ic_account_circle_black_36dp"/>
+                        android:src="@drawable/ic_anon_person_36dp"/>
 
                     <com.instachat.android.view.AnimatedDotLoadingView
                         android:id="@+id/text_dot_loader"

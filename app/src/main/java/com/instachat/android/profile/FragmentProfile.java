@@ -69,7 +69,7 @@ public class FragmentProfile extends BaseFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ANONYMOUS_USER_DRAWABLE_RES_ID = R.drawable.ic_person_black_48dp;
+        ANONYMOUS_USER_DRAWABLE_RES_ID = R.drawable.ic_anon_person_48dp;
         final FriendlyMessage friendlyMessage = getArguments().getParcelable(Constants.KEY_FRIENDLY_MESSAGE);
         setupToolbar(friendlyMessage.getName());
         ((TextView) getView().findViewById(R.id.username)).setText(enrichUsername(friendlyMessage.getName()));

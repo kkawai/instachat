@@ -106,18 +106,43 @@ public class PrivateChatActivity extends GroupChatActivity {
                     mUserInfoValueEventListener = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(sToUserid)).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (isActivityDestroyed())
+                                return;
                             try {
                                 if (dataSnapshot.getValue() != null) {
                                     User user = dataSnapshot.getValue(User.class);
-                                    mToUser.setProfilePicUrl(user.getProfilePicUrl());
-                                    mToUser.setBio(user.getBio());
-                                    mToUser.setUsername(user.getUsername());
-                                    mToUser.setCurrentGroupName(user.getCurrentGroupName());
-                                    mToUser.setCurrentGroupId(user.getCurrentGroupId());
+
+                                    //check if only the last active time changed
+                                    boolean onlyUpdateLastActiveTime = true;
+                                    if (!mToUser.getUsername().equals(user.getUsername())) {
+                                        onlyUpdateLastActiveTime = false;
+                                        mToUser.setUsername(user.getUsername());
+                                    }
+                                    if (!mToUser.getProfilePicUrl().equals(user.getProfilePicUrl())) {
+                                        onlyUpdateLastActiveTime = false;
+                                        mToUser.setProfilePicUrl(user.getProfilePicUrl());
+                                    }
+                                    String existingBio = mToUser.getBio() + "";
+                                    String newBio = user.getBio() + "";
+                                    if (!existingBio.equals(newBio)) {
+                                        onlyUpdateLastActiveTime = false;
+                                        mToUser.setBio(user.getBio());
+                                    }
+
+                                    if (mToUser.getCurrentGroupId() != user.getCurrentGroupId()) {
+                                        onlyUpdateLastActiveTime = false;
+                                        mToUser.setCurrentGroupName(user.getCurrentGroupName());
+                                        mToUser.setCurrentGroupId(user.getCurrentGroupId());
+                                    }
                                     setCustomTitles(user.getUsername(), user.getLastOnline());
-                                    populateUserProfile();
+                                    if (!onlyUpdateLastActiveTime) {
+                                        populateUserProfile();
+                                    }
+                                    MLog.d(TAG, "user info changed onlyUpdateLastActiveTime: ", onlyUpdateLastActiveTime);
+
                                 }
                             } catch (Exception e) {
+                                MLog.e(TAG, "", e);
                             }
                         }
 
@@ -385,14 +410,14 @@ public class PrivateChatActivity extends GroupChatActivity {
                 if (isActivityDestroyed())
                     return;
                 if (!task.isSuccessful()) {
-                    miniPic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                    miniPic.setImageResource(R.drawable.ic_anon_person_36dp);
                     collapseAppbarAfterDelay();
                     return;
                 }
                 try {
                     Glide.with(PrivateChatActivity.this)
                             .load(task.getResult().toString())
-                            .error(R.drawable.ic_account_circle_black_36dp)
+                            .error(R.drawable.ic_anon_person_36dp)
                             .crossFade()
                             .listener(new RequestListener<String, GlideDrawable>() {
                                 @Override
@@ -414,19 +439,19 @@ public class PrivateChatActivity extends GroupChatActivity {
                             .into(profilePic);
                     Glide.with(PrivateChatActivity.this)
                             .load(task.getResult().toString())
-                            .error(R.drawable.ic_account_circle_black_36dp)
+                            .error(R.drawable.ic_anon_person_36dp)
                             .crossFade()
                             .into(miniPic);
                     Glide.with(PrivateChatActivity.this)
                             .load(task.getResult().toString())
-                            .error(R.drawable.ic_account_circle_black_36dp)
+                            .error(R.drawable.ic_anon_person_36dp)
                             .crossFade()
                             .into(toolbarProfileImageView);
 
 
                 } catch (Exception e) {
                     MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
-                    miniPic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                    miniPic.setImageResource(R.drawable.ic_anon_person_36dp);
                     collapseAppbarAfterDelay();
                 }
             }

@@ -159,16 +159,16 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
                     return;
                 try {
                     if (!task.isSuccessful()) {
-                        groupChatUserViewHolder.userPic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                        groupChatUserViewHolder.userPic.setImageResource(R.drawable.ic_anon_person_36dp);
                         return;
                     }
                     Glide.with(mActivity.get()).
                             load(task.getResult().toString()).
-                            error(R.drawable.ic_account_circle_black_36dp).
+                            error(R.drawable.ic_anon_person_36dp).
                             into(groupChatUserViewHolder.userPic);
                 } catch (final Exception e) {
                     MLog.e(TAG, "Constants.DP_URL user dp doesn't exist in google cloud storage.  task: " + task.isSuccessful());
-                    groupChatUserViewHolder.userPic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                    groupChatUserViewHolder.userPic.setImageResource(R.drawable.ic_anon_person_36dp);
                 }
             }
         });

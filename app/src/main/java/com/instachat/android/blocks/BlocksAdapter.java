@@ -68,7 +68,7 @@ public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends 
         viewHolder.username.setText(model.getName());
         viewHolder.username.setTextColor(mActivity.getResources().getColor(android.R.color.black));
         if (TextUtils.isEmpty(model.dpid)) {
-            viewHolder.userPic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+            viewHolder.userPic.setImageResource(R.drawable.ic_anon_person_36dp);
             return;
         }
         Constants.DP_URL(model.id, model.getDpid(), new OnCompleteListener<Uri>() {
@@ -82,11 +82,11 @@ public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends 
                     }
                     Glide.with(mActivity).
                             load(task.getResult().toString()).
-                            error(R.drawable.ic_account_circle_black_36dp).
+                            error(R.drawable.ic_anon_person_36dp).
                             into(viewHolder.userPic);
                 } catch (final Exception e) {
                     MLog.e(TAG, "Constants.DP_URL failed to get pic from storage.  task: " + task.isSuccessful(), e);
-                    viewHolder.userPic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                    viewHolder.userPic.setImageResource(R.drawable.ic_anon_person_36dp);
                 }
             }
         });

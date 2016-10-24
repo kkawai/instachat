@@ -15,7 +15,6 @@
             android:id="@+id/messengerImageView"
             android:layout_width="@dimen/user_thumb_pic_size"
             android:layout_height="@dimen/user_thumb_pic_size"
-            android:src="@drawable/ic_account_circle_black_36dp"
             android:transitionName="image"/>
 
         <LinearLayout

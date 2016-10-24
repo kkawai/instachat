@@ -72,17 +72,17 @@ public class LeftDrawerHelper {
                 }
                 try {
                     if (!task.isSuccessful()) {
-                        navpic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                        navpic.setImageResource(R.drawable.ic_anon_person_36dp);
                         return;
                     }
                     Glide.with(mActivity)
                             .load(task.getResult().toString())
-                            .error(R.drawable.ic_account_circle_black_36dp)
+                            .error(R.drawable.ic_anon_person_36dp)
                             .crossFade()
                             .into(navpic);
                 } catch (Exception e) {
                     MLog.e(TAG, "DP_URL failed", e);
-                    navpic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                    navpic.setImageResource(R.drawable.ic_anon_person_36dp);
                 }
             }
         });
@@ -102,18 +102,18 @@ public class LeftDrawerHelper {
                 if (mActivityState == null || mActivityState.isActivityDestroyed())
                     return;
                 if (!task.isSuccessful()) {
-                    navpic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                    navpic.setImageResource(R.drawable.ic_anon_person_36dp);
                     return;
                 }
                 try {
                     Glide.with(mActivity)
                             .load(task.getResult().toString())
-                            .error(R.drawable.ic_account_circle_black_36dp)
+                            .error(R.drawable.ic_anon_person_36dp)
                             .crossFade()
                             .into(navpic);
                 } catch (Exception e) {
                     MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
-                    navpic.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                    navpic.setImageResource(R.drawable.ic_anon_person_36dp);
                 }
                 checkForRemoteUpdatesToMyDP();
             }
@@ -362,7 +362,7 @@ public class LeftDrawerHelper {
                                         try {
                                             Glide.with(mActivity)
                                                     .load(task.getResult().toString())
-                                                    .error(R.drawable.ic_account_circle_black_36dp)
+                                                    .error(R.drawable.ic_anon_person_36dp)
                                                     .crossFade()
                                                     .into(navpic);
                                         } catch (Exception e) {

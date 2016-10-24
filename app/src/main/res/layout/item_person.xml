@@ -16,7 +16,7 @@
             android:id="@+id/userPic"
             android:layout_width="@dimen/user_thumb_pic_size"
             android:layout_height="@dimen/user_thumb_pic_size"
-            android:src="@drawable/ic_account_circle_black_36dp"
+            android:src="@drawable/ic_anon_person_36dp"
             android:transitionName="image"/>
 
         <com.instachat.android.view.CustomFontTextView

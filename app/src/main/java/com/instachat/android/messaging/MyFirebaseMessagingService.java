@@ -168,7 +168,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // Large icon appears on the left of the notification
         if (bitmap == null) {
-            builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_account_circle_black_36dp));
+            builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_anon_person_36dp));
         } else {
             builder.setLargeIcon(bitmap);
         }
