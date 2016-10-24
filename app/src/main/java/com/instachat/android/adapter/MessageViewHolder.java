@@ -31,7 +31,6 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
     /*
      * Web link content
      */
-    public TextView webLinkContent;
     public ImageView webLinkImageView;
     public TextView webLinkTitle;
     public TextView webLinkUrl;
@@ -53,7 +52,6 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         likesCount = (TextView) itemView.findViewById(R.id.likes);
 
         webLinkParent = itemView.findViewById(R.id.web_clipping_parent);
-        webLinkContent = (TextView) itemView.findViewById(R.id.web_clipping_orginal_url);
         webLinkImageView = (ImageView) itemView.findViewById(R.id.image_post);
         webLinkTitle = (TextView) itemView.findViewById(R.id.title);
         webLinkUrl = (TextView) itemView.findViewById(R.id.url);

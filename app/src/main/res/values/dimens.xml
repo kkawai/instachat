@@ -8,7 +8,7 @@
     <dimen name="user_thumb_pic_size">48dp</dimen>
     <dimen name="user_thumb_pic_in_titlebar_size">36dp</dimen>
     <dimen name="super_small_user_thumb_size">26dp</dimen>
-    <dimen name="web_clipping_image_size">100dp</dimen>
+    <dimen name="web_clipping_image_size">72dp</dimen>
     <dimen name="posted_photo_size">250dp</dimen>
     <!-- if likes_button_size is decreased, then you must also decrease likes_count_bottom_margin -->
     <!-- and the same for increase; the two views are interrelated -->
@@ -19,14 +19,14 @@
     <dimen name="web_clipping_right_text_padding">30dp</dimen>
 
     <!-- text sizes in SP -->
-    <dimen name="message_sender_name_size">14sp</dimen>
+    <dimen name="message_sender_name_size">15sp</dimen>
     <dimen name="message_sent_time_ago_size">13sp</dimen>
-    <dimen name="message_text_size">15sp</dimen>
+    <dimen name="message_text_size">17sp</dimen>
     <dimen name="message_likes_counter_size">13sp</dimen>
     <dimen name="web_clipping_original_url_size">15sp</dimen>
-    <dimen name="web_clipping_article_title_size">18sp</dimen>
-    <dimen name="web_clipping_short_url_size">14sp</dimen>
-    <dimen name="web_clipping_short_description_size">16sp</dimen>
+    <dimen name="web_clipping_article_title_size">17sp</dimen>
+    <dimen name="web_clipping_short_url_size">13sp</dimen>
+    <dimen name="web_clipping_short_description_size">15sp</dimen>
 
     <!-- fragment profile -->
     <dimen name="fragment_profile_pic_size">220dp</dimen>
@@ -38,6 +38,7 @@
     <dimen name="private_activity_profile_pic_size">200dp</dimen>
 
     <!-- posted photos -->
+    <dimen name="posted_photo_rounded_corner_reverse_padding">-6dp</dimen>
     <dimen name="posted_photo_rounded_corner_padding">6dp</dimen>
     <dimen name="posted_photo_rounded_corner_radius">18dp</dimen>
 

@@ -24,7 +24,7 @@ public class WebLinkHelper {
     }
 
     public void populateWebLinkPost(final MessageViewHolder viewHolder, final FriendlyMessage friendlyMessage, int position) {
-        viewHolder.messageTextView.setText(R.string.fetching_web_clipping);
+        //viewHolder.messageTextView.setText(R.string.fetching_web_clipping);
         LinkPreviewCallback callback = new LinkPreviewCallback() {
             @Override
             public void onPre() {
@@ -39,11 +39,10 @@ public class WebLinkHelper {
                 rss.setTitle(sourceContent.getTitle());
                 rss.setBasicLink(sourceContent.getCannonicalUrl());
                 rss.setLink(friendlyMessage.getText().trim());
-                viewHolder.messageTextView.setText(R.string.web_clipping);
+                //viewHolder.messageTextView.setText(R.string.web_clipping);
                 viewHolder.webLinkDescription.setText(sourceContent.getDescription() + "");
                 viewHolder.webLinkTitle.setText(sourceContent.getTitle() + "");
                 viewHolder.webLinkUrl.setText(sourceContent.getCannonicalUrl() + "");
-                viewHolder.webLinkContent.setText(friendlyMessage.getText().trim());
                 if (sourceContent.getImages().size() > 0) {
                     Glide.with(MyApp.getInstance()).load(sourceContent.getImages().get(0)).into(viewHolder.webLinkImageView);
                     rss.setImageUrl(sourceContent.getImages().get(0));
@@ -55,11 +54,10 @@ public class WebLinkHelper {
 
         Rss rss = RssDb.getInstance().getRssByLink(friendlyMessage.getText().trim());
         if (rss != null) {
-            viewHolder.messageTextView.setText(R.string.web_clipping);
+            //viewHolder.messageTextView.setText(R.string.web_clipping);
             viewHolder.webLinkDescription.setText(rss.getDescr() + "");
             viewHolder.webLinkTitle.setText(rss.getTitle() + "");
             viewHolder.webLinkUrl.setText(rss.getBasicLink() + "");
-            viewHolder.webLinkContent.setText(rss.getLink() + "");
             if (rss.getImageUrl() != null && rss.getImageUrl().toLowerCase().startsWith("http")) {
                 Glide.with(MyApp.getInstance()).load(rss.getImageUrl()).into(viewHolder.webLinkImageView);
             }

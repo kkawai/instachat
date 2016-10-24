@@ -18,7 +18,6 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.ath.fuel.FuelInjector;
-import com.ath.fuel.Lazy;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -270,7 +269,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             viewHolder.likesCount.setText(" " + friendlyMessage.getLikes() + " ");
 
         } else {
-            viewHolder.periscopeParent.setVisibility(View.GONE);
+            viewHolder.periscopeParent.setVisibility(View.INVISIBLE);
             viewHolder.likesButton.setBtnColor(viewHolder.likesButton.getContext().getResources().getColor(R.color.chat_like_button_inactive_state));
             viewHolder.likesButton.setChecked(false);
         }
