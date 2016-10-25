@@ -3,72 +3,83 @@
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="@dimen/left_drawer_header_height"
-              android:gravity="bottom"
               android:orientation="vertical"
-              android:padding="16dp"
               android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <LinearLayout
+    <EditText
+        android:id="@+id/nav_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:inputType="none"
+        android:maxLength="@integer/max_username_length"
+        android:textColor="@android:color/white"
+        android:textSize="15sp"
+        android:textStyle="bold"/>
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/nav_pic"
+        android:layout_width="@dimen/nav_header_profile_pic_size"
+        android:layout_height="@dimen/nav_header_profile_pic_size"
+        android:layout_gravity="center_horizontal"
+        app:civ_border_color="@android:color/white"
+        app:civ_border_overlay="true"
+        app:civ_border_width="2px"/>
+
+    <EditText
+        android:id="@+id/input_bio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:inputType="textMultiLine|text"
+        android:textAlignment="center"
+        android:lines="2"
+        android:maxLength="@integer/max_bio"
+        android:maxLines="2"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"/>
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/nav_pic"
-            android:layout_width="@dimen/nav_header_profile_pic_size"
-            android:layout_height="@dimen/nav_header_profile_pic_size"
-            android:layout_marginBottom="10dp"
-            app:civ_border_color="@android:color/white"
-            app:civ_border_overlay="true"
-            app:civ_border_width="2px"/>
-
-        <Button
-            android:id="@+id/edit_bio"
-            android:layout_width="40dp"
-            android:layout_height="32dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="16dp"
-            android:background="@drawable/rounded_white_trim_red_background"
-            android:text="@string/bio"
-            android:visibility="invisible"
-            />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/nav_username"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:inputType="textFilter"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textSize="15sp"/>
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="0"
+                android:textSize="17sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="HEARTS"
+                android:textSize="17sp"/>
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/save_username"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="8dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginRight="8dp"
             android:background="@drawable/rounded_white_trim_red_background"
             android:text="@string/save_username"
-            android:visibility="invisible"
-            />
+            android:visibility="visible"/>
 
-    </LinearLayout>
-
-
-    <com.instachat.android.view.CustomFontTextView
-        android:id="@+id/nav_email"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="15sp"
-        app:font="Lato-Regular.ttf"/>
+    </FrameLayout>
 
 </LinearLayout>

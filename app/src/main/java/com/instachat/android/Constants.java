@@ -14,12 +14,14 @@ public final class Constants {
 
     private Constants() {
     }
+
     public static final int MAX_USERNAME_LENGTH = 30;
     public static final int MIN_USERNAME_LENGTH = 2;
     public static final int MAX_EMAIL_LENGTH = 128;
     public static final int MIN_EMAIL_LENGTH = 5;
     public static final int MAX_PASSWORD_LENGTH = 10;
     public static final int MIN_PASSWORD_LENGTH = 4;
+    public static final int MAX_BIO_LENGTH = 512;
 
     //remote configuration with default values
     public static final int DEFAULT_MAX_MESSAGE_HISTORY = 1000;
@@ -184,6 +186,8 @@ public final class Constants {
     public static String GROUP_CHAT_USERS_REF(long groupid) {
         return "/public_group_users/" + groupid;
     }
+
+    public static String PUBLIC_CHATS_TYPING_PARENT_REF = "/public_group_typing/";
 
     public static String PUBLIC_CHATS_SUMMARY_PARENT_REF = "/public_group_summaries/";
 

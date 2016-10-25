@@ -41,6 +41,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/profile_pic"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     android:layout_centerHorizontal="true"
                     android:autoLink="web|map|email|phone"
                     android:maxLines="3"
@@ -48,6 +50,7 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                     android:textSize="15sp"
                     app:font="Lato-Regular.ttf"
+                    android:scrollbars="none"
                     />
 
                 <LinearLayout

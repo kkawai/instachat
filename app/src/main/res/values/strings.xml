@@ -59,6 +59,8 @@
     <string name="error_send_photo">Sorry, could not upload photo. Please try again.</string>
     <string name="is_your_new_username">%s is your new username</string>
     <string name="username_changed_dialog_title">Username Changed!</string>
+    <string name="your_profile_has_been_updated_title">Saved!</string>
+    <string name="your_profile_has_been_updated_msg">Your profile has been saved</string>
     <string name="title_update_my_pic">Update My Photo</string>
     <string name="sent_via">Sent via %s</string>
 
@@ -134,4 +136,6 @@
     <string name="user_active_in_group">Active in %s</string>
     <string name="web_clipping">Web Clipping:</string>
     <string name="fetching_web_clipping">Fetching web clipping...</string>
+
+    <string name="default_bio">Hey there!  I am using %s  Send me a message on here!</string>
 </resources>
