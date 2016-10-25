@@ -319,6 +319,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             }
         }
 
+        viewHolder.messengerImageView.setImageDrawable(null);
         if (TextUtils.isEmpty(friendlyMessage.getName())) {
             viewHolder.messengerImageView.setVisibility(View.GONE);
         } else {
