@@ -27,6 +27,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.RejectedExecutionException;
 
 /**
  * Created by kevin on 9/26/2016.
@@ -152,26 +153,28 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
         User user = data.get(position);
         final GroupChatUserViewHolder groupChatUserViewHolder = (GroupChatUserViewHolder) holder;
         groupChatUserViewHolder.username.setText(user.getUsername());
-        Constants.DP_URL(user.getId(), user.getProfilePicUrl(), new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                if (mActivityState == null || mActivityState.isActivityDestroyed())
-                    return;
-                try {
-                    if (!task.isSuccessful()) {
-                        groupChatUserViewHolder.userPic.setImageResource(R.drawable.ic_anon_person_36dp);
+        try {
+            Constants.DP_URL(user.getId(), user.getProfilePicUrl(), new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (mActivityState == null || mActivityState.isActivityDestroyed())
                         return;
+                    try {
+                        if (!task.isSuccessful()) {
+                            groupChatUserViewHolder.userPic.setImageResource(R.drawable.ic_anon_person_36dp);
+                            return;
+                        }
+                        Glide.with(mActivity.get()).
+                                load(task.getResult().toString()).
+                                error(R.drawable.ic_anon_person_36dp).
+                                into(groupChatUserViewHolder.userPic);
+                    } catch (final Exception e) {
+                        MLog.e(TAG, "Constants.DP_URL user dp doesn't exist in google cloud storage.  task: " + task.isSuccessful());
+                        groupChatUserViewHolder.userPic.setImageResource(R.drawable.ic_anon_person_36dp);
                     }
-                    Glide.with(mActivity.get()).
-                            load(task.getResult().toString()).
-                            error(R.drawable.ic_anon_person_36dp).
-                            into(groupChatUserViewHolder.userPic);
-                } catch (final Exception e) {
-                    MLog.e(TAG, "Constants.DP_URL user dp doesn't exist in google cloud storage.  task: " + task.isSuccessful());
-                    groupChatUserViewHolder.userPic.setImageResource(R.drawable.ic_anon_person_36dp);
                 }
-            }
-        });
+            });
+        }catch(RejectedExecutionException e) {}
     }
 
     @Override

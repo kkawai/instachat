@@ -32,6 +32,8 @@ import com.tooltip.Tooltip;
 
 import org.json.JSONObject;
 
+import java.util.concurrent.RejectedExecutionException;
+
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
@@ -61,47 +63,53 @@ public class LeftDrawerHelper {
             return;
         Glide.clear(mProfilePic);
         final User user = Preferences.getInstance().getUser();
-        Constants.DP_URL(user.getId(), dpid, new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                if (mActivityState == null || mActivityState.isActivityDestroyed()) {
-                    return;
-                }
-                try {
-                    if (!task.isSuccessful()) {
-                        mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
+        try {
+            Constants.DP_URL(user.getId(), dpid, new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (mActivityState == null || mActivityState.isActivityDestroyed()) {
                         return;
                     }
-                    Glide.with(mActivity).load(task.getResult().toString()).error(R.drawable.ic_anon_person_36dp).crossFade().into(mProfilePic);
-                } catch (Exception e) {
-                    MLog.e(TAG, "DP_URL failed", e);
-                    mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
+                    try {
+                        if (!task.isSuccessful()) {
+                            mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
+                            return;
+                        }
+                        Glide.with(mActivity).load(task.getResult().toString()).error(R.drawable.ic_anon_person_36dp).crossFade().into(mProfilePic);
+                    } catch (Exception e) {
+                        MLog.e(TAG, "DP_URL failed", e);
+                        mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
+                    }
                 }
-            }
-        });
+            });
+        } catch (RejectedExecutionException e) {
+        }
     }
 
     private void populateNavHeader() {
         final User user = Preferences.getInstance().getUser();
         mUsernameEditText.setText(Preferences.getInstance().getUsername());
-        Constants.DP_URL(user.getId(), user.getProfilePicUrl(), new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                if (mActivityState == null || mActivityState.isActivityDestroyed())
-                    return;
-                if (!task.isSuccessful()) {
-                    mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
-                    return;
+        try {
+            Constants.DP_URL(user.getId(), user.getProfilePicUrl(), new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (mActivityState == null || mActivityState.isActivityDestroyed())
+                        return;
+                    if (!task.isSuccessful()) {
+                        mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
+                        return;
+                    }
+                    try {
+                        Glide.with(mActivity).load(task.getResult().toString()).error(R.drawable.ic_anon_person_36dp).crossFade().into(mProfilePic);
+                    } catch (Exception e) {
+                        MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
+                        mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
+                    }
+                    checkForRemoteUpdatesToMyDP();
                 }
-                try {
-                    Glide.with(mActivity).load(task.getResult().toString()).error(R.drawable.ic_anon_person_36dp).crossFade().into(mProfilePic);
-                } catch (Exception e) {
-                    MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
-                    mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
-                }
-                checkForRemoteUpdatesToMyDP();
-            }
-        });
+            });
+        } catch (RejectedExecutionException e) {
+        }
 
         mHeaderLayout.findViewById(R.id.save_username).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -256,24 +264,27 @@ public class LeftDrawerHelper {
                         if (!TextUtils.isEmpty(remote.getProfilePicUrl())) {
                             User local = Preferences.getInstance().getUser();
                             if (TextUtils.isEmpty(local.getProfilePicUrl()) || !remote.getProfilePicUrl().equals(local.getProfilePicUrl())) {
-                                Constants.DP_URL(remote.getId(), remote.getProfilePicUrl(), new OnCompleteListener<Uri>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Uri> task) {
-                                        if (!task.isSuccessful() || mActivityState.isActivityDestroyed()) {
-                                            return;
-                                        }
-                                        User user = Preferences.getInstance().getUser();
-                                        user.setProfilePicUrl(remote.getProfilePicUrl());
-                                        Preferences.getInstance().saveUser(user);
+                                try {
+                                    Constants.DP_URL(remote.getId(), remote.getProfilePicUrl(), new OnCompleteListener<Uri>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Uri> task) {
+                                            if (!task.isSuccessful() || mActivityState.isActivityDestroyed()) {
+                                                return;
+                                            }
+                                            User user = Preferences.getInstance().getUser();
+                                            user.setProfilePicUrl(remote.getProfilePicUrl());
+                                            Preferences.getInstance().saveUser(user);
 
-                                        MLog.i(TAG, "checkForRemoteUpdatesToMyDP() my pic changed remotely. attempt to update");
-                                        try {
-                                            Glide.with(mActivity).load(task.getResult().toString()).error(R.drawable.ic_anon_person_36dp).crossFade().into(mProfilePic);
-                                        } catch (Exception e) {
-                                            MLog.e(TAG, "onDrawerOpened() could not find my photo in google cloud storage", e);
+                                            MLog.i(TAG, "checkForRemoteUpdatesToMyDP() my pic changed remotely. attempt to update");
+                                            try {
+                                                Glide.with(mActivity).load(task.getResult().toString()).error(R.drawable.ic_anon_person_36dp).crossFade().into(mProfilePic);
+                                            } catch (Exception e) {
+                                                MLog.e(TAG, "onDrawerOpened() could not find my photo in google cloud storage", e);
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                } catch (RejectedExecutionException e) {
+                                }
                             } else {
                                 MLog.i(TAG, "checkForRemoteUpdatesToMyDP() my pic did not change remotely. do not update.");
                             }
