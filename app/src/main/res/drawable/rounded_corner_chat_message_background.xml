@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     android:shape="rectangle">
-    <solid android:color="@android:color/transparent"/>
+    <solid android:color="@color/jonGray"/>
     <padding
         android:bottom="@dimen/posted_photo_rounded_corner_padding"
         android:left="@dimen/posted_photo_rounded_corner_padding"
@@ -10,5 +10,5 @@
     <corners android:radius="@dimen/posted_photo_rounded_corner_radius"/>
     <stroke
         android:width="@dimen/posted_photo_rounded_corner_padding"
-        android:color="@color/jonGray"/>
+        android:color="@color/chat_background_screen_color"/>
 </shape>
