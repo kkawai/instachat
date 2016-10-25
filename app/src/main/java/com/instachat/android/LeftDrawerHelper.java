@@ -110,6 +110,9 @@ public class LeftDrawerHelper {
             });
         } catch (RejectedExecutionException e) {
         }
+        mUsernameEditText.setFocusableInTouchMode(true);
+        mUsernameEditText.clearFocus();
+        MLog.d(TAG, "clearFocus called");
 
         mHeaderLayout.findViewById(R.id.save_username).setOnClickListener(new View.OnClickListener() {
             @Override
