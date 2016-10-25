@@ -21,6 +21,7 @@ public final class Constants {
     public static final int MIN_EMAIL_LENGTH = 5;
     public static final int MAX_PASSWORD_LENGTH = 10;
     public static final int MIN_PASSWORD_LENGTH = 4;
+    public static final int MAX_BIO_LENGTH = 512;
 
     //remote configuration with default values
     public static final int DEFAULT_MAX_MESSAGE_HISTORY = 1000;
