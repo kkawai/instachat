@@ -78,7 +78,7 @@
                 android:layout_height="wrap_content"
                 android:autoLink="web|map|email|phone"
                 android:textColor="@color/chat_message_color"
-                android:textSize="15sp"
+                android:textSize="@dimen/message_text_size"
                 app:font="Lato-Regular.ttf"/>
 
         </LinearLayout>
