@@ -14,6 +14,7 @@ public final class Constants {
 
     private Constants() {
     }
+
     public static final int MAX_USERNAME_LENGTH = 30;
     public static final int MIN_USERNAME_LENGTH = 2;
     public static final int MAX_EMAIL_LENGTH = 128;
@@ -184,6 +185,8 @@ public final class Constants {
     public static String GROUP_CHAT_USERS_REF(long groupid) {
         return "/public_group_users/" + groupid;
     }
+
+    public static String PUBLIC_CHATS_TYPING_PARENT_REF = "/public_group_typing/";
 
     public static String PUBLIC_CHATS_SUMMARY_PARENT_REF = "/public_group_summaries/";
 
