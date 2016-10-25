@@ -95,6 +95,15 @@
                                 app:font="Lato-Bold.ttf" />
 
                             <com.instachat.android.view.CustomFontTextView
+                                android:id="@+id/description"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:maxLines="3"
+                                android:textSize="@dimen/web_clipping_short_description_size"
+                                app:font="Lato-Italic.ttf" />
+
+                            <com.instachat.android.view.CustomFontTextView
                                 android:id="@+id/url"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -104,14 +113,6 @@
                                 android:textSize="@dimen/web_clipping_short_url_size"
                                 app:font="Lato-Regular.ttf" />
 
-                            <com.instachat.android.view.CustomFontTextView
-                                android:id="@+id/description"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:ellipsize="end"
-                                android:maxLines="5"
-                                android:textSize="@dimen/web_clipping_short_description_size"
-                                app:font="Lato-BoldItalic.ttf" />
                         </LinearLayout>
 
                         <LinearLayout
