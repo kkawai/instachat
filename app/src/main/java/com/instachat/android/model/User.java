@@ -202,7 +202,7 @@ public class User extends DomainObject {
     }
 
     public String getUsername() {
-        return username;
+        return username+"";
     }
 
     public void setUsername(String username) {
@@ -266,7 +266,7 @@ public class User extends DomainObject {
     }
 
     public String getBio() {
-        return bio;
+        return bio+"";
     }
 
     public void setBio(String bio) {

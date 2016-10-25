@@ -7,8 +7,10 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -23,6 +25,7 @@ import com.google.android.gms.tasks.Task;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.User;
+import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ScreenUtil;
@@ -50,6 +53,7 @@ public class LeftDrawerHelper {
 
     private EditText mBioEditText, mUsernameEditText;
     private ImageView mProfilePic;
+    private View mSaveButton;
 
     public LeftDrawerHelper(@NonNull Activity activity, @NonNull ActivityState activityState, @NonNull DrawerLayout drawerLayout, @NonNull MyProfilePicListener listener) {
         mActivity = activity;
@@ -114,17 +118,6 @@ public class LeftDrawerHelper {
         mUsernameEditText.clearFocus();
         MLog.d(TAG, "clearFocus called");
 
-        mHeaderLayout.findViewById(R.id.save_username).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                /**
-                 * simply closing the drawer will trigger the process of saving
-                 * the username
-                 */
-                mDrawerLayout.closeDrawer(GravityCompat.START);
-            }
-        });
-
         if (TextUtils.isEmpty(user.getProfilePicUrl())) {
             mTooltip = new Tooltip.Builder(mProfilePic, R.style.drawer_tooltip).setText(mActivity.getString(R.string.display_photo_tooltip)).show();
             mTooltip.setOnDismissListener(new OnDismissListener() {
@@ -157,17 +150,20 @@ public class LeftDrawerHelper {
         mHeaderLayout = navigationView.getHeaderView(0); // 0-index header
         mBioEditText = (EditText) mHeaderLayout.findViewById(R.id.input_bio);
         mUsernameEditText = (EditText) mHeaderLayout.findViewById(R.id.nav_username);
-        FontUtil.setTextViewFont(mUsernameEditText);
-        FontUtil.setTextViewFont(mBioEditText);
-        mUsernameEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constants.MAX_USERNAME_LENGTH)});
-        mBioEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constants.MAX_BIO_LENGTH)});
-
+        mSaveButton = mHeaderLayout.findViewById(R.id.save_username);
+        setupUsernameAndBio();
         mProfilePic = (ImageView) mHeaderLayout.findViewById(R.id.nav_pic);
         mProfilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ScreenUtil.hideKeyboard(mActivity);
                 showChooseDialog();
+            }
+        });
+        mSaveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mDrawerLayout.closeDrawer(GravityCompat.START);
             }
         });
 
@@ -205,24 +201,15 @@ public class LeftDrawerHelper {
                 MLog.d(TAG, "onDrawerClosed() LEFT drawer");
 
                 ScreenUtil.hideKeyboard(mActivity);
-                /**
-                 * don't bother setting visibility to invisible on any view
-                 * in the navigation drawer after the first drawer open
-                 * it won't work.  android caches it and I'm not sure
-                 * how to fix it right now.  no big deal.
-                 */
-                /*
-                mHeaderLayout.findViewById(R.id.save_username).setVisibility(View.INVISIBLE);
-                mHeaderLayout.findViewById(R.id.edit_bio).setVisibility(View.INVISIBLE);
-                */
+
                 if (mTooltip != null && mTooltip.isShowing())
                     mTooltip.dismiss();
 
                 final User user = Preferences.getInstance().getUser();
-                final String existingUsername = user.getUsername() + "";
+                final String existingUsername = user.getUsername();
                 final String newUsername = mUsernameEditText.getText().toString();
 
-                final String existingBio = user.getBio() + "";
+                final String existingBio = user.getBio();
                 final String newBio = mBioEditText.getText().toString();
 
                 /**
@@ -346,6 +333,7 @@ public class LeftDrawerHelper {
     private void showProfileUpdatedDialog() {
         //new SweetAlertDialog(mActivity, SweetAlertDialog.SUCCESS_TYPE).setTitleText(mActivity.getString(R.string.username_changed_dialog_title)).setContentText(mActivity.getString(R.string.is_your_new_username, newUsername)).show();
         new SweetAlertDialog(mActivity, SweetAlertDialog.SUCCESS_TYPE).setTitleText(mActivity.getString(R.string.your_profile_has_been_updated_title)).setContentText(mActivity.getString(R.string.your_profile_has_been_updated_msg)).show();
+        mSaveButton.setVisibility(View.GONE);
     }
 
     private void saveUser(final User user, final String newUsername, final String newBio, final boolean needToSaveBio, final boolean needToSaveUsername) {
@@ -433,5 +421,68 @@ public class LeftDrawerHelper {
             });
         }
 
+    }
+
+    private void setupUsernameAndBio() {
+
+        FontUtil.setTextViewFont(mUsernameEditText);
+        FontUtil.setTextViewFont(mBioEditText);
+        mUsernameEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constants.MAX_USERNAME_LENGTH)});
+        mBioEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constants.MAX_BIO_LENGTH)});
+
+        mUsernameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (!Preferences.getInstance().getUsername().equals(charSequence.toString())) {
+                    if (mSaveButton.getVisibility() != View.VISIBLE) {
+                        mSaveButton.setVisibility(View.VISIBLE);
+                        AnimationUtil.scaleInFromCenter(mSaveButton);
+                    }
+                } else {
+                    if (mSaveButton.getVisibility() != View.GONE) {
+                        mSaveButton.setVisibility(View.GONE);
+                        AnimationUtil.scaleInToCenter(mSaveButton);
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        mBioEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                User user = Preferences.getInstance().getUser();
+                if (!user.getBio().equals(charSequence.toString())) {
+                    if (mSaveButton.getVisibility() != View.VISIBLE) {
+                        mSaveButton.setVisibility(View.VISIBLE);
+                        AnimationUtil.scaleInFromCenter(mSaveButton);
+                    }
+                } else {
+                    if (mSaveButton.getVisibility() != View.GONE) {
+                        mSaveButton.setVisibility(View.GONE);
+                        AnimationUtil.scaleInToCenter(mSaveButton);
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
     }
 }

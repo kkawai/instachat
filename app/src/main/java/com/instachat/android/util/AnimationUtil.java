@@ -183,10 +183,19 @@ public final class AnimationUtil {
 
     public static void scaleInFromCenter(final View view) {
 
-        ScaleAnimation fade_in = new ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        fade_in.setDuration(300);     // animation duration in milliseconds
-        fade_in.setFillAfter(true);    // If fillAfter is true, the transformation that this animation performed will persist when it is finished.
-        view.startAnimation(fade_in);
+        ScaleAnimation anim = new ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        anim.setDuration(300);     // animation duration in milliseconds
+        anim.setFillAfter(true);    // If fillAfter is true, the transformation that this animation performed will persist when it is finished.
+        view.startAnimation(anim);
+
+    }
+
+    public static void scaleInToCenter(final View view) {
+
+        ScaleAnimation anim = new ScaleAnimation(1f, 0f, 1f, 0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        anim.setDuration(300);     // animation duration in milliseconds
+        anim.setFillAfter(true);    // If fillAfter is true, the transformation that this animation performed will persist when it is finished.
+        view.startAnimation(anim);
 
     }
 

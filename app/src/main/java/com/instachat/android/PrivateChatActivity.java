@@ -123,8 +123,8 @@ public class PrivateChatActivity extends GroupChatActivity {
                                         onlyUpdateLastActiveTime = false;
                                         mToUser.setProfilePicUrl(user.getProfilePicUrl());
                                     }
-                                    String existingBio = mToUser.getBio() + "";
-                                    String newBio = user.getBio() + "";
+                                    String existingBio = mToUser.getBio();
+                                    String newBio = user.getBio();
                                     if (!existingBio.equals(newBio)) {
                                         onlyUpdateLastActiveTime = false;
                                         mToUser.setBio(user.getBio());
@@ -451,7 +451,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         } catch (RejectedExecutionException e) {
         }
         bio.setVisibility(TextUtils.isEmpty(mToUser.getBio()) ? View.GONE : View.VISIBLE);
-        bio.setText(mToUser.getBio() + "");
+        bio.setText(mToUser.getBio());
         TextView activeGroup = (TextView) findViewById(R.id.activeGroup);
         if (mToUser.getCurrentGroupId() != 0 && !TextUtils.isEmpty(mToUser.getCurrentGroupName())) {
             activeGroup.setVisibility(View.VISIBLE);

@@ -50,7 +50,7 @@
         android:id="@+id/input_bio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:layout_gravity="center_horizontal|bottom"
         android:layout_marginBottom="3dp"
         android:background="@android:color/transparent"
         android:inputType="textMultiLine|text"
@@ -66,6 +66,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -74,21 +75,14 @@
             android:layout_gravity="center_horizontal"
             android:orientation="vertical">
 
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="0"
-                android:textSize="17sp"
+                android:drawableLeft="@drawable/ic_favorite_white_18dp"
+                android:text="16 likes"
+                android:textSize="13sp"
                 android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="HEARTS"
-                android:textSize="13sp"/>
 
         </LinearLayout>
 
@@ -100,7 +94,7 @@
             android:layout_marginRight="8dp"
             android:background="@drawable/rounded_white_trim_red_background"
             android:text="@string/save_username"
-            android:visibility="visible"/>
+            android:visibility="gone"/>
 
     </FrameLayout>
 
