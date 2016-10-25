@@ -15,7 +15,7 @@
     <dimen name="likes_button_size">21dp</dimen>
     <dimen name="likes_count_bottom_margin">3dp</dimen>
     <dimen name="periscope_width">40dp</dimen>
-    <dimen name="nav_header_profile_pic_size">120dp</dimen>
+    <dimen name="nav_header_profile_pic_size">105dp</dimen>
     <dimen name="web_clipping_right_text_padding">30dp</dimen>
 
     <!-- text sizes in SP -->
@@ -31,7 +31,7 @@
     <!-- fragment profile -->
     <dimen name="fragment_profile_pic_size">220dp</dimen>
 
-    <dimen name="left_drawer_header_height">280dp</dimen>
+    <dimen name="left_drawer_header_height">285dp</dimen>
 
     <!-- private chat activity profile -->
     <dimen name="profile_header_height">360dp</dimen>
