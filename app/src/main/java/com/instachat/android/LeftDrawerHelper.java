@@ -177,6 +177,7 @@ public class LeftDrawerHelper {
             MLog.d(TAG, "onDrawerOpened() LEFT drawer");
 
             populateNavHeader();
+            ScreenUtil.hideKeyboard(mActivity);
          }
 
          @Override
