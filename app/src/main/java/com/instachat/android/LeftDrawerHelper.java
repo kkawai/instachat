@@ -15,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -25,7 +24,6 @@ import com.google.android.gms.tasks.Task;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.User;
-import com.instachat.android.profile.UserBioHelper;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
@@ -84,12 +82,10 @@ public class LeftDrawerHelper {
    }
 
    private void populateNavHeader() {
-      final TextView email = (TextView) mHeaderLayout.findViewById(R.id.nav_email);
-      final TextView username = (TextView) mHeaderLayout.findViewById(R.id.nav_username);
-      FontUtil.setTextViewFont(username);
+      final EditText bio = (EditText) mHeaderLayout.findViewById(R.id.input_bio);
+      final EditText username = (EditText) mHeaderLayout.findViewById(R.id.nav_username);
       final ImageView navpic = (ImageView) mHeaderLayout.findViewById(R.id.nav_pic);
       final User user = Preferences.getInstance().getUser();
-      email.setText(Preferences.getInstance().getEmail());
       username.setText(Preferences.getInstance().getUsername());
       Constants.DP_URL(user.getId(), user.getProfilePicUrl(), new OnCompleteListener<Uri>() {
          @Override
@@ -109,12 +105,7 @@ public class LeftDrawerHelper {
             checkForRemoteUpdatesToMyDP();
          }
       });
-      mHeaderLayout.findViewById(R.id.edit_bio).setOnClickListener(new View.OnClickListener() {
-         @Override
-         public void onClick(View view) {
-            new UserBioHelper().showBioInputDialog(mActivity);
-         }
-      });
+
       mHeaderLayout.findViewById(R.id.save_username).setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
@@ -137,6 +128,12 @@ public class LeftDrawerHelper {
       } else {
          checkIfShownUsernameTooltip(username);
       }
+
+      if (TextUtils.isEmpty(user.getBio())) {
+         bio.setHint(R.string.hint_write_something_about_yourself);
+      } else {
+         bio.setText(user.getBio());
+      }
    }
 
    private void checkIfShownUsernameTooltip(View anchor) {
@@ -151,6 +148,7 @@ public class LeftDrawerHelper {
    public void setup(NavigationView navigationView) {
       mHeaderLayout = navigationView.getHeaderView(0); // 0-index header
       final EditText username = (EditText) mHeaderLayout.findViewById(R.id.nav_username);
+      FontUtil.setTextViewFont(username);
       username.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constants.MAX_USERNAME_LENGTH)});
       final ImageView navpic = (ImageView) mHeaderLayout.findViewById(R.id.nav_pic);
       navpic.setOnClickListener(new View.OnClickListener() {
@@ -177,10 +175,7 @@ public class LeftDrawerHelper {
                return; //only handle left drawer logic
 
             MLog.d(TAG, "onDrawerOpened() LEFT drawer");
-            if (mHeaderLayout.findViewById(R.id.edit_bio).getVisibility() != View.VISIBLE) {
-               mHeaderLayout.findViewById(R.id.edit_bio).setVisibility(View.VISIBLE);
-               AnimationUtil.scaleInFromCenter(mHeaderLayout.findViewById(R.id.edit_bio));
-            }
+
             populateNavHeader();
          }
 

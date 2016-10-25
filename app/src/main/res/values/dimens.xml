@@ -15,7 +15,7 @@
     <dimen name="likes_button_size">26dp</dimen>
     <dimen name="likes_count_bottom_margin">5dp</dimen>
     <dimen name="periscope_width">40dp</dimen>
-    <dimen name="nav_header_profile_pic_size">72dp</dimen>
+    <dimen name="nav_header_profile_pic_size">120dp</dimen>
     <dimen name="web_clipping_right_text_padding">30dp</dimen>
 
     <!-- text sizes in SP -->
@@ -51,6 +51,7 @@
     <dimen name="dialog_options_title_padding">16dp</dimen>
 
     <integer name="max_bio">256</integer>
+    <integer name="max_username_length">30</integer>
 
 
 </resources>

@@ -134,4 +134,6 @@
     <string name="user_active_in_group">Active in %s</string>
     <string name="web_clipping">Web Clipping:</string>
     <string name="fetching_web_clipping">Fetching web clipping...</string>
+
+    <string name="default_bio">Hey there!  I am using %s  Send me a message on here!</string>
 </resources>
