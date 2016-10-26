@@ -123,11 +123,14 @@ Document differences between activity_main.xml here:
                         android:layout_width="@dimen/send_button_size"
                         android:layout_height="@dimen/send_button_size"
                         android:layout_gravity="bottom"
+                        app:fab_showShadow="false"
+                        android:layout_marginBottom="7dp"
+                        android:layout_marginRight="2dp"
                         android:src="@drawable/ic_photo_camera_black_24dp"
                         app:fab_size="mini"
                         fab:fab_colorNormal="@color/colorPrimary"
                         fab:fab_colorPressed="@color/colorPrimaryDark"
-                        fab:fab_colorRipple="@color/colorAccent"/>
+                        fab:fab_colorRipple="@color/colorPrimaryDark"/>
 
                     <EditText
                         android:id="@+id/messageEditText"
