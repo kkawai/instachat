@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingBottom="25dp">
+        android:paddingBottom="18dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/messengerImageView"
@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_weight="1"
-            android:paddingLeft="8dp"
+            android:paddingLeft="10dp"
             android:paddingRight="8dp"
             android:paddingBottom="8dp"
             android:paddingTop="5dp"
@@ -80,7 +80,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autoLink="web|map|email|phone"
-                android:lineSpacingExtra="3dp"
+                android:lineSpacingExtra="2dp"
                 android:textColor="@color/chat_message_color"
                 android:textSize="@dimen/message_text_size"
                 app:font="Lato-Regular.ttf" />
