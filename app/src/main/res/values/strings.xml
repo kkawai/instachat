@@ -70,8 +70,8 @@
     <string name="choose_thumbnail">Choose a Thumbnail</string>
     <string name="post">Post</string>
     <string name="photo">Photo</string>
-    <string name="group_chat_header">GROUP CHATS</string>
-    <string name="private_chat_header">DIRECT CHATS</string>
+    <string name="group_chat_header">LIVE ROOMS</string>
+    <string name="private_chat_header">DIRECT MESSAGES</string>
 
     <string name="could_not_send_message">Sorry!  Could not send message.  Please try again.</string>
     <string name="please_upload_photo">Please upload a display photo to start chatting</string>

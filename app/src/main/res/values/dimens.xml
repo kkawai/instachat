@@ -12,8 +12,8 @@
     <dimen name="posted_photo_size">240dp</dimen>
     <!-- if likes_button_size is decreased, then you must also decrease likes_count_bottom_margin -->
     <!-- and the same for increase; the two views are interrelated -->
-    <dimen name="likes_button_size">21dp</dimen>
-    <dimen name="likes_count_bottom_margin">3dp</dimen>
+    <dimen name="likes_button_size">25dp</dimen>
+    <dimen name="likes_count_bottom_margin">4dp</dimen>
     <dimen name="periscope_width">40dp</dimen>
     <dimen name="nav_header_profile_pic_size">140dp</dimen>
     <dimen name="web_clipping_right_text_padding">30dp</dimen>
@@ -24,9 +24,9 @@
     <dimen name="message_text_size">17sp</dimen>
     <dimen name="message_likes_counter_size">13sp</dimen>
     <dimen name="web_clipping_original_url_size">15sp</dimen>
-    <dimen name="web_clipping_article_title_size">17sp</dimen>
+    <dimen name="web_clipping_article_title_size">15sp</dimen>
     <dimen name="web_clipping_short_url_size">13sp</dimen>
-    <dimen name="web_clipping_short_description_size">15sp</dimen>
+    <dimen name="web_clipping_short_description_size">13sp</dimen>
 
     <!-- fragment profile -->
     <dimen name="fragment_profile_pic_size">220dp</dimen>
