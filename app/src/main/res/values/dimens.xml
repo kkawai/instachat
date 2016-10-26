@@ -4,7 +4,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="sign_in_button_widths">200dp</dimen>
 
-    <dimen name="send_button_size">32dp</dimen>
+    <dimen name="send_button_size">30dp</dimen>
     <dimen name="user_thumb_pic_size">48dp</dimen>
     <dimen name="user_thumb_pic_in_titlebar_size">36dp</dimen>
     <dimen name="super_small_user_thumb_size">26dp</dimen>
