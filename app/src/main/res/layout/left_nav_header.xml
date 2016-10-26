@@ -35,16 +35,60 @@
             app:civ_border_overlay="true"
             app:civ_border_width="2px"/>
 
-        <ImageView
+        <Button
+            android:id="@+id/save_username"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_gravity="bottom|right"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:background="@drawable/rounded_white_trim_red_background"
+            android:text="@string/save_username"
+            android:visibility="gone"/>
+
+        <FrameLayout
             android:id="@+id/help"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="top|right">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_help_outline_white_24dp"
+                />
+        </FrameLayout>
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/drawerLikesParent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingBottom="3dp"
+        android:paddingTop="3dp">
+
+        <ImageView
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="3dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_favorite_white_18dp"/>
+
+        <com.instachat.android.view.CustomFontTextView
+            android:id="@+id/drawerLikes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:padding="@dimen/activity_horizontal_margin"
-            android:src="@drawable/ic_help_outline_white_24dp"
-            />
-
-    </FrameLayout>
+            android:layout_gravity="center_vertical"
+            android:text="16 likes"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:font="Lato-Bold.ttf"/>
+    </LinearLayout>
 
     <EditText
         android:id="@+id/input_bio"
@@ -54,48 +98,12 @@
         android:layout_marginBottom="3dp"
         android:background="@android:color/transparent"
         android:inputType="textMultiLine|text"
-        android:lines="2"
         android:maxLength="@integer/max_bio"
-        android:maxLines="2"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp"
+        android:maxLines="5"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="13sp"/>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:drawableLeft="@drawable/ic_favorite_white_18dp"
-                android:text="16 likes"
-                android:textSize="13sp"
-                android:textStyle="bold"/>
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/save_username"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginRight="8dp"
-            android:background="@drawable/rounded_white_trim_red_background"
-            android:text="@string/save_username"
-            android:visibility="gone"/>
-
-    </FrameLayout>
 
 </LinearLayout>

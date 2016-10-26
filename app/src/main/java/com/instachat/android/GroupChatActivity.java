@@ -363,6 +363,11 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     final void setDatabaseRoot(final String root) {
         mDatabaseRoot = root;
+        try {
+            FirebaseDatabase.getInstance().getReference(mDatabaseRoot).keepSynced(true);
+        } catch (Exception e) {
+            MLog.e(TAG, "", e);
+        }
     }
 
     private void setEnableSendButton(final boolean isEnable) {
@@ -729,7 +734,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         if (navigationView == null)
             return;
-        View headerView = getLayoutInflater().inflate(R.layout.nav_header, navigationView, false);
+        View headerView = getLayoutInflater().inflate(R.layout.left_nav_header, navigationView, false);
         View drawerView = getLayoutInflater().inflate(R.layout.left_drawer_layout, navigationView, false);
         navigationView.addView(drawerView);
         navigationView.addHeaderView(headerView);
@@ -1100,7 +1105,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                     MLog.e(TAG, "saveUser() failed via uploadFromUri() ", error);
                 }
             });
-            mLeftDrawerHelper.updateProfilePic(photoId);
+            mLeftDrawerHelper.updateProfilePic(myUserid(), photoId);
         }
     }
 

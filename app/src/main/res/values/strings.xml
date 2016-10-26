@@ -95,7 +95,9 @@
     <string name="display_photo_title">Add display photo</string>
     <string name="display_photo_tooltip">Tap here to upload a display photo of yourself</string>
     <string name="toolbar_user_profile_tooltip">Tap here to see the profile again</string>
-    <string name="change_username_tooltip">If you wish, you can change your username here</string>
+    <string name="change_username_tooltip">Tap here to change your username</string>
+    <string name="change_bio_tooltip">Tap here to change your bio</string>
+    <string name="change_photo_tooltip">Tap here to change your photo</string>
     <string name="message_copied_to_clipboard">Message copied to clipboard</string>
     <string name="manage_blocks">Manage Blocks</string>
     <string name="message_options_title">Message Options</string>
