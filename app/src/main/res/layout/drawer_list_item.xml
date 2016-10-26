@@ -31,8 +31,7 @@
         android:text="Jondotli"
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        android:textStyle="bold"
-        app:font="Lato-Heavy.ttf"
+        app:font="Lato.ttf"
         />
 
     <com.instachat.android.view.CustomFontTextView
