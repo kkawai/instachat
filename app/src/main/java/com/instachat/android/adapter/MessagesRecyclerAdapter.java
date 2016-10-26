@@ -51,6 +51,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.RejectedExecutionException;
 
 /**
  * Created by kevin on 8/23/2016.
@@ -318,27 +319,31 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             }
         }
 
+        viewHolder.messengerImageView.setImageDrawable(null);
         if (TextUtils.isEmpty(friendlyMessage.getName())) {
             viewHolder.messengerImageView.setVisibility(View.GONE);
         } else {
             viewHolder.messengerImageView.setVisibility(View.VISIBLE);
-            Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if (mActivityState == null || mActivityState.isActivityDestroyed())
-                        return;
-                    try {
-                        if (!task.isSuccessful()) {
-                            //viewHolder.messengerImageView.setImageResource(R.drawable.ic_account_circle_black_36dp);
+            try {
+                Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if (mActivityState == null || mActivityState.isActivityDestroyed())
                             return;
+                        try {
+                            if (!task.isSuccessful()) {
+                                //viewHolder.messengerImageView.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                                return;
+                            }
+                            Glide.with(mActivity.get()).load(task.getResult().toString()).error(R.drawable.ic_anon_person_36dp).into(viewHolder.messengerImageView);
+                        } catch (final Exception e) {
+                            MLog.e(TAG, "Constants.DP_URL user dp doesn't exist in google cloud storage.  task: " + task.isSuccessful());
+                            viewHolder.messengerImageView.setImageResource(R.drawable.ic_anon_person_36dp);
                         }
-                        Glide.with(mActivity.get()).load(task.getResult().toString()).error(R.drawable.ic_anon_person_36dp).into(viewHolder.messengerImageView);
-                    } catch (final Exception e) {
-                        MLog.e(TAG, "Constants.DP_URL user dp doesn't exist in google cloud storage.  task: " + task.isSuccessful());
-                        viewHolder.messengerImageView.setImageResource(R.drawable.ic_anon_person_36dp);
                     }
-                }
-            });
+                });
+            } catch (RejectedExecutionException executionException) {
+            }
         }
     }
 

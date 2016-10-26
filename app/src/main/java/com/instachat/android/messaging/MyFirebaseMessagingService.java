@@ -37,6 +37,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.RejectedExecutionException;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
@@ -102,39 +103,41 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private void consumeFriendlyMessage(final FriendlyMessage friendlyMessage) {
         incrementPrivateUnreadMessages(friendlyMessage);
-
-        Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(final @NonNull Task<Uri> task) {
-                try {
-                    if (!task.isSuccessful()) {
-                        showNotification(friendlyMessage, null);
-                        return;
-                    }
-                    ThreadWrapper.executeInWorkerThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                Bitmap bitmap = Glide.
-                                        with(MyApp.getInstance()).
-                                        load(task.getResult().toString()).
-                                        asBitmap().
-                                        into(thumbSize(), thumbSize()). // Width and height
-                                        get();
-                                showNotification(friendlyMessage, bitmap);
-                            } catch (Exception e) {
-                                MLog.e(TAG, "", e); //todo better error handling/message
-                                showNotification(friendlyMessage, null);
-                            }
+        try {
+            Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(final @NonNull Task<Uri> task) {
+                    try {
+                        if (!task.isSuccessful()) {
+                            showNotification(friendlyMessage, null);
+                            return;
                         }
-                    });
+                        ThreadWrapper.executeInWorkerThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Bitmap bitmap = Glide.
+                                            with(MyApp.getInstance()).
+                                            load(task.getResult().toString()).
+                                            asBitmap().
+                                            into(thumbSize(), thumbSize()). // Width and height
+                                            get();
+                                    showNotification(friendlyMessage, bitmap);
+                                } catch (Exception e) {
+                                    MLog.e(TAG, "", e); //todo better error handling/message
+                                    showNotification(friendlyMessage, null);
+                                }
+                            }
+                        });
 
-                } catch (Exception e) {
-                    MLog.e(TAG, "", e); //todo better error handling/message
-                    showNotification(friendlyMessage, null);
+                    } catch (Exception e) {
+                        MLog.e(TAG, "", e); //todo better error handling/message
+                        showNotification(friendlyMessage, null);
+                    }
                 }
-            }
-        });
+            });
+        } catch (RejectedExecutionException e) {
+        }
     }
 
     private void showNotification(FriendlyMessage friendlyMessage, Bitmap bitmap) {

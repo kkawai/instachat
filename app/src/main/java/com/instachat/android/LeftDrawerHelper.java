@@ -7,12 +7,15 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -23,14 +26,16 @@ import com.google.android.gms.tasks.Task;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.User;
+import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
-import com.tooltip.OnDismissListener;
 import com.tooltip.Tooltip;
 
 import org.json.JSONObject;
+
+import java.util.concurrent.RejectedExecutionException;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -43,11 +48,15 @@ public class LeftDrawerHelper {
     private DrawerLayout mDrawerLayout;
     private View mHeaderLayout;
     private MyProfilePicListener mMyProfilePicListener;
-    private Tooltip mTooltip;
+    private Tooltip mUsernameTooltip, mBioTooltip, mProfilePicTooltip;
     private ActivityState mActivityState;
 
     private EditText mBioEditText, mUsernameEditText;
     private ImageView mProfilePic;
+    private View mSaveButton;
+    private View mHelpButton;
+    private View mDrawerLikesParent;
+    private View mDrawerLikesCountView;
 
     public LeftDrawerHelper(@NonNull Activity activity, @NonNull ActivityState activityState, @NonNull DrawerLayout drawerLayout, @NonNull MyProfilePicListener listener) {
         mActivity = activity;
@@ -56,101 +65,85 @@ public class LeftDrawerHelper {
         mMyProfilePicListener = listener;
     }
 
-    public void updateProfilePic(String dpid) {
+    public void updateProfilePic(final int userid, final String dpid) {
         if (mActivityState == null || mActivityState.isActivityDestroyed())
             return;
         Glide.clear(mProfilePic);
-        final User user = Preferences.getInstance().getUser();
-        Constants.DP_URL(user.getId(), dpid, new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                if (mActivityState == null || mActivityState.isActivityDestroyed()) {
-                    return;
+        try {
+            Constants.DP_URL(userid, dpid, new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (mActivityState == null || mActivityState.isActivityDestroyed()) {
+                        return;
+                    }
+                    try {
+                        if (!task.isSuccessful()) {
+                            mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
+                            return;
+                        }
+                        Glide.with(mActivity).load(task.getResult().toString()).error(R.drawable.ic_anon_person_36dp).crossFade().into(mProfilePic);
+                    } catch (Exception e) {
+                        MLog.e(TAG, "DP_URL failed", e);
+                        mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
+                    }
                 }
-                try {
+            });
+        } catch (RejectedExecutionException e) {
+        }
+    }
+
+    private void setupProfilePic(int userid, String profilePicUrl) {
+
+        try {
+            Constants.DP_URL(userid, profilePicUrl, new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (mActivityState == null || mActivityState.isActivityDestroyed())
+                        return;
                     if (!task.isSuccessful()) {
                         mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
                         return;
                     }
-                    Glide.with(mActivity).load(task.getResult().toString()).error(R.drawable.ic_anon_person_36dp).crossFade().into(mProfilePic);
-                } catch (Exception e) {
-                    MLog.e(TAG, "DP_URL failed", e);
-                    mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
-                }
-            }
-        });
-    }
-
-    private void populateNavHeader() {
-        final User user = Preferences.getInstance().getUser();
-        mUsernameEditText.setText(Preferences.getInstance().getUsername());
-        Constants.DP_URL(user.getId(), user.getProfilePicUrl(), new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                if (mActivityState == null || mActivityState.isActivityDestroyed())
-                    return;
-                if (!task.isSuccessful()) {
-                    mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
-                    return;
-                }
-                try {
-                    Glide.with(mActivity).load(task.getResult().toString()).error(R.drawable.ic_anon_person_36dp).crossFade().into(mProfilePic);
-                } catch (Exception e) {
-                    MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
-                    mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
-                }
-                checkForRemoteUpdatesToMyDP();
-            }
-        });
-
-        mHeaderLayout.findViewById(R.id.save_username).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                /**
-                 * simply closing the drawer will trigger the process of saving
-                 * the username
-                 */
-                mDrawerLayout.closeDrawer(GravityCompat.START);
-            }
-        });
-
-        if (TextUtils.isEmpty(user.getProfilePicUrl())) {
-            mTooltip = new Tooltip.Builder(mProfilePic, R.style.drawer_tooltip).setText(mActivity.getString(R.string.display_photo_tooltip)).show();
-            mTooltip.setOnDismissListener(new OnDismissListener() {
-                @Override
-                public void onDismiss() {
-                    checkIfShownUsernameTooltip(mUsernameEditText);
+                    try {
+                        Glide.with(mActivity).load(task.getResult().toString()).error(R.drawable.ic_anon_person_36dp).crossFade().into(mProfilePic);
+                    } catch (Exception e) {
+                        MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
+                        mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
+                    }
+                    checkForRemoteUpdatesToMyDP();
                 }
             });
-        } else {
-            checkIfShownUsernameTooltip(mUsernameEditText);
-        }
-
-        if (TextUtils.isEmpty(user.getBio())) {
-            mBioEditText.setHint(R.string.hint_write_something_about_yourself);
-        } else {
-            mBioEditText.setText(user.getBio());
+        } catch (RejectedExecutionException e) {
         }
     }
 
-    private void checkIfShownUsernameTooltip(View anchor) {
-        if (!Preferences.getInstance().hasShownUsernameTooltip()) {
-            mTooltip = new Tooltip.Builder(anchor, R.style.drawer_tooltip).setText(mActivity.getString(R.string.change_username_tooltip)).show();
-            Preferences.getInstance().setShownUsernameTooltip(true);
-        }
+    private void hideTooltips() {
+        if (mUsernameTooltip != null && mUsernameTooltip.isShowing())
+            mUsernameTooltip.dismiss();
+        if (mBioTooltip != null && mBioTooltip.isShowing())
+            mBioTooltip.dismiss();
+        if (mProfilePicTooltip != null && mProfilePicTooltip.isShowing())
+            mProfilePicTooltip.dismiss();
+    }
+
+    private void showTooltips() {
+        mUsernameTooltip = new Tooltip.Builder(mUsernameEditText, R.style.drawer_tooltip).setText(mActivity.getString(R.string.change_username_tooltip)).show();
+        mBioTooltip = new Tooltip.Builder(mBioEditText, R.style.drawer_tooltip).setText(mActivity.getString(R.string.change_bio_tooltip)).show();
     }
 
     private int mWhichDrawerLastOpened;
 
     public void setup(NavigationView navigationView) {
+        final User user = Preferences.getInstance().getUser();
         mHeaderLayout = navigationView.getHeaderView(0); // 0-index header
         mBioEditText = (EditText) mHeaderLayout.findViewById(R.id.input_bio);
         mUsernameEditText = (EditText) mHeaderLayout.findViewById(R.id.nav_username);
-        FontUtil.setTextViewFont(mUsernameEditText);
-        FontUtil.setTextViewFont(mBioEditText);
-        mUsernameEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constants.MAX_USERNAME_LENGTH)});
-        mBioEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constants.MAX_BIO_LENGTH)});
-
+        mSaveButton = mHeaderLayout.findViewById(R.id.save_username);
+        mDrawerLikesParent = mHeaderLayout.findViewById(R.id.drawerLikesParent);
+        mDrawerLikesCountView = mHeaderLayout.findViewById(R.id.drawerLikes);
+        FontUtil.setTextViewFont((TextView) mDrawerLikesCountView);
+        mHelpButton = mHeaderLayout.findViewById(R.id.help);
+        setupUsernameAndBio();
         mProfilePic = (ImageView) mHeaderLayout.findViewById(R.id.nav_pic);
         mProfilePic.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -159,10 +152,24 @@ public class LeftDrawerHelper {
                 showChooseDialog();
             }
         });
+        mHelpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTooltips();
+                ScreenUtil.hideKeyboard(mActivity);
+            }
+        });
+        mSaveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+            }
+        });
 
         mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
+
             }
 
             @Override
@@ -177,9 +184,11 @@ public class LeftDrawerHelper {
                     return; //only handle left drawer logic
 
                 MLog.d(TAG, "onDrawerOpened() LEFT drawer");
-
-                populateNavHeader();
                 ScreenUtil.hideKeyboard(mActivity);
+                if (TextUtils.isEmpty(user.getProfilePicUrl())) {
+                    mProfilePicTooltip = new Tooltip.Builder(mProfilePic, R.style.drawer_tooltip).setText(mActivity.getString(R.string.display_photo_tooltip)).show();
+                }
+                showViews(true);
             }
 
             @Override
@@ -194,24 +203,14 @@ public class LeftDrawerHelper {
                 MLog.d(TAG, "onDrawerClosed() LEFT drawer");
 
                 ScreenUtil.hideKeyboard(mActivity);
-                /**
-                 * don't bother setting visibility to invisible on any view
-                 * in the navigation drawer after the first drawer open
-                 * it won't work.  android caches it and I'm not sure
-                 * how to fix it right now.  no big deal.
-                 */
-                /*
-                mHeaderLayout.findViewById(R.id.save_username).setVisibility(View.INVISIBLE);
-                mHeaderLayout.findViewById(R.id.edit_bio).setVisibility(View.INVISIBLE);
-                */
-                if (mTooltip != null && mTooltip.isShowing())
-                    mTooltip.dismiss();
 
-                final User user = Preferences.getInstance().getUser();
-                final String existingUsername = user.getUsername() + "";
+                showViews(false);
+                hideTooltips();
+
+                final String existingUsername = user.getUsername();
                 final String newUsername = mUsernameEditText.getText().toString();
 
-                final String existingBio = user.getBio() + "";
+                final String existingBio = user.getBio();
                 final String newBio = mBioEditText.getText().toString();
 
                 /**
@@ -241,6 +240,19 @@ public class LeftDrawerHelper {
             }
         });
 
+        mUsernameEditText.setText(user.getUsername());
+        if (TextUtils.isEmpty(user.getBio())) {
+            mBioEditText.setHint(R.string.hint_write_something_about_yourself);
+        } else {
+            mBioEditText.setText(user.getBio());
+        }
+        mHeaderLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ScreenUtil.hideKeyboard(mActivity);
+            }
+        });
+        setupProfilePic(user.getId(), user.getProfilePicUrl());
     }
 
     private void checkForRemoteUpdatesToMyDP() {
@@ -256,24 +268,27 @@ public class LeftDrawerHelper {
                         if (!TextUtils.isEmpty(remote.getProfilePicUrl())) {
                             User local = Preferences.getInstance().getUser();
                             if (TextUtils.isEmpty(local.getProfilePicUrl()) || !remote.getProfilePicUrl().equals(local.getProfilePicUrl())) {
-                                Constants.DP_URL(remote.getId(), remote.getProfilePicUrl(), new OnCompleteListener<Uri>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Uri> task) {
-                                        if (!task.isSuccessful() || mActivityState.isActivityDestroyed()) {
-                                            return;
-                                        }
-                                        User user = Preferences.getInstance().getUser();
-                                        user.setProfilePicUrl(remote.getProfilePicUrl());
-                                        Preferences.getInstance().saveUser(user);
+                                try {
+                                    Constants.DP_URL(remote.getId(), remote.getProfilePicUrl(), new OnCompleteListener<Uri>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Uri> task) {
+                                            if (!task.isSuccessful() || mActivityState.isActivityDestroyed()) {
+                                                return;
+                                            }
+                                            User user = Preferences.getInstance().getUser();
+                                            user.setProfilePicUrl(remote.getProfilePicUrl());
+                                            Preferences.getInstance().saveUser(user);
 
-                                        MLog.i(TAG, "checkForRemoteUpdatesToMyDP() my pic changed remotely. attempt to update");
-                                        try {
-                                            Glide.with(mActivity).load(task.getResult().toString()).error(R.drawable.ic_anon_person_36dp).crossFade().into(mProfilePic);
-                                        } catch (Exception e) {
-                                            MLog.e(TAG, "onDrawerOpened() could not find my photo in google cloud storage", e);
+                                            MLog.i(TAG, "checkForRemoteUpdatesToMyDP() my pic changed remotely. attempt to update");
+                                            try {
+                                                Glide.with(mActivity).load(task.getResult().toString()).error(R.drawable.ic_anon_person_36dp).crossFade().into(mProfilePic);
+                                            } catch (Exception e) {
+                                                MLog.e(TAG, "onDrawerOpened() could not find my photo in google cloud storage", e);
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                } catch (RejectedExecutionException e) {
+                                }
                             } else {
                                 MLog.i(TAG, "checkForRemoteUpdatesToMyDP() my pic did not change remotely. do not update.");
                             }
@@ -326,12 +341,12 @@ public class LeftDrawerHelper {
             }
         });
         dialog.show();
-
     }
 
     private void showProfileUpdatedDialog() {
         //new SweetAlertDialog(mActivity, SweetAlertDialog.SUCCESS_TYPE).setTitleText(mActivity.getString(R.string.username_changed_dialog_title)).setContentText(mActivity.getString(R.string.is_your_new_username, newUsername)).show();
         new SweetAlertDialog(mActivity, SweetAlertDialog.SUCCESS_TYPE).setTitleText(mActivity.getString(R.string.your_profile_has_been_updated_title)).setContentText(mActivity.getString(R.string.your_profile_has_been_updated_msg)).show();
+        mSaveButton.setVisibility(View.GONE);
     }
 
     private void saveUser(final User user, final String newUsername, final String newBio, final boolean needToSaveBio, final boolean needToSaveUsername) {
@@ -420,4 +435,106 @@ public class LeftDrawerHelper {
         }
 
     }
+
+    private void clearEditableFocus() {
+        mUsernameEditText.setFocusableInTouchMode(true);
+        mUsernameEditText.clearFocus();
+        mBioEditText.setFocusableInTouchMode(true);
+        mBioEditText.clearFocus();
+    }
+
+    private boolean mIsUsernameChanged, mIsBioChanged;
+
+    private void setupUsernameAndBio() {
+
+        //clearEditableFocus();
+        FontUtil.setTextViewFont(mUsernameEditText);
+        FontUtil.setTextViewFont(mBioEditText);
+        mUsernameEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constants.MAX_USERNAME_LENGTH)});
+        mBioEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constants.MAX_BIO_LENGTH)});
+
+        mUsernameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (!Preferences.getInstance().getUsername().equals(charSequence.toString())) {
+                    mIsUsernameChanged = true;
+                    setSaveButtonVisibility(mIsUsernameChanged, mIsBioChanged);
+                } else {
+                    mIsUsernameChanged = false;
+                    setSaveButtonVisibility(mIsUsernameChanged, mIsBioChanged);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        mBioEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                User user = Preferences.getInstance().getUser();
+                if (!user.getBio().equals(charSequence.toString())) {
+                    mIsBioChanged = true;
+                    setSaveButtonVisibility(mIsUsernameChanged, mIsBioChanged);
+                } else {
+                    mIsBioChanged = false;
+                    setSaveButtonVisibility(mIsUsernameChanged, mIsBioChanged);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+    }
+
+    private void setSaveButtonVisibility(boolean isUsernameChanged, boolean isBioChanged) {
+        if (isUsernameChanged || isBioChanged) {
+            if (mSaveButton.getVisibility() != View.VISIBLE) {
+                mSaveButton.setVisibility(View.VISIBLE);
+                AnimationUtil.scaleInFromCenter(mSaveButton);
+            }
+        } else {
+            if (mSaveButton.getVisibility() != View.GONE) {
+                mSaveButton.setVisibility(View.GONE);
+                AnimationUtil.scaleInToCenter(mSaveButton);
+            }
+        }
+    }
+
+    private void showViews(boolean isShow) {
+        if (isShow) {
+            mBioEditText.setVisibility(View.VISIBLE);
+            mUsernameEditText.setVisibility(View.VISIBLE);
+            mDrawerLikesParent.setVisibility(View.VISIBLE);
+            mHelpButton.setVisibility(View.VISIBLE);
+            AnimationUtil.scaleInFromCenter(mUsernameEditText);
+            AnimationUtil.scaleInFromCenter(mBioEditText);
+            AnimationUtil.scaleInFromCenter(mDrawerLikesParent);
+            AnimationUtil.scaleInFromCenter(mHelpButton);
+        } else {
+            mBioEditText.setVisibility(View.INVISIBLE);
+            mUsernameEditText.setVisibility(View.INVISIBLE);
+            mDrawerLikesParent.setVisibility(View.INVISIBLE);
+            mHelpButton.setVisibility(View.INVISIBLE);
+            AnimationUtil.scaleInToCenter(mUsernameEditText);
+            AnimationUtil.scaleInToCenter(mBioEditText);
+            AnimationUtil.scaleInToCenter(mDrawerLikesParent);
+            AnimationUtil.scaleInToCenter(mHelpButton);
+        }
+    }
+
 }
