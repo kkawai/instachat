@@ -15,10 +15,7 @@
             android:id="@+id/messengerImageView"
             android:layout_width="@dimen/user_thumb_pic_size"
             android:layout_height="@dimen/user_thumb_pic_size"
-            android:transitionName="image"
-            app:civ_border_color="@color/colorPrimaryDark"
-            app:civ_border_overlay="true"
-            app:civ_border_width="2px" />
+            android:transitionName="image"/>
 
         <LinearLayout
             android:id="@+id/messageTextParent"

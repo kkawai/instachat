@@ -42,7 +42,7 @@
         android:paddingRight="30dp"
         android:layout_marginBottom="3dp"
         android:textColor="@android:color/white"
-        android:textSize="13sp"/>
+        android:textSize="14sp"/>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -69,7 +69,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:text="HEARTS"
-                android:textSize="13sp"/>
+                android:textSize="14sp"
+                android:textStyle="bold"/>
 
         </LinearLayout>
 
