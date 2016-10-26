@@ -138,6 +138,7 @@ Document differences between activity_main.xml here:
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_weight="1"
+                        android:backgroundTint="@color/jonPink"
                         android:hint="@string/message_hint"
                         android:imeOptions="actionSend|flagNoEnterAction"
                         android:inputType="textShortMessage|textAutoCorrect|textCapSentences|textMultiLine"/>
