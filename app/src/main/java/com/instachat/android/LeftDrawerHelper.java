@@ -12,6 +12,7 @@ import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -203,6 +204,7 @@ public class LeftDrawerHelper {
                 MLog.d(TAG, "onDrawerClosed() LEFT drawer");
 
                 ScreenUtil.hideKeyboard(mActivity);
+                mSaveButton.setVisibility(View.GONE);
 
                 showViews(false);
                 hideTooltips();
@@ -246,10 +248,12 @@ public class LeftDrawerHelper {
         } else {
             mBioEditText.setText(user.getBio());
         }
-        mHeaderLayout.setOnClickListener(new View.OnClickListener() {
+        mHeaderLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onTouch(View view, MotionEvent motionEvent) {
                 ScreenUtil.hideKeyboard(mActivity);
+                clearEditableFocus();
+                return true;
             }
         });
         setupProfilePic(user.getId(), user.getProfilePicUrl());
@@ -344,7 +348,6 @@ public class LeftDrawerHelper {
     }
 
     private void showProfileUpdatedDialog() {
-        //new SweetAlertDialog(mActivity, SweetAlertDialog.SUCCESS_TYPE).setTitleText(mActivity.getString(R.string.username_changed_dialog_title)).setContentText(mActivity.getString(R.string.is_your_new_username, newUsername)).show();
         new SweetAlertDialog(mActivity, SweetAlertDialog.SUCCESS_TYPE).setTitleText(mActivity.getString(R.string.your_profile_has_been_updated_title)).setContentText(mActivity.getString(R.string.your_profile_has_been_updated_msg)).show();
         mSaveButton.setVisibility(View.GONE);
     }
