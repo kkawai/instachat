@@ -156,6 +156,7 @@ public class LeftDrawerHelper {
             @Override
             public void onClick(View view) {
                 showTooltips();
+                ScreenUtil.hideKeyboard(mActivity);
             }
         });
         mSaveButton.setOnClickListener(new View.OnClickListener() {
@@ -168,7 +169,7 @@ public class LeftDrawerHelper {
         mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
-                showViews(false);
+
             }
 
             @Override
@@ -252,17 +253,6 @@ public class LeftDrawerHelper {
             }
         });
         setupProfilePic(user.getId(), user.getProfilePicUrl());
-    }
-
-    private void hideKeyboard() {
-        mUsernameEditText.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                ScreenUtil.hideKeyboard(mActivity);
-                ScreenUtil.hideKeyboard(mBioEditText);
-                ScreenUtil.hideKeyboard(mUsernameEditText);
-            }
-        }, 25);
     }
 
     private void checkForRemoteUpdatesToMyDP() {
@@ -457,7 +447,7 @@ public class LeftDrawerHelper {
 
     private void setupUsernameAndBio() {
 
-        clearEditableFocus();
+        //clearEditableFocus();
         FontUtil.setTextViewFont(mUsernameEditText);
         FontUtil.setTextViewFont(mBioEditText);
         mUsernameEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(Constants.MAX_USERNAME_LENGTH)});
@@ -540,6 +530,10 @@ public class LeftDrawerHelper {
             mUsernameEditText.setVisibility(View.INVISIBLE);
             mDrawerLikesParent.setVisibility(View.INVISIBLE);
             mHelpButton.setVisibility(View.INVISIBLE);
+            AnimationUtil.scaleInToCenter(mUsernameEditText);
+            AnimationUtil.scaleInToCenter(mBioEditText);
+            AnimationUtil.scaleInToCenter(mDrawerLikesParent);
+            AnimationUtil.scaleInToCenter(mHelpButton);
         }
     }
 
