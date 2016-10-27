@@ -9,10 +9,10 @@
     <color name="material_grey">#f5f2f2</color>
 
     <!-- send message button colors -->
-    <color name="send_button_disabled_color">@color/material_grey</color>
-    <color name="send_button_normal_color">@color/colorPrimary</color>
-    <color name="send_button_pressed_color">#FFD9DE</color>
-    <color name="send_button_ripple_color">#d8dade</color>
+    <color name="send_button_disabled_color">#a8a8a8</color>
+    <color name="send_button_normal_color">#FF425A</color>
+    <color name="send_button_pressed_color">#FFA0AC</color>
+    <color name="send_button_ripple_color">#99FFFFFF</color>
 
     <color name="defaultChatSummaryNameColor">#d8dade</color>
 
@@ -31,7 +31,7 @@
     </array>
 
     <color name="white_baby_powder">#FEFEFA</color>
-    <color name="link_color">#ff3f739a</color>
+    <color name="link_color">#ff007de3</color>
 
     <color name="light_turquoise">#71efc5</color>
 
