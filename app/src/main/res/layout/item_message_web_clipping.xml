@@ -153,8 +153,7 @@
             android:id="@+id/periscopeParent"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_gravity="end|bottom"
-            android:layout_marginBottom="10dp">
+            android:layout_gravity="end|bottom">
 
             <com.instachat.android.view.PeriscopeLayout
                 android:id="@+id/periscope"
@@ -179,7 +178,6 @@
             android:layout_width="@dimen/likes_button_size"
             android:layout_height="@dimen/likes_button_size"
             android:layout_gravity="end|bottom"
-            android:layout_marginBottom="10dp"
             android:src="@color/chat_like_button_inactive_state"
             app:allow_random_color="false"
             app:big_shine_color="@color/chat_like_button_active_state"
