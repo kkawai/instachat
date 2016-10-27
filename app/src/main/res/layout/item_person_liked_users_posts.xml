@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="13dp"
+        android:paddingLeft="16dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/userPic"
+            android:layout_width="@dimen/user_thumb_pic_size"
+            android:layout_height="@dimen/user_thumb_pic_size"
+            android:src="@drawable/ic_anon_person_36dp"
+            android:transitionName="image"
+            app:civ_border_color="@color/colorAccent"
+            app:civ_border_overlay="true"
+            app:civ_border_width="2px"/>
+
+        <com.instachat.android.view.CustomFontTextView
+            android:id="@+id/username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:text="theonetrevor"
+            android:textColor="@android:color/black"
+            android:textSize="15sp"
+            app:font="Lato-Bold.ttf"/>
+
+        <com.instachat.android.view.CustomFontTextView
+            android:id="@+id/likedPersonsPosts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:text="Likes my posts 56 times"
+            android:textColor="@android:color/black"
+            android:textSize="15sp"
+            app:font="Lato-Bold.ttf"/>
+
+    </LinearLayout>
+
+</layout>

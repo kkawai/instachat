@@ -1,7 +1,6 @@
-package com.instachat.android.blocks;
+package com.instachat.android.likes;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -24,22 +23,24 @@ import com.instachat.android.R;
 import com.instachat.android.adapter.UserClickedListener;
 import com.instachat.android.model.User;
 import com.instachat.android.util.MLog;
+import com.instachat.android.util.Preferences;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
-public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends FirebaseRecyclerAdapter<BlockedUser, BlocksViewHolder> {
+public final class UserLikedUserAdapter<T, VH extends RecyclerView.ViewHolder> extends FirebaseRecyclerAdapter<User, UserLikedUserViewHolder> {
 
-    private static final String TAG = "BlocksAdapter";
+    private static final String TAG = "UserLikedUserAdapter";
 
     private UserClickedListener mUserClickedListener;
     private Activity mActivity;
     private ActivityState mActivityState;
     private List<Map.Entry<DatabaseReference, ValueEventListener>> mUserInfoChangeListeners = new ArrayList<>();
 
-    public BlocksAdapter(Class<BlockedUser> modelClass, int modelLayout, Class<BlocksViewHolder> viewHolderClass, DatabaseReference ref) {
+    public UserLikedUserAdapter(Class<User> modelClass, int modelLayout, Class<UserLikedUserViewHolder> viewHolderClass, DatabaseReference ref) {
         super(modelClass, modelLayout, viewHolderClass, ref);
     }
 
@@ -53,28 +54,28 @@ public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends 
     }
 
     @Override
-    public BlocksViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final BlocksViewHolder holder = super.onCreateViewHolder(parent, viewType);
+    public UserLikedUserViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        final UserLikedUserViewHolder holder = super.onCreateViewHolder(parent, viewType);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                BlockedUser blockedUser = getItem(holder.getAdapterPosition());
-                mUserClickedListener.onUserClicked(blockedUser.id, blockedUser.getName(), blockedUser.getDpid());
+                User user = getItem(holder.getAdapterPosition());
+                mUserClickedListener.onUserClicked(user.getId(), user.getUsername(), user.getProfilePicUrl());
             }
         });
         return holder;
     }
 
     @Override
-    protected void populateViewHolder(final BlocksViewHolder viewHolder, BlockedUser model, int position) {
-        viewHolder.username.setText(model.getName());
-        viewHolder.username.setTextColor(Color.BLACK);
-        if (TextUtils.isEmpty(model.dpid)) {
+    protected void populateViewHolder(final UserLikedUserViewHolder viewHolder, User model, int position) {
+        viewHolder.username.setText(model.getUsername());
+        viewHolder.likedPersonsPosts.setText(mActivity.getString(R.string.liked_my_posts_x_times, model.getLikes() + ""));
+        if (TextUtils.isEmpty(model.getProfilePicUrl())) {
             viewHolder.userPic.setImageResource(R.drawable.ic_anon_person_36dp);
             return;
         }
         try {
-            Constants.DP_URL(model.id, model.getDpid(), new OnCompleteListener<Uri>() {
+            Constants.DP_URL(model.getId(), model.getProfilePicUrl(), new OnCompleteListener<Uri>() {
                 @Override
                 public void onComplete(@NonNull Task<Uri> task) {
                     if (mActivityState == null || mActivityState.isActivityDestroyed())
@@ -93,16 +94,15 @@ public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends 
                     }
                 }
             });
-        }catch (RejectedExecutionException e){}
+        } catch (RejectedExecutionException e) {
+        }
     }
 
     @Override
-    protected BlockedUser parseSnapshot(DataSnapshot snapshot) {
-        MLog.d(TAG, "BlockedUser: " + snapshot);
-        BlockedUser blockedUser = snapshot.getValue(BlockedUser.class);
-        blockedUser.id = Integer.parseInt(snapshot.getKey());
-        listenForUserUpdates(blockedUser);
-        return blockedUser;
+    protected User parseSnapshot(DataSnapshot snapshot) {
+        User user = snapshot.getValue(User.class);
+        listenForUserUpdates(user.getId());
+        return user;
     }
 
     @Override
@@ -117,9 +117,9 @@ public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends 
         super.cleanup();
     }
 
-    private void listenForUserUpdates(final BlockedUser blockedUser) {
+    private void listenForUserUpdates(final int userid) {
 
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(Integer.parseInt(blockedUser.id + "")));
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(Integer.parseInt(userid + "")));
         final ValueEventListener eventListener = ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -128,8 +128,7 @@ public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends 
                 try {
                     if (dataSnapshot.getValue() != null) {
                         User user = dataSnapshot.getValue(User.class);
-                        BlockedUser blockedUser = new BlockedUser(user.getId(), user.getUsername(), user.getProfilePicUrl());
-                        updateBlockedUser(blockedUser);
+                        updateUser(user);
                     }
                 } catch (Exception e) {
                     MLog.e(TAG, "", e);
@@ -161,7 +160,12 @@ public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends 
         mUserInfoChangeListeners.add(entry);
     }
 
-    private void updateBlockedUser(BlockedUser blockedUser) {
-        FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF()).child(blockedUser.id + "").updateChildren(blockedUser.getUpdateMap());
+    private void updateUser(User user) {
+        Map<String, Object> map = new HashMap<>(1);
+        map.put("username", user.getUsername());
+        if (user.getProfilePicUrl() != null)
+            map.put("profilePicUrl", user.getProfilePicUrl());
+        map.put("id", user.getId());
+        FirebaseDatabase.getInstance().getReference(Constants.USER_RECEIVED_LIKES_REF(Preferences.getInstance().getUserId())).child(user.getId() + "").updateChildren(map);
     }
 }

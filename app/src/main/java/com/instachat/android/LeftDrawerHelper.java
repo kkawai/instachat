@@ -31,6 +31,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.font.FontUtil;
+import com.instachat.android.likes.UserLikedUserListener;
 import com.instachat.android.model.User;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
@@ -66,6 +67,7 @@ public class LeftDrawerHelper {
     private boolean mIsVirgin = true;
     private DatabaseReference mTotalLikesRef;
     private ValueEventListener mTotalLikesEventListener;
+    private UserLikedUserListener mUserLikedUserListener;
 
     public LeftDrawerHelper(@NonNull Activity activity, @NonNull ActivityState activityState, @NonNull DrawerLayout drawerLayout, @NonNull MyProfilePicListener listener) {
         mActivity = activity;
@@ -154,6 +156,15 @@ public class LeftDrawerHelper {
         mHelpButton = mHeaderLayout.findViewById(R.id.help);
         setupUsernameAndBio();
         mProfilePic = (ImageView) mHeaderLayout.findViewById(R.id.nav_pic);
+        mDrawerLikesParent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mUserLikedUserListener != null) {
+                    mDrawerLayout.closeDrawer(GravityCompat.START);
+                    mUserLikedUserListener.onMyLikersClicked();
+                }
+            }
+        });
         mProfilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -325,6 +336,7 @@ public class LeftDrawerHelper {
         mActivity = null;
         mDrawerLayout = null;
         mMyProfilePicListener = null;
+        mUserLikedUserListener = null;
         if (mTotalLikesRef != null && mTotalLikesEventListener != null)
             mTotalLikesRef.removeEventListener(mTotalLikesEventListener);
     }
@@ -569,6 +581,10 @@ public class LeftDrawerHelper {
             }
         };
         mTotalLikesRef.addValueEventListener(mTotalLikesEventListener);
+    }
+
+    public void setUserLikedUserListener(UserLikedUserListener listener) {
+        mUserLikedUserListener = listener;
     }
 
 }

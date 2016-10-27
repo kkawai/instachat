@@ -77,6 +77,8 @@ import com.instachat.android.font.FontUtil;
 import com.instachat.android.fullscreen.FriendlyMessageContainer;
 import com.instachat.android.fullscreen.FullScreenTextFragment;
 import com.instachat.android.gcm.GCMHelper;
+import com.instachat.android.likes.UserLikedUserFragment;
+import com.instachat.android.likes.UserLikedUserListener;
 import com.instachat.android.login.LogoutDialogHelper;
 import com.instachat.android.login.SignInActivity;
 import com.instachat.android.model.FriendlyMessage;
@@ -740,6 +742,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         navigationView.addHeaderView(headerView);
         mLeftDrawerHelper = new LeftDrawerHelper(this, this, mDrawerLayout, mMyProfilePicListener);
         mLeftDrawerHelper.setup(navigationView);
+        mLeftDrawerHelper.setUserLikedUserListener(mUserLikedUserListener);
 
         mChatsRecyclerViewAdapter = new ChatSummariesRecyclerAdapter(this, this);
         RecyclerView recyclerView = (RecyclerView) drawerView.findViewById(R.id.drawerRecyclerView);
@@ -1360,5 +1363,13 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         mFirebaseRemoteConfig.setConfigSettings(firebaseRemoteConfigSettings);
         mFirebaseRemoteConfig.setDefaults(defaultConfigMap);
     }
+
+    private UserLikedUserListener mUserLikedUserListener = new UserLikedUserListener() {
+        @Override
+        public void onMyLikersClicked() {
+            Fragment fragment = new UserLikedUserFragment();
+            getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, UserLikedUserFragment.TAG).addToBackStack(null).commit();
+        }
+    };
 
 }

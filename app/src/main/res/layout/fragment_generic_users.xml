@@ -38,7 +38,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:text="@string/manage_blocks"
                 android:textColor="@android:color/black"
                 android:textSize="18sp"
                 app:font="Lato-Normal.ttf"/>
@@ -48,7 +47,7 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/blocksRecyclerView"
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingLeft="@dimen/activity_horizontal_margin"

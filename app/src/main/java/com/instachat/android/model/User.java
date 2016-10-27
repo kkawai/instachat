@@ -154,7 +154,7 @@ public class User extends DomainObject {
      * @return
      */
     public Map<String, Object> getMap(boolean includeTimestamp) {
-        Map<String, Object> map = new HashMap<>(1);
+        Map<String, Object> map = new HashMap<>(10);
         map.put("username", username);
         if (profilePicUrl != null)
             map.put("profilePicUrl", profilePicUrl);
@@ -202,7 +202,7 @@ public class User extends DomainObject {
     }
 
     public String getUsername() {
-        return username+"";
+        return username + "";
     }
 
     public void setUsername(String username) {
@@ -266,7 +266,7 @@ public class User extends DomainObject {
     }
 
     public String getBio() {
-        return bio+"";
+        return bio + "";
     }
 
     public void setBio(String bio) {

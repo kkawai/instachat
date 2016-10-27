@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -34,14 +35,16 @@ public class BlocksFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_blocks, container, false);
-        mBlocksRecyclerView = (RecyclerView) view.findViewById(R.id.blocksRecyclerView);
+        View view = inflater.inflate(R.layout.fragment_generic_users, container, false);
+        mBlocksRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        TextView fragmentTitle = (TextView)getView().findViewById(R.id.customFragmentToolbarTitle);
+        fragmentTitle.setText(R.string.manage_blocks);
         mUserClickedListener = new UserClickedListener() {
             @Override
             public void onUserClicked(final int userid, final String username, final String dpid) {

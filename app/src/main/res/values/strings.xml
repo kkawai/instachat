@@ -142,4 +142,6 @@
     <string name="default_bio">Hey there!  I am using %s  Send me a message on here!</string>
     <string name="like_singular">1 like</string>
     <string name="likes_plural">%s likes</string>
+    <string name="liked_my_posts_x_times">Liked my posts %s times</string>
+    <string name="received_likes_title">Received likes</string>
 </resources>
