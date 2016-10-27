@@ -210,6 +210,11 @@ public class LeftDrawerHelper {
                 }
                 showViews(true);
                 mSaveButton.setVisibility(View.GONE);
+
+                if (!Preferences.getInstance().hasShownUsernameTooltip()) {
+                    showTooltips();
+                    Preferences.getInstance().setShownUsernameTooltip(true);
+                }
             }
 
             @Override
