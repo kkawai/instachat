@@ -74,6 +74,7 @@
         android:visibility="invisible">
 
         <ImageView
+            android:id="@+id/drawerLikesIcon"
             android:layout_width="10dp"
             android:layout_height="10dp"
             android:layout_gravity="center_vertical"
@@ -86,7 +87,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="16 likes"
+            android:text=""
             android:textSize="13sp"
             android:textStyle="bold"
             app:font="Lato-Bold.ttf"/>

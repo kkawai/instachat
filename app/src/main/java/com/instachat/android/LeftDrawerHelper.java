@@ -24,6 +24,11 @@ import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.User;
@@ -57,7 +62,10 @@ public class LeftDrawerHelper {
     private View mSaveButton;
     private View mHelpButton;
     private View mDrawerLikesParent;
-    private View mDrawerLikesCountView;
+    private TextView mDrawerLikesCountView;
+    private boolean mIsVirgin = true;
+    private DatabaseReference mTotalLikesRef;
+    private ValueEventListener mTotalLikesEventListener;
 
     public LeftDrawerHelper(@NonNull Activity activity, @NonNull ActivityState activityState, @NonNull DrawerLayout drawerLayout, @NonNull MyProfilePicListener listener) {
         mActivity = activity;
@@ -141,8 +149,8 @@ public class LeftDrawerHelper {
         mUsernameEditText = (EditText) mHeaderLayout.findViewById(R.id.nav_username);
         mSaveButton = mHeaderLayout.findViewById(R.id.save_username);
         mDrawerLikesParent = mHeaderLayout.findViewById(R.id.drawerLikesParent);
-        mDrawerLikesCountView = mHeaderLayout.findViewById(R.id.drawerLikes);
-        FontUtil.setTextViewFont((TextView) mDrawerLikesCountView);
+        mDrawerLikesCountView = (TextView) mHeaderLayout.findViewById(R.id.drawerLikes);
+        FontUtil.setTextViewFont(mDrawerLikesCountView);
         mHelpButton = mHeaderLayout.findViewById(R.id.help);
         setupUsernameAndBio();
         mProfilePic = (ImageView) mHeaderLayout.findViewById(R.id.nav_pic);
@@ -190,6 +198,7 @@ public class LeftDrawerHelper {
                     mProfilePicTooltip = new Tooltip.Builder(mProfilePic, R.style.drawer_tooltip).setText(mActivity.getString(R.string.display_photo_tooltip)).show();
                 }
                 showViews(true);
+                mSaveButton.setVisibility(View.GONE);
             }
 
             @Override
@@ -257,6 +266,7 @@ public class LeftDrawerHelper {
             }
         });
         setupProfilePic(user.getId(), user.getProfilePicUrl());
+        listenForUpdatedLikeCount(user.getId());
     }
 
     private void checkForRemoteUpdatesToMyDP() {
@@ -315,6 +325,8 @@ public class LeftDrawerHelper {
         mActivity = null;
         mDrawerLayout = null;
         mMyProfilePicListener = null;
+        if (mTotalLikesRef != null && mTotalLikesEventListener != null)
+            mTotalLikesRef.removeEventListener(mTotalLikesEventListener);
     }
 
     private void showChooseDialog() {
@@ -522,22 +534,41 @@ public class LeftDrawerHelper {
         if (isShow) {
             mBioEditText.setVisibility(View.VISIBLE);
             mUsernameEditText.setVisibility(View.VISIBLE);
-            mDrawerLikesParent.setVisibility(View.VISIBLE);
             mHelpButton.setVisibility(View.VISIBLE);
-            AnimationUtil.scaleInFromCenter(mUsernameEditText);
-            AnimationUtil.scaleInFromCenter(mBioEditText);
-            AnimationUtil.scaleInFromCenter(mDrawerLikesParent);
-            AnimationUtil.scaleInFromCenter(mHelpButton);
-        } else {
-            mBioEditText.setVisibility(View.INVISIBLE);
-            mUsernameEditText.setVisibility(View.INVISIBLE);
-            mDrawerLikesParent.setVisibility(View.INVISIBLE);
-            mHelpButton.setVisibility(View.INVISIBLE);
-            AnimationUtil.scaleInToCenter(mUsernameEditText);
-            AnimationUtil.scaleInToCenter(mBioEditText);
-            AnimationUtil.scaleInToCenter(mDrawerLikesParent);
-            AnimationUtil.scaleInToCenter(mHelpButton);
+            if (mIsVirgin) {
+                mIsVirgin = false;
+                AnimationUtil.scaleInFromCenter(mUsernameEditText);
+                AnimationUtil.scaleInFromCenter(mBioEditText);
+                AnimationUtil.scaleInFromCenter(mDrawerLikesParent);
+                AnimationUtil.scaleInFromCenter(mHelpButton);
+            }
         }
+    }
+
+    private void listenForUpdatedLikeCount(int userid) {
+        mTotalLikesRef = FirebaseDatabase.getInstance().getReference(Constants.USER_TOTAL_LIKES_RECEIVED_REF(userid));
+        mTotalLikesEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    if (mDrawerLikesParent.getVisibility() != View.VISIBLE) {
+                        mDrawerLikesParent.setVisibility(View.VISIBLE);
+                    }
+                    long count = dataSnapshot.getValue(Long.class);
+                    if (count == 1) {
+                        mDrawerLikesCountView.setText(mActivity.getString(R.string.like_singular));
+                    } else {
+                        mDrawerLikesCountView.setText(mActivity.getString(R.string.likes_plural, count + ""));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        mTotalLikesRef.addValueEventListener(mTotalLikesEventListener);
     }
 
 }

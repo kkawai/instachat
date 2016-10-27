@@ -140,4 +140,6 @@
     <string name="fetching_web_clipping">Fetching web clipping...</string>
 
     <string name="default_bio">Hey there!  I am using %s  Send me a message on here!</string>
+    <string name="like_singular">1 like</string>
+    <string name="likes_plural">%s likes</string>
 </resources>
