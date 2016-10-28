@@ -144,4 +144,5 @@
     <string name="likes_plural">%s likes</string>
     <string name="liked_my_posts_x_times">Liked my posts %s times</string>
     <string name="received_likes_title">Received likes</string>
+    <string name="possible_explicit_content_warning">Warning: this photo may contain inappropriate or explicit content</string>
 </resources>

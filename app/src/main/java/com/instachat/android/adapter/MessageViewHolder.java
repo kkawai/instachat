@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.instachat.android.R;
@@ -22,6 +23,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
     public TextView messageTimeTextView;
     public ImageView messagePhotoView;
     public FrameLayout messagePhotoViewParent;
+    public View messagePhotoWarningView;
     public CircleImageView messengerImageView;
     public PeriscopeLayout periscopeLayout;
     public View periscopeParent;
@@ -46,6 +48,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         messageTimeTextView = (TextView) itemView.findViewById(R.id.messageTimeTextView);
         messagePhotoView = (ImageView) itemView.findViewById(R.id.messagePhotoView);
         messagePhotoViewParent = (FrameLayout) itemView.findViewById(R.id.messagePhotoViewParent);
+        messagePhotoWarningView = itemView.findViewById(R.id.messagePhotoWarningView);
         periscopeParent = itemView.findViewById(R.id.periscopeParent);
         periscopeLayout = (PeriscopeLayout) itemView.findViewById(R.id.periscope);
         likesButton = (ShineButton) itemView.findViewById(R.id.likeButton);

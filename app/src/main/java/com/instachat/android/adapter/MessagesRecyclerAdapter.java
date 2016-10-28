@@ -206,6 +206,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             final View.OnClickListener onClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    MLog.d(TAG, "message clicked");
                     mMessageTextClickedListener.onMessageClicked(holder.getAdapterPosition());
                 }
             };
@@ -214,21 +215,11 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             holder.messageTextParent.setOnClickListener(onClickListener);
             holder.messageTextParent.setOnLongClickListener(onLongClickListener);
             holder.messagePhotoView.setOnLongClickListener(onLongClickListener);
-            holder.messagePhotoView.setOnClickListener(new View.OnClickListener() {
+            holder.messagePhotoView.setOnClickListener(onClickListener);
+            holder.messagePhotoWarningView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (holder.messagePhotoView.getVisibility() == View.VISIBLE) {
-                        onClickListener.onClick(view);
-                    }
-                }
-            });
-            holder.messagePhotoViewParent.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (holder.messagePhotoView.getVisibility() != View.VISIBLE) {
-                        notifyItemChanged(holder.getAdapterPosition(), PAYLOAD_IMAGE_REVEAL);
-                        MLog.d(TAG, "messagePhotoViewParent debug clicked NOT VISIBLE");
-                    }
+                    notifyItemChanged(holder.getAdapterPosition(), PAYLOAD_IMAGE_REVEAL);
                 }
             });
         } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
@@ -314,16 +305,21 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 if (payloads != null && payloads.contains(PAYLOAD_IMAGE_REVEAL)) {
                     MLog.d(TAG, "populate messagePhotoViewParent got reveal payload");
                     viewHolder.messagePhotoView.setVisibility(View.VISIBLE);
+                    viewHolder.messagePhotoWarningView.setVisibility(View.GONE);
                     AnimationUtil.scaleInFromCenter(viewHolder.messagePhotoViewParent);
                 } else if (friendlyMessage.isPossibleAdultImage() || friendlyMessage.isPossibleViolentImage()) {
                     MLog.d(TAG, "populate messagePhotoViewParent did not get reveal payload");
                     viewHolder.messagePhotoView.setVisibility(View.INVISIBLE);
+                    viewHolder.messagePhotoWarningView.setVisibility(View.VISIBLE);
                 } else {
                     viewHolder.messagePhotoView.setVisibility(View.VISIBLE);
+                    viewHolder.messagePhotoWarningView.setVisibility(View.GONE);
                 }
 
             } else {
                 viewHolder.messagePhotoViewParent.setVisibility(View.GONE);
+                viewHolder.messagePhotoView.setVisibility(View.GONE);
+                viewHolder.messagePhotoWarningView.setVisibility(View.GONE);
             }
         }
 
