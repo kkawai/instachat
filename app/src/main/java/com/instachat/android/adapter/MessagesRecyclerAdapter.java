@@ -412,6 +412,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 if (mActivityState == null || mActivityState.isActivityDestroyed())
                     return;
                 friendlyMessage.setId(dataSnapshot.getKey());
+                MLog.d(TAG, "pushed message. debug possibleAdult content ", friendlyMessage.isPossibleAdultImage());
                 mFirebaseDatabaseReference.child(mDatabaseRef).child(friendlyMessage.getId()).setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {

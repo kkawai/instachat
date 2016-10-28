@@ -56,7 +56,7 @@ public class LikesHelper {
                 ref.removeEventListener(this);
                 if (dataSnapshot.getValue() == null) {
                     me.setLikes(1);
-                    ref.setValue(me.getLikesMap());
+                    ref.setValue(me.toLikesMap());
                 } else {
                     User user = dataSnapshot.getValue(User.class);
                     ref.child(Constants.CHILD_LIKES).setValue(user.getLikes() + 1);
@@ -114,7 +114,7 @@ public class LikesHelper {
                 userReceivedLikesRef.removeEventListener(this);
                 if (dataSnapshot.getValue() == null) {
                     me.setLikes(1);
-                    userReceivedLikesRef.setValue(me.getLikesMap());
+                    userReceivedLikesRef.setValue(me.toLikesMap());
                 } else {
                     User user = dataSnapshot.getValue(User.class);
                     user.incrementLikes();
@@ -135,7 +135,7 @@ public class LikesHelper {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 userGivenLikesRef.removeEventListener(this);
                 if (dataSnapshot.getValue() == null) {
-                    userGivenLikesRef.setValue(friendlyMessage.getUserMap());
+                    userGivenLikesRef.setValue(friendlyMessage.toUserMap());
                 } else {
                     User user = dataSnapshot.getValue(User.class);
                     user.incrementLikes();

@@ -153,7 +153,7 @@ public class User extends DomainObject {
      *
      * @return
      */
-    public Map<String, Object> getMap(boolean includeTimestamp) {
+    public Map<String, Object> toMap(boolean includeTimestamp) {
         Map<String, Object> map = new HashMap<>(10);
         map.put("username", username);
         if (profilePicUrl != null)
@@ -173,7 +173,7 @@ public class User extends DomainObject {
         return map;
     }
 
-    public Map<String, Object> getLikesMap() {
+    public Map<String, Object> toLikesMap() {
         Map<String, Object> map = new HashMap<>(1);
         map.put("username", username);
         if (profilePicUrl != null)

@@ -72,7 +72,7 @@ public class DirectReplyActivity extends AppCompatActivity {
         } else {
             User me = Preferences.getInstance().getUser();
             final FriendlyMessage friendlyMessage = new FriendlyMessage(myDirectReply, me.getUsername(), me.getId(),
-                    me.getProfilePicUrl(), null, null, System.currentTimeMillis());
+                    me.getProfilePicUrl(), null, false, false, null, System.currentTimeMillis());
 
             FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHAT_REF(userid)).push().addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override

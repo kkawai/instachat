@@ -26,6 +26,8 @@ public class FriendlyMessage implements Parcelable {
     private String name;
     private String dpid;
     private int userid;
+    private boolean possibleViolentImage;
+    private boolean possibleAdultImage;
     private String imageUrl;
     private String imageId;
     private long time;
@@ -39,7 +41,7 @@ public class FriendlyMessage implements Parcelable {
     public FriendlyMessage() {
     }
 
-    public Map<String, Object> getUserMap() {
+    public Map<String, Object> toUserMap() {
         Map<String, Object> map = new HashMap<>(8);
         if (getName() != null)
             map.put("username", getName());
@@ -78,10 +80,14 @@ public class FriendlyMessage implements Parcelable {
             map.put(Constants.CHILD_LIKES, friendlyMessage.likes);
         }
         map.put("messageType", friendlyMessage.getMessageType());
+        if (friendlyMessage.possibleAdultImage)
+            map.put("possibleAdultImage", friendlyMessage.possibleAdultImage);
+        if (friendlyMessage.possibleViolentImage)
+            map.put("possibleViolentImage", friendlyMessage.possibleViolentImage);
         return map;
     }
 
-    public FriendlyMessage(String text, String name, int userid, String dpid, String imageUrl, String imageId, long time) {
+    public FriendlyMessage(String text, String name, int userid, String dpid, String imageUrl, boolean possibleAdultImage, boolean possibleViolentImage, String imageId, long time) {
         this.text = text;
         this.name = name;
         this.time = time;
@@ -89,6 +95,8 @@ public class FriendlyMessage implements Parcelable {
         this.imageUrl = imageUrl;
         this.imageId = imageId;
         this.dpid = dpid;
+        this.possibleAdultImage = possibleAdultImage;
+        this.possibleViolentImage = possibleViolentImage;
     }
 
     public JSONObject toJSONObject() throws JSONException {
@@ -114,6 +122,10 @@ public class FriendlyMessage implements Parcelable {
         if (likes != 0)
             o.put(Constants.CHILD_LIKES, likes);
         o.put("messageType", messageType);
+        if (possibleAdultImage)
+            o.put("possibleAdultImage", possibleAdultImage);
+        if (possibleViolentImage)
+            o.put("possibleViolentImage", possibleViolentImage);
         return o;
     }
 
@@ -196,6 +208,10 @@ public class FriendlyMessage implements Parcelable {
         } else if (text == null && friendlyMessage.text != null) {
             text = friendlyMessage.text;
         }
+        if (possibleAdultImage || friendlyMessage.possibleAdultImage)
+            possibleAdultImage = true;
+        if (possibleViolentImage || friendlyMessage.possibleViolentImage)
+            possibleViolentImage = true;
         return true;
     }
 
@@ -213,6 +229,8 @@ public class FriendlyMessage implements Parcelable {
             friendlyMessage.messageType = o.optInt("messageType");
             friendlyMessage.groupName = o.optString("groupName");
             friendlyMessage.groupId = o.optLong("groupId");
+            friendlyMessage.possibleAdultImage = o.optBoolean("possibleAdultImage");
+            friendlyMessage.possibleViolentImage = o.optBoolean("possibleViolentImage");
             friendlyMessage.likes = o.optInt(Constants.CHILD_LIKES);
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
@@ -246,6 +264,8 @@ public class FriendlyMessage implements Parcelable {
             groupName = friendlyMessage.groupName;
             groupId = friendlyMessage.groupId;
             messageType = friendlyMessage.messageType;
+            possibleAdultImage = friendlyMessage.possibleAdultImage;
+            possibleViolentImage = friendlyMessage.possibleViolentImage;
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
         }
@@ -355,8 +375,12 @@ public class FriendlyMessage implements Parcelable {
         this.likes = likes;
     }
 
-    public void incrementLikes() {
-        likes++;
+    public boolean isPossibleViolentImage() {
+        return possibleViolentImage;
+    }
+
+    public boolean isPossibleAdultImage() {
+        return possibleAdultImage;
     }
 
     @Override

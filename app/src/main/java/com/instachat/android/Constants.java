@@ -237,7 +237,7 @@ public final class Constants {
     }
 
     public static final long DEFAULT_PUBLIC_GROUP_ID = 1;
-    public static final int MAX_PIC_SIZE_BYTES = 512000;
+    public static final int MAX_PIC_SIZE_BYTES = 900000;
     public static final int MAX_PROFILE_PIC_SIZE_BYTES = 400000;
     public static final float MAX_FULLSCREEN_FONT_SIZE = 199f;
 
@@ -275,5 +275,7 @@ public final class Constants {
     public static String FIELD_LAST_MESSAGE_SENT_TIMESTAMP = "lastMessageSentTimestamp";
     public static String FIELD_CURRENT_GROUP_ID = "currentGroupId";
     public static String FIELD_CURRENT_GROUP_NAME = "currentGroupName";
+
+    public static final String GOOGLE_API_KEY = "AIzaSyAHnphNjr0gqXkxps262WCzNmyG_P6OE24";
 
 }

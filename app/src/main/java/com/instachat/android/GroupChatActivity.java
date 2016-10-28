@@ -502,7 +502,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 if (isNeedsDp())
                     return;
                 mMessageEditText.setText("");//fast double taps on send can cause 2x sends!
-                final FriendlyMessage friendlyMessage = new FriendlyMessage(text, myUsername(), myUserid(), myDpid(), null, null, System.currentTimeMillis());
+                final FriendlyMessage friendlyMessage = new FriendlyMessage(text, myUsername(), myUserid(), myDpid(), null, false, false, null, System.currentTimeMillis());
                 try {
                     mFirebaseAdapter.sendFriendlyMessage(friendlyMessage);
                 } catch (Exception e) {
@@ -1077,7 +1077,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     }
 
     @Override
-    public void onPhotoUploadSuccess(String photoId, String photoUrl) {
+    public void onPhotoUploadSuccess(String photoId, String photoUrl, boolean isPossiblyAdultImage, boolean isPossiblyViolentImage) {
         if (isActivityDestroyed()) {
             return;
         }
@@ -1085,8 +1085,10 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
         if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.chatRoomPhoto) {
 
-            final FriendlyMessage friendlyMessage = new FriendlyMessage("", myUsername(), myUserid(), myDpid(), photoUrl, photoId, System.currentTimeMillis());
-            MLog.d(TAG, "uploadFromUri:onSuccess photoId: " + photoId);
+            final FriendlyMessage friendlyMessage = new FriendlyMessage("", myUsername(), myUserid(), myDpid(),
+                    photoUrl, isPossiblyAdultImage, isPossiblyViolentImage, photoId,
+                    System.currentTimeMillis());
+            MLog.d(TAG, "uploadFromUri:onSuccess photoId: " + photoId, " debug possibleAdult: ", friendlyMessage.isPossibleAdultImage(), " parameter: ", isPossiblyAdultImage);
             try {
                 mFirebaseAdapter.sendFriendlyMessage(friendlyMessage);
             } catch (final Exception e) {
@@ -1280,7 +1282,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                             User me = Preferences.getInstance().getUser();
                             final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(mGroupId)).
                                     child(myUserid() + "");
-                            ref.updateChildren(me.getMap(true)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            ref.updateChildren(me.toMap(true)).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (mChatsRecyclerViewAdapter != null)
@@ -1290,7 +1292,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
                             me.setCurrentGroupId(groupChatSummary.getId());
                             me.setCurrentGroupName(groupChatSummary.getName());
-                            FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(myUserid())).updateChildren(me.getMap(true));
+                            FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(myUserid())).updateChildren(me.toMap(true));
 
                         }
                     }, 3000);

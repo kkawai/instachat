@@ -112,7 +112,7 @@ public class GroupChatSummary implements Comparable<GroupChatSummary> {
      * @return returns only the fields you want
      * to update in cloud database
      */
-    public Map<String, Object> getUpdateMap() {
+    public Map<String, Object> toUpdateMap() {
         Map<String, Object> map = new HashMap<>(8);
         if (getName() != null)
             map.put("name", getName());
