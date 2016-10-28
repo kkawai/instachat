@@ -41,6 +41,7 @@ import com.instachat.android.blocks.BlockedUserListener;
 import com.instachat.android.likes.LikesHelper;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.options.MessageOptionsDialogHelper;
+import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.StringUtil;
@@ -62,6 +63,9 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
     private static final int ITEM_VIEW_TYPE_STANDARD_MESSAGE = 0;
     private static final int ITEM_VIEW_TYPE_WEB_LINK = 1;
+
+    private static final int PAYLOAD_PERISCOPE_CHANGE = 0;
+    private static final int PAYLOAD_IMAGE_REVEAL = 1;
 
     private StorageReference mStorageRef;
     private DatabaseReference mFirebaseDatabaseReference;
@@ -209,8 +213,20 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                     mMessageTextClickedListener.onMessageClicked(holder.getAdapterPosition());
                 }
             };
-            holder.messageTextParent.setOnClickListener(onClickListener);
+            holder.itemView.setOnClickListener(onClickListener);
             holder.messageTextParent.setOnLongClickListener(onLongClickListener);
+            holder.messagePhotoView.setOnLongClickListener(onLongClickListener);
+            holder.messagePhotoViewParent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (holder.messagePhotoView.getVisibility() == View.VISIBLE) {
+                        onClickListener.onClick(view);
+                    } else {
+                        notifyItemChanged(holder.getAdapterPosition(), PAYLOAD_IMAGE_REVEAL);
+                    }
+                    MLog.d(TAG, "messagePhotoViewParent debug clicked");
+                }
+            });
         } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
             View.OnClickListener webLinkClickListener = new View.OnClickListener() {
                 @Override
@@ -283,7 +299,31 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
          * See where notifyItemChanged(position,0) is called to see what
          * is going on there.
          */
-        if (payloads != null && payloads.size() != 0) {
+        if (payloads != null && payloads.contains(PAYLOAD_PERISCOPE_CHANGE)) {
+            return;
+        }
+
+        if (viewHolder.messagePhotoViewParent != null) {
+            if (friendlyMessage.getImageUrl() != null) {
+                viewHolder.messagePhotoViewParent.setVisibility(View.VISIBLE);
+                Glide.with(mActivity.get()).load(friendlyMessage.getImageUrl()).crossFade().into(viewHolder.messagePhotoView);
+                if (payloads != null && payloads.contains(PAYLOAD_IMAGE_REVEAL)) {
+                    MLog.d(TAG, "populate messagePhotoViewParent got reveal payload");
+                    viewHolder.messagePhotoView.setVisibility(View.VISIBLE);
+                    AnimationUtil.scaleInFromCenter(viewHolder.messagePhotoViewParent);
+                } else if (friendlyMessage.isPossibleAdultImage() || friendlyMessage.isPossibleViolentImage()) {
+                    MLog.d(TAG, "populate messagePhotoViewParent did not get reveal payload");
+                    viewHolder.messagePhotoView.setVisibility(View.INVISIBLE);
+                } else {
+                    viewHolder.messagePhotoView.setVisibility(View.VISIBLE);
+                }
+
+            } else {
+                viewHolder.messagePhotoViewParent.setVisibility(View.GONE);
+            }
+        }
+
+        if (payloads != null && payloads.contains(PAYLOAD_IMAGE_REVEAL)) {
             return;
         }
 
@@ -306,17 +346,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             viewHolder.messageTimeTextView.setText(TimeUtil.getTimeAgo(friendlyMessage.getTime()));
         } else {
             viewHolder.messageTimeTextView.setVisibility(View.INVISIBLE);
-        }
-
-        if (viewHolder.messagePhotoViewParent != null) {
-            if (friendlyMessage.getImageUrl() != null) {
-                Glide.with(mActivity.get()).load(friendlyMessage.getImageUrl()).crossFade().into(viewHolder.messagePhotoView);
-                viewHolder.messagePhotoViewParent.setVisibility(View.VISIBLE);
-                viewHolder.messagePhotoView.setVisibility(View.VISIBLE);
-            } else {
-                viewHolder.messagePhotoViewParent.setVisibility(View.GONE);
-                viewHolder.messagePhotoView.setVisibility(View.GONE);
-            }
         }
 
         viewHolder.messengerImageView.setImageDrawable(null);
@@ -553,7 +582,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
              * Even a list of objects.  It causes populateViewHolder
              * to pass in List<Object> with a size > 0.
              */
-            notifyItemChanged(index, 0);
+            notifyItemChanged(index, PAYLOAD_PERISCOPE_CHANGE);
         } else {
             replaceItem(index, newItem);
             notifyItemChanged(index);
