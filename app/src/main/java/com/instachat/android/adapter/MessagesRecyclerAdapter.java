@@ -214,17 +214,25 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 }
             };
             holder.itemView.setOnClickListener(onClickListener);
+            holder.itemView.setOnLongClickListener(onLongClickListener);
+            holder.messageTextParent.setOnClickListener(onClickListener);
             holder.messageTextParent.setOnLongClickListener(onLongClickListener);
             holder.messagePhotoView.setOnLongClickListener(onLongClickListener);
-            holder.messagePhotoViewParent.setOnClickListener(new View.OnClickListener() {
+            holder.messagePhotoView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (holder.messagePhotoView.getVisibility() == View.VISIBLE) {
                         onClickListener.onClick(view);
-                    } else {
-                        notifyItemChanged(holder.getAdapterPosition(), PAYLOAD_IMAGE_REVEAL);
                     }
-                    MLog.d(TAG, "messagePhotoViewParent debug clicked");
+                }
+            });
+            holder.messagePhotoViewParent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (holder.messagePhotoView.getVisibility() != View.VISIBLE) {
+                        notifyItemChanged(holder.getAdapterPosition(), PAYLOAD_IMAGE_REVEAL);
+                        MLog.d(TAG, "messagePhotoViewParent debug clicked NOT VISIBLE");
+                    }
                 }
             });
         } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {

@@ -133,7 +133,7 @@
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:textColor="@android:color/black"
             android:textSize="18sp"
-            app:font="Lato-Normal.ttf"/>
+            app:font="Lato-Regular.ttf"/>
 
         <ImageView
             android:id="@+id/rotate90"

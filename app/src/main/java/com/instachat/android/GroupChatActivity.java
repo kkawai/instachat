@@ -923,7 +923,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         mFirebaseAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {
             @Override
             public void onViewHolderPopulated() {
-                mProgressBar.setVisibility(ProgressBar.GONE);
+                if (mProgressBar.isShown())
+                    mProgressBar.setVisibility(ProgressBar.GONE);
             }
         });
         mFirebaseAdapter.setMessageTextClickedListener(new MessageTextClickedListener() {

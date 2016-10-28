@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,12 +23,12 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_weight="1"
+            android:background="@color/jonGray"
+            android:orientation="vertical"
+            android:paddingBottom="0dp"
             android:paddingLeft="10dp"
             android:paddingRight="8dp"
-            android:paddingBottom="0dp"
-            android:paddingTop="4dp"
-            android:background="@color/jonGray"
-            android:orientation="vertical">
+            android:paddingTop="4dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -43,7 +43,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/chat_sender_username"
                     android:textSize="@dimen/message_sender_name_size"
-                    app:font="Lato-Bold.ttf" />
+                    app:font="Lato-Bold.ttf"/>
 
                 <com.instachat.android.view.CustomFontTextView
                     android:id="@+id/messageTimeTextView"
@@ -53,7 +53,7 @@
                     android:layout_weight="0"
                     android:textColor="@color/chat_time_message_sent"
                     android:textSize="@dimen/message_sent_time_ago_size"
-                    app:font="Lato-Regular.ttf" />
+                    app:font="Lato-Regular.ttf"/>
             </LinearLayout>
 
             <LinearLayout
@@ -94,7 +94,7 @@
                                 android:maxLines="2"
                                 android:textColor="@color/chat_web_clipping_article_title"
                                 android:textSize="@dimen/web_clipping_article_title_size"
-                                app:font="Lato-Bold.ttf" />
+                                app:font="Lato-Bold.ttf"/>
 
                             <com.instachat.android.view.CustomFontTextView
                                 android:id="@+id/description"
@@ -103,7 +103,7 @@
                                 android:ellipsize="end"
                                 android:maxLines="3"
                                 android:textSize="@dimen/web_clipping_short_description_size"
-                                app:font="Lato.ttf" />
+                                app:font="Lato-Regular.ttf"/>
 
                             <com.instachat.android.view.CustomFontTextView
                                 android:id="@+id/url"
@@ -113,7 +113,7 @@
                                 android:maxLines="1"
                                 android:textColor="@color/chat_web_cliping_url"
                                 android:textSize="@dimen/web_clipping_short_url_size"
-                                app:font="Lato-Regular.ttf" />
+                                app:font="Lato-Regular.ttf"/>
 
                         </LinearLayout>
 
@@ -133,12 +133,12 @@
                                     android:layout_height="match_parent"
                                     android:contentDescription="@string/empty"
                                     android:padding="@dimen/posted_photo_rounded_corner_padding"
-                                    android:scaleType="centerCrop" />
+                                    android:scaleType="centerCrop"/>
 
                                 <ImageView
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:src="@drawable/rounded_corner_photo" />
+                                    android:src="@drawable/rounded_corner_photo"/>
                             </FrameLayout>
                         </LinearLayout>
                     </LinearLayout>
@@ -158,7 +158,7 @@
             <com.instachat.android.view.PeriscopeLayout
                 android:id="@+id/periscope"
                 android:layout_width="@dimen/periscope_width"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"/>
 
             <com.instachat.android.view.CustomFontTextView
                 android:id="@+id/likes"
@@ -170,7 +170,7 @@
                 android:textColor="@color/chat_likes_count"
                 android:textSize="@dimen/message_likes_counter_size"
                 android:textStyle="bold"
-                app:font="Lato-Bold.ttf" />
+                app:font="Lato-Bold.ttf"/>
         </FrameLayout>
 
         <com.sackcentury.shinebuttonlib.ShineButton
@@ -190,7 +190,7 @@
             app:shine_turn_angle="10"
             app:siShape="@raw/heart"
             app:small_shine_color="#CC9999"
-            app:small_shine_offset_angle="20" />
+            app:small_shine_offset_angle="20"/>
 
     </LinearLayout>
 
