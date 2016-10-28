@@ -206,10 +206,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             final View.OnClickListener onClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
-                    if (TextUtils.isEmpty(friendlyMessage.getName())) {
-                        return;
-                    }
                     mMessageTextClickedListener.onMessageClicked(holder.getAdapterPosition());
                 }
             };

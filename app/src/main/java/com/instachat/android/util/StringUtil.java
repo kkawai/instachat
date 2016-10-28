@@ -44,7 +44,7 @@ public class StringUtil {
     }
 
     public static String stripNewLines(String s) {
-        return s.replaceAll("\r\n", "");
+        return s.replaceAll("\r\n", " ").replaceAll("\n", " ");
     }
 
     public static boolean isDigits(final String str) {

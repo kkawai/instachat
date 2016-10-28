@@ -19,6 +19,7 @@ import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
+import com.instachat.android.util.StringUtil;
 import com.instachat.android.view.ZoomImageListener;
 import com.instachat.android.view.ZoomableImageView;
 
@@ -68,7 +69,7 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
 
         if (TextUtils.isEmpty(mFriendlyMessage.getImageUrl())) {
             FontUtil.setTextViewFont(mAutoResizeTextView);
-            mAutoResizeTextView.setText(mFriendlyMessage.getText());
+            mAutoResizeTextView.setText(StringUtil.stripNewLines(mFriendlyMessage.getText()));
             mAutoResizeTextView.setMaxLines(Integer.MAX_VALUE);
             //float t = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()), getResources().getDisplayMetrics());
             //textView.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()), getResources().getDisplayMetrics()));
