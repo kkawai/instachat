@@ -315,7 +315,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                     viewHolder.messagePhotoView.setVisibility(View.VISIBLE);
                     viewHolder.messagePhotoWarningView.setVisibility(View.GONE);
                 }
-
             } else {
                 viewHolder.messagePhotoViewParent.setVisibility(View.GONE);
                 viewHolder.messagePhotoView.setVisibility(View.GONE);
