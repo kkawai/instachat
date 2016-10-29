@@ -17,7 +17,7 @@ import java.util.Map;
 public class FriendlyMessage implements Parcelable {
 
     public static final int MESSAGE_TYPE_NORMAL = 0;
-    public static final int MESSAGE_TYPE_DISAPPEARING = 1;
+    public static final int MESSAGE_TYPE_ONE_TIME = 1;
 
     private static final String TAG = "FriendlyMessage";
 
@@ -87,7 +87,9 @@ public class FriendlyMessage implements Parcelable {
         return map;
     }
 
-    public FriendlyMessage(String text, String name, int userid, String dpid, String imageUrl, boolean possibleAdultImage, boolean possibleViolentImage, String imageId, long time) {
+    public FriendlyMessage(String text, String name, int userid, String dpid, String imageUrl,
+                           boolean possibleAdultImage, boolean possibleViolentImage,
+                           String imageId, long time) {
         this.text = text;
         this.name = name;
         this.time = time;

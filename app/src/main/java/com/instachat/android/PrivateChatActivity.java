@@ -44,6 +44,7 @@ import com.instachat.android.util.Preferences;
 import com.instachat.android.util.TimeUtil;
 import com.tooltip.Tooltip;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.concurrent.RejectedExecutionException;
@@ -311,6 +312,12 @@ public class PrivateChatActivity extends GroupChatActivity {
     @Override
     public void onFriendlyMessageSuccess(FriendlyMessage friendlyMessage) {
         super.onFriendlyMessageSuccess(friendlyMessage);
+
+        try {
+            NetworkApi.gcmsend(sToUserid, Constants.GcmMessageType.msg, friendlyMessage.toLightweightJSONObject());
+        } catch (JSONException e) {
+            MLog.e(TAG, "", e);
+        }
         if (mIsAppBarExpanded) {
             final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
             appBarLayout.setExpanded(false, true);

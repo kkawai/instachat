@@ -85,6 +85,7 @@ import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.model.GroupChatSummary;
 import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.model.User;
+import com.instachat.android.options.MessageOptionsDialogHelper;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
@@ -496,18 +497,15 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             @Override
             public void onClick(View view) {
                 final String text = mMessageEditText.getText().toString();
-                if (StringUtil.isEmpty(text)) {
-                    return;
-                }
-                if (isNeedsDp())
-                    return;
-                mMessageEditText.setText("");//fast double taps on send can cause 2x sends!
-                final FriendlyMessage friendlyMessage = new FriendlyMessage(text, myUsername(), myUserid(), myDpid(), null, false, false, null, System.currentTimeMillis());
-                try {
-                    mFirebaseAdapter.sendFriendlyMessage(friendlyMessage);
-                } catch (Exception e) {
-                    MLog.e(TAG, "", e);
-                }
+                validateBeforeSendText(text,false);
+            }
+        });
+        mSendButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                final String text = mMessageEditText.getText().toString();
+                validateBeforeSendText(text,true);
+                return true;
             }
         });
         mAttachButton.setOnClickListener(new View.OnClickListener() {
@@ -518,6 +516,42 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 showFileOptions();
             }
         });
+    }
+
+    private void sendText(FriendlyMessage friendlyMessage) {
+        try {
+            mFirebaseAdapter.sendFriendlyMessage(friendlyMessage);
+            mMessageEditText.setText("");//fast double taps on send can cause 2x sends!
+        } catch (Exception e) {
+            MLog.e(TAG, "", e);
+        }
+    }
+
+    private boolean validateBeforeSendText(final String text, boolean showOptions) {
+        if (StringUtil.isEmpty(text)) {
+            return false;
+        }
+        if (isNeedsDp())
+            return false;
+        final FriendlyMessage friendlyMessage = new FriendlyMessage(text, myUsername(), myUserid(), myDpid(), null, false, false, null, System.currentTimeMillis());
+        if (!showOptions) {
+            sendText(friendlyMessage);
+            return true;
+        }
+        new MessageOptionsDialogHelper().showSendOptions(GroupChatActivity.this, mSendButton, friendlyMessage, new MessageOptionsDialogHelper.SendOptionsListener() {
+            @Override
+            public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
+                friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
+                sendText(friendlyMessage);
+            }
+
+            @Override
+            public void onSendOneTimeRequested(FriendlyMessage friendlyMessage) {
+                friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
+                sendText(friendlyMessage);
+            }
+        });
+        return true;
     }
 
     private PresenceHelper mPresenceHelper = new PresenceHelper();

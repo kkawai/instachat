@@ -231,7 +231,7 @@ public final class NetworkApi {
       }
    }
 
-   public static void gcmsend(final String toid, final Constants.GcmMessageType messageType, final JSONObject msg) {
+   public static void gcmsend(final int toid, final Constants.GcmMessageType messageType, final JSONObject msg) {
 
       ThreadWrapper.executeInWorkerThread(new Runnable() {
          @Override
@@ -239,7 +239,7 @@ public final class NetworkApi {
             try {
                msg.put(Constants.KEY_GCM_MSG_TYPE, messageType.name());
                final HashMap<String, String> params = new HashMap<>();
-               params.put(Constants.KEY_TO_USERID, toid);
+               params.put(Constants.KEY_TO_USERID, toid+"");
                params.put(Constants.KEY_GCM_MESSAGE, msg.toString());
                final JSONObject response = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/gcmsend").post(params));
                if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {

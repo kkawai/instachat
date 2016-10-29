@@ -122,7 +122,9 @@
     <string name="type_your_reply_here">Type your reply here...</string>
 
     <!-- do not change the following hard-coded message options ordering! -->
-    <string name="copy_text_">Copy Text</string>
+    <string name="send_normal">Send normally</string>
+    <string name="send_one_time">Send one time</string>
+    <string name="copy_text">Copy Text</string>
     <string name="delete_message">Delete Message</string>
     <string name="delete_photo">Delete Photo</string>
 

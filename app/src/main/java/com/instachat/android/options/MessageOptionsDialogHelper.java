@@ -33,6 +33,44 @@ public class MessageOptionsDialogHelper {
         void onMessageOptionsDismissed();
     }
 
+    public interface SendOptionsListener {
+        void onSendNormalRequested(FriendlyMessage friendlyMessage);
+
+        void onSendOneTimeRequested(FriendlyMessage friendlyMessage);
+    }
+
+    public void showSendOptions(
+            @NonNull final Context context,
+            @NonNull final View anchor,
+            @NonNull final FriendlyMessage friendlyMessage,
+            @NonNull final SendOptionsListener listener) {
+
+        PopupMenu popupMenu = new PopupMenu(context, anchor);
+        popupMenu.inflate(R.menu.send_options);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.menu_send_normal:
+                        listener.onSendNormalRequested(friendlyMessage);
+                        break;
+                    case R.id.menu_send_one_time:
+                        listener.onSendOneTimeRequested(friendlyMessage);
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
+        popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
+            @Override
+            public void onDismiss(PopupMenu menu) {
+            }
+        });
+        popupMenu.show();
+    }
+
     public void showMessageOptions(
             @NonNull final Context context,
             @NonNull final View anchor,

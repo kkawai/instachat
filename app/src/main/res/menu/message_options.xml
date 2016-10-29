@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_copy_text"
-        android:title="@string/copy_text_"/>
+        android:title="@string/copy_text"/>
     <item
         android:id="@+id/menu_delete_message"
         android:title="@string/delete_message"/>

@@ -50,8 +50,10 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mFriendlyMessage = getArguments().getParcelable(Constants.KEY_FRIENDLY_MESSAGE);
-
-        setCustomFragmentToolbarTitle(mFriendlyMessage.getName());
+        if (mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME)
+            setCustomFragmentToolbarTitle("");
+        else
+            setCustomFragmentToolbarTitle(mFriendlyMessage.getName());
 
         getView().findViewById(R.id.toolbar).setOnClickListener(new View.OnClickListener() {
             @Override

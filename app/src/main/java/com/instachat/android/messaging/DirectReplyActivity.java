@@ -88,7 +88,7 @@ public class DirectReplyActivity extends AppCompatActivity {
                                     if (task.isSuccessful()) {
                                         try {
                                             JSONObject o = friendlyMessage.toLightweightJSONObject();
-                                            NetworkApi.gcmsend("" + userid, Constants.GcmMessageType.msg, o);
+                                            NetworkApi.gcmsend(userid, Constants.GcmMessageType.msg, o);
                                         } catch (Exception e) {
                                             MLog.e(TAG, "gcmsend() failed", e);
                                         }

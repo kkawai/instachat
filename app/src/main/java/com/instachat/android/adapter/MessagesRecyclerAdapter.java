@@ -3,8 +3,10 @@ package com.instachat.android.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.ClipboardManager;
@@ -15,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ath.fuel.FuelInjector;
@@ -332,9 +335,14 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             new WebLinkHelper().populateWebLinkPost(viewHolder, friendlyMessage, position);
         } else {
             if (viewHolder.messageTextView != null) {
-                if (StringUtil.isNotEmpty(friendlyMessage.getText()))
+                if (StringUtil.isNotEmpty(friendlyMessage.getText())) {
                     viewHolder.messageTextView.setText(friendlyMessage.getText());
-                else
+                    if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
+                        blurText(viewHolder.messageTextView, true);
+                    } else {
+                        blurText(viewHolder.messageTextView, false);
+                    }
+                } else
                     viewHolder.messageTextView.setText("");
             }
         }
@@ -586,5 +594,18 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             replaceItem(index, newItem);
             notifyItemChanged(index);
         }
+    }
+
+    private void blurText(TextView textView, boolean doBlur) {
+        if (!doBlur) {
+            textView.getPaint().setMaskFilter(null);
+            return;
+        }
+        if (Build.VERSION.SDK_INT >= 11) {
+            textView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        }
+        float radius = textView.getTextSize() / 3;
+        BlurMaskFilter filter = new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL);
+        textView.getPaint().setMaskFilter(filter);
     }
 }
