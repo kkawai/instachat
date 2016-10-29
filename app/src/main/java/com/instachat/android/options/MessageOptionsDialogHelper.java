@@ -18,6 +18,8 @@ import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.view.ThemedAlertDialog;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 /**
  * Created by kevin on 10/11/2016.
  */
@@ -60,6 +62,8 @@ public class MessageOptionsDialogHelper {
                     case R.id.menu_send_one_time:
                         listener.onSendOneTimeRequested(friendlyMessage);
                         break;
+                    case R.id.menu_what_is_one_time:
+                        new SweetAlertDialog(context, SweetAlertDialog.NORMAL_TYPE).setContentText(context.getString(R.string.one_time_definition)).show();
                     default:
                         break;
                 }

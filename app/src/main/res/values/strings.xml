@@ -122,8 +122,10 @@
     <string name="type_your_reply_here">Type your reply here...</string>
 
     <!-- do not change the following hard-coded message options ordering! -->
-    <string name="send_normal">Send normally</string>
-    <string name="send_one_time">Send one time</string>
+    <string name="send_normal">Send As Normal Message</string>
+    <string name="send_one_time">Send As ONE-TIME Message</string>
+    <string name="what_is_one_time">What is ONE-TIME?</string>
+    <string name="one_time_definition">One-Time message is a message that appears blurry and can only be opened one-time by tapping on it.  After that, it cannot be opened again.  However, the sender my open it again, others cannot.</string>
     <string name="copy_text">Copy Text</string>
     <string name="delete_message">Delete Message</string>
     <string name="delete_photo">Delete Photo</string>
@@ -147,7 +149,7 @@
     <string name="liked_my_posts_x_times">Liked my posts %s times</string>
     <string name="received_likes_title">Received likes</string>
     <string name="possible_explicit_content_warning">Warning: this photo may contain inappropriate or explicit content</string>
-    <string name="one_time_message_has_been_read_already">You have already read this message, so it cannot be opened again :D</string>
+    <string name="one_time_message_has_been_read_already">You have already opened this one-time post, so it cannot be opened again :D</string>
     <string name="one_time_message_notification_title">One-time Message</string>
     <string name="one_time_photo_notification_title">One-time Photo</string>
     <string name="send_option_protips">Long-press for more options!</string>

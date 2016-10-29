@@ -225,7 +225,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                     setEnableSendButton(true);
                     onMeEnteringText();
                     showSendOptionsTooltip(mSendButton);
-                    showSendOptionsTooltip(mAttachButton);
                 } else {
                     setEnableSendButton(false);
                 }
@@ -1413,16 +1412,16 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         }
     };
 
-    boolean shownSendOptionsProtips;
+    private boolean mShownSendOptionsProtips;
 
     private void showSendOptionsTooltip(View anchor) {
 //        if (Preferences.getInstance().hasShownToolbarProfileTooltip())
 //            return;
 //        Preferences.getInstance().setShownToolbarProfileTooltip(true);
-        if (shownSendOptionsProtips) {
+        if (mShownSendOptionsProtips) {
             return;
         }
-        shownSendOptionsProtips = true;
+        mShownSendOptionsProtips = true;
         final Tooltip tooltip = new Tooltip.Builder(anchor, R.style.drawer_tooltip_non_cancellable)
                 .setText(getString(R.string.send_option_protips))
                 .show();

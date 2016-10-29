@@ -20,6 +20,7 @@ import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
+import com.instachat.android.util.Preferences;
 import com.instachat.android.util.StringUtil;
 import com.instachat.android.view.TextViewUtil;
 import com.instachat.android.view.ZoomImageListener;
@@ -158,8 +159,11 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
 
     @Override
     public void onDestroy() {
-        if (mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME)
-            OneTimeMessageDb.getInstance().insertMessageId(mFriendlyMessage.getId());
+        if (mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
+            if (mFriendlyMessage.getUserid() != Preferences.getInstance().getUserId()) {
+                OneTimeMessageDb.getInstance().insertMessageId(mFriendlyMessage.getId());
+            }
+        }
         super.onDestroy();
     }
 }
