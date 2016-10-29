@@ -170,7 +170,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         final MessageViewHolder holder = createMessageViewHolder(parent, viewType);
-
         View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
@@ -209,16 +208,22 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             final View.OnClickListener onClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    MLog.d(TAG, "message clicked");
-                    mMessageTextClickedListener.onMessageClicked(holder.getAdapterPosition());
+                    final FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
+                    if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME
+                            || !TextUtils.isEmpty(friendlyMessage.getImageUrl())) {
+                        MLog.d(TAG, "message clicked");
+                        mMessageTextClickedListener.onMessageClicked(holder.getAdapterPosition());
+                    }
                 }
             };
+
             holder.itemView.setOnClickListener(onClickListener);
-            holder.itemView.setOnLongClickListener(onLongClickListener);
             holder.messageTextParent.setOnClickListener(onClickListener);
+            holder.messagePhotoView.setOnClickListener(onClickListener);
+
+            holder.itemView.setOnLongClickListener(onLongClickListener);
             holder.messageTextParent.setOnLongClickListener(onLongClickListener);
             holder.messagePhotoView.setOnLongClickListener(onLongClickListener);
-            holder.messagePhotoView.setOnClickListener(onClickListener);
             holder.messagePhotoWarningView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -229,8 +234,8 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             View.OnClickListener webLinkClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final FriendlyMessage msg = getItem(holder.getAdapterPosition());
-                    final Uri uri = Uri.parse(msg.getText());
+                    final FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
+                    final Uri uri = Uri.parse(friendlyMessage.getText());
                     mActivity.get().startActivity(new Intent(Intent.ACTION_VIEW, uri));
                 }
             };
@@ -243,7 +248,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         holder.likesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
+                final FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
                 //friendlyMessage.incrementLikesCount();
                 DatabaseReference ref = mFirebaseDatabaseReference.child(mDatabaseRef).child(friendlyMessage.getId()).child(Constants.CHILD_LIKES);
                 LikesHelper.getInstance().likeFriendlyMessage(friendlyMessage, ref);
