@@ -13,108 +13,117 @@
             android:id="@+id/messengerImageView"
             android:layout_width="@dimen/user_thumb_pic_size"
             android:layout_height="@dimen/user_thumb_pic_size"
+            android:layout_gravity="bottom"
             android:transitionName="image"
             app:civ_border_color="@color/colorPrimaryDark"
             app:civ_border_overlay="true"
             app:civ_border_width="0px"/>
 
-        <LinearLayout
-            android:id="@+id/messageTextParent"
-            android:layout_width="match_parent"
+        <me.himanshusoni.chatmessageview.ChatMessageView
+            android:id="@+id/contentMessageChat"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_weight="1"
-            android:background="@color/jonGray"
-            android:orientation="vertical"
-            android:paddingBottom="8dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="8dp"
-            android:paddingTop="5dp">
+            app:cmv_arrowGravity="end"
+            app:cmv_arrowPosition="left"
+            app:cmv_backgroundColor="@color/chat_bubble_background_color"
+            app:cmv_backgroundColorPressed="#FFBABABA"
+            app:cmv_cornerRadius="6dp"
+            app:cmv_showArrow="true">
+            >
 
             <LinearLayout
+                android:id="@+id/messageTextParent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <!-- android:textAppearance="?android:attr/textAppearanceSmall" -->
-
-                <com.instachat.android.view.CustomFontTextView
-                    android:id="@+id/messengerTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/chat_sender_username"
-                    android:textSize="@dimen/message_sender_name_size"
-                    app:font="Lato-Bold.ttf"/>
-
-                <com.instachat.android.view.CustomFontTextView
-                    android:id="@+id/messageTimeTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:textColor="@color/chat_time_message_sent"
-                    android:textSize="@dimen/message_sent_time_ago_size"
-                    app:font="Lato-Regular.ttf"/>
-
-            </LinearLayout>
-
-            <FrameLayout
-                android:id="@+id/messagePhotoViewParent"
-                android:layout_width="@dimen/posted_photo_size"
-                android:layout_height="@dimen/posted_photo_size">
-
-                <ImageView
-                    android:id="@+id/messagePhotoView"
-                    android:layout_width="@dimen/posted_photo_size"
-                    android:layout_height="@dimen/posted_photo_size"
-                    android:adjustViewBounds="true"
-                    android:padding="@dimen/posted_photo_rounded_corner_padding"
-                    android:scaleType="centerCrop"/>
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/rounded_corner_photo"/>
+                android:layout_weight="1"
+                android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/messagePhotoWarningView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/jonGray"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:paddingTop="16dp"
-                        android:src="@drawable/ic_warning_black_36dp"/>
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <!-- android:textAppearance="?android:attr/textAppearanceSmall" -->
 
                     <com.instachat.android.view.CustomFontTextView
-                        android:layout_width="match_parent"
+                        android:id="@+id/messengerTextView"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:lineSpacingExtra="2dp"
-                        android:paddingLeft="8dp"
-                        android:paddingRight="8dp"
-                        android:text="@string/possible_explicit_content_warning"
-                        android:textAlignment="center"
-                        android:textColor="@color/chat_message_color"
-                        android:textSize="@dimen/message_text_size"
+                        android:textColor="@color/chat_sender_username"
+                        android:textSize="@dimen/message_sender_name_size"
+                        app:font="Lato-Bold.ttf"/>
+
+                    <com.instachat.android.view.CustomFontTextView
+                        android:id="@+id/messageTimeTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:textColor="@color/chat_time_message_sent"
+                        android:textSize="@dimen/message_sent_time_ago_size"
                         app:font="Lato-Regular.ttf"/>
 
                 </LinearLayout>
 
-            </FrameLayout>
+                <FrameLayout
+                    android:id="@+id/messagePhotoViewParent"
+                    android:layout_width="@dimen/posted_photo_size"
+                    android:layout_height="@dimen/posted_photo_size">
 
-            <com.instachat.android.view.CustomFontTextView
-                android:id="@+id/messageTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autoLink="web|map|email|phone"
-                android:lineSpacingExtra="2dp"
-                android:textColor="@color/chat_message_color"
-                android:textSize="@dimen/message_text_size"
-                app:font="Lato-Regular.ttf"/>
+                    <ImageView
+                        android:id="@+id/messagePhotoView"
+                        android:layout_width="@dimen/posted_photo_size"
+                        android:layout_height="@dimen/posted_photo_size"
+                        android:adjustViewBounds="true"
+                        android:padding="@dimen/posted_photo_rounded_corner_padding"
+                        android:scaleType="centerCrop"/>
 
-        </LinearLayout>
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/rounded_corner_photo"/>
+
+                    <LinearLayout
+                        android:id="@+id/messagePhotoWarningView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/jonGray"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:paddingTop="16dp"
+                            android:src="@drawable/ic_warning_black_36dp"/>
+
+                        <com.instachat.android.view.CustomFontTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineSpacingExtra="2dp"
+                            android:paddingLeft="8dp"
+                            android:paddingRight="8dp"
+                            android:text="@string/possible_explicit_content_warning"
+                            android:textAlignment="center"
+                            android:textColor="@color/chat_message_color"
+                            android:textSize="@dimen/message_text_size"
+                            app:font="Lato-Regular.ttf"/>
+
+                    </LinearLayout>
+
+                </FrameLayout>
+
+                <com.instachat.android.view.CustomFontTextView
+                    android:id="@+id/messageTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoLink="web|map|email|phone"
+                    android:lineSpacingExtra="2dp"
+                    android:textColor="@color/chat_message_color"
+                    android:textSize="@dimen/message_text_size"
+                    app:font="Lato-Regular.ttf"/>
+
+            </LinearLayout>
+
+        </me.himanshusoni.chatmessageview.ChatMessageView>
 
         <FrameLayout
             android:id="@+id/periscopeParent"
