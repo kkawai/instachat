@@ -10,9 +10,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.FriendlyMessage;
+import com.instachat.android.util.Preferences;
 import com.instachat.android.view.ThemedAlertDialog;
 
 /**
@@ -86,8 +89,18 @@ public class MessageOptionsDialogHelper {
         if (!TextUtils.isEmpty(friendlyMessage.getImageUrl()) && TextUtils.isEmpty(friendlyMessage.getText())) {
             popupMenu.getMenu().findItem(R.id.menu_delete_message).setTitle(R.string.delete_photo);
         }
-        popupMenu.getMenu().findItem(R.id.menu_block_user).setTitle(context.getString(R.string.block) + " " + friendlyMessage.getName());
-        popupMenu.getMenu().findItem(R.id.menu_report_user).setTitle(context.getString(R.string.report) + " " + friendlyMessage.getName());
+        if (!FirebaseRemoteConfig.getInstance().getBoolean(Constants.KEY_ALLOW_DELETE_OTHER_MESSAGES)) {
+            if (Preferences.getInstance().getUserId() != friendlyMessage.getUserid() && friendlyMessage.getUserid() != Constants.ADMIN_USERID) {
+                popupMenu.getMenu().removeItem(R.id.menu_delete_message);
+            }
+        }
+        if (Preferences.getInstance().getUserId() == friendlyMessage.getUserid()) {
+            popupMenu.getMenu().removeItem(R.id.menu_report_user);
+            popupMenu.getMenu().removeItem(R.id.menu_block_user);
+        } else {
+            popupMenu.getMenu().findItem(R.id.menu_block_user).setTitle(context.getString(R.string.block) + " " + friendlyMessage.getName());
+            popupMenu.getMenu().findItem(R.id.menu_report_user).setTitle(context.getString(R.string.report) + " " + friendlyMessage.getName());
+        }
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {

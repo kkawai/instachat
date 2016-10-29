@@ -23,7 +23,10 @@ public final class Constants {
     public static final int MIN_PASSWORD_LENGTH = 4;
     public static final int MAX_BIO_LENGTH = 512;
 
+    public static final int ADMIN_USERID = 3733523; //me
+
     //remote configuration with default values
+    public static final boolean DEFAULT_ALLOW_DELETE_OTHER_MESSAGES = false;
     public static final int DEFAULT_MAX_MESSAGE_HISTORY = 1000;
     public static final int DEFAULT_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS = 3500;
     public static final int DEFAULT_MAX_TYPING_DOTS_DISPLAY_TIME = 3500;
@@ -38,6 +41,7 @@ public final class Constants {
     public static String KEY_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME = "MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME";
     public static String KEY_MAX_MESSAGE_LENGTH = "MAX_MESSAGE_LENGTH";
     public static String KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM = "MAX_PERISCOPABLE_LIKES_PER_ITEM";
+    public static String KEY_ALLOW_DELETE_OTHER_MESSAGES = "ALLOW_DELETE_OTHER_MESSAGES";
 
     /*
      * CHANGE THESE WHEN MAKING PRODUCTION BUILDS
