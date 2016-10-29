@@ -3,10 +3,8 @@ package com.instachat.android.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BlurMaskFilter;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.ClipboardManager;
@@ -17,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ath.fuel.FuelInjector;
@@ -41,6 +38,7 @@ import com.instachat.android.R;
 import com.instachat.android.blocks.BlockUserDialogHelper;
 import com.instachat.android.blocks.BlockedUser;
 import com.instachat.android.blocks.BlockedUserListener;
+import com.instachat.android.db.OneTimeMessageDb;
 import com.instachat.android.likes.LikesHelper;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.options.MessageOptionsDialogHelper;
@@ -49,6 +47,7 @@ import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.TimeUtil;
+import com.tooltip.Tooltip;
 
 import java.lang.ref.WeakReference;
 import java.util.Hashtable;
@@ -56,6 +55,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.RejectedExecutionException;
+
+import static com.instachat.android.view.TextViewUtil.blurText;
 
 /**
  * Created by kevin on 8/23/2016.
@@ -209,9 +210,14 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 @Override
                 public void onClick(View view) {
                     final FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
-                    if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME
-                            || !TextUtils.isEmpty(friendlyMessage.getImageUrl())) {
-                        MLog.d(TAG, "message clicked");
+
+                    if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
+                        if (!OneTimeMessageDb.getInstance().messageExists(friendlyMessage.getId())) {
+                            mMessageTextClickedListener.onMessageClicked(holder.getAdapterPosition());
+                        } else {
+                            new Tooltip.Builder(view, R.style.drawer_tooltip).setText(mActivity.get().getString(R.string.one_time_message_has_been_read_already)).show();
+                        }
+                    } else if (!TextUtils.isEmpty(friendlyMessage.getImageUrl())) {
                         mMessageTextClickedListener.onMessageClicked(holder.getAdapterPosition());
                     }
                 }
@@ -601,16 +607,4 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         }
     }
 
-    private void blurText(TextView textView, boolean doBlur) {
-        if (!doBlur) {
-            textView.getPaint().setMaskFilter(null);
-            return;
-        }
-        if (Build.VERSION.SDK_INT >= 11) {
-            textView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        }
-        float radius = textView.getTextSize() / 3;
-        BlurMaskFilter filter = new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL);
-        textView.getPaint().setMaskFilter(filter);
-    }
 }

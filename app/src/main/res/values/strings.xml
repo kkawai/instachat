@@ -147,4 +147,8 @@
     <string name="liked_my_posts_x_times">Liked my posts %s times</string>
     <string name="received_likes_title">Received likes</string>
     <string name="possible_explicit_content_warning">Warning: this photo may contain inappropriate or explicit content</string>
+    <string name="one_time_message_has_been_read_already">You have already read this message, so it cannot be opened again :D</string>
+    <string name="one_time_message_notification_title">One-time Message</string>
+    <string name="one_time_photo_notification_title">One-time Photo</string>
+    <string name="send_option_protips">Long-press for more options!</string>
 </resources>

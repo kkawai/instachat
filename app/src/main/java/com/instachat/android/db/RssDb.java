@@ -131,7 +131,7 @@ public final class RssDb {
         try {
             final SQLiteDatabase db = sqlHelper.getWritableDatabase();
             final long rowId = db.replace(TABLE_NAME, null, rss.getContentValues());
-            MLog.i(TAG, "rss: " + rss + " inserted at " + rowId + " [" + rss.getCategory() + "]");
+            //MLog.i(TAG, "rss: " + rss + " inserted at " + rowId + " [" + rss.getCategory() + "]");
         } catch (Throwable t) {
             Log.e(TAG, "Error in storing rss: ", t);
         }

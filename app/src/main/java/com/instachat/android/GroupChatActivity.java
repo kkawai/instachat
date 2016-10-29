@@ -92,6 +92,7 @@ import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
 import com.instachat.android.view.AnimatedDotLoadingView;
+import com.tooltip.Tooltip;
 
 import java.util.HashMap;
 import java.util.List;
@@ -223,6 +224,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 if (charSequence.toString().trim().length() > 0) {
                     setEnableSendButton(true);
                     onMeEnteringText();
+                    showSendOptionsTooltip(mSendButton);
+                    showSendOptionsTooltip(mAttachButton);
                 } else {
                     setEnableSendButton(false);
                 }
@@ -497,14 +500,14 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             @Override
             public void onClick(View view) {
                 final String text = mMessageEditText.getText().toString();
-                validateBeforeSendText(text,false);
+                validateBeforeSendText(text, false);
             }
         });
         mSendButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
                 final String text = mMessageEditText.getText().toString();
-                validateBeforeSendText(text,true);
+                validateBeforeSendText(text, true);
                 return true;
             }
         });
@@ -1408,5 +1411,30 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, UserLikedUserFragment.TAG).addToBackStack(null).commit();
         }
     };
+
+    boolean shownSendOptionsProtips;
+
+    private void showSendOptionsTooltip(View anchor) {
+//        if (Preferences.getInstance().hasShownToolbarProfileTooltip())
+//            return;
+//        Preferences.getInstance().setShownToolbarProfileTooltip(true);
+        if (shownSendOptionsProtips) {
+            return;
+        }
+        shownSendOptionsProtips = true;
+        final Tooltip tooltip = new Tooltip.Builder(anchor, R.style.drawer_tooltip_non_cancellable)
+                .setText(getString(R.string.send_option_protips))
+                .show();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isActivityDestroyed())
+                    return;
+                if (tooltip.isShowing())
+                    tooltip.dismiss();
+            }
+        }, 2000);
+
+    }
 
 }

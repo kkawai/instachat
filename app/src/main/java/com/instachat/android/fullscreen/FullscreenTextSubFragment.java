@@ -15,11 +15,13 @@ import com.instachat.android.BaseFragment;
 import com.instachat.android.Constants;
 import com.instachat.android.PrivateChatActivity;
 import com.instachat.android.R;
+import com.instachat.android.db.OneTimeMessageDb;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.StringUtil;
+import com.instachat.android.view.TextViewUtil;
 import com.instachat.android.view.ZoomImageListener;
 import com.instachat.android.view.ZoomableImageView;
 
@@ -50,9 +52,9 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mFriendlyMessage = getArguments().getParcelable(Constants.KEY_FRIENDLY_MESSAGE);
-        if (mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME)
+        if (mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
             setCustomFragmentToolbarTitle("");
-        else
+        } else
             setCustomFragmentToolbarTitle(mFriendlyMessage.getName());
 
         getView().findViewById(R.id.toolbar).setOnClickListener(new View.OnClickListener() {
@@ -85,6 +87,17 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
             mAutoResizeTextView.setTextSize(Constants.MAX_FULLSCREEN_FONT_SIZE);
         } else if (!TextUtils.isEmpty(mFriendlyMessage.getImageUrl()) && !TextUtils.isEmpty(mFriendlyMessage.getText())) {
             mTextView.setText(mFriendlyMessage.getText());
+        }
+
+        if (mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
+            if (OneTimeMessageDb.getInstance().messageExists(mFriendlyMessage.getId())) {
+                mAutoResizeTextView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        TextViewUtil.blurText(mAutoResizeTextView, true);
+                    }
+                });
+            }
         }
 
         mRotateButton.setOnClickListener(new View.OnClickListener() {
@@ -141,5 +154,12 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
             }
         });
         mRotateButton.startAnimation(anim);
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME)
+            OneTimeMessageDb.getInstance().insertMessageId(mFriendlyMessage.getId());
+        super.onDestroy();
     }
 }

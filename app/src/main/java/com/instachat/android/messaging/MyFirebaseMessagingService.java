@@ -32,6 +32,7 @@ import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ThreadWrapper;
+import com.instachat.android.view.CircleTransform;
 
 import org.json.JSONObject;
 
@@ -120,6 +121,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                                             with(MyApp.getInstance()).
                                             load(task.getResult().toString()).
                                             asBitmap().
+                                            transform(new CircleTransform(MyFirebaseMessagingService.this)).
                                             into(thumbSize(), thumbSize()). // Width and height
                                             get();
                                     showNotification(friendlyMessage, bitmap);
@@ -185,7 +187,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         builder.setContentTitle(friendlyMessage.getName());
 
         // Content text, which appears in smaller text below the title
-        if (TextUtils.isEmpty(friendlyMessage.getText()))
+        if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME && TextUtils.isEmpty(friendlyMessage.getText()))
+            builder.setContentText(getString(R.string.one_time_photo_notification_title));
+        else if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME && !TextUtils.isEmpty(friendlyMessage.getText()))
+            builder.setContentText(getString(R.string.one_time_message_notification_title));
+        else if (TextUtils.isEmpty(friendlyMessage.getText()))
             builder.setContentText(getString(R.string.photo));
         else
             builder.setContentText(friendlyMessage.getText() + "");

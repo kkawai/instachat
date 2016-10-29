@@ -79,7 +79,8 @@ public class MessageOptionsDialogHelper {
 
         PopupMenu popupMenu = new PopupMenu(context, anchor);
         popupMenu.inflate(R.menu.message_options);
-        if (TextUtils.isEmpty(friendlyMessage.getText())) {
+        if (TextUtils.isEmpty(friendlyMessage.getText()) ||
+                friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
             popupMenu.getMenu().removeItem(R.id.menu_copy_text);
         }
         if (!TextUtils.isEmpty(friendlyMessage.getImageUrl()) && TextUtils.isEmpty(friendlyMessage.getText())) {
