@@ -37,7 +37,7 @@
 
     <!-- chat colors! these are very important -->
     <color name="chat_like_button_inactive_state">#edeff1</color>
-    <color name="chat_like_button_active_state">#ed3d53</color>
+    <color name="chat_like_button_active_state">#ff21272b</color>
     <color name="chat_background_screen_color">@android:color/white</color>
     <color name="chat_bubble_background_color">@color/jonGray</color>
     <color name="chat_sender_username">@android:color/black</color>

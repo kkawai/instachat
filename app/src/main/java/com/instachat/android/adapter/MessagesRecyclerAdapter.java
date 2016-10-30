@@ -253,17 +253,31 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         View.OnClickListener likesButtonClicked = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                holder.likesButton.callOnClick();
-                final FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
-                //friendlyMessage.incrementLikesCount();
-                DatabaseReference ref = mFirebaseDatabaseReference.child(mDatabaseRef).child(friendlyMessage.getId()).child(Constants.CHILD_LIKES);
-                LikesHelper.getInstance().likeFriendlyMessage(friendlyMessage, ref);
+                MLog.d(TAG, "likesButtonClicked likes debug ", holder.getAdapterPosition());
+                likeFriendlyMessage(holder);
             }
         };
-        holder.likesButtonParent.setOnClickListener(likesButtonClicked);
-        holder.periscopeLayout.setOnClickListener(likesButtonClicked);
-
+        View.OnClickListener likesRelatedButtonsClicked = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (view.getTag() != null) {
+                    ((View) view.getTag()).callOnClick();
+                }
+                MLog.d(TAG, "likesRelatedButtonsClicked likes debug ", holder.getAdapterPosition());
+            }
+        };
+        holder.likesButton.setOnClickListener(likesButtonClicked);
+        holder.likesButtonParent.setOnClickListener(likesRelatedButtonsClicked);
+        holder.likesButtonParent.setTag(holder.likesButton);
+        holder.periscopeLayout.setOnClickListener(likesRelatedButtonsClicked);
+        holder.periscopeLayout.setTag(holder.likesButton);
         return holder;
+    }
+
+    private void likeFriendlyMessage(MessageViewHolder holder) {
+        final FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
+        DatabaseReference ref = mFirebaseDatabaseReference.child(mDatabaseRef).child(friendlyMessage.getId()).child(Constants.CHILD_LIKES);
+        LikesHelper.getInstance().likeFriendlyMessage(friendlyMessage, ref);
     }
 
     @Override

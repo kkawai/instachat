@@ -80,7 +80,7 @@
                         android:id="@+id/messagePhotoWarningView"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@color/jonGray"
+                        android:background="@color/chat_bubble_background_color"
                         android:orientation="vertical">
 
                         <ImageView
@@ -112,7 +112,7 @@
                     android:layout_height="wrap_content"
                     android:autoLink="web|map|email|phone"
                     android:lineSpacingExtra="2dp"
-                    android:maxWidth="230dp"
+                    android:maxWidth="240dp"
                     android:textColor="@color/chat_message_color"
                     android:textSize="@dimen/message_text_size"
                     app:font="Lato-Regular.ttf"/>
