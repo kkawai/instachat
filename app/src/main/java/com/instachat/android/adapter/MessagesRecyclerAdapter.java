@@ -67,6 +67,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
     private static final int ITEM_VIEW_TYPE_STANDARD_MESSAGE = 0;
     private static final int ITEM_VIEW_TYPE_WEB_LINK = 1;
+    private static final int ITEM_VIEW_TYPE_STANDARD_MESSAGE_ME = 2;
 
     private static final int PAYLOAD_PERISCOPE_CHANGE = 0;
     private static final int PAYLOAD_IMAGE_REVEAL = 1;
@@ -142,6 +143,9 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         if (URLUtil.isHttpUrl(text) || URLUtil.isHttpsUrl(text)) {
             return ITEM_VIEW_TYPE_WEB_LINK;
         }
+        if (friendlyMessage.getUserid() == Preferences.getInstance().getUserId()) {
+            return ITEM_VIEW_TYPE_STANDARD_MESSAGE_ME;
+        }
         return ITEM_VIEW_TYPE_STANDARD_MESSAGE;
     }
 
@@ -160,9 +164,10 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private MessageViewHolder createMessageViewHolder(ViewGroup parent, int viewType) {
         if (viewType == ITEM_VIEW_TYPE_STANDARD_MESSAGE) {
             return super.onCreateViewHolder(parent, viewType);
+        } else if (viewType == ITEM_VIEW_TYPE_STANDARD_MESSAGE_ME) {
+            return new MessageViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_me, parent, false));
         } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_web_clipping, parent, false);
-            return new MessageViewHolder(view);
+            return new MessageViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_web_clipping, parent, false));
         }
         throw new IllegalArgumentException("unknown viewType");
     }
@@ -205,7 +210,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             }
         });
 
-        if (viewType == ITEM_VIEW_TYPE_STANDARD_MESSAGE) {
+        if (viewType == ITEM_VIEW_TYPE_STANDARD_MESSAGE || viewType == ITEM_VIEW_TYPE_STANDARD_MESSAGE_ME) {
             final View.OnClickListener onClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
