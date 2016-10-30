@@ -223,7 +223,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 }
             };
 
-            holder.itemView.setOnClickListener(onClickListener);
             holder.messageTextParent.setOnClickListener(onClickListener);
             holder.messagePhotoView.setOnClickListener(onClickListener);
 
@@ -251,15 +250,18 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             throw new IllegalArgumentException("unknown viewType");
         }
 
-        holder.likesButton.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener likesButtonClicked = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                holder.likesButton.callOnClick();
                 final FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
                 //friendlyMessage.incrementLikesCount();
                 DatabaseReference ref = mFirebaseDatabaseReference.child(mDatabaseRef).child(friendlyMessage.getId()).child(Constants.CHILD_LIKES);
                 LikesHelper.getInstance().likeFriendlyMessage(friendlyMessage, ref);
             }
-        });
+        };
+        holder.likesButtonParent.setOnClickListener(likesButtonClicked);
+        holder.periscopeLayout.setOnClickListener(likesButtonClicked);
 
         return holder;
     }

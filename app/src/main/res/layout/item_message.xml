@@ -14,10 +14,7 @@
             android:layout_width="@dimen/user_thumb_pic_size"
             android:layout_height="@dimen/user_thumb_pic_size"
             android:layout_gravity="bottom"
-            android:transitionName="image"
-            app:civ_border_color="@color/colorPrimaryDark"
-            app:civ_border_overlay="true"
-            app:civ_border_width="0px"/>
+            android:transitionName="image"/>
 
         <me.himanshusoni.chatmessageview.ChatMessageView
             android:id="@+id/contentMessageChat"
@@ -115,7 +112,7 @@
                     android:layout_height="wrap_content"
                     android:autoLink="web|map|email|phone"
                     android:lineSpacingExtra="2dp"
-                    android:maxWidth="218dp"
+                    android:maxWidth="230dp"
                     android:textColor="@color/chat_message_color"
                     android:textSize="@dimen/message_text_size"
                     app:font="Lato-Regular.ttf"/>
@@ -123,6 +120,32 @@
             </LinearLayout>
 
         </me.himanshusoni.chatmessageview.ChatMessageView>
+
+        <FrameLayout
+            android:id="@+id/likeButtonParent"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="bottom">
+
+            <com.sackcentury.shinebuttonlib.ShineButton
+                android:id="@+id/likeButton"
+                android:layout_width="@dimen/likes_button_size"
+                android:layout_height="@dimen/likes_button_size"
+                android:layout_gravity="center"
+                android:src="@color/chat_like_button_inactive_state"
+                app:allow_random_color="false"
+                app:big_shine_color="@color/chat_like_button_active_state"
+                app:btn_color="@color/chat_like_button_inactive_state"
+                app:btn_fill_color="@color/chat_like_button_active_state"
+                app:click_animation_duration="200"
+                app:enable_flashing="false"
+                app:shine_animation_duration="1500"
+                app:shine_count="8"
+                app:shine_turn_angle="10"
+                app:siShape="@raw/heart"
+                app:small_shine_color="#CC9999"
+                app:small_shine_offset_angle="20"/>
+        </FrameLayout>
 
         <FrameLayout
             android:id="@+id/periscopeParent"
@@ -137,45 +160,16 @@
                 android:layout_gravity="bottom|center_horizontal"/>
 
             <com.instachat.android.view.CustomFontTextView
-                android:id="@+id/likes"
+                android:id="@+id/likesCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center_horizontal"
+                android:layout_gravity="bottom|left"
                 android:layout_marginBottom="@dimen/likes_count_bottom_margin"
                 android:textColor="@color/chat_likes_count"
                 android:textSize="@dimen/message_likes_counter_size"
                 android:textStyle="bold"
                 app:font="Lato-Bold.ttf"/>
         </FrameLayout>
-
-        <!--<ImageView-->
-        <!--android:id="@+id/likeButton"-->
-        <!--android:layout_width="36dp"-->
-        <!--android:layout_height="36dp"-->
-        <!--android:layout_gravity="end|bottom"-->
-        <!--android:src="@drawable/ic_heart_button_inactive"-->
-        <!--/>-->
-
-        <!-- app:shine_distance_multiple="" -->
-        <com.sackcentury.shinebuttonlib.ShineButton
-            android:id="@+id/likeButton"
-            android:layout_width="@dimen/likes_button_size"
-            android:layout_height="@dimen/likes_button_size"
-            android:layout_gravity="end|bottom"
-            android:src="@color/chat_like_button_inactive_state"
-            app:allow_random_color="false"
-            app:big_shine_color="@color/chat_like_button_active_state"
-            app:btn_color="@color/chat_like_button_inactive_state"
-            app:btn_fill_color="@color/chat_like_button_active_state"
-            app:click_animation_duration="200"
-            app:enable_flashing="false"
-            app:shine_animation_duration="1500"
-            app:shine_count="8"
-            app:shine_turn_angle="10"
-            app:siShape="@raw/heart"
-            app:small_shine_color="#CC9999"
-            app:small_shine_offset_angle="20"/>
-
 
     </LinearLayout>
 
