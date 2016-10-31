@@ -68,6 +68,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private static final int ITEM_VIEW_TYPE_STANDARD_MESSAGE = 0;
     private static final int ITEM_VIEW_TYPE_WEB_LINK = 1;
     private static final int ITEM_VIEW_TYPE_STANDARD_MESSAGE_ME = 2;
+    private static final int ITEM_VIEW_TYPE_WEB_LINK_ME = 3;
 
     private static final int PAYLOAD_PERISCOPE_CHANGE = 0;
     private static final int PAYLOAD_IMAGE_REVEAL = 1;
@@ -141,12 +142,15 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         String text = friendlyMessage.getText() + "";
 
         if (URLUtil.isHttpUrl(text) || URLUtil.isHttpsUrl(text)) {
-            return ITEM_VIEW_TYPE_WEB_LINK;
+            if (friendlyMessage.getUserid() == Preferences.getInstance().getUserId())
+                return ITEM_VIEW_TYPE_WEB_LINK_ME;
+            else
+                return ITEM_VIEW_TYPE_WEB_LINK;
         }
-        if (friendlyMessage.getUserid() == Preferences.getInstance().getUserId()) {
+        if (friendlyMessage.getUserid() == Preferences.getInstance().getUserId())
             return ITEM_VIEW_TYPE_STANDARD_MESSAGE_ME;
-        }
-        return ITEM_VIEW_TYPE_STANDARD_MESSAGE;
+        else
+            return ITEM_VIEW_TYPE_STANDARD_MESSAGE;
     }
 
     private void blockUser(int userid) {
@@ -168,6 +172,8 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             return new MessageViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_me, parent, false));
         } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
             return new MessageViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_web_clipping, parent, false));
+        } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK_ME) {
+            return new MessageViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_me_web_clipping, parent, false));
         }
         throw new IllegalArgumentException("unknown viewType");
     }
@@ -240,7 +246,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                     notifyItemChanged(holder.getAdapterPosition(), PAYLOAD_IMAGE_REVEAL);
                 }
             });
-        } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
+        } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK || viewType == ITEM_VIEW_TYPE_WEB_LINK_ME) {
             View.OnClickListener webLinkClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -367,7 +373,8 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
         mAdapterPopulateHolderListener.onViewHolderPopulated();
 
-        if (getItemViewType(position) == ITEM_VIEW_TYPE_WEB_LINK) {
+        int type = getItemViewType(position);
+        if (type == ITEM_VIEW_TYPE_WEB_LINK || type == ITEM_VIEW_TYPE_WEB_LINK_ME) {
             new WebLinkHelper().populateWebLinkPost(viewHolder, friendlyMessage, position);
         } else {
             if (viewHolder.messageTextView != null) {
