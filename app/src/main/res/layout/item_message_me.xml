@@ -6,39 +6,15 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="end|right"
+        android:gravity="right"
         android:orientation="horizontal"
         android:paddingBottom="18dp">
-
-        <FrameLayout
-            android:id="@+id/periscopeParent"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="right|bottom">
-
-            <com.instachat.android.view.PeriscopeLayout
-                android:id="@+id/periscope"
-                android:layout_width="@dimen/periscope_width"
-                android:layout_height="match_parent"
-                android:layout_gravity="bottom|center_horizontal"/>
-
-            <com.instachat.android.view.CustomFontTextView
-                android:id="@+id/likesCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:layout_marginBottom="@dimen/likes_count_bottom_margin"
-                android:textColor="@color/chat_likes_count"
-                android:textSize="@dimen/message_likes_counter_size"
-                android:textStyle="bold"
-                app:font="Lato-Bold.ttf"/>
-        </FrameLayout>
 
         <FrameLayout
             android:id="@+id/likeButtonParent"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_gravity="right|bottom">
+            android:layout_gravity="bottom">
 
             <com.sackcentury.shinebuttonlib.ShineButton
                 android:id="@+id/likeButton"
@@ -60,17 +36,40 @@
                 app:small_shine_offset_angle="20"/>
         </FrameLayout>
 
+        <FrameLayout
+            android:id="@+id/periscopeParent"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end|bottom">
+
+            <com.instachat.android.view.PeriscopeLayout
+                android:id="@+id/periscope"
+                android:layout_width="@dimen/periscope_width"
+                android:layout_height="match_parent"
+                android:layout_gravity="bottom|center_horizontal"/>
+
+            <com.instachat.android.view.CustomFontTextView
+                android:id="@+id/likesCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|left"
+                android:layout_marginBottom="@dimen/likes_count_bottom_margin"
+                android:textColor="@color/chat_likes_count"
+                android:textSize="@dimen/message_likes_counter_size"
+                android:textStyle="bold"
+                app:font="Lato-Bold.ttf"/>
+        </FrameLayout>
+
         <me.himanshusoni.chatmessageview.ChatMessageView
             android:id="@+id/contentMessageChat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="end|right"
             app:cmv_arrowGravity="end"
-            app:cmv_arrowPosition="right"
+            app:cmv_arrowPosition="left"
             app:cmv_backgroundColor="@color/chat_bubble_background_color"
             app:cmv_backgroundColorPressed="#FFBABABA"
             app:cmv_cornerRadius="6dp"
-            app:cmv_showArrow="true">
+            app:cmv_showArrow="false">
 
             <LinearLayout
                 android:id="@+id/messageTextParent"
@@ -83,13 +82,14 @@
                     android:layout_height="wrap_content"
                     android:gravity="end"
                     android:orientation="horizontal">
-
+                    <!-- android:textAppearance="?android:attr/textAppearanceSmall" -->
                     <com.instachat.android.view.CustomFontTextView
                         android:id="@+id/messageTimeTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:textAlignment="textEnd"
                         android:textColor="@color/chat_time_message_sent"
                         android:textSize="@dimen/message_sent_time_ago_size"
                         app:font="Lato-Regular.ttf"/>
@@ -99,6 +99,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
+                        android:textAlignment="textEnd"
                         android:textColor="@color/chat_sender_username"
                         android:textSize="@dimen/message_sender_name_size"
                         app:font="Lato-Bold.ttf"/>
@@ -157,10 +158,11 @@
                     android:id="@+id/messageTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right|end"
+                    android:layout_gravity="end"
                     android:autoLink="web|map|email|phone"
                     android:lineSpacingExtra="2dp"
                     android:maxWidth="240dp"
+                    android:textAlignment="textEnd"
                     android:textColor="@color/chat_message_color"
                     android:textSize="@dimen/message_text_size"
                     app:font="Lato-Regular.ttf"/>
@@ -173,8 +175,9 @@
             android:id="@+id/messengerImageView"
             android:layout_width="@dimen/user_thumb_pic_size"
             android:layout_height="@dimen/user_thumb_pic_size"
-            android:layout_gravity="bottom|right|end"
+            android:layout_gravity="bottom"
             android:transitionName="image"/>
+
 
     </LinearLayout>
 

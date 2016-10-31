@@ -303,7 +303,11 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                         if (mActivityState == null || mActivityState.isActivityDestroyed())
                             return;
                         for (int i = 0; i < count; i++) {
-                            viewHolder.periscopeLayout.addHeart();
+                            try {
+                                viewHolder.periscopeLayout.addHeart();
+                            } catch (final IllegalArgumentException e) {
+                                MLog.e(TAG, " failed to periscope ", e.getMessage());
+                            }
                         }
                         MyApp.getInstance().getMap().getConsumedLikesMap().put(friendlyMessage.getId(), friendlyMessage.getLikes());
                     }
