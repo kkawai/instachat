@@ -53,6 +53,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -265,6 +266,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             getIntent().removeExtra(Constants.KEY_SHARE_MESSAGE);
         }
         addUserPresenceToGroup();
+        listenForTyping();
     }
 
     private DatabaseReference mGroupSummaryRef;
@@ -279,8 +281,70 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private long prevInputTime;
     private int prevInputCount;
 
-    protected void onMeEnteringText() {
+    private long mLastTypingTime;
 
+    protected void onMeEnteringText() {
+        try {
+            if (System.currentTimeMillis() - mLastTypingTime < 3000) {
+                return;
+            }
+            Map<String, Object> map = new HashMap<>(3);
+            map.put(Constants.CHILD_TYPING, true);
+            map.put(Constants.CHILD_DPID, myDpid());
+            map.put(Constants.CHILD_USERNAME, myUsername());
+            FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, myUserid())).setValue(map);
+            mLastTypingTime = System.currentTimeMillis();
+        } catch (Exception e) {
+            MLog.e(TAG, "onMeEnteringText() failed", e);
+        }
+    }
+
+    private DatabaseReference mTypingReference;
+    private ChildEventListener mTypingChildEventListener;
+
+    private void listenForTyping() {
+        mTypingReference = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_PARENT_REF(mGroupId));
+        mTypingChildEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                MLog.d(TAG, "isTyping: onChildAdded() dataSnapshot ", dataSnapshot, " s: ", s);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                MLog.d(TAG, "isTyping: onChildChanged() dataSnapshot ", dataSnapshot, " s: ", s);
+                if (isActivityDestroyed())
+                    return;
+                MLog.d(TAG, "isTyping: onDataChange() dataSnapshot ", dataSnapshot);
+                if (dataSnapshot.exists() && dataSnapshot.hasChild(Constants.CHILD_TYPING)) {
+                    boolean isTyping = dataSnapshot.child(Constants.CHILD_TYPING).getValue(Boolean.class);
+                    String username = dataSnapshot.child(Constants.CHILD_USERNAME).getValue(String.class);
+                    String dpid = dataSnapshot.child(Constants.CHILD_DPID).getValue(String.class);
+                    int userid = Integer.parseInt(dataSnapshot.getKey());
+                    MLog.d(TAG, "isTyping: ", isTyping, " dpid: ", dpid, " userid ", userid);
+                    if (isTyping) {
+                        onRemoteUserTyping(userid, username, dpid);
+                        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, userid)).child(Constants.CHILD_TYPING).setValue(false);
+                    }
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                MLog.d(TAG, "isTyping: onChildRemoved() dataSnapshot ", dataSnapshot);
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        mTypingReference.addChildEventListener(mTypingChildEventListener);
     }
 
     @Override
@@ -346,6 +410,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         if (mGroupChatUsersRecyclerAdapter != null)
             mGroupChatUsersRecyclerAdapter.cleanup();
         mBlockedUserListener = null;
+        if (mTypingReference != null && mTypingChildEventListener != null)
+            mTypingReference.removeEventListener(mTypingChildEventListener);
         super.onDestroy();
     }
 
@@ -1201,10 +1267,11 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 .addToBackStack(null).commit();*/
     }
 
-    protected void onRemoteUserTyping(int userid) {
+    protected void onRemoteUserTyping(int userid, String username, String dpid) {
         if (isActivityDestroyed()) {
             return;
         }
+        ((TextView) findViewById(R.id.usernameTyping)).setText(username);
         showTypingDots();
     }
 
@@ -1331,13 +1398,14 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                                         mChatsRecyclerViewAdapter.removeUserFromAllGroups(myUserid(), mGroupId);
                                 }
                             });
+                            FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, myUserid())).child(Constants.CHILD_TYPING).setValue(false);
 
                             me.setCurrentGroupId(groupChatSummary.getId());
                             me.setCurrentGroupName(groupChatSummary.getName());
                             FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(myUserid())).updateChildren(me.toMap(true));
 
                         }
-                    }, 3000);
+                    }, 2000);
                 }
             }
 
@@ -1354,6 +1422,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(mGroupId)).child(myUserid() + "").removeValue();
         FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(myUserid())).child(Constants.FIELD_CURRENT_GROUP_ID).removeValue();
         FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(myUserid())).child(Constants.FIELD_CURRENT_GROUP_NAME).removeValue();
+        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, myUserid())).removeValue();
     }
 
     private void toggleRightDrawer() {

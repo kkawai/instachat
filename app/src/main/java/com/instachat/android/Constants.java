@@ -191,7 +191,13 @@ public final class Constants {
         return "/public_group_users/" + groupid;
     }
 
-    public static String PUBLIC_CHATS_TYPING_PARENT_REF = "/public_group_typing/";
+    public static String GROUP_CHAT_USERS_TYPING_REF(long groupid, int userid) {
+        return "/public_group_users_typing/" + groupid + "/" + userid;
+    }
+
+    public static String GROUP_CHAT_USERS_TYPING_PARENT_REF(long groupid) {
+        return "/public_group_users_typing/" + groupid;
+    }
 
     public static String PUBLIC_CHATS_SUMMARY_PARENT_REF = "/public_group_summaries/";
 
@@ -261,6 +267,9 @@ public final class Constants {
     public static final String KEY_TO_USERID = "toid";
     public static final String CHILD_UNREAD_MESSAGES = "unread_messages";
     public static final String CHILD_LIKES = "likes";
+    public static final String CHILD_TYPING = "isTyping";
+    public static final String CHILD_DPID = "dpid";
+    public static final String CHILD_USERNAME = "username";
     public static final String CHILD_MESSAGE_CONSUMED_BY_PARTNER = "consumedByPartner";
 
     /**

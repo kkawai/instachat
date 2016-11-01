@@ -331,7 +331,7 @@ public class PrivateChatActivity extends GroupChatActivity {
             if (System.currentTimeMillis() - mLastTypingTime < 3000) {
                 return;
             }
-            FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHAT_TYPING_REF(sToUserid)).child("" + myUserid()).child("isTyping").setValue(true);
+            FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHAT_TYPING_REF(sToUserid)).child("" + myUserid()).child(Constants.CHILD_TYPING).setValue(true);
             mLastTypingTime = System.currentTimeMillis();
         } catch (Exception e) {
             MLog.e(TAG, "onMeEnteringText() failed", e);
@@ -389,11 +389,11 @@ public class PrivateChatActivity extends GroupChatActivity {
     }
 
     @Override
-    protected void onRemoteUserTyping(int userid) {
-        if (!sIsActive || sToUserid != userid) {
+    protected void onRemoteUserTyping(int userid, String username, String dpid) {
+        if (isActivityDestroyed() || !sIsActive || sToUserid != userid) {
             return;
         }
-        super.onRemoteUserTyping(userid);
+        showTypingDots();
     }
 
     private void populateUserProfile() {
@@ -604,7 +604,7 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     private void listenForPartnerTyping() {
         mTypingReference = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHAT_TYPING_REF(sToUserid)).
-                child("" + sToUserid).child("isTyping");
+                child("" + sToUserid).child(Constants.CHILD_TYPING);
         mTypingReference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -618,7 +618,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                             boolean isTyping = dataSnapshot.getValue(Boolean.class);
                             MLog.d(TAG, "isTyping: ", isTyping);
                             if (isTyping) {
-                                onRemoteUserTyping(sToUserid);
+                                onRemoteUserTyping(sToUserid, mToUser.getUsername(), mToUser.getProfilePicUrl());
                                 mTypingReference.setValue(false);
                             }
                         }
