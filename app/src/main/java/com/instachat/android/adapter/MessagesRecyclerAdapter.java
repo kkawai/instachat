@@ -86,6 +86,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private FrameLayout mEntireScreenFrameLayout;
     private int mMaxPeriscopesPerItem;
     private boolean mIsPrivateChat;
+    private int mMyUserid;
 
     public MessagesRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref) {
         super(modelClass, modelLayout, viewHolderClass, ref);
@@ -93,6 +94,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         mStorageRef = FirebaseStorage.getInstance().getReference();
         listenForBlockedUsers();
         mMaxPeriscopesPerItem = (int) FirebaseRemoteConfig.getInstance().getLong(Constants.KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM);
+        mMyUserid = Preferences.getInstance().getUserId();
     }
 
     public void setIsPrivateChat(boolean isPrivateChat) {
@@ -147,12 +149,12 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         String text = friendlyMessage.getText() + "";
 
         if (URLUtil.isHttpUrl(text) || URLUtil.isHttpsUrl(text)) {
-            if (friendlyMessage.getUserid() == Preferences.getInstance().getUserId())
+            if (friendlyMessage.getUserid() == mMyUserid)
                 return ITEM_VIEW_TYPE_WEB_LINK_ME;
             else
                 return ITEM_VIEW_TYPE_WEB_LINK;
         }
-        if (friendlyMessage.getUserid() == Preferences.getInstance().getUserId())
+        if (friendlyMessage.getUserid() == mMyUserid)
             return ITEM_VIEW_TYPE_STANDARD_MESSAGE_ME;
         else
             return ITEM_VIEW_TYPE_STANDARD_MESSAGE;
@@ -404,11 +406,11 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         }
 
         if (mIsPrivateChat) {
-            viewHolder.messageReadConfirmationView.setVisibility(View.VISIBLE);
+
             if (friendlyMessage.isConsumedByPartner()) {
                 viewHolder.messageReadConfirmationView.setImageResource(R.drawable.ic_done_all_black_18dp);
             } else {
-                if (Preferences.getInstance().getUserId() != friendlyMessage.getUserid()) {
+                if (mMyUserid != friendlyMessage.getUserid()) {
                     //my partner reading the message for the first time
                     friendlyMessage.setConsumedByPartner(true);//set locally for optimization purposes
                     mFirebaseDatabaseReference.child(mDatabaseRef).child(friendlyMessage.getId()).child(Constants.CHILD_MESSAGE_CONSUMED_BY_PARTNER).setValue(true); //save remotely
@@ -418,6 +420,11 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                     viewHolder.messageReadConfirmationView.setImageResource(R.drawable.ic_done_black_18dp);
                 }
             }
+
+            /**
+             * lastly, I only care about messages that I have sent showing read confirmation
+             */
+            viewHolder.messageReadConfirmationView.setVisibility(mMyUserid != friendlyMessage.getUserid() ? View.GONE : View.VISIBLE);
         }
 
         viewHolder.messengerImageView.setImageDrawable(null);
