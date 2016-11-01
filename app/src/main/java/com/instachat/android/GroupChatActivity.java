@@ -92,7 +92,6 @@ import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
-import com.instachat.android.view.AnimatedDotLoadingView;
 import com.tooltip.Tooltip;
 
 import java.util.HashMap;
@@ -118,6 +117,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     //private FirebaseUser mFirebaseUser;
     private FirebaseAnalytics mFirebaseAnalytics;
     private EditText mMessageEditText;
+    private TextView mUsernameTyping;
     private AdView mAdView;
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
     //private GoogleApiClient mGoogleApiClient;
@@ -131,7 +131,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private LeftDrawerHelper mLeftDrawerHelper;
     private String mDatabaseRoot;
     private boolean mIsStartedAnimation;
-    private AnimatedDotLoadingView mDotsLoader;
+    //private AnimatedDotLoadingView mDotsLoader;
+    private View mDotsLayoutParent;
     private ChatSummariesRecyclerAdapter mChatsRecyclerViewAdapter;
     private GroupChatUsersRecyclerAdapter mGroupChatUsersRecyclerAdapter;
     private ExternalSendIntentConsumer mExternalSendIntentConsumer;
@@ -156,7 +157,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         initPhotoHelper(savedInstanceState);
         setupDrawers();
         setupToolbar();
-        mDotsLoader = (AnimatedDotLoadingView) findViewById(R.id.text_dot_loader);
+        //mDotsLoader = (AnimatedDotLoadingView) findViewById(R.id.text_dot_loader);
+        mDotsLayoutParent = findViewById(R.id.dotsLayout);
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -199,6 +201,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         // Initialize Firebase Measurement.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
+        mUsernameTyping = ((TextView) findViewById(R.id.usernameTyping));
         mMessageEditText = (EditText) findViewById(R.id.messageEditText);
         mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter((int) mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_LENGTH))});
         mMessageEditText.addTextChangedListener(new TextWatcher() {
@@ -294,9 +297,21 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             map.put(Constants.CHILD_USERNAME, myUsername());
             FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, myUserid())).setValue(map);
             mLastTypingTime = System.currentTimeMillis();
+            //postDelayedMeNotEnteringText();
         } catch (Exception e) {
             MLog.e(TAG, "onMeEnteringText() failed", e);
         }
+    }
+
+    private void postDelayedMeNotEnteringText() {
+        if (isActivityDestroyed())
+            return;
+        mUsernameTyping.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, myUserid())).child(Constants.CHILD_TYPING).setValue(false);
+            }
+        }, 3000);
     }
 
     private DatabaseReference mTypingReference;
@@ -324,7 +339,10 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                     MLog.d(TAG, "isTyping: ", isTyping, " dpid: ", dpid, " userid ", userid);
                     if (isTyping) {
                         onRemoteUserTyping(userid, username, dpid);
-                        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, userid)).child(Constants.CHILD_TYPING).setValue(false);
+                    } else {
+                        /*String current = mUsernameTyping.getText().toString();
+                        current = current.replace(username, "");
+                        mUsernameTyping.setText(current);*/
                     }
                 }
             }
@@ -1271,7 +1289,10 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         if (isActivityDestroyed()) {
             return;
         }
-        ((TextView) findViewById(R.id.usernameTyping)).setText(username);
+        /*String current = mUsernameTyping.getText().toString();
+        current = current.replace(username, "");
+        current = current + " " + username;*/
+        mUsernameTyping.setText(username);
         showTypingDots();
     }
 
@@ -1281,14 +1302,12 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         public void run() {
             if (isActivityDestroyed())
                 return;
-            mDotsLoader.stopAnimation();
-            hideDotsParent(true);
+            hideDotsParent();
         }
     };
 
     void showTypingDots() {
         showDotsParent(true);
-        mDotsLoader.startAnimation();
         mDotsHandler.removeCallbacks(mDotsHideRunner);
         mDotsHandler.postDelayed(mDotsHideRunner, mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_TYPING_DOTS_DISPLAY_TIME));
     }
@@ -1316,24 +1335,18 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         mShareText = null;
     }
 
-    protected void hideDotsParent(boolean isAnimate) {
-        if (mDotsLoader.getVisibility() == View.GONE)
+    private void hideDotsParent() {
+        if (mDotsLayoutParent.getVisibility() == View.GONE)
             return;
-        mDotsLoader.setVisibility(View.GONE);
-        if (isAnimate)
-            AnimationUtil.fadeOutAnimation(findViewById(R.id.dotsLayout));
-        else
-            findViewById(R.id.dotsLayout).setVisibility(View.GONE);
+        mDotsLayoutParent.setVisibility(View.GONE);
     }
 
-    protected void showDotsParent(boolean isAnimate) {
-        if (mDotsLoader.getVisibility() == View.VISIBLE)
+    private void showDotsParent(boolean isAnimate) {
+        if (mDotsLayoutParent.getVisibility() == View.VISIBLE)
             return;
-        mDotsLoader.setVisibility(View.VISIBLE);
+        mDotsLayoutParent.setVisibility(View.VISIBLE);
         if (isAnimate)
-            AnimationUtil.fadeInAnimation(findViewById(R.id.dotsLayout));
-        else
-            findViewById(R.id.dotsLayout).setVisibility(View.VISIBLE);
+            AnimationUtil.fadeInAnimation(mDotsLayoutParent);
     }
 
     public static void startGroupChatActivity(Context context, long groupId, String groupName, Uri sharePhotoUri, String shareMessage) {
@@ -1398,8 +1411,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                                         mChatsRecyclerViewAdapter.removeUserFromAllGroups(myUserid(), mGroupId);
                                 }
                             });
-                            FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, myUserid())).child(Constants.CHILD_TYPING).setValue(false);
-
                             me.setCurrentGroupId(groupChatSummary.getId());
                             me.setCurrentGroupName(groupChatSummary.getName());
                             FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(myUserid())).updateChildren(me.toMap(true));

@@ -79,6 +79,7 @@
 -keep class com.sackcentury:shinebutton.** { *; }
 -keep class hanks.xyz.** { *; }
 -keep class me.himanshusoni.chatmessageview.** { *; }
+-keep class com.github.silvestrpredko.** { *; }
 
 # below was necessary for making proguard work with flurry jar
 -keep class com.flurry.** { *; }

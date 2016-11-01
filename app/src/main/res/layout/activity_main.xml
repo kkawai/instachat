@@ -72,15 +72,17 @@
                     android:visibility="gone"
                     >
 
-                    <com.instachat.android.view.AnimatedDotLoadingView
-                        android:id="@+id/text_dot_loader"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                    <com.github.silvestrpredko.dotprogressbar.DotProgressBar
+                        android:id="@+id/dot_progress_bar"
+                        android:layout_width="30dp"
+                        android:layout_height="13dp"
                         android:layout_gravity="center_vertical"
-                        android:visibility="gone"
-                        app:color_array="@array/dot_colors"
-                        app:dot_radius="4dp"
-                        app:number_of_dots="3"/>
+                        android:layout_marginLeft="8dp"
+                        app:amount="3"
+                        app:animationDirection="right"
+                        app:duration="@android:integer/config_mediumAnimTime"
+                        app:endColor="@color/dotColor3"
+                        app:startColor="@color/dotColor1"/>
 
                     <com.instachat.android.view.CustomFontTextView
                         android:id="@+id/usernameTyping"

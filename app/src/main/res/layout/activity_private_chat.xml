@@ -88,6 +88,7 @@ Document differences between activity_main.xml here:
                         app:civ_border_overlay="true"
                         app:civ_border_width="0px"/>
 
+                    <!--
                     <com.instachat.android.view.AnimatedDotLoadingView
                         android:id="@+id/text_dot_loader"
                         android:layout_width="wrap_content"
@@ -96,7 +97,18 @@ Document differences between activity_main.xml here:
                         app:color_array="@array/dot_colors"
                         app:dot_radius="4dp"
                         android:layout_marginLeft="4dp"
-                        app:number_of_dots="3"/>
+                        app:number_of_dots="3"/> -->
+                    <com.github.silvestrpredko.dotprogressbar.DotProgressBar
+                        android:id="@+id/dot_progress_bar"
+                        android:layout_width="30dp"
+                        android:layout_height="13dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="8dp"
+                        app:amount="3"
+                        app:animationDirection="right"
+                        app:duration="@android:integer/config_mediumAnimTime"
+                        app:endColor="@color/dotColor3"
+                        app:startColor="@color/dotColor1"/>
 
                 </LinearLayout>
 
@@ -123,10 +135,10 @@ Document differences between activity_main.xml here:
                         android:layout_width="@dimen/send_button_size"
                         android:layout_height="@dimen/send_button_size"
                         android:layout_gravity="bottom"
-                        app:fab_showShadow="false"
                         android:layout_marginBottom="6dp"
                         android:layout_marginLeft="4dp"
                         android:src="@drawable/ic_photo_camera_black_24dp"
+                        app:fab_showShadow="false"
                         app:fab_size="mini"
                         fab:fab_colorNormal="@color/colorPrimary"
                         fab:fab_colorPressed="@color/colorPrimaryDark"
@@ -137,9 +149,9 @@ Document differences between activity_main.xml here:
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_weight="1"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
+                        android:layout_weight="1"
                         android:backgroundTint="@color/jonPink"
                         android:hint="@string/message_hint"
                         android:imeOptions="actionSend|flagNoEnterAction"
@@ -172,9 +184,9 @@ Document differences between activity_main.xml here:
                         android:layout_width="@dimen/send_button_size"
                         android:layout_height="@dimen/send_button_size"
                         android:layout_gravity="bottom"
-                        app:fab_showShadow="true"
                         android:src="@drawable/ic_send_black_24dp"
                         app:fab_colorDisabled="@color/send_button_disabled_color"
+                        app:fab_showShadow="true"
                         app:fab_size="mini"
                         fab:fab_colorNormal="@color/send_button_normal_color"
                         fab:fab_colorPressed="@color/send_button_pressed_color"

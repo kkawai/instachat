@@ -107,6 +107,7 @@ dependencies {
     compile 'com.google.apis:google-api-services-vision:v1-rev2-1.21.0'
 
     compile 'me.himanshusoni.chatmessageview:chat-message-view:1.0.3'
+    compile 'com.github.silvestrpredko:dot-progress-bar:1.0'
 }
 
 apply plugin: 'com.google.gms.google-services'
