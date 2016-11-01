@@ -160,7 +160,6 @@
                                     android:layout_gravity="end"
                                     android:ellipsize="end"
                                     android:maxLines="2"
-                                    android:textAlignment="textEnd"
                                     android:textColor="@color/chat_web_clipping_article_title"
                                     android:textSize="@dimen/web_clipping_article_title_size"
                                     app:font="Lato-Bold.ttf"/>
@@ -172,7 +171,6 @@
                                     android:layout_gravity="end"
                                     android:ellipsize="end"
                                     android:maxLines="3"
-                                    android:textAlignment="textEnd"
                                     android:textSize="@dimen/web_clipping_short_description_size"
                                     app:font="Lato-Regular.ttf"/>
 
@@ -183,7 +181,6 @@
                                     android:layout_gravity="end"
                                     android:ellipsize="end"
                                     android:maxLines="1"
-                                    android:textAlignment="textEnd"
                                     android:textColor="@color/chat_web_cliping_url"
                                     android:textSize="@dimen/web_clipping_short_url_size"
                                     app:font="Lato-Regular.ttf"/>

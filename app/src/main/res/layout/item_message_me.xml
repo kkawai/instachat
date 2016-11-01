@@ -174,7 +174,6 @@
                     android:autoLink="web|map|email|phone"
                     android:lineSpacingExtra="2dp"
                     android:maxWidth="240dp"
-                    android:textAlignment="textEnd"
                     android:textColor="@color/chat_message_color"
                     android:textSize="@dimen/message_text_size"
                     app:font="Lato-Regular.ttf"/>
