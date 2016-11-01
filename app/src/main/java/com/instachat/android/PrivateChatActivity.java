@@ -326,7 +326,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     }
 
     @Override
-    protected void onMeEnteringText() {
+    protected void onMeTyping() {
         try {
             if (System.currentTimeMillis() - mLastTypingTime < 3000) {
                 return;
@@ -334,7 +334,7 @@ public class PrivateChatActivity extends GroupChatActivity {
             FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHAT_TYPING_REF(sToUserid)).child("" + myUserid()).child(Constants.CHILD_TYPING).setValue(true);
             mLastTypingTime = System.currentTimeMillis();
         } catch (Exception e) {
-            MLog.e(TAG, "onMeEnteringText() failed", e);
+            MLog.e(TAG, "onMeTyping() failed", e);
         }
     }
 

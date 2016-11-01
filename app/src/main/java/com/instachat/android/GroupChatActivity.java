@@ -227,7 +227,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 MLog.i(TAG, "input onTextChanged() text start: " + start + " before: " + before + " count: " + count);
                 if (charSequence.toString().trim().length() > 0) {
                     setEnableSendButton(true);
-                    onMeEnteringText();
+                    onMeTyping();
                     showSendOptionsTooltip(mSendButton);
                 } else {
                     setEnableSendButton(false);
@@ -286,7 +286,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     private long mLastTypingTime;
 
-    protected void onMeEnteringText() {
+    protected void onMeTyping() {
         try {
             if (System.currentTimeMillis() - mLastTypingTime < 3000) {
                 return;
@@ -299,7 +299,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             mLastTypingTime = System.currentTimeMillis();
             //postDelayedMeNotEnteringText();
         } catch (Exception e) {
-            MLog.e(TAG, "onMeEnteringText() failed", e);
+            MLog.e(TAG, "onMeTyping() failed", e);
         }
     }
 
@@ -318,6 +318,9 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private ChildEventListener mTypingChildEventListener;
 
     private void listenForTyping() {
+
+        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, myUserid())).child(Constants.CHILD_TYPING).setValue(false);
+
         mTypingReference = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_PARENT_REF(mGroupId));
         mTypingChildEventListener = new ChildEventListener() {
             @Override
