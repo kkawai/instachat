@@ -35,55 +35,56 @@ public class FriendlyMessage implements Parcelable {
     private long groupId;
     private String groupName;
     private int likes;
-
+    private boolean consumedByPartner;
     private boolean isBlocked; //NOT persisted, volatile
 
     public FriendlyMessage() {
     }
 
-    public Map<String, Object> toUserMap() {
+    public Map<String, Object> toMapForLikes() {
         Map<String, Object> map = new HashMap<>(8);
         if (getName() != null)
             map.put("username", getName());
         if (getDpid() != null)
             map.put("profilePicUrl", getDpid());
         map.put("id", getUserid());
-        map.put("likes", 1);
+        map.put(Constants.CHILD_LIKES, 1);
         return map;
     }
 
-    public static Map<String, Object> toMap(FriendlyMessage friendlyMessage) {
+    public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>(8);
-        if (friendlyMessage.getName() != null)
-            map.put("name", friendlyMessage.getName());
-        if (friendlyMessage.getDpid() != null)
-            map.put("dpid", friendlyMessage.getDpid());
-        if (friendlyMessage.getImageUrl() != null)
-            map.put("imageUrl", friendlyMessage.getImageUrl());
-        if (friendlyMessage.getImageId() != null)
-            map.put("imageId", friendlyMessage.getImageId());
-        if (friendlyMessage.getId() != null)
-            map.put("id", friendlyMessage.getId());
-        if (friendlyMessage.getText() != null)
-            map.put("text", friendlyMessage.getText());
-        if (friendlyMessage.getUserid() != 0)
-            map.put("userid", friendlyMessage.getUserid());
-        if (friendlyMessage.getTime() != 0)
-            map.put("time", friendlyMessage.getTime());
-        if (friendlyMessage.groupId != 0) {
-            map.put("groupId", friendlyMessage.groupId);
+        if (getName() != null)
+            map.put("name", getName());
+        if (getDpid() != null)
+            map.put("dpid", getDpid());
+        if (getImageUrl() != null)
+            map.put("imageUrl", getImageUrl());
+        if (getImageId() != null)
+            map.put("imageId", getImageId());
+        if (getId() != null)
+            map.put("id", getId());
+        if (getText() != null)
+            map.put("text", getText());
+        if (getUserid() != 0)
+            map.put("userid", getUserid());
+        if (getTime() != 0)
+            map.put("time", getTime());
+        if (groupId != 0) {
+            map.put("groupId", groupId);
         }
-        if (friendlyMessage.groupName != null) {
-            map.put("groupName", friendlyMessage.groupName);
+        if (groupName != null) {
+            map.put("groupName", groupName);
         }
-        if (friendlyMessage.likes != 0) {
-            map.put(Constants.CHILD_LIKES, friendlyMessage.likes);
+        if (likes != 0) {
+            map.put(Constants.CHILD_LIKES, likes);
         }
-        map.put("messageType", friendlyMessage.getMessageType());
-        if (friendlyMessage.possibleAdultImage)
-            map.put("possibleAdultImage", friendlyMessage.possibleAdultImage);
-        if (friendlyMessage.possibleViolentImage)
-            map.put("possibleViolentImage", friendlyMessage.possibleViolentImage);
+        map.put("messageType", getMessageType());
+        if (possibleAdultImage)
+            map.put("possibleAdultImage", possibleAdultImage);
+        if (possibleViolentImage)
+            map.put("possibleViolentImage", possibleViolentImage);
+        map.put(Constants.CHILD_MESSAGE_CONSUMED_BY_PARTNER, consumedByPartner);
         return map;
     }
 
@@ -128,6 +129,8 @@ public class FriendlyMessage implements Parcelable {
             o.put("possibleAdultImage", possibleAdultImage);
         if (possibleViolentImage)
             o.put("possibleViolentImage", possibleViolentImage);
+        if (consumedByPartner)
+            o.put(Constants.CHILD_MESSAGE_CONSUMED_BY_PARTNER, consumedByPartner);
         return o;
     }
 
@@ -214,6 +217,7 @@ public class FriendlyMessage implements Parcelable {
             possibleAdultImage = true;
         if (possibleViolentImage || friendlyMessage.possibleViolentImage)
             possibleViolentImage = true;
+        consumedByPartner = false;
         return true;
     }
 
@@ -234,6 +238,7 @@ public class FriendlyMessage implements Parcelable {
             friendlyMessage.possibleAdultImage = o.optBoolean("possibleAdultImage");
             friendlyMessage.possibleViolentImage = o.optBoolean("possibleViolentImage");
             friendlyMessage.likes = o.optInt(Constants.CHILD_LIKES);
+            friendlyMessage.consumedByPartner = o.optBoolean(Constants.CHILD_MESSAGE_CONSUMED_BY_PARTNER, false);
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
         }
@@ -268,6 +273,7 @@ public class FriendlyMessage implements Parcelable {
             messageType = friendlyMessage.messageType;
             possibleAdultImage = friendlyMessage.possibleAdultImage;
             possibleViolentImage = friendlyMessage.possibleViolentImage;
+            consumedByPartner = friendlyMessage.consumedByPartner;
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
         }
@@ -383,6 +389,14 @@ public class FriendlyMessage implements Parcelable {
 
     public boolean isPossibleAdultImage() {
         return possibleAdultImage;
+    }
+
+    public boolean isConsumedByPartner() {
+        return consumedByPartner;
+    }
+
+    public void setConsumedByPartner(boolean consumedByPartner) {
+        this.consumedByPartner = consumedByPartner;
     }
 
     @Override

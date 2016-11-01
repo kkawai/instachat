@@ -73,7 +73,10 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (activityState == null || activityState.isActivityDestroyed())
                     return;
-                MLog.d(TAG, "onChildAdded() dataSnapshot: " + dataSnapshot.toString());
+                MLog.d(TAG, "private chat: onChildAdded() dataSnapshot: " + dataSnapshot.toString());
+                if (!dataSnapshot.hasChild("name")) {
+                    return;
+                }
                 PrivateChatSummary privateChatSummary = getPrivateChatSummary(dataSnapshot);
                 insertPrivateChatSummary(privateChatSummary);
             }
@@ -83,7 +86,10 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
                 //todo to-user might have changed their name or sent a message that is unread by you
                 if (activityState == null || activityState.isActivityDestroyed())
                     return;
-                MLog.d(TAG, "onChildChanged() dataSnapshot: " + dataSnapshot.toString());
+                MLog.d(TAG, "private chat: onChildChanged() dataSnapshot: " + dataSnapshot.toString());
+                if (!dataSnapshot.hasChild("name")) {
+                    return;
+                }
                 PrivateChatSummary privateChatSummary = getPrivateChatSummary(dataSnapshot);
                 updatePrivateChatSummary(privateChatSummary);
             }
@@ -94,6 +100,9 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
                 if (activityState == null || activityState.isActivityDestroyed())
                     return;
                 MLog.d(TAG, "onChildRemoved() dataSnapshot: " + dataSnapshot.toString());
+                if (!dataSnapshot.hasChild("name")) {
+                    return;
+                }
                 PrivateChatSummary privateChatSummary = getPrivateChatSummary(dataSnapshot);
                 removePrivateChatSummary(privateChatSummary);
 

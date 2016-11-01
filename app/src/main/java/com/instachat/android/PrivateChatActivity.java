@@ -252,10 +252,10 @@ public class PrivateChatActivity extends GroupChatActivity {
     private void createPrivateChatSummary() {
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF())
                 .child(mToUser.getId() + "");
-        ref.addValueEventListener(new ValueEventListener() {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() == null) {
+                if (dataSnapshot.getValue() == null || !dataSnapshot.hasChild("name")) {
                     ref.removeEventListener(this);
                     PrivateChatSummary summary = new PrivateChatSummary();
                     summary.setName(mToUser.getUsername());
@@ -458,7 +458,9 @@ public class PrivateChatActivity extends GroupChatActivity {
         } catch (RejectedExecutionException e) {
         }
         bio.setVisibility(TextUtils.isEmpty(mToUser.getBio()) ? View.GONE : View.VISIBLE);
-        bio.setText(mToUser.getBio());
+        String bioStr = mToUser.getBio() + "";
+        bioStr = bioStr.equals("null") ? "" : bioStr;
+        bio.setText(bioStr);
         TextView activeGroup = (TextView) findViewById(R.id.activeGroup);
         if (mToUser.getCurrentGroupId() != 0 && !TextUtils.isEmpty(mToUser.getCurrentGroupName())) {
             activeGroup.setVisibility(View.VISIBLE);
@@ -631,5 +633,10 @@ public class PrivateChatActivity extends GroupChatActivity {
             }
         });
 
+    }
+
+    @Override
+    protected boolean isPrivateChat() {
+        return true;
     }
 }

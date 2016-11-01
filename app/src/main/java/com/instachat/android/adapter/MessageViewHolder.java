@@ -29,6 +29,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
     public ShineButton likesButton;
     public View likesButtonParent;
     public TextView likesCount;
+    public ImageView messageReadConfirmationView;
 
     /*
      * Web link content
@@ -54,6 +55,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         likesButton = (ShineButton) itemView.findViewById(R.id.likeButton);
         likesButtonParent = itemView.findViewById(R.id.likeButtonParent);
         likesCount = (TextView) itemView.findViewById(R.id.likesCount);
+        messageReadConfirmationView = (ImageView)itemView.findViewById(R.id.messageReadConfirmationView);
 
         webLinkParent = itemView.findViewById(R.id.web_clipping_parent);
         webLinkImageView = (ImageView) itemView.findViewById(R.id.image_post);

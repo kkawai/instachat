@@ -125,7 +125,7 @@
     <string name="send_normal">Send As Normal Message</string>
     <string name="send_one_time">Send As ONE-TIME Message</string>
     <string name="what_is_one_time">What is ONE-TIME?</string>
-    <string name="one_time_definition">One-Time message is a message that appears blurry and can only be opened one-time by tapping on it.  After that, it cannot be opened again.  However, the sender my open it again, others cannot.</string>
+    <string name="one_time_definition">A One-Time message is a message that appears blurry and can only be opened once by tapping on it.  After that, it cannot be opened again.  However, the sender may open it again, others cannot.</string>
     <string name="copy_text">Copy Text</string>
     <string name="delete_message">Delete Message</string>
     <string name="delete_photo">Delete Photo</string>

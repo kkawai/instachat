@@ -86,7 +86,16 @@
                     android:layout_height="wrap_content"
                     android:gravity="end"
                     android:orientation="horizontal">
-                    <!-- android:textAppearance="?android:attr/textAppearanceSmall" -->
+
+                    <ImageView
+                        android:id="@+id/messageReadConfirmationView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:layout_marginRight="3dp"
+                        android:src="@drawable/ic_done_black_18dp"
+                        android:visibility="gone"/>
+
                     <com.instachat.android.view.CustomFontTextView
                         android:id="@+id/messageTimeTextView"
                         android:layout_width="wrap_content"

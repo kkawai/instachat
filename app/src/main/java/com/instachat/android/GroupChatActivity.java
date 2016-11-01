@@ -949,11 +949,16 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     }
 
+    protected boolean isPrivateChat() {
+        return false;
+    }
+
     private void initFirebaseAdapter() {
         mFirebaseAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class, R.layout.item_message, MessageViewHolder.class,
                 FirebaseDatabase.getInstance().
                         getReference(mDatabaseRoot).
                         limitToLast((int) mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)));
+        mFirebaseAdapter.setIsPrivateChat(isPrivateChat());
         mFirebaseAdapter.setDatabaseRoot(mDatabaseRoot);
         mFirebaseAdapter.setActivity(this, this, (FrameLayout) findViewById(R.id.fragment_content));
         mFirebaseAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {

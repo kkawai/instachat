@@ -85,6 +85,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private String mDatabaseRef;
     private FrameLayout mEntireScreenFrameLayout;
     private int mMaxPeriscopesPerItem;
+    private boolean mIsPrivateChat;
 
     public MessagesRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref) {
         super(modelClass, modelLayout, viewHolderClass, ref);
@@ -92,6 +93,10 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         mStorageRef = FirebaseStorage.getInstance().getReference();
         listenForBlockedUsers();
         mMaxPeriscopesPerItem = (int) FirebaseRemoteConfig.getInstance().getLong(Constants.KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM);
+    }
+
+    public void setIsPrivateChat(boolean isPrivateChat) {
+        mIsPrivateChat = isPrivateChat;
     }
 
     public void setDatabaseRoot(String root) {
@@ -398,6 +403,23 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             viewHolder.messageTimeTextView.setVisibility(View.INVISIBLE);
         }
 
+        if (mIsPrivateChat) {
+            viewHolder.messageReadConfirmationView.setVisibility(View.VISIBLE);
+            if (friendlyMessage.isConsumedByPartner()) {
+                viewHolder.messageReadConfirmationView.setImageResource(R.drawable.ic_done_all_black_18dp);
+            } else {
+                if (Preferences.getInstance().getUserId() != friendlyMessage.getUserid()) {
+                    //my partner reading the message for the first time
+                    friendlyMessage.setConsumedByPartner(true);//set locally for optimization purposes
+                    mFirebaseDatabaseReference.child(mDatabaseRef).child(friendlyMessage.getId()).child(Constants.CHILD_MESSAGE_CONSUMED_BY_PARTNER).setValue(true); //save remotely
+                    viewHolder.messageReadConfirmationView.setImageResource(R.drawable.ic_done_all_black_18dp);
+                } else {
+                    //just me reading my own message again
+                    viewHolder.messageReadConfirmationView.setImageResource(R.drawable.ic_done_black_18dp);
+                }
+            }
+        }
+
         viewHolder.messengerImageView.setImageDrawable(null);
         if (TextUtils.isEmpty(friendlyMessage.getName())) {
             viewHolder.messengerImageView.setVisibility(View.GONE);
@@ -463,7 +485,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                         if (!currdpid.equals(lastdpid)) {
                             lastFriendlyMessage.setDpid(currdpid);
                         }
-                        mFirebaseDatabaseReference.child(mDatabaseRef).child(lastFriendlyMessage.getId()).updateChildren(FriendlyMessage.toMap(lastFriendlyMessage)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        mFirebaseDatabaseReference.child(mDatabaseRef).child(lastFriendlyMessage.getId()).updateChildren(lastFriendlyMessage.toMap()).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
@@ -620,6 +642,8 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     @Override
     protected void checkItemBeforeChanging(int index, FriendlyMessage newItem) {
         FriendlyMessage current = getItem(index);
+
+
         if (current.getLikes() != newItem.getLikes()) {
             replaceItem(index, newItem);
             /**

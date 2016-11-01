@@ -173,7 +173,7 @@ public class User extends DomainObject {
         return map;
     }
 
-    public Map<String, Object> toLikesMap() {
+    public Map<String, Object> toMapForLikes() {
         Map<String, Object> map = new HashMap<>(1);
         map.put("username", username);
         if (profilePicUrl != null)

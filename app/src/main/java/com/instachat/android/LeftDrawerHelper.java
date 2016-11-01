@@ -271,7 +271,9 @@ public class LeftDrawerHelper {
         if (TextUtils.isEmpty(user.getBio())) {
             mBioEditText.setHint(R.string.hint_write_something_about_yourself);
         } else {
-            mBioEditText.setText(user.getBio());
+            String bioStr = user.getBio() + "";
+            bioStr = bioStr.equals("null") ? "" : bioStr;
+            mBioEditText.setText(bioStr);
         }
         mHeaderLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
