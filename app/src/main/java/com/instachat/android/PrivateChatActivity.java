@@ -65,6 +65,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     private long mLastTypingTime;
     private ValueEventListener mUserInfoValueEventListener = null;
     private FirebaseRemoteConfig mConfig;
+    private View mMessageRecyclerViewParent;
 
     @Override
     protected int getLayout() {
@@ -88,6 +89,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        mMessageRecyclerViewParent = findViewById(R.id.messageRecyclerViewParent);
         getSupportActionBar().setTitle("");
         final int toUserid = getIntent().getIntExtra(Constants.KEY_USERID, 0);
         MLog.d(TAG, "onNewIntent() toUserid : " + toUserid);
@@ -189,6 +191,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                 customTitlePairInParallax.setAlpha(alpha);
                 toolbarProfileImageView.setAlpha(1 - alpha);
                 customTitlePairInToolbar.setAlpha(1 - alpha);
+                mMessageRecyclerViewParent.setAlpha(1 - alpha);
 
                 MLog.d(TAG, "appBarLayout.height: " + appBarLayout.getHeight(), " verticalOffset ", verticalOffset, " toolbarHeight ", getToolbarHeight(), " alpha ", alpha);
                 if (verticalOffset == 0) {

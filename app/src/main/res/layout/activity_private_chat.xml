@@ -47,13 +47,21 @@ Document differences between activity_main.xml here:
 
                 <include layout="@layout/merge_private_appbar"/>
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/messageRecyclerView"
+                <FrameLayout
+                    android:id="@+id/messageRecyclerViewParent"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingLeft="@dimen/activity_horizontal_margin"
-                    android:paddingRight="@dimen/activity_horizontal_margin"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/messageRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingLeft="@dimen/activity_horizontal_margin"
+                        android:paddingRight="@dimen/activity_horizontal_margin"
+                        />
+
+                </FrameLayout>
 
             </android.support.design.widget.CoordinatorLayout>
 
