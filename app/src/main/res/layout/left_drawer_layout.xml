@@ -2,14 +2,14 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_marginTop="@dimen/left_drawer_header_height">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/drawerRecyclerView"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="@color/left_drawer_list_background_color"
         />
 </FrameLayout>
