@@ -48,6 +48,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.App">
 
+        <meta-data
+            android:name="com.google.android.urlshortener.API_KEY"
+            android:value="AIzaSyAHnphNjr0gqXkxps262WCzNmyG_P6OE24"/>
+
         <activity
             android:name=".GroupChatActivity"
             android:screenOrientation="portrait">

@@ -219,7 +219,9 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 if (TextUtils.isEmpty(friendlyMessage.getName())) {
                     return;
                 }
-                mUserClickedListener.onUserClicked(friendlyMessage.getUserid(), friendlyMessage.getName(), friendlyMessage.getDpid());
+                mUserClickedListener.onUserClicked(friendlyMessage.getUserid(),
+                        friendlyMessage.getName(),
+                        friendlyMessage.fullUserDpUrl == null ? friendlyMessage.getDpid() : friendlyMessage.fullUserDpUrl);
             }
         });
 
@@ -432,25 +434,39 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             viewHolder.messengerImageView.setVisibility(View.GONE);
         } else {
             viewHolder.messengerImageView.setVisibility(View.VISIBLE);
-            try {
-                Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Uri> task) {
-                        if (mActivityState == null || mActivityState.isActivityDestroyed())
-                            return;
-                        try {
-                            if (!task.isSuccessful()) {
-                                //viewHolder.messengerImageView.setImageResource(R.drawable.ic_account_circle_black_36dp);
+
+            //optimization, first check if we already have the user full dp url
+            if (friendlyMessage.fullUserDpUrl != null) {
+                try {
+                    Glide.with(mActivity.get()).load(friendlyMessage.fullUserDpUrl).error(R.drawable.ic_anon_person_36dp).into(viewHolder.messengerImageView);
+                    MLog.d(TAG, "optimization: use cached url instead of fetching url from storage ");
+                } catch (final Exception e) {
+                    viewHolder.messengerImageView.setImageResource(R.drawable.ic_anon_person_36dp);
+                }
+            } else {
+                try {
+                    MLog.d(TAG, "optimization: fetching url from storage NOT OPTIMIZED");
+                    Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Uri> task) {
+                            if (mActivityState == null || mActivityState.isActivityDestroyed())
                                 return;
+                            try {
+                                if (!task.isSuccessful()) {
+                                    //viewHolder.messengerImageView.setImageResource(R.drawable.ic_account_circle_black_36dp);
+                                    return;
+                                }
+                                //temporarily cache the user full dp url
+                                friendlyMessage.fullUserDpUrl = task.getResult().toString();
+                                Glide.with(mActivity.get()).load(friendlyMessage.fullUserDpUrl).error(R.drawable.ic_anon_person_36dp).into(viewHolder.messengerImageView);
+                            } catch (final Exception e) {
+                                MLog.e(TAG, "Constants.DP_URL user dp doesn't exist in google cloud storage.  task: " + task.isSuccessful());
+                                viewHolder.messengerImageView.setImageResource(R.drawable.ic_anon_person_36dp);
                             }
-                            Glide.with(mActivity.get()).load(task.getResult().toString()).error(R.drawable.ic_anon_person_36dp).into(viewHolder.messengerImageView);
-                        } catch (final Exception e) {
-                            MLog.e(TAG, "Constants.DP_URL user dp doesn't exist in google cloud storage.  task: " + task.isSuccessful());
-                            viewHolder.messengerImageView.setImageResource(R.drawable.ic_anon_person_36dp);
                         }
-                    }
-                });
-            } catch (RejectedExecutionException executionException) {
+                    });
+                } catch (RejectedExecutionException executionException) {
+                }
             }
         }
     }

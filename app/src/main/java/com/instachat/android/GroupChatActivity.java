@@ -1225,6 +1225,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             }
 
         } else if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.userProfilePhoto) {
+
             final User user = Preferences.getInstance().getUser();
             user.setProfilePicUrl(photoId);
             Preferences.getInstance().saveUser(user);
@@ -1279,7 +1280,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     public void onUserClicked(int userid, String username, String dpid) {
         closeBothDrawers();
         ScreenUtil.hideVirtualKeyboard(mMessageEditText);
-        PrivateChatActivity.startPrivateChatActivity(this, userid, null, null);
+        PrivateChatActivity.startPrivateChatActivity(this, userid, username, dpid, null, null);
         /*Fragment fragment = FragmentProfile.newInstance(message);
         getSupportFragmentManager().beginTransaction()
                 .setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down)

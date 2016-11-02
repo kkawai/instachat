@@ -93,7 +93,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         getSupportActionBar().setTitle("");
         final int toUserid = getIntent().getIntExtra(Constants.KEY_USERID, 0);
         MLog.d(TAG, "onNewIntent() toUserid : " + toUserid);
-
+        preloadUserIfPossible();
         sToUserid = toUserid;
         NetworkApi.getUserById(this, toUserid, new Response.Listener<JSONObject>() {
             @Override
@@ -338,7 +338,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         }
     }
 
-    public static void startPrivateChatActivity(final Context context, final int userid,
+    public static void startPrivateChatActivity(final Context context, final int userid, final String username, final String profilePicUrl,
                                                 final Uri sharePhotoUri, final String shareMessage) {
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF() + userid);
         ref.addValueEventListener(new ValueEventListener() {
@@ -347,7 +347,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                 MLog.d(TAG, "onDataChange() snapshot: " + dataSnapshot, " ref: ", ref);
                 ref.removeEventListener(this);
                 if (dataSnapshot.getValue() == null) {
-                    startPrivateChatActivityInternal(context, userid, sharePhotoUri, shareMessage);
+                    startPrivateChatActivityInternal(context, userid, username, profilePicUrl, sharePhotoUri, shareMessage);
                 } else {
                     Toast.makeText(context, R.string.cannot_chat_you_blocked_them, Toast.LENGTH_LONG).show();
                 }
@@ -361,13 +361,22 @@ public class PrivateChatActivity extends GroupChatActivity {
         });
     }
 
-    private static void startPrivateChatActivityInternal(Context context, int userid,
+    public static void startPrivateChatActivity(final Context context, final int userid,
+                                                final Uri sharePhotoUri, final String shareMessage) {
+        startPrivateChatActivity(context, userid, null, null, sharePhotoUri, shareMessage);
+    }
+
+    private static void startPrivateChatActivityInternal(Context context, int userid, String username, String profilePicUrl,
                                                          Uri sharePhotoUri, String shareMessage) {
         Intent intent = newIntent(context, userid);
         if (sharePhotoUri != null)
             intent.putExtra(Constants.KEY_SHARE_PHOTO_URI, sharePhotoUri);
         if (shareMessage != null)
             intent.putExtra(Constants.KEY_SHARE_MESSAGE, shareMessage);
+        if (username != null)
+            intent.putExtra(Constants.KEY_USERNAME, username);
+        if (profilePicUrl != null)
+            intent.putExtra(Constants.KEY_PROFILE_PIC_URL, profilePicUrl);
         context.startActivity(intent);
     }
 
@@ -394,6 +403,42 @@ public class PrivateChatActivity extends GroupChatActivity {
             return;
         }
         showTypingDots();
+    }
+
+    private void preloadUserIfPossible() {
+
+        final ImageView profilePic = (ImageView) findViewById(R.id.profile_pic);
+        String username = getIntent().hasExtra(Constants.KEY_USERNAME) ? getIntent().getStringExtra(Constants.KEY_USERNAME) : null;
+        String dpid = getIntent().hasExtra(Constants.KEY_PROFILE_PIC_URL) ? getIntent().getStringExtra(Constants.KEY_PROFILE_PIC_URL) : null;
+        if (username != null) {
+            ((TextView) findViewById(R.id.customTitleInToolbar)).setText(username);
+            ((TextView) findViewById(R.id.customTitleInParallax)).setText(username);
+        }
+        if (dpid != null && dpid.startsWith("http")) {
+            Glide.with(PrivateChatActivity.this)
+                    .load(dpid)
+                    .error(R.drawable.ic_anon_person_36dp)
+                    .crossFade()
+                    .listener(new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            if (isActivityDestroyed())
+                                return false;
+                            //collapseAppbarAfterDelay();
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            if (isActivityDestroyed())
+                                return false;
+                            //collapseAppbarAfterDelay();
+                            return false;
+                        }
+                    })
+                    .into(profilePic);
+
+        }
     }
 
     private void populateUserProfile() {
