@@ -26,7 +26,7 @@
                 android:id="@+id/likesCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
+                android:layout_gravity="bottom|center_horizontal"
                 android:layout_marginBottom="@dimen/likes_count_bottom_margin"
                 android:textColor="@color/chat_likes_count"
                 android:textSize="@dimen/message_likes_counter_size"

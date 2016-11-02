@@ -57,13 +57,13 @@
                         app:font="Lato-Regular.ttf"/>
 
                     <ImageView
-                        android:visibility="gone"
                         android:id="@+id/messageReadConfirmationView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom"
                         android:layout_marginLeft="3dp"
-                        android:src="@drawable/ic_done_black_18dp"/>
+                        android:src="@drawable/ic_done_black_18dp"
+                        android:visibility="gone"/>
 
                 </LinearLayout>
 
@@ -172,7 +172,7 @@
                 android:id="@+id/likesCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|left"
+                android:layout_gravity="bottom|center_horizontal"
                 android:layout_marginBottom="@dimen/likes_count_bottom_margin"
                 android:textColor="@color/chat_likes_count"
                 android:textSize="@dimen/message_likes_counter_size"
