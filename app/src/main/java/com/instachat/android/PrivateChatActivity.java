@@ -47,8 +47,6 @@ import com.tooltip.Tooltip;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.concurrent.RejectedExecutionException;
-
 /**
  * Created by kevin on 9/16/2016.
  * The difference between Private and Group Chat:
@@ -447,60 +445,52 @@ public class PrivateChatActivity extends GroupChatActivity {
         final ImageView miniPic = (ImageView) findViewById(R.id.superSmallProfileImage);
         final TextView bio = (TextView) findViewById(R.id.bio);
         final ImageView profilePic = (ImageView) findViewById(R.id.profile_pic);
-        try {
-            Constants.DP_URL(mToUser.getId(), mToUser.getProfilePicUrl(), new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if (isActivityDestroyed())
-                        return;
-                    if (!task.isSuccessful()) {
-                        miniPic.setImageResource(R.drawable.ic_anon_person_36dp);
-                        collapseAppbarAfterDelay();
-                        return;
-                    }
-                    try {
-                        Glide.with(PrivateChatActivity.this)
-                                .load(task.getResult().toString())
-                                .error(R.drawable.ic_anon_person_36dp)
-                                .crossFade()
-                                .listener(new RequestListener<String, GlideDrawable>() {
-                                    @Override
-                                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                                        if (isActivityDestroyed())
-                                            return false;
-                                        collapseAppbarAfterDelay();
-                                        return false;
-                                    }
 
-                                    @Override
-                                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                                        if (isActivityDestroyed())
-                                            return false;
-                                        collapseAppbarAfterDelay();
-                                        return false;
-                                    }
-                                })
-                                .into(profilePic);
-                        Glide.with(PrivateChatActivity.this)
-                                .load(task.getResult().toString())
-                                .error(R.drawable.ic_anon_person_36dp)
-                                .crossFade()
-                                .into(miniPic);
-                        Glide.with(PrivateChatActivity.this)
-                                .load(task.getResult().toString())
-                                .error(R.drawable.ic_anon_person_36dp)
-                                .crossFade()
-                                .into(toolbarProfileImageView);
+        if (TextUtils.isEmpty(mToUser.getProfilePicUrl())) {
+            toolbarProfileImageView.setImageResource(R.drawable.ic_anon_person_36dp);
+            miniPic.setImageResource(R.drawable.ic_anon_person_36dp);
+            profilePic.setImageResource(R.drawable.ic_anon_person_36dp);
+            collapseAppbarAfterDelay();
+        } else {
+            try {
+                Glide.with(PrivateChatActivity.this)
+                        .load(mToUser.getProfilePicUrl())
+                        .error(R.drawable.ic_anon_person_36dp)
+                        .crossFade()
+                        .listener(new RequestListener<String, GlideDrawable>() {
+                            @Override
+                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                if (isActivityDestroyed())
+                                    return false;
+                                collapseAppbarAfterDelay();
+                                return false;
+                            }
 
+                            @Override
+                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                if (isActivityDestroyed())
+                                    return false;
+                                collapseAppbarAfterDelay();
+                                return false;
+                            }
+                        })
+                        .into(profilePic);
+                Glide.with(PrivateChatActivity.this)
+                        .load(mToUser.getProfilePicUrl())
+                        .error(R.drawable.ic_anon_person_36dp)
+                        .crossFade()
+                        .into(miniPic);
+                Glide.with(PrivateChatActivity.this)
+                        .load(mToUser.getProfilePicUrl())
+                        .error(R.drawable.ic_anon_person_36dp)
+                        .crossFade()
+                        .into(toolbarProfileImageView);
 
-                    } catch (Exception e) {
-                        MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
-                        miniPic.setImageResource(R.drawable.ic_anon_person_36dp);
-                        collapseAppbarAfterDelay();
-                    }
-                }
-            });
-        } catch (RejectedExecutionException e) {
+            } catch (Exception e) {
+                MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
+                miniPic.setImageResource(R.drawable.ic_anon_person_36dp);
+                collapseAppbarAfterDelay();
+            }
         }
         bio.setVisibility(TextUtils.isEmpty(mToUser.getBio()) ? View.GONE : View.VISIBLE);
         String bioStr = mToUser.getBio() + "";

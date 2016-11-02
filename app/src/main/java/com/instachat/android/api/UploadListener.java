@@ -10,7 +10,7 @@ public interface UploadListener {
 
     void onPhotoUploadProgress(int max, int current);
 
-    void onPhotoUploadSuccess(String photoId, String photoUrl, boolean isPossibleAdult, boolean isPossibleViolence);
+    void onPhotoUploadSuccess(String photoUrl, boolean isPossibleAdult, boolean isPossibleViolence);
 
     void onPhotoUploadError(Exception exception);
 }

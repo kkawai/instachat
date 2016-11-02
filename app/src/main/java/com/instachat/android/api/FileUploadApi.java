@@ -54,7 +54,7 @@ public final class FileUploadApi {
             }
 
             @Override
-            public void onPhotoUploadSuccess(String photoId, String photoUrl, boolean isPossiblyAdult, boolean isPossiblyViolent) {
+            public void onPhotoUploadSuccess(String photoUrl, boolean isPossiblyAdult, boolean isPossiblyViolent) {
 
             }
 
@@ -94,7 +94,7 @@ public final class FileUploadApi {
             ThreadWrapper.executeInUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    listener.onPhotoUploadSuccess(filename, null, false, false);
+                    listener.onPhotoUploadSuccess(null, false, false);
                 }
             });
             return filename;
@@ -176,7 +176,7 @@ public final class FileUploadApi {
                     ThreadWrapper.executeInUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            listener.onPhotoUploadSuccess(filename, null, false, false);
+                            listener.onPhotoUploadSuccess(null, false, false);
                         }
                     });
                     break;

@@ -1,8 +1,6 @@
 package com.instachat.android.profile;
 
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -18,8 +16,6 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.instachat.android.BaseFragment;
 import com.instachat.android.Constants;
 import com.instachat.android.MyApp;
@@ -31,8 +27,6 @@ import com.instachat.android.model.User;
 import com.instachat.android.util.MLog;
 
 import org.json.JSONObject;
-
-import java.util.concurrent.RejectedExecutionException;
 
 /**
  * Created by kevin on 9/13/2016.
@@ -83,29 +77,14 @@ public class FragmentProfile extends BaseFragment {
                     final User remote = User.fromResponse(response);
                     ((TextView) getView().findViewById(R.id.username)).setText(enrichUsername(remote.getUsername()));
                     try {
-                        Constants.DP_URL(remote.getId(), remote.getProfilePicUrl(), new OnCompleteListener<Uri>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Uri> task) {
-                                        if (isActivityDestroyed())
-                                            return;
-                                        if (!task.isSuccessful()) {
-                                            pic.setImageResource(ANONYMOUS_USER_DRAWABLE_RES_ID);
-                                            return;
-                                        }
-                                        try {
-                                            Glide.with(FragmentProfile.this)
-                                                    .load(task.getResult().toString())
-                                                    .error(ANONYMOUS_USER_DRAWABLE_RES_ID)
-                                                    .crossFade()
-                                                    .into(pic);
-                                        } catch (Exception e) {
-                                            MLog.e(TAG, "Constants.DP_URL user profile pic exist in google cloud storage", e);
-                                            pic.setImageResource(ANONYMOUS_USER_DRAWABLE_RES_ID);
-                                        }
-                                    }
-                                }
-                        );
-                    } catch (RejectedExecutionException e) {
+                        Glide.with(FragmentProfile.this)
+                                .load(remote.getProfilePicUrl())
+                                .error(ANONYMOUS_USER_DRAWABLE_RES_ID)
+                                .crossFade()
+                                .into(pic);
+                    } catch (Exception e) {
+                        MLog.e(TAG, "Constants.DP_URL user profile pic exist in google cloud storage", e);
+                        pic.setImageResource(ANONYMOUS_USER_DRAWABLE_RES_ID);
                     }
                     pic.setOnClickListener(new View.OnClickListener() {
                         @Override

@@ -92,6 +92,7 @@ import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
+import com.instachat.android.util.ThreadWrapper;
 import com.tooltip.Tooltip;
 
 import java.util.HashMap;
@@ -1206,7 +1207,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     }
 
     @Override
-    public void onPhotoUploadSuccess(String photoId, String photoUrl, boolean isPossiblyAdultImage, boolean isPossiblyViolentImage) {
+    public void onPhotoUploadSuccess(String photoUrl, boolean isPossiblyAdultImage, boolean isPossiblyViolentImage) {
         if (isActivityDestroyed()) {
             return;
         }
@@ -1215,9 +1216,9 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.chatRoomPhoto) {
 
             final FriendlyMessage friendlyMessage = new FriendlyMessage("", myUsername(), myUserid(), myDpid(),
-                    photoUrl, isPossiblyAdultImage, isPossiblyViolentImage, photoId,
+                    photoUrl, isPossiblyAdultImage, isPossiblyViolentImage, null,
                     System.currentTimeMillis());
-            MLog.d(TAG, "uploadFromUri:onSuccess photoId: " + photoId, " debug possibleAdult: ", friendlyMessage.isPossibleAdultImage(), " parameter: ", isPossiblyAdultImage);
+            MLog.d(TAG, "uploadFromUri:onSuccess photoUrl: " + photoUrl, " debug possibleAdult: ", friendlyMessage.isPossibleAdultImage(), " parameter: ", isPossiblyAdultImage);
             try {
                 mFirebaseAdapter.sendFriendlyMessage(friendlyMessage);
             } catch (final Exception e) {
@@ -1227,7 +1228,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         } else if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.userProfilePhoto) {
 
             final User user = Preferences.getInstance().getUser();
-            user.setProfilePicUrl(photoId);
+            user.setProfilePicUrl(photoUrl);
             Preferences.getInstance().saveUser(user);
             NetworkApi.saveUser(null, user, new Response.Listener<String>() {
                 @Override
@@ -1240,7 +1241,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                     MLog.e(TAG, "saveUser() failed via uploadFromUri() ", error);
                 }
             });
-            mLeftDrawerHelper.updateProfilePic(myUserid(), photoId);
+            mLeftDrawerHelper.updateProfilePic(myUserid(), photoUrl);
         }
     }
 

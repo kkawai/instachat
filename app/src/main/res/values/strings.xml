@@ -153,4 +153,6 @@
     <string name="one_time_message_notification_title">One-time Message</string>
     <string name="one_time_photo_notification_title">One-time Photo</string>
     <string name="send_option_protips">Long-press for more options!</string>
+    <string name="possible_explicit_content_warning_pls_choose_another">Warning: this photo may contain inappropriate or explicit content.  Please choose another photo.</string>
+    <string name="warning">Warning</string>
 </resources>

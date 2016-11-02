@@ -17,6 +17,10 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.extensions.android.json.AndroidJsonFactory;
+import com.google.api.services.urlshortener.Urlshortener;
+import com.google.api.services.urlshortener.model.Url;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -33,6 +37,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
 /**
@@ -293,8 +298,27 @@ public class PhotoUploadHelper {
         }
     }
 
+    private void showIllegalProfilePicDialog() {
+        new SweetAlertDialog(mActivity, SweetAlertDialog.WARNING_TYPE).
+                setTitleText(mActivity.getString(R.string.warning)).
+                setContentText(mActivity.getString(R.string.possible_explicit_content_warning_pls_choose_another)).
+                setConfirmText(mActivity.getString(android.R.string.ok)).
+                showCancelButton(false).
+                setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        sweetAlertDialog.dismiss();
+                    }
+                }).show();
+    }
+
     private void uploadFromUri(Uri fileUri, final boolean isPossibleAdult, final boolean isPossibleViolence) {
         MLog.d(TAG, "uploadFromUri:src:" + fileUri.toString());
+
+        if (mPhotoType == PhotoType.userProfilePhoto && (isPossibleAdult || isPossibleViolence)) {
+            showIllegalProfilePicDialog();
+            return;
+        }
 
         final StorageReference photoRef = mStorageRef.child(mStorageRefString).child(mTargetFileUri.getLastPathSegment());
 
@@ -313,7 +337,7 @@ public class PhotoUploadHelper {
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 if (mActivityState == null || mActivityState.isActivityDestroyed())
                     return;
-                mListener.onPhotoUploadSuccess(mTargetFileUri.getLastPathSegment(), taskSnapshot.getDownloadUrl().toString(), isPossibleAdult, isPossibleViolence);
+                postProcessPhoto(taskSnapshot.getDownloadUrl().toString(), isPossibleAdult, isPossibleViolence);
             }
         }).addOnFailureListener(mActivity, new OnFailureListener() {
             @Override
@@ -323,5 +347,32 @@ public class PhotoUploadHelper {
                 mListener.onPhotoUploadError(exception);
             }
         });
+    }
+
+    private void postProcessPhoto(final String photoUrl, final boolean isPossibleAdult, final boolean isPossibleViolence) {
+        ThreadWrapper.executeInWorkerThread(new Runnable() {
+            @Override
+            public void run() {
+                Urlshortener.Builder builder = new Urlshortener.Builder(AndroidHttp.newCompatibleTransport(), AndroidJsonFactory.getDefaultInstance(), null);
+                Urlshortener urlshortener = builder.build();
+
+                com.google.api.services.urlshortener.model.Url url = new Url();
+                url.setLongUrl(photoUrl);
+                try {
+                    url = urlshortener.url().insert(url).setKey(Constants.GOOGLE_API_KEY).execute();
+                } catch (Exception e) {
+                    MLog.e(TAG, "", e);
+                }
+                final String newUrl = url != null && url.getId() != null ? url.getId() : photoUrl;
+                MLog.d(TAG, "shortened url: " + newUrl);
+                ThreadWrapper.executeInUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mListener.onPhotoUploadSuccess(newUrl, isPossibleAdult, isPossibleViolence);
+                    }
+                });
+            }
+        });
+
     }
 }

@@ -1,7 +1,6 @@
 package com.instachat.android.adapter;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,8 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,7 +24,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.RejectedExecutionException;
 
 /**
  * Created by kevin on 9/26/2016.
@@ -154,27 +150,14 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
         final GroupChatUserViewHolder groupChatUserViewHolder = (GroupChatUserViewHolder) holder;
         groupChatUserViewHolder.username.setText(user.getUsername());
         try {
-            Constants.DP_URL(user.getId(), user.getProfilePicUrl(), new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if (mActivityState == null || mActivityState.isActivityDestroyed())
-                        return;
-                    try {
-                        if (!task.isSuccessful()) {
-                            groupChatUserViewHolder.userPic.setImageResource(R.drawable.ic_anon_person_36dp);
-                            return;
-                        }
-                        Glide.with(mActivity.get()).
-                                load(task.getResult().toString()).
-                                error(R.drawable.ic_anon_person_36dp).
-                                into(groupChatUserViewHolder.userPic);
-                    } catch (final Exception e) {
-                        MLog.e(TAG, "Constants.DP_URL user dp doesn't exist in google cloud storage.  task: " + task.isSuccessful());
-                        groupChatUserViewHolder.userPic.setImageResource(R.drawable.ic_anon_person_36dp);
-                    }
-                }
-            });
-        }catch(RejectedExecutionException e) {}
+            Glide.with(mActivity.get()).
+                    load(user.getProfilePicUrl()).
+                    error(R.drawable.ic_anon_person_36dp).
+                    into(groupChatUserViewHolder.userPic);
+        } catch (final Exception e) {
+            MLog.e(TAG, "", e);
+            groupChatUserViewHolder.userPic.setImageResource(R.drawable.ic_anon_person_36dp);
+        }
     }
 
     @Override

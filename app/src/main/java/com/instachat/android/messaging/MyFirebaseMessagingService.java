@@ -8,15 +8,12 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.support.v4.app.RemoteInput;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,7 +35,6 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.RejectedExecutionException;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
@@ -104,42 +100,24 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private void consumeFriendlyMessage(final FriendlyMessage friendlyMessage) {
         incrementPrivateUnreadMessages(friendlyMessage);
-        try {
-            Constants.DP_URL(friendlyMessage.getUserid(), friendlyMessage.getDpid(), new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(final @NonNull Task<Uri> task) {
-                    try {
-                        if (!task.isSuccessful()) {
-                            showNotification(friendlyMessage, null);
-                            return;
-                        }
-                        ThreadWrapper.executeInWorkerThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Bitmap bitmap = Glide.
-                                            with(MyApp.getInstance()).
-                                            load(task.getResult().toString()).
-                                            asBitmap().
-                                            transform(new CircleTransform(MyFirebaseMessagingService.this)).
-                                            into(thumbSize(), thumbSize()). // Width and height
-                                            get();
-                                    showNotification(friendlyMessage, bitmap);
-                                } catch (Exception e) {
-                                    MLog.e(TAG, "", e); //todo better error handling/message
-                                    showNotification(friendlyMessage, null);
-                                }
-                            }
-                        });
-
-                    } catch (Exception e) {
-                        MLog.e(TAG, "", e); //todo better error handling/message
-                        showNotification(friendlyMessage, null);
-                    }
+        ThreadWrapper.executeInWorkerThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Bitmap bitmap = Glide.
+                            with(MyApp.getInstance()).
+                            load(friendlyMessage.getDpid()).
+                            asBitmap().
+                            transform(new CircleTransform(MyFirebaseMessagingService.this)).
+                            into(thumbSize(), thumbSize()). // Width and height
+                            get();
+                    showNotification(friendlyMessage, bitmap);
+                } catch (Exception e) {
+                    MLog.e(TAG, "", e); //todo better error handling/message
+                    showNotification(friendlyMessage, null);
                 }
-            });
-        } catch (RejectedExecutionException e) {
-        }
+            }
+        });
     }
 
     private void showNotification(FriendlyMessage friendlyMessage, Bitmap bitmap) {

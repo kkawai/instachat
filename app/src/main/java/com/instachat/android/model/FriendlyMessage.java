@@ -37,7 +37,6 @@ public class FriendlyMessage implements Parcelable {
     private int likes;
     private boolean consumedByPartner;
     private boolean isBlocked; //NOT persisted, volatile
-    public String fullUserDpUrl; //NOT persisted, volatile
     public FriendlyMessage() {
     }
 

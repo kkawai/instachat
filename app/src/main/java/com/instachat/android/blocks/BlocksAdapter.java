@@ -2,8 +2,6 @@ package com.instachat.android.blocks;
 
 import android.app.Activity;
 import android.graphics.Color;
-import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
@@ -11,8 +9,6 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,7 +24,6 @@ import com.instachat.android.util.MLog;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.RejectedExecutionException;
 
 public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends FirebaseRecyclerAdapter<BlockedUser, BlocksViewHolder> {
 
@@ -74,26 +69,14 @@ public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends 
             return;
         }
         try {
-            Constants.DP_URL(model.id, model.getDpid(), new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if (mActivityState == null || mActivityState.isActivityDestroyed())
-                        return;
-                    try {
-                        if (!task.isSuccessful()) {
-                            throw new Exception("failed to get user pic");
-                        }
-                        Glide.with(mActivity).
-                                load(task.getResult().toString()).
-                                error(R.drawable.ic_anon_person_36dp).
-                                into(viewHolder.userPic);
-                    } catch (final Exception e) {
-                        MLog.e(TAG, "Constants.DP_URL failed to get pic from storage.  task: " + task.isSuccessful(), e);
-                        viewHolder.userPic.setImageResource(R.drawable.ic_anon_person_36dp);
-                    }
-                }
-            });
-        }catch (RejectedExecutionException e){}
+            Glide.with(mActivity).
+                    load(model.getDpid()).
+                    error(R.drawable.ic_anon_person_36dp).
+                    into(viewHolder.userPic);
+        } catch (final Exception e) {
+            MLog.e(TAG, "", e);
+            viewHolder.userPic.setImageResource(R.drawable.ic_anon_person_36dp);
+        }
     }
 
     @Override
