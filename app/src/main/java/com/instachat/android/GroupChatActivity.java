@@ -92,7 +92,6 @@ import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
-import com.instachat.android.util.ThreadWrapper;
 import com.tooltip.Tooltip;
 
 import java.util.HashMap;
@@ -123,6 +122,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
     //private GoogleApiClient mGoogleApiClient;
     private DrawerLayout mDrawerLayout;
+    private DatabaseReference mMeTypingRef;
 
     private BroadcastReceiver mDownloadReceiver;
     private ProgressDialog mProgressDialog;
@@ -289,41 +289,34 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     protected void onMeTyping() {
         try {
-            if (System.currentTimeMillis() - mLastTypingTime < 3000) {
+            if (System.currentTimeMillis() - mLastTypingTime < 3000)
                 return;
-            }
-            Map<String, Object> map = new HashMap<>(3);
-            map.put(Constants.CHILD_TYPING, true);
-            map.put(Constants.CHILD_DPID, myDpid());
-            map.put(Constants.CHILD_USERNAME, myUsername());
-            FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, myUserid())).setValue(map);
             mLastTypingTime = System.currentTimeMillis();
-            //postDelayedMeNotEnteringText();
+            mMeTypingRef.setValue(true).
+                    addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            //immediately flip the value back to false in order
+                            //to pick up further typing by my person
+                            mMeTypingRef.setValue(false);
+                        }
+                    });
         } catch (Exception e) {
             MLog.e(TAG, "onMeTyping() failed", e);
         }
     }
 
-    private void postDelayedMeNotEnteringText() {
-        if (isActivityDestroyed())
-            return;
-        mUsernameTyping.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, myUserid())).child(Constants.CHILD_TYPING).setValue(false);
-            }
-        }, 3000);
-    }
-
-    private DatabaseReference mTypingReference;
-    private ChildEventListener mTypingChildEventListener;
+    private DatabaseReference mTypingInRoomReference;
+    private ChildEventListener mTypingInRoomEventListener;
 
     private void listenForTyping() {
 
-        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, myUserid())).child(Constants.CHILD_TYPING).setValue(false);
+        mMeTypingRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, myUserid())).
+                child(Constants.CHILD_TYPING);
+        mMeTypingRef.setValue(false);
 
-        mTypingReference = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_PARENT_REF(mGroupId));
-        mTypingChildEventListener = new ChildEventListener() {
+        mTypingInRoomReference = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_PARENT_REF(mGroupId));
+        mTypingInRoomEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 MLog.d(TAG, "isTyping: onChildAdded() dataSnapshot ", dataSnapshot, " s: ", s);
@@ -343,10 +336,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                     MLog.d(TAG, "isTyping: ", isTyping, " dpid: ", dpid, " userid ", userid);
                     if (isTyping) {
                         onRemoteUserTyping(userid, username, dpid);
-                    } else {
-                        /*String current = mUsernameTyping.getText().toString();
-                        current = current.replace(username, "");
-                        mUsernameTyping.setText(current);*/
                     }
                 }
             }
@@ -366,7 +355,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
             }
         };
-        mTypingReference.addChildEventListener(mTypingChildEventListener);
+        mTypingInRoomReference.addChildEventListener(mTypingInRoomEventListener);
     }
 
     @Override
@@ -432,8 +421,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         if (mGroupChatUsersRecyclerAdapter != null)
             mGroupChatUsersRecyclerAdapter.cleanup();
         mBlockedUserListener = null;
-        if (mTypingReference != null && mTypingChildEventListener != null)
-            mTypingReference.removeEventListener(mTypingChildEventListener);
+        if (mTypingInRoomReference != null && mTypingInRoomEventListener != null)
+            mTypingInRoomReference.removeEventListener(mTypingInRoomEventListener);
         super.onDestroy();
     }
 
@@ -1282,21 +1271,12 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         closeBothDrawers();
         ScreenUtil.hideVirtualKeyboard(mMessageEditText);
         PrivateChatActivity.startPrivateChatActivity(this, userid, username, dpid, null, null);
-        /*Fragment fragment = FragmentProfile.newInstance(message);
-        getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down)
-                //.addSharedElement(imageView, "image")
-                .replace(R.id.fragment_content, fragment, FragmentProfile.TAG)
-                .addToBackStack(null).commit();*/
     }
 
     protected void onRemoteUserTyping(int userid, String username, String dpid) {
         if (isActivityDestroyed()) {
             return;
         }
-        /*String current = mUsernameTyping.getText().toString();
-        current = current.replace(username, "");
-        current = current + " " + username;*/
         mUsernameTyping.setText(username);
         showTypingDots();
     }
