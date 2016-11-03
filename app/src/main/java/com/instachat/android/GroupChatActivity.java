@@ -288,13 +288,19 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     private long mLastTypingTime;
 
+    private Map<String, Object> mMeTypingMap = new HashMap<>(3);
+
     protected void onMeTyping() {
         try {
             if (System.currentTimeMillis() - mLastTypingTime < 3000)
                 return;
             mLastTypingTime = System.currentTimeMillis();
-            mMeTypingRef.setValue(true).
-                    addOnCompleteListener(new OnCompleteListener<Void>() {
+            if (mMeTypingMap.size() == 0) {
+                mMeTypingMap.put(Constants.CHILD_TYPING, true);
+                mMeTypingMap.put(Constants.CHILD_USERNAME, myUsername());
+            }
+            FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, myUserid())).setValue(mMeTypingMap)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             //immediately flip the value back to false in order
@@ -332,11 +338,11 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 if (dataSnapshot.exists() && dataSnapshot.hasChild(Constants.CHILD_TYPING)) {
                     boolean isTyping = dataSnapshot.child(Constants.CHILD_TYPING).getValue(Boolean.class);
                     String username = dataSnapshot.child(Constants.CHILD_USERNAME).getValue(String.class);
-                    String dpid = dataSnapshot.child(Constants.CHILD_DPID).getValue(String.class);
+                    //String dpid = dataSnapshot.child(Constants.CHILD_DPID).getValue(String.class);
                     int userid = Integer.parseInt(dataSnapshot.getKey());
-                    MLog.d(TAG, "isTyping: ", isTyping, " dpid: ", dpid, " userid ", userid);
+                    //MLog.d(TAG, "isTyping: ", isTyping, " dpid: ", dpid, " userid ", userid);
                     if (isTyping) {
-                        onRemoteUserTyping(userid, username, dpid);
+                        onRemoteUserTyping(userid, username, null);
                     }
                 }
             }
