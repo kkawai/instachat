@@ -116,6 +116,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                     //getSupportActionBar().setTitle(mToUser.getUsername());
                     setCustomTitles(mToUser.getUsername(), mToUser.getLastOnline());
                     listenForPartnerTyping();
+                    checkIfPartnerIsBlocked();
 
                     mUserInfoValueEventListener = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(sToUserid)).addValueEventListener(new ValueEventListener() {
                         @Override
@@ -358,29 +359,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                                                 final View transitionImageView,
                                                 final Uri sharePhotoUri, final String shareMessage) {
 
-        /**
-         * before going into private, check if you have blocked this user.  If so,
-         * show toast indicating this user needs to be unblocked first.
-         */
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF() + userid);
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                MLog.d(TAG, "onDataChange() snapshot: " + dataSnapshot, " ref: ", ref);
-                ref.removeEventListener(this);
-                if (dataSnapshot.getValue() == null) {
-                    startPrivateChatActivityInternal(activity, userid, username, profilePicUrl, transitionImageView, sharePhotoUri, shareMessage);
-                } else {
-                    Toast.makeText(activity, R.string.cannot_chat_you_blocked_them, Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                ref.removeEventListener(this);
-                Toast.makeText(activity, activity.getString(R.string.general_api_error, "(c)"), Toast.LENGTH_SHORT).show();
-            }
-        });
+        startPrivateChatActivityInternal(activity, userid, username, profilePicUrl, transitionImageView, sharePhotoUri, shareMessage);
     }
 
     public static void startPrivateChatActivity(final Activity activity, final int userid,
@@ -774,6 +753,28 @@ public class PrivateChatActivity extends GroupChatActivity {
                     }
                 }
                 return false;
+            }
+        });
+    }
+
+    private void checkIfPartnerIsBlocked() {
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF() + sToUserid);
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                MLog.d(TAG, "onDataChange() snapshot: " + dataSnapshot, " ref: ", ref);
+                ref.removeEventListener(this);
+                if (dataSnapshot.getValue() == null) {
+                    //
+                } else {
+                    Toast.makeText(PrivateChatActivity.this, getString(R.string.cannot_chat_you_blocked_them,mToUser.getUsername()), Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                ref.removeEventListener(this);
+                Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, "(c)"), Toast.LENGTH_SHORT).show();
             }
         });
     }

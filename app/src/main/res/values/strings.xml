@@ -101,7 +101,7 @@
     <string name="message_copied_to_clipboard">Message copied to clipboard</string>
     <string name="manage_blocks">Manage Blocks</string>
     <string name="message_options_title">Message Options</string>
-    <string name="cannot_chat_you_blocked_them">You have blocked this person.  You should unblock.</string>
+    <string name="cannot_chat_you_blocked_them">You blocked %s on a previous occasion.  Just letting you know.</string>
 
     <!-- time ago -->
     <string name="online_now">online now</string>
