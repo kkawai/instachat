@@ -70,6 +70,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     private ValueEventListener mUserInfoValueEventListener = null;
     private FirebaseRemoteConfig mConfig;
     private View mMessageRecyclerViewParent;
+    private ImageView mProfilePic;
     private AppBarLayout mAppBarLayout;
     private GestureDetectorCompat mGestureDetector;
 
@@ -95,6 +96,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        mProfilePic = (ImageView) findViewById(R.id.profile_pic);
         mMessageRecyclerViewParent = findViewById(R.id.messageRecyclerViewParent);
         mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
         getSupportActionBar().setTitle("");
@@ -184,7 +186,6 @@ public class PrivateChatActivity extends GroupChatActivity {
 
         final ImageView toolbarProfileImageView = (ImageView) findViewById(R.id.topCornerUserThumb);
         final TextView bio = (TextView) findViewById(R.id.bio);
-        final ImageView profilePic = (ImageView) findViewById(R.id.profile_pic);
         mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
@@ -194,7 +195,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                     alpha = 1;
                 }
                 bio.setAlpha(alpha);
-                profilePic.setAlpha(alpha);
+                mProfilePic.setAlpha(alpha);
                 customTitlePairInParallax.setAlpha(alpha);
                 toolbarProfileImageView.setAlpha(1 - alpha);
                 customTitlePairInToolbar.setAlpha(1 - alpha);
@@ -207,7 +208,7 @@ public class PrivateChatActivity extends GroupChatActivity {
 
                 } else if (Math.abs(verticalOffset) + getToolbarHeight() == appBarLayout.getHeight()) {
                     mIsAppBarExpanded = false;
-                    checkIfSeenToolbarProfileTooltip(profilePic);
+                    checkIfSeenToolbarProfileTooltip(mProfilePic);
                     invalidateOptionsMenu();
                 }
             }
@@ -420,7 +421,6 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     private void preloadUserIfPossible() {
 
-        final ImageView profilePic = (ImageView) findViewById(R.id.profile_pic);
         String username = getIntent().hasExtra(Constants.KEY_USERNAME) ? getIntent().getStringExtra(Constants.KEY_USERNAME) : null;
         String dpid = getIntent().hasExtra(Constants.KEY_PROFILE_PIC_URL) ? getIntent().getStringExtra(Constants.KEY_PROFILE_PIC_URL) : null;
         if (username != null) {
@@ -449,7 +449,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                             return false;
                         }
                     })
-                    .into(profilePic);
+                    .into(mProfilePic);
 
         }
     }
@@ -459,12 +459,11 @@ public class PrivateChatActivity extends GroupChatActivity {
         final ImageView toolbarProfileImageView = (ImageView) findViewById(R.id.topCornerUserThumb);
         final ImageView miniPic = (ImageView) findViewById(R.id.superSmallProfileImage);
         final TextView bio = (TextView) findViewById(R.id.bio);
-        final ImageView profilePic = (ImageView) findViewById(R.id.profile_pic);
 
         if (TextUtils.isEmpty(mToUser.getProfilePicUrl())) {
             toolbarProfileImageView.setImageResource(R.drawable.ic_anon_person_36dp);
             miniPic.setImageResource(R.drawable.ic_anon_person_36dp);
-            profilePic.setImageResource(R.drawable.ic_anon_person_36dp);
+            mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
             collapseAppbarAfterDelay();
         } else {
             try {
@@ -489,7 +488,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                                 return false;
                             }
                         })
-                        .into(profilePic);
+                        .into(mProfilePic);
                 Glide.with(PrivateChatActivity.this)
                         .load(mToUser.getProfilePicUrl())
                         .error(R.drawable.ic_anon_person_36dp)
@@ -646,7 +645,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                 if (lastActive.equals(getString(R.string.just_now))) {
                     lastActive = getString(R.string.online_now);
                 }
-                ((TextView) findViewById(R.id.customSubtitleInParallax)).setText("  •  " + lastActive);
+                ((TextView) findViewById(R.id.customSubtitleInParallax)).setText(lastActive);
                 ((TextView) findViewById(R.id.customSubtitleInToolbar)).setText(lastActive);
             }
         }
