@@ -108,6 +108,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private static final int REQUEST_INVITE = 1;
     private static final String MESSAGE_SENT_EVENT = "message_sent";
 
+    private Toolbar mToolbar;
     private View mSendButton, mAttachButton;
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
@@ -802,14 +803,18 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     }
 
     private void setupToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
 
         ActionBar ab = getSupportActionBar();
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
-        setupToolbarTitle(toolbar);
-        setToolbarOnClickListener(toolbar);
+        setupToolbarTitle(mToolbar);
+        setToolbarOnClickListener(mToolbar);
+    }
+
+    Toolbar getToolbar() {
+        return mToolbar;
     }
 
     protected void setToolbarOnClickListener(Toolbar toolbar) {
@@ -822,8 +827,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     }
 
     protected int getToolbarHeight() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        return toolbar.getHeight();
+        return mToolbar.getHeight();
     }
 
     private void setupDrawers() {

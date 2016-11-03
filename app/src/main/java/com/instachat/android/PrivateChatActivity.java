@@ -8,11 +8,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -68,6 +71,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     private FirebaseRemoteConfig mConfig;
     private View mMessageRecyclerViewParent;
     private AppBarLayout mAppBarLayout;
+    private GestureDetectorCompat mGestureDetector;
 
     @Override
     protected int getLayout() {
@@ -216,10 +220,14 @@ public class PrivateChatActivity extends GroupChatActivity {
             }
         };
         mAppBarLayout.setOnClickListener(appBarOnClickListener);
+        mGestureDetector = initializeGestureDetector();
+        getToolbar().setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return mGestureDetector.onTouchEvent(motionEvent);
+            }
+        });
         updateLastActiveTimestamp();
-        //findViewById(R.id.toolbar).setOnClickListener(appBarOnClickListener);
-        //bio.setOnClickListener(appBarOnClickListener);
-        //profilePic.setOnClickListener(appBarOnClickListener);
     }
 
     private void checkIfSeenToolbarProfileTooltip(View anchor) {
@@ -714,4 +722,46 @@ public class PrivateChatActivity extends GroupChatActivity {
             super.onUserClicked(userid, username, dpid);
         }
     }
+
+    private GestureDetectorCompat initializeGestureDetector() {
+        return new GestureDetectorCompat(this, new GestureDetector.OnGestureListener() {
+            @Override
+            public boolean onDown(MotionEvent motionEvent) {
+                return false;
+            }
+
+            @Override
+            public void onShowPress(MotionEvent motionEvent) {
+
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent motionEvent) {
+                return false;
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+                return false;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent motionEvent) {
+
+            }
+
+            @Override
+            public boolean onFling(MotionEvent event1, MotionEvent event2,
+                                   float velocityX, float velocityY) {
+                if (velocityY > 20) {
+                    if (!mIsAppBarExpanded) {
+                        toggleAppbar();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+    }
+
 }
