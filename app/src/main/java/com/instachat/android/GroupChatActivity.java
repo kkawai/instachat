@@ -1271,10 +1271,10 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     }
 
     @Override
-    public void onUserClicked(int userid, String username, String dpid) {
+    public void onUserClicked(int userid, String username, String dpid, View transitionImageView) {
         closeBothDrawers();
         ScreenUtil.hideVirtualKeyboard(mMessageEditText);
-        PrivateChatActivity.startPrivateChatActivity(this, userid, username, dpid, null, null);
+        PrivateChatActivity.startPrivateChatActivity(this, userid, username, dpid, transitionImageView, null, null);
     }
 
     protected void onRemoteUserTyping(int userid, String username, String dpid) {

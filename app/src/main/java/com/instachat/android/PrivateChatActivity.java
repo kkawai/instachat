@@ -1,5 +1,6 @@
 package com.instachat.android;
 
+import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -352,8 +354,14 @@ public class PrivateChatActivity extends GroupChatActivity {
         }
     }
 
-    public static void startPrivateChatActivity(final Context context, final int userid, final String username, final String profilePicUrl,
+    public static void startPrivateChatActivity(final Activity activity, final int userid, final String username, final String profilePicUrl,
+                                                final View transitionImageView,
                                                 final Uri sharePhotoUri, final String shareMessage) {
+
+        /**
+         * before going into private, check if you have blocked this user.  If so,
+         * show toast indicating this user needs to be unblocked first.
+         */
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF() + userid);
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -361,28 +369,29 @@ public class PrivateChatActivity extends GroupChatActivity {
                 MLog.d(TAG, "onDataChange() snapshot: " + dataSnapshot, " ref: ", ref);
                 ref.removeEventListener(this);
                 if (dataSnapshot.getValue() == null) {
-                    startPrivateChatActivityInternal(context, userid, username, profilePicUrl, sharePhotoUri, shareMessage);
+                    startPrivateChatActivityInternal(activity, userid, username, profilePicUrl, transitionImageView, sharePhotoUri, shareMessage);
                 } else {
-                    Toast.makeText(context, R.string.cannot_chat_you_blocked_them, Toast.LENGTH_LONG).show();
+                    Toast.makeText(activity, R.string.cannot_chat_you_blocked_them, Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 ref.removeEventListener(this);
-                Toast.makeText(context, context.getString(R.string.general_api_error, "(c)"), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, activity.getString(R.string.general_api_error, "(c)"), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    public static void startPrivateChatActivity(final Context context, final int userid,
+    public static void startPrivateChatActivity(final Activity activity, final int userid,
                                                 final Uri sharePhotoUri, final String shareMessage) {
-        startPrivateChatActivity(context, userid, null, null, sharePhotoUri, shareMessage);
+        startPrivateChatActivity(activity, userid, null, null, null, sharePhotoUri, shareMessage);
     }
 
-    private static void startPrivateChatActivityInternal(Context context, int userid, String username, String profilePicUrl,
+    private static void startPrivateChatActivityInternal(Activity activity, int userid, String username, String profilePicUrl,
+                                                         final View transitionImageView,
                                                          Uri sharePhotoUri, String shareMessage) {
-        Intent intent = newIntent(context, userid);
+        Intent intent = newIntent(activity, userid);
         if (sharePhotoUri != null)
             intent.putExtra(Constants.KEY_SHARE_PHOTO_URI, sharePhotoUri);
         if (shareMessage != null)
@@ -391,7 +400,13 @@ public class PrivateChatActivity extends GroupChatActivity {
             intent.putExtra(Constants.KEY_USERNAME, username);
         if (profilePicUrl != null)
             intent.putExtra(Constants.KEY_PROFILE_PIC_URL, profilePicUrl);
-        context.startActivity(intent);
+
+        if (transitionImageView != null) {
+            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, transitionImageView, "profilePic");
+            activity.startActivity(intent, options.toBundle());
+        } else {
+            activity.startActivity(intent);
+        }
     }
 
     public static Intent newIntent(Context context, int userid) {
@@ -431,7 +446,7 @@ public class PrivateChatActivity extends GroupChatActivity {
             Glide.with(PrivateChatActivity.this)
                     .load(dpid)
                     .error(R.drawable.ic_anon_person_36dp)
-                    .crossFade()
+                    //.crossFade()
                     .listener(new RequestListener<String, GlideDrawable>() {
                         @Override
                         public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
@@ -470,7 +485,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                 Glide.with(PrivateChatActivity.this)
                         .load(mToUser.getProfilePicUrl())
                         .error(R.drawable.ic_anon_person_36dp)
-                        .crossFade()
+                        //.crossFade()
                         .listener(new RequestListener<String, GlideDrawable>() {
                             @Override
                             public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
@@ -714,11 +729,11 @@ public class PrivateChatActivity extends GroupChatActivity {
     }
 
     @Override
-    public void onUserClicked(int userid, String username, String dpid) {
+    public void onUserClicked(int userid, String username, String dpid, View transitionImageView) {
         if (userid == sToUserid) {
             mAppBarLayout.setExpanded(true, true);
         } else {
-            super.onUserClicked(userid, username, dpid);
+            super.onUserClicked(userid, username, dpid, transitionImageView);
         }
     }
 

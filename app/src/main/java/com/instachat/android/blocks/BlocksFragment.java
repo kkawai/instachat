@@ -47,7 +47,7 @@ public class BlocksFragment extends BaseFragment {
         fragmentTitle.setText(R.string.manage_blocks);
         mUserClickedListener = new UserClickedListener() {
             @Override
-            public void onUserClicked(final int userid, final String username, final String dpid) {
+            public void onUserClicked(final int userid, final String username, final String dpid, final View transitionImageView) {
 
                 new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
                         .setTitleText(getActivity().getString(R.string.unblock_person_title, username))

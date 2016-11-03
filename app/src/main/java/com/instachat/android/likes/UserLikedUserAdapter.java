@@ -55,7 +55,7 @@ public final class UserLikedUserAdapter<T, VH extends RecyclerView.ViewHolder> e
             @Override
             public void onClick(View view) {
                 User user = getItem(holder.getAdapterPosition());
-                mUserClickedListener.onUserClicked(user.getId(), user.getUsername(), user.getProfilePicUrl());
+                mUserClickedListener.onUserClicked(user.getId(), user.getUsername(), user.getProfilePicUrl(), holder.userPic);
             }
         });
         return holder;

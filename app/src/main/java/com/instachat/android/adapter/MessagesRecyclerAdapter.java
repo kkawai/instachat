@@ -220,7 +220,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 }
                 mUserClickedListener.onUserClicked(friendlyMessage.getUserid(),
                         friendlyMessage.getName(),
-                        friendlyMessage.getDpid());
+                        friendlyMessage.getDpid(), holder.messengerImageView);
             }
         });
 

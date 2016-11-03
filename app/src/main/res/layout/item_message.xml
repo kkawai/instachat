@@ -14,7 +14,7 @@
             android:layout_width="@dimen/user_thumb_pic_size"
             android:layout_height="@dimen/user_thumb_pic_size"
             android:layout_gravity="bottom"
-            android:transitionName="image"/>
+            android:transitionName="profilePic"/>
 
         <me.himanshusoni.chatmessageview.ChatMessageView
             android:id="@+id/contentMessageChat"

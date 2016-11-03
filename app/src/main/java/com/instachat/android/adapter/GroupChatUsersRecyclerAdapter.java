@@ -137,7 +137,7 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
             @Override
             public void onClick(View view) {
                 User user = data.get(holder.getAdapterPosition());
-                userClickedListener.onUserClicked(user.getId(), user.getUsername(), user.getProfilePicUrl());
+                userClickedListener.onUserClicked(user.getId(), user.getUsername(), user.getProfilePicUrl(), holder.userPic);
             }
         });
         return holder;
