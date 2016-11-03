@@ -41,6 +41,7 @@ import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.model.User;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
+import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.TimeUtil;
 import com.tooltip.Tooltip;
 
@@ -66,6 +67,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     private ValueEventListener mUserInfoValueEventListener = null;
     private FirebaseRemoteConfig mConfig;
     private View mMessageRecyclerViewParent;
+    private AppBarLayout mAppBarLayout;
 
     @Override
     protected int getLayout() {
@@ -90,6 +92,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         mMessageRecyclerViewParent = findViewById(R.id.messageRecyclerViewParent);
+        mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
         getSupportActionBar().setTitle("");
         final int toUserid = getIntent().getIntExtra(Constants.KEY_USERID, 0);
         MLog.d(TAG, "onNewIntent() toUserid : " + toUserid);
@@ -104,6 +107,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                     populateUserProfile();
                     //getSupportActionBar().setTitle(mToUser.getUsername());
                     setCustomTitles(mToUser.getUsername(), mToUser.getLastOnline());
+                    listenForPartnerTyping();
 
                     mUserInfoValueEventListener = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(sToUserid)).addValueEventListener(new ValueEventListener() {
                         @Override
@@ -177,8 +181,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         final ImageView toolbarProfileImageView = (ImageView) findViewById(R.id.topCornerUserThumb);
         final TextView bio = (TextView) findViewById(R.id.bio);
         final ImageView profilePic = (ImageView) findViewById(R.id.profile_pic);
-        final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
-        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+        mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
                 //android.R.attr.actionBarSize
@@ -191,14 +194,17 @@ public class PrivateChatActivity extends GroupChatActivity {
                 customTitlePairInParallax.setAlpha(alpha);
                 toolbarProfileImageView.setAlpha(1 - alpha);
                 customTitlePairInToolbar.setAlpha(1 - alpha);
-                mMessageRecyclerViewParent.setAlpha(1 - alpha);
+                mMessageRecyclerViewParent.setAlpha(1 - (alpha / 2f));
 
-                MLog.d(TAG, "appBarLayout.height: " + appBarLayout.getHeight(), " verticalOffset ", verticalOffset, " toolbarHeight ", getToolbarHeight(), " alpha ", alpha);
+                MLog.d(TAG, "mAppBarLayout.height: " + appBarLayout.getHeight(), " verticalOffset ", verticalOffset, " toolbarHeight ", getToolbarHeight(), " alpha ", alpha);
                 if (verticalOffset == 0) {
                     mIsAppBarExpanded = true;
+                    invalidateOptionsMenu();
+
                 } else if (Math.abs(verticalOffset) + getToolbarHeight() == appBarLayout.getHeight()) {
                     mIsAppBarExpanded = false;
                     checkIfSeenToolbarProfileTooltip(profilePic);
+                    invalidateOptionsMenu();
                 }
             }
         });
@@ -209,12 +215,11 @@ public class PrivateChatActivity extends GroupChatActivity {
                 toggleAppbar();
             }
         };
-        appBarLayout.setOnClickListener(appBarOnClickListener);
+        mAppBarLayout.setOnClickListener(appBarOnClickListener);
         updateLastActiveTimestamp();
         //findViewById(R.id.toolbar).setOnClickListener(appBarOnClickListener);
         //bio.setOnClickListener(appBarOnClickListener);
         //profilePic.setOnClickListener(appBarOnClickListener);
-        listenForPartnerTyping();
     }
 
     private void checkIfSeenToolbarProfileTooltip(View anchor) {
@@ -237,11 +242,11 @@ public class PrivateChatActivity extends GroupChatActivity {
     }
 
     private void toggleAppbar() {
-        final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
-        if (!mIsAppBarExpanded)
-            appBarLayout.setExpanded(true, true);
-        else
-            appBarLayout.setExpanded(false, true);
+        if (!mIsAppBarExpanded) {
+            mAppBarLayout.setExpanded(true, true);
+            ScreenUtil.hideKeyboard(this);
+        } else
+            mAppBarLayout.setExpanded(false, true);
     }
 
     private boolean mIsAppBarExpanded = true; //initially it's expanded
@@ -320,8 +325,7 @@ public class PrivateChatActivity extends GroupChatActivity {
             MLog.e(TAG, "", e);
         }
         if (mIsAppBarExpanded) {
-            final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
-            appBarLayout.setExpanded(false, true);
+            mAppBarLayout.setExpanded(false, true);
         }
         updatePrivateChatSummaryLastMessageSentTimestamp();
     }
@@ -524,9 +528,8 @@ public class PrivateChatActivity extends GroupChatActivity {
             public void run() {
                 if (isActivityDestroyed())
                     return;
-                final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
                 if (mIsAppBarExpanded)
-                    appBarLayout.setExpanded(false, true);
+                    mAppBarLayout.setExpanded(false, true);
             }
         }, mConfig.getLong(Constants.KEY_COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY));
     }
@@ -557,9 +560,25 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.private_chat_options_menu, menu);
+        selectMenu(menu);
         return true;
+    }
+
+    private void selectMenu(Menu menu) {
+        menu.clear();
+        MenuInflater inflater = getMenuInflater();
+        if (sToUserid == myUserid()) {
+            if (!mIsAppBarExpanded)
+                inflater.inflate(R.menu.private_chat_options_menu_myself, menu);
+            else
+                inflater.inflate(R.menu.private_chat_options_menu_myself_no_view_profile, menu);
+        } else {
+            if (!mIsAppBarExpanded)
+                inflater.inflate(R.menu.private_chat_options_menu, menu);
+            else
+                inflater.inflate(R.menu.private_chat_options_menu_no_view_profile, menu);
+        }
+
     }
 
     @Override
@@ -676,5 +695,23 @@ public class PrivateChatActivity extends GroupChatActivity {
     @Override
     protected boolean isPrivateChat() {
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mIsAppBarExpanded) {
+            toggleAppbar();
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    @Override
+    public void onUserClicked(int userid, String username, String dpid) {
+        if (userid == sToUserid) {
+            mAppBarLayout.setExpanded(true, true);
+        } else {
+            super.onUserClicked(userid, username, dpid);
+        }
     }
 }

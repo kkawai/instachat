@@ -30,7 +30,7 @@ public final class Constants {
     public static final int DEFAULT_MAX_MESSAGE_HISTORY = 1000;
     public static final int DEFAULT_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS = 3500;
     public static final int DEFAULT_MAX_TYPING_DOTS_DISPLAY_TIME = 3500;
-    public static final int DEFAULT_COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY = 1750;
+    public static final int DEFAULT_COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY = 8000;
     public static final int DEFAULT_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME = 4000;
     public static final int DEFAULT_MAX_MESSAGE_LENGTH = 256;
     public static final int DEFAULT_MAX_PERISCOPABLE_LIKES_PER_ITEM = 25;
