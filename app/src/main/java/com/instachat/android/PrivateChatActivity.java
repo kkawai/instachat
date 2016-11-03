@@ -443,7 +443,7 @@ public class PrivateChatActivity extends GroupChatActivity {
             ((TextView) findViewById(R.id.customTitleInParallax)).setText(username);
         }
         if (dpid != null && dpid.startsWith("http")) {
-            Glide.with(PrivateChatActivity.this)
+            /*Glide.with(PrivateChatActivity.this)
                     .load(dpid)
                     .error(R.drawable.ic_anon_person_36dp)
                     //.crossFade()
@@ -463,10 +463,10 @@ public class PrivateChatActivity extends GroupChatActivity {
                             //collapseAppbarAfterDelay();
                             return false;
                         }
-                    })
-                    .into(mProfilePic);
+                    }).into(mProfilePic); */
 
         }
+
     }
 
     private void populateUserProfile() {
