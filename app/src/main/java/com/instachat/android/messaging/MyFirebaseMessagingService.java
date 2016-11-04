@@ -3,7 +3,6 @@ package com.instachat.android.messaging;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,7 +21,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.instachat.android.Constants;
-import com.instachat.android.MyApp;
 import com.instachat.android.PrivateChatActivity;
 import com.instachat.android.R;
 import com.instachat.android.model.FriendlyMessage;
@@ -56,7 +54,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 if (msg.has(Constants.KEY_GCM_MSG_TYPE) && msg.getString(Constants.KEY_GCM_MSG_TYPE).equals(Constants.GcmMessageType.typing.name())) {
                     Intent intent = new Intent(Constants.ACTION_USER_TYPING);
                     intent.putExtra(Constants.KEY_USERID, msg.getInt(Constants.KEY_USERID));
-                    LocalBroadcastManager.getInstance(MyApp.getInstance()).sendBroadcast(intent);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
                 } else if (msg.has(Constants.KEY_GCM_MSG_TYPE) && msg.getString(Constants.KEY_GCM_MSG_TYPE).equals(Constants.GcmMessageType.msg.name())) {
                     final FriendlyMessage friendlyMessage = FriendlyMessage.fromJSONObject(msg);
 
@@ -105,7 +103,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             public void run() {
                 try {
                     Bitmap bitmap = Glide.
-                            with(MyApp.getInstance()).
+                            with(MyFirebaseMessagingService.this).
                             load(friendlyMessage.getDpid()).
                             asBitmap().
                             transform(new CircleTransform(MyFirebaseMessagingService.this)).
@@ -132,6 +130,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Intent intent = DirectReplyActivity.newIntent(this, friendlyMessage.getUserid());
         PendingIntent pendingIntent = PendingIntent.getActivity(this, friendlyMessage.getUserid(), intent, 0);
 
+        Uri customSound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
+                + "://" + getPackageName() + "/raw/sound_yourturn");
+
         NotificationCompat.Action replyAction =
                 new NotificationCompat.Action.Builder(
                         android.R.drawable.ic_dialog_email,
@@ -141,28 +142,26 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // Use NotificationCompat.Builder to set up our notification.
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.addAction(replyAction);
+        builder.addAction(replyAction)
+                //.setPriority(Notification.PRIORITY_HIGH)  hold off until we figure things out
+                .setContentTitle(friendlyMessage.getName())
+                .setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp)
+                .setLargeIcon(bitmap == null ? BitmapFactory.decodeResource(getResources(), R.drawable.ic_anon_person_36dp) : bitmap)
+                .setContentIntent(pendingIntent)
+                .setSound(customSound)
+                .setSubText(getString(R.string.sent_via, getString(R.string.app_name)));
+
 
         //icon appears in device notification bar and right hand corner of notification
-        builder.setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp);
+        //builder.setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp);
 
         // Set the intent that will fire when the user taps the notification.
-        builder.setContentIntent(pendingIntent);
+        //builder.setContentIntent(pendingIntent);
 
         // Large icon appears on the left of the notification
-        if (bitmap == null) {
-            builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_anon_person_36dp));
-        } else {
-            builder.setLargeIcon(bitmap);
-        }
-
-        Uri customSound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
-                + "://" + getPackageName() + "/raw/sound_yourturn");
-
-        builder.setSound(customSound);
 
         // Content title, which appears in large type at the top of the notification
-        builder.setContentTitle(friendlyMessage.getName());
+        //builder.setContentTitle(friendlyMessage.getName());
 
         // Content text, which appears in smaller text below the title
         if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME && TextUtils.isEmpty(friendlyMessage.getText()))
@@ -177,8 +176,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // The subtext, which appears under the text on newer devices.
         // This will show-up in the devices with Android 4.2 and above only
-        Context c = MyApp.getInstance();
-        builder.setSubText(c.getString(R.string.sent_via, c.getString(R.string.app_name)));
+        //builder.setSubText(getString(R.string.sent_via, c.getString(R.string.app_name)));
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
@@ -187,7 +185,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private int thumbSize() {
-        return MyApp.getInstance().getResources().getDimensionPixelSize(R.dimen.user_thumb_pic_size);
+        return getResources().getDimensionPixelSize(R.dimen.user_thumb_pic_size);
     }
 
     private void incrementPrivateUnreadMessages(final FriendlyMessage friendlyMessage) {
