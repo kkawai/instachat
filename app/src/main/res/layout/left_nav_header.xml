@@ -33,7 +33,7 @@
             android:layout_gravity="center_horizontal"
             app:civ_border_color="@android:color/white"
             app:civ_border_overlay="true"
-            app:civ_border_width="2px"/>
+            app:civ_border_width="9px"/>
 
         <Button
             android:id="@+id/save_username"
@@ -75,10 +75,11 @@
 
         <ImageView
             android:id="@+id/drawerLikesIcon"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
+            android:layout_width="13dp"
+            android:layout_height="13dp"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="3dp"
+            android:layout_marginTop="4dp"
             android:scaleType="fitXY"
             android:src="@drawable/ic_favorite_white_18dp"/>
 
@@ -87,8 +88,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_marginTop="4dp"
             android:text=""
-            android:textSize="13sp"
+            android:textSize="14sp"
             android:textStyle="bold"
             app:font="Lato-Bold.ttf"/>
     </LinearLayout>
@@ -102,12 +104,12 @@
         android:background="@android:color/transparent"
         android:inputType="textMultiLine|text"
         android:maxLength="@integer/max_bio"
-        android:maxLines="5"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
+        android:maxLines="3"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
         android:textAlignment="center"
         android:textColor="@android:color/white"
-        android:textSize="13sp"
+        android:textSize="14sp"
         android:visibility="invisible"/>
 
 </LinearLayout>
