@@ -139,15 +139,15 @@
 
     <string name="logout_title">Logout</string>
     <string name="logout_question">Sure you want to logout now?  It does not consume your phone battery or other resources to stay logged in.</string>
-    <string name="user_active_in_group">Active in %s</string>
+    <string name="user_active_in_group">Active in: %s</string>
     <string name="web_clipping">Web Clipping:</string>
     <string name="fetching_web_clipping">Fetching web clipping...</string>
 
     <string name="default_bio">Hey there!  I am using %s  Send me a message on here!</string>
     <string name="like_singular">1 like</string>
     <string name="likes_plural">%s likes</string>
-    <string name="liked_my_posts_x_times">Liked my posts %s times</string>
-    <string name="received_likes_title">Received likes</string>
+    <string name="liked_my_posts_x_times">liked your posts %s times</string>
+    <string name="received_likes_title">Your Likes</string>
     <string name="possible_explicit_content_warning">Warning: this photo may contain inappropriate or explicit content</string>
     <string name="one_time_message_has_been_read_already">You have already opened this one-time post, so it cannot be opened again :D</string>
     <string name="one_time_message_notification_title">One-time Message</string>

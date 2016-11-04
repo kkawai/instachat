@@ -37,9 +37,10 @@
 
     <!-- chat colors! these are very important -->
     <color name="chat_like_button_inactive_state">#edeff1</color>
-    <color name="chat_like_button_active_state">#575757</color>
+    <color name="chat_like_button_active_state">#a8a8a8</color>
     <color name="chat_background_screen_color">@android:color/white</color>
-    <color name="chat_bubble_background_color">@color/jonGray</color>
+    <color name="chat_bubble_background_color">@android:color/white</color>
+    <color name="chat_bubble_background_color_me">@color/jonGray</color>
     <color name="chat_sender_username">@android:color/black</color>
     <color name="chat_time_message_sent">#a8a8a8</color>
     <color name="chat_message_color">@android:color/black</color>
@@ -52,8 +53,8 @@
     <color name="left_drawer_list_name_text_color">#73757e</color>
     <color name="left_drawer_list_name_new_messages_text_color">#ff21272b</color>
     <color name="left_drawer_list_headers_text_color">#384449</color>
-    <color name="left_drawer_groups_label_text_color">@color/colorPrimaryDark</color>
-    <color name="left_drawer_privates_label_text_color">@color/light_turquoise</color>
+    <color name="left_drawer_groups_label_text_color">@color/jonPink</color>
+    <color name="left_drawer_privates_label_text_color">@color/jonGreen</color>
     <color name="left_drawer_list_room_name_text_color">#696f71</color>
 
     <!-- sweet alert dialog -->
