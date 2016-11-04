@@ -14,7 +14,7 @@
     <!-- and the same for increase; the two views are interrelated -->
     <dimen name="likes_button_size">18dp</dimen>
     <dimen name="likes_count_bottom_margin">7dp</dimen>
-    <dimen name="periscope_width">37dp</dimen>
+    <dimen name="periscope_width">40dp</dimen>
     <dimen name="nav_header_profile_pic_size">140dp</dimen>
     <dimen name="web_clipping_right_text_padding">30dp</dimen>
 
