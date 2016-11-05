@@ -994,6 +994,11 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     }
 
     @Override
+    public String getFriendlyMessageDatabase() {
+        return mDatabaseRoot;
+    }
+
+    @Override
     public int getFriendlyMessageCount() {
         return mFirebaseAdapter.getItemCount();
     }
