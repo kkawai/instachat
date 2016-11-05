@@ -9,7 +9,7 @@
     <dimen name="user_thumb_pic_in_titlebar_size">36dp</dimen>
     <dimen name="super_small_user_thumb_size">26dp</dimen>
     <dimen name="web_clipping_image_size">72dp</dimen>
-    <dimen name="posted_photo_size">240dp</dimen>
+    <dimen name="posted_photo_size">200dp</dimen>
     <!-- if likes_button_size is decreased, then you must also decrease likes_count_bottom_margin -->
     <!-- and the same for increase; the two views are interrelated -->
     <dimen name="likes_button_size">18dp</dimen>

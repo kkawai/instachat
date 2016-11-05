@@ -70,6 +70,7 @@
             android:layout_height="wrap_content"
             app:cmv_arrowGravity="end"
             app:cmv_arrowPosition="left"
+            android:layout_marginRight="5dp"
             app:cmv_backgroundColor="@color/chat_bubble_background_color_me"
             app:cmv_backgroundColorPressed="#FFBABABA"
             app:cmv_cornerRadius="20dp"
@@ -199,6 +200,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:paddingLeft="-1px"
+            android:paddingBottom="16dp"
             android:src="@drawable/right_chat_arrow"/>
 
         <de.hdodenhof.circleimageview.CircleImageView
