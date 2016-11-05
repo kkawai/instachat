@@ -54,8 +54,7 @@
                         android:maxLines="1"
                         android:text=""
                         android:textSize="14sp"
-                        android:textStyle="bold"
-                        app:font="Lato-SemiboldItalic.ttf"
+                        app:font="Lato-Regular.ttf"
                         />
                 </LinearLayout>
 
@@ -165,8 +164,7 @@
                         android:maxLines="1"
                         android:text=""
                         android:textSize="14sp"
-                        android:textStyle="bold"
-                        app:font="Lato-SemiboldItalic.ttf"
+                        app:font="Lato-Regular.ttf"
                         />
                 </LinearLayout>
 
