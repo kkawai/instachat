@@ -11,4 +11,6 @@ public interface FriendlyMessageContainer {
     int getFriendlyMessageCount();
 
     void setCurrentFriendlyMessage(int position);
+
+    String getFriendlyMessageDatabase();
 }

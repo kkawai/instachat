@@ -11,6 +11,7 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.BaseFragment;
 import com.instachat.android.Constants;
 import com.instachat.android.PrivateChatActivity;
@@ -55,6 +56,13 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
         mFriendlyMessage = getArguments().getParcelable(Constants.KEY_FRIENDLY_MESSAGE);
         if (mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
             setCustomFragmentToolbarTitle("");
+            if (mFriendlyMessage.getUserid() != Preferences.getInstance().getUserId()) {
+                FirebaseDatabase.getInstance().getReference(getArguments().getString(Constants.KEY_FRIENDLY_MESSAGE_DATABASE)).
+                        child(mFriendlyMessage.getId()).
+                        child(Constants.CHILD_MESSAGE_CONSUMED_BY_PARTNER).
+                        setValue(true);
+            }
+
         } else
             setCustomFragmentToolbarTitle(mFriendlyMessage.getName());
 

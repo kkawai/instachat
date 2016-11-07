@@ -151,7 +151,8 @@ public final class Constants {
     public static final String FILE_PROVIDER_IMAGES_SUBDIR = "/images"; //look at file_provider_paths.xml
 
     public static final String KEY_PHOTO_TYPE = "key_phototype";
-    public static final String KEY_FRIENDLY_MESSAGE = "key_text";
+    public static final String KEY_FRIENDLY_MESSAGE = "key_fm_text";
+    public static final String KEY_FRIENDLY_MESSAGE_DATABASE = "key_fm_database";
     public static final String KEY_STARTING_POS = "key_starting_pos";
 
     public static void DP_URL(int userid, String dpid, OnCompleteListener<Uri> onCompleteListener) {

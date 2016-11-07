@@ -411,7 +411,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             if (friendlyMessage.isConsumedByPartner()) {
                 viewHolder.messageReadConfirmationView.setImageResource(R.drawable.ic_done_all_black_18dp);
             } else {
-                if (mMyUserid != friendlyMessage.getUserid()) {
+                if (mMyUserid != friendlyMessage.getUserid() && friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_NORMAL) {
                     //my partner reading the message for the first time
                     friendlyMessage.setConsumedByPartner(true);//set locally for optimization purposes
                     mFirebaseDatabaseReference.child(mDatabaseRef).child(friendlyMessage.getId()).child(Constants.CHILD_MESSAGE_CONSUMED_BY_PARTNER).setValue(true); //save remotely
