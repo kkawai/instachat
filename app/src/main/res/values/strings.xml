@@ -14,7 +14,7 @@
     <string name="information_emailed">Information has been emailed</string>
     <string name="find">Find</string>
     <string name="login_with_google">Log in with Google</string>
-    <string name="delete_message_question">Delete message?</string>
+    <string name="delete_message_question">Delete Message?</string>
     <string name="block">Block</string>
     <string name="report">Report</string>
     <string name="block_person_title">Block %s?</string>
@@ -71,7 +71,7 @@
     <string name="post">Post</string>
     <string name="photo">Photo</string>
     <string name="group_chat_header">LIVE ROOMS</string>
-    <string name="private_chat_header">DIRECT MESSAGES</string>
+    <string name="private_chat_header">FRIENDS</string>
 
     <string name="could_not_send_message">Sorry!  Could not send message.  Please try again.</string>
     <string name="please_upload_photo">Please upload a display photo to start chatting</string>
@@ -87,18 +87,18 @@
     <string name="save_username">Save</string>
     <string name="share_message">Share Message</string>
     <string name="share_photo">Share Photo</string>
-    <string name="please_choose_person_or_group">Please choose person or group</string>
-    <string name="people_in_group">See Who\'s Online</string>
+    <string name="please_choose_person_or_group">Please choose person or group.</string>
+    <string name="people_in_group">See Who's Online</string>
     <string name="view_profile">View Profile</string>
     <string name="options">Options</string>
-    <string name="display_photo">Before you can post messages, please add a display photo of yourself</string>
-    <string name="display_photo_title">Add display photo</string>
-    <string name="display_photo_tooltip">Tap here to upload a display photo of yourself</string>
-    <string name="toolbar_user_profile_tooltip">Tap here to see the profile again</string>
-    <string name="change_username_tooltip">Tap here to change your username</string>
-    <string name="change_bio_tooltip">Tap here to change your bio</string>
-    <string name="change_photo_tooltip">Tap here to change your photo</string>
-    <string name="message_copied_to_clipboard">Message copied to clipboard</string>
+    <string name="display_photo">Before you can post messages, please add a profile photo of yourself.</string>
+    <string name="display_photo_title">Add profile photo</string>
+    <string name="display_photo_tooltip">Tap here to upload a profile photo of yourself.</string>
+    <string name="toolbar_user_profile_tooltip">Tap here to see the profile again.</string>
+    <string name="change_username_tooltip">Tap here to change your username.</string>
+    <string name="change_bio_tooltip">Tap here to change your bio.</string>
+    <string name="change_photo_tooltip">Tap here to change your photo.</string>
+    <string name="message_copied_to_clipboard">Message copied to clipboard.</string>
     <string name="manage_blocks">Manage Blocks</string>
     <string name="message_options_title">Message Options</string>
     <string name="cannot_chat_you_blocked_them">You blocked %s on a previous occasion.  Just letting you know.</string>
@@ -122,10 +122,10 @@
     <string name="type_your_reply_here">Type your reply here...</string>
 
     <!-- do not change the following hard-coded message options ordering! -->
-    <string name="send_normal">Send As Normal Message</string>
-    <string name="send_one_time">Send As ONE-TIME Message</string>
-    <string name="what_is_one_time">What is ONE-TIME?</string>
-    <string name="one_time_definition">A One-Time message is a message that appears blurry and can only be opened once by tapping on it.  After that, it cannot be opened again.  However, the sender may open it again, others cannot.</string>
+    <string name="send_normal">Send as Normal Message</string>
+    <string name="send_one_time">Send as DISAPPEARING Message</string>
+    <string name="what_is_one_time">What is DISAPPEARING?</string>
+    <string name="one_time_definition">A Disappearing Message is a message that appears blurry and can only be opened once by tapping on it.  After that, it cannot be opened again.  However, the sender may open it again, others cannot.</string>
     <string name="copy_text">Copy Text</string>
     <string name="delete_message">Delete Message</string>
     <string name="delete_photo">Delete Photo</string>
@@ -138,7 +138,7 @@
     </string-array>
 
     <string name="logout_title">Logout</string>
-    <string name="logout_question">Sure you want to logout now?  It does not consume your phone battery or other resources to stay logged in.</string>
+    <string name="logout_question">Sure you want to log out now?  It does not consume your phone battery or other resources to stay logged in.</string>
     <string name="user_active_in_group">Active in: %s</string>
     <string name="web_clipping">Web Clipping:</string>
     <string name="fetching_web_clipping">Fetching web clipping...</string>
@@ -146,12 +146,12 @@
     <string name="default_bio">Hey there!  I am using %s  Send me a message on here!</string>
     <string name="like_singular">1 like</string>
     <string name="likes_plural">%s likes</string>
-    <string name="liked_my_posts_x_times">liked your posts %s times</string>
+    <string name="liked_my_posts_x_times">liked your post %s times</string>
     <string name="received_likes_title">Your Likes</string>
     <string name="possible_explicit_content_warning">Warning: this photo may contain inappropriate or explicit content</string>
-    <string name="one_time_message_has_been_read_already">You have already opened this one-time post, so it cannot be opened again :D</string>
-    <string name="one_time_message_notification_title">One-time Message</string>
-    <string name="one_time_photo_notification_title">One-time Photo</string>
+    <string name="one_time_message_has_been_read_already">You have already opened this Disappearing Message, so it cannot be opened again :D</string>
+    <string name="one_time_message_notification_title">Disappearing Message</string>
+    <string name="one_time_photo_notification_title">Disappearing Photo</string>
     <string name="send_option_protips">Long-press for more options!</string>
     <string name="possible_explicit_content_warning_pls_choose_another">Warning: this photo may contain inappropriate or explicit content.  Please choose another photo.</string>
     <string name="warning">Warning</string>
