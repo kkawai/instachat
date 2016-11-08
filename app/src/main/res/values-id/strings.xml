@@ -1,55 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Instachat</string>
-    <string name="invitation_title">Group Chat Inviter</string>
-    <string name="invitation_cta">Appel à l\'action</string>
-    <string name="invitation_message">S\'il vous plaît joindre à moi pour une conversation amicale</string>
-    <string name="welcome_msg">Bienvenue!</string>
-    <string name="sign_out">Se déconnecter</string>
-    <string name="contacts_permission_rationale">L\'accès aux informations de compte est nécessaire pour vous connecter.</string>
-    <string name="invite_menu_label">Invitez</string>
-    <string name="sign_in">Se connecter</string>
-    <string name="forgot_your_password">Mot de passe oublié?</string>
-    <string name="forgot_password">Mot de passe oublié</string>
-    <string name="please_enter_username_or_email">S\'il vous plaît entrez le nom d\'utilisateur ou adresse e-mail</string>
-    <string name="information_emailed">L\'information a été envoyé par courriel</string>
-    <string name="find">Trouver</string>
-    <string name="login_with_google">Connectez-vous avec Google</string>
-    <string name="delete_message_question">Supprimer le message?</string>
-    <string name="sign_in_with_google">Connectez-vous avec Google</string>
-    <string name="sign_up">S\'inscrire</string>
-    <string name="success">Le succès!</string>
-    <string name="rationale_storage">Cette application lit les photos de votre appareil photo de sorte que vous pouvez télécharger les photos que vous choisissez de télécharger.</string>
-    <string name="new_account">Nouveau compte</string>
-    <string name="hint_username">Nom d\'utilisateur</string>
-    <string name="hint_email">Email</string>
-    <string name="hint_email_or_username">Nom d\'utilisateur ou email</string>
-    <string name="hint_password">Mot de passe</string>
-    <string name="invalid_email">Email invalide</string>
-    <string name="invalid_password">Mot de passe incorrect</string>
-    <string name="invalid_username">Nom d\'utilisateur invalide</string>
-    <string name="create_account">Créer un compte</string>
-    <string name="fresh_config">Config frais</string>
-    <string name="cause_crash">cause_crash</string>
-    <string name="general_api_error">Impossible de le faire. Veuillez réessayer. %s</string>
-    <string name="email_exists">S\'il vous plaît choisir un email différent. %s est déjà enregistré.</string>
-    <string name="username_exists">S\'il vous plaît choisir un nom de nom d\'utilisateur. %s est déjà pris.</string>
-    <string name="email_password_not_found">Compte non trouvé. Réessayer.</string>
-    <string name="wrong_password">Mauvais mot de passe. Réessayer.</string>
-    <string name="menu_choose_photo">Choisissez photo</string>
-    <string name="menu_take_photo">Prendre une photo</string>
-    <string name="message_hint">Envoyer un message amical ...</string>
-    <string name="error_send_photo">Désolé, ne pouvait pas télécharger de photos. Veuillez réessayer.</string>
-    <string name="is_your_new_username">%s est votre nouveau nom d\'utilisateur</string>
-    <string name="title_update_my_pic">Mettre à jour ma photo</string>
-    <string name="sent_via">Envoyé par %s</string>
-    <string name="preview_area">Zone de prévisualisation</string>
-    <string name="post_area">Poster Area</string>
-    <string name="no_thumbnail">Aucune miniature</string>
-    <string name="choose_thumbnail">Choisissez une miniature</string>
-    <string name="post">Poster</string>
-    <string name="photo">Photo</string>
-    <string name="group_chat_header">VIVRE</string>
-    <string name="private_chat_header">PRIVÉ</string>
-    <string name="could_not_send_message">Pardon! Impossible d\'envoyer un message. Veuillez réessayer.</string>
+    <string name="app_name">"Instachat"</string>
+    <string name="invitation_title">"Group Chat Undang"</string>
+    <string name="invitation_cta">"Panggilan untuk bertindak"</string>
+    <string name="invitation_message">"Silakan bergabung dengan saya untuk chatting ramah"</string>
+    <string name="welcome_msg">"Sambutan!"</string>
+    <string name="sign_out">"Keluar"</string>
+    <string name="contacts_permission_rationale">"Akses ke informasi account diperlukan untuk masuk."</string>
+    <string name="invite_menu_label">"Mengundang teman-teman"</string>
+    <string name="sign_in">"Masuk"</string>
+    <string name="forgot_your_password">"lupa kata sandi Anda?"</string>
+    <string name="forgot_password">"Lupa kata sandi"</string>
+    <string name="please_enter_username_or_email">"Silakan masukkan username atau alamat email"</string>
+    <string name="information_emailed">"Informasi telah diemail"</string>
+    <string name="find">"Aku menemukan mu!"</string>
+    <string name="login_with_google">"Login dengan Google"</string>
+    <string name="delete_message_question">"Hapus Pesan?"</string>
+    <string name="block">"Blokir"</string>
+    <string name="report">"laporan"</string>
+    <string name="block_person_title">"Apa?"</string>
+    <string name="block_person_question">"Apakah kamu yakin ini? %s tidak akan dapat mengirimkan pesan langsung dan Anda tidak akan melihat lagi nya posting di salah satu ruang chatting. Jika Anda ingin, Anda dapat membuka blokir nanti."</string>
+    <string name="block_person_failed">"Ups! Kita tidak bisa memblokir %s . Silakan coba lagi."</string>
+    <string name="block_person_success">"Anda telah memblokir %s"</string>
+
+    <string name="unblock_person_title">"Membuka blokir %s?"</string>
+    <string name="unblock_person_question">"Apakah kamu yakin ini? %s akan dapat mengirimkan pesan langsung dan Anda dapat mulai melihat nya posting di salah satu ruang chatting. Jika Anda ingin, Anda dapat memblokir lagi."</string>
+    <string name="unblock_person_failed">"Ups! Kita tidak bisa membuka blokir %s . Silakan coba lagi."</string>
+    <string name="unblock_person_success">"Anda telah diblokir %s"</string>
+
+    <string name="block_cannot_block_yourself">"Anda tidak dapat memblokir diri konyol!"</string>
+    <string name="message_delete_title">"Hapus Pesan?"</string>
+    <string name="message_delete_question">"Apakah Anda yakin ingin menghapus ini? Tak seorang pun akan dapat melihatnya lagi. Ini akan hilang selamanya."</string>
+    <string name="message_delete_success">"Berhasil dihapus pesan dari percakapan"</string>
+    <string name="message_delete_failed">"tidak bisa menghapus pesan dari percakapan. Ini mungkin sudah dihapus. Jika tidak, coba lagi."</string>
+    <string name="sign_in_with_google">"Masuk dengan Google"</string>
+    <string name="sign_up">"Pendaftaran"</string>
+    <string name="success_exclamation">"Berhasil!"</string>
+    <string name="oops_exclamation">"Ups!"</string>
+    <string name="rationale_storage">"Aplikasi ini membaca foto dari kamera Anda sehingga Anda dapat meng-upload foto-foto yang Anda memilih untuk mengunggah."</string>
+    <string name="new_account">"Akun Baru"</string>
+    <string name="hint_username">"Nama"</string>
+    <string name="hint_email">"E-mail"</string>
+    <string name="hint_email_or_username">"Username atau E-mail"</string>
+    <string name="hint_password">"Kata Sandi"</string>
+    <string name="invalid_email">"Email Tidak Valid"</string>
+    <string name="invalid_password">"Kata Sandi Salah"</string>
+    <string name="invalid_username">"Nama Pengguna Tidak Valid"</string>
+    <string name="create_account">"Membuat Akun"</string>
+    <string name="fresh_config">"Segar Config"</string>
+    <string name="cause_crash">"Penyebab Kecelakaan"</string>
+    <string name="general_api_error">"tidak bisa melakukannya. Silakan coba lagi. %s"</string>
+    <string name="email_exists">"Silahkan pilih email yang berbeda. %s sudah terdaftar."</string>
+    <string name="username_exists">"Pilih nama username yang berbeda. %s sudah diambil."</string>
+    <string name="email_password_not_found">"Akun tidak ditemukan. Coba lagi."</string>
+    <string name="wrong_password">"Kata Sandi salah, silahkan coba lagi!"</string>
+    <string name="menu_choose_photo">"Pilih Foto"</string>
+    <string name="menu_take_photo">"Memotret"</string>
+    <string name="message_hint">"Kirim pesan ramah..."</string>
+    <string name="error_send_photo">"Maaf, tidak bisa meng-upload foto. Silakan coba lagi."</string>
+    <string name="is_your_new_username">"%s adalah nama baru Anda"</string>
+    <string name="username_changed_dialog_title">"Username Berubah!"</string>
+    <string name="your_profile_has_been_updated_title">"Disimpan"</string>
+    <string name="your_profile_has_been_updated_msg">"Profil Anda telah disimpan"</string>
+    <string name="title_update_my_pic">"Memperbarui Foto Saya"</string>
+    <string name="sent_via">"Dikirim melalui %s"</string>
+
+    <string name="preview_area">"Preview Lokasi"</string>
+    <string name="post_area">"posting Lokasi"</string>
+    <string name="no_thumbnail">"Tidak ada Thumbnail"</string>
+    <string name="choose_thumbnail">"Pilih Thumbnail"</string>
+    <string name="post">"Posting"</string>
+    <string name="photo">"Foto"</string>
+    <string name="group_chat_header">"KAMAR LANGSUNG"</string>
+    <string name="private_chat_header">"TEMAN"</string>
+
+    <string name="could_not_send_message">"Maaf! tidak bisa mengirim pesan. Silakan coba lagi."</string>
+    <string name="please_upload_photo">"Harap unggah foto layar untuk mulai chatting"</string>
+    <string name="bio">"Bio"</string>
+    <string name="hint_write_something_about_yourself">"Menulis sesuatu tentang diri Anda ..."</string>
+
+    <!-- sweet alert dialog -->
+    <string name="sweet_alert_dialog_default_title">" "</string>
+    <string name="sweet_alert_dialog_ok">"@android: string / ok"</string>
+    <string name="sweet_alert_dialog_cancel">"@android: string / membatalkan"</string>
+    <string name="sweet_alert_loading_message">"Memuat…"</string>
+
+    <string name="save_username">"Simpan"</string>
+    <string name="share_message">"Berbagi Pesan"</string>
+    <string name="share_photo">"Berbagi Foto"</string>
+    <string name="please_choose_person_or_group">"Silahkan pilih orang atau kelompok."</string>
+    <string name="people_in_group">"Lihat Siapa Yang Online"</string>
+    <string name="view_profile">"Lihat profil"</string>
+    <string name="options">"Pilihan"</string>
+    <string name="display_photo">"Sebelum Anda dapat mengirim pesan, tambahkan foto profil diri."</string>
+    <string name="display_photo_title">"Tambahkan foto profil"</string>
+    <string name="display_photo_tooltip">"Ketuk di sini untuk meng-upload foto profil diri."</string>
+    <string name="toolbar_user_profile_tooltip">"Ketuk di sini untuk melihat profil lagi."</string>
+    <string name="change_username_tooltip">"Ketuk di sini untuk mengubah nama pengguna."</string>
+    <string name="change_bio_tooltip">"Ketuk di sini untuk mengubah bio Anda."</string>
+    <string name="change_photo_tooltip">"Ketuk di sini untuk mengubah foto Anda."</string>
+    <string name="message_copied_to_clipboard">"Pesan disalin ke clipboard."</string>
+    <string name="manage_blocks">"Mengelola Blok"</string>
+    <string name="message_options_title">"Pesan Pilihan"</string>
+    <string name="cannot_chat_you_blocked_them">"Anda diblokir %s pada kesempatan sebelumnya. Hanya membiarkan Anda tahu."</string>
+
+    <!-- time ago -->
+    <string name="online_now">"sekarang online"</string>
+    <string name="just_now">"baru saja"</string>
+    <string name="less_than_one_minute_ago">"kurang dari 1 menit yang lalu"</string>
+    <string name="some_minutes_ago">"%s menit yang lalu"</string>
+    <string name="one_hour_ago">"1 jam yang lalu"</string>
+    <string name="some_hours_ago">"%s jam yang lalu"</string>
+    <string name="one_day_ago">"hari lalu"</string>
+    <string name="some_days_ago">"%s hari lalu"</string>
+    <string name="some_months_ago">"%s bulan (s) yang lalu"</string>
+    <string name="more_than_one_year_ago">"lebih dari 1 tahun yang lalu"</string>
+
+    <string name="send_photo_to_group_or_person">"Kirim foto ke %s"</string>
+    <string name="anonymous_user">"Pengguna"</string>
+
+    <string name="reply">"Balasan"</string>
+    <string name="type_your_reply_here">"Ketik balasan Anda di sini ..."</string>
+
+    <!-- do not change the following hard-coded message options ordering! -->
+    <string name="send_normal">"Kirim sebagai Pesan Normal"</string>
+    <string name="send_one_time">"Kirim sebagai LENYAPNYA Pesan"</string>
+    <string name="what_is_one_time">"Apa yang LENYAPNYA?"</string>
+    <string name="one_time_definition">"Pesan Menghilang adalah pesan yang muncul kabur dan hanya bisa dibuka setelah dengan menekan di atasnya. Setelah itu, ia tidak dapat dibuka lagi. Namun, pengirim dapat membukanya lagi, orang lain tidak bisa."</string>
+    <string name="copy_text">"Salin teks"</string>
+    <string name="delete_message">"Hapus Pesan"</string>
+    <string name="delete_photo">"Hapus Foto"</string>
+
+    <string-array name="message_options">
+        <item>"Salin Teks"</item>
+        <item>"Hapus Pesan"</item>
+        <item>"Blokir"</item>
+        <item>"Laporan"</item>
+    </string-array>
+
+    <string name="logout_title">"Logout"</string>
+    <string name="logout_question">"Tentu Anda ingin logout sekarang? Ini tidak mengkonsumsi baterai ponsel atau sumber daya lain untuk tetap masuk."</string>
+    <string name="user_active_in_group">"Aktif dalam: %s"</string>
+    <string name="web_clipping">"Web Kliping:"</string>
+    <string name="fetching_web_clipping">"Mengambil web kliping ..."</string>
+
+    <string name="default_bio">"Hey there! Saya menggunakan %s Kirimkan saya pesan di sini!"</string>
+    <string name="like_singular">"1 anda"</string>
+    <string name="likes_plural">"%s anda"</string>
+    <string name="liked_my_posts_x_times">"menyukai posting Anda %s kali"</string>
+    <string name="received_likes_title">"Suka Anda"</string>
+    <string name="possible_explicit_content_warning">"Peringatan: foto ini mungkin berisi konten yang tidak pantas atau eksplisit"</string>
+    <string name="one_time_message_has_been_read_already">"Anda telah membuka Pesan Menghilang ini, sehingga tidak bisa dibuka lagi: D"</string>
+    <string name="one_time_message_notification_title">"Menghilang Pesan"</string>
+    <string name="one_time_photo_notification_title">"Menghilang Photo"</string>
+    <string name="send_option_protips">"Tekan lama untuk lebih banyak pilihan!"</string>
+    <string name="possible_explicit_content_warning_pls_choose_another">"Peringatan: foto ini mungkin berisi konten yang tidak pantas atau eksplisit. Silahkan pilih foto lain."</string>
+    <string name="warning">"Peringatan"</string>
 </resources>
