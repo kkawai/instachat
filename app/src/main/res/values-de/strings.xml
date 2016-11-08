@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 <string name="app_name">"Instachat"</string>
-<string name="invitation_title">"
-Gruppenchat Einladen"</string>
+<string name="invitation_title">"Gruppenchat Einladen"</string>
 <string name="invitation_cta">"Aufruf zum Handeln"</string>
 <string name="invitation_message">"Bitte verbinden Sie mich für einen freundlichen Chat"</string>
 <string name="welcome_msg">"Herzlich Willkommen!"</string>
@@ -33,8 +32,7 @@ Gruppenchat Einladen"</string>
 <string name="fresh_config">"Fresh Config"</string>
 <string name="cause_crash">"Cause Crash"</string>
 <string name="general_api_error">"Könnte es nicht. Bitte versuche es erneut. %s"</string>
-<string name="email_exists">"
-Bitte wählen Sie eine andere E-Mail. %s ist bereits registriert."</string>
+<string name="email_exists">"Bitte wählen Sie eine andere E-Mail. %s ist bereits registriert."</string>
 <string name="username_exists">"Bitte wählen Sie einen anderen Benutzernamen. %s ist bereits vergeben."</string>
 <string name="email_password_not_found">"Konto nicht gefunden. Versuch es noch einmal."</string>
 <string name="wrong_password">"Falsches Passwort. Versuch es noch einmal."</string>

@@ -60,8 +60,7 @@
 <string name="report">"Informe"</string>
 <string name="block_person_title">"Bloque %s?"</string>
 <string name="block_person_question">"¿Seguro que quieres esto? %s no podrá enviarle mensajes directos y no verá más de sus mensajes en ninguna de las salas de chat. Si lo desea, puede desbloquearlo más tarde."</string>
-<string name="block_person_failed">"¡Vaya! No pudimos bloquear %s. Vuelve a intentarlo.
-"</string>
+<string name="block_person_failed">"¡Vaya! No pudimos bloquear %s. Vuelve a intentarlo."</string>
 <string name="block_person_success">"Has bloqueado %s"</string>
 <string name="unblock_person_title">"Desbloquear %s?"</string>
 <string name="unblock_person_question">"¿Seguro que quieres esto? %s podrá enviarle mensajes directos y podrá comenzar a ver sus publicaciones en cualquiera de las salas de chat. Si lo desea, puede bloquear de nuevo."</string>

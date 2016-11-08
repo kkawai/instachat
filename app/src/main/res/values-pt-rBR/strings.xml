@@ -82,8 +82,7 @@
     <!-- sweet alert dialog -->
     <string name="sweet_alert_dialog_default_title">" "</string>
     <string name="sweet_alert_dialog_ok">"@android:string/ok"</string>
-    <string name="sweet_alert_dialog_cancel">"@android:string/cancel
-"</string>
+    <string name="sweet_alert_dialog_cancel">"@android:string/cancel"</string>
     <string name="sweet_alert_loading_message">"Carregando..."</string>
 
     <string name="save_username">"Salvar"</string>
