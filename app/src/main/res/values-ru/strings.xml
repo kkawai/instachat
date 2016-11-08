@@ -1,55 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Instachat</string>
-    <string name="invitation_title">Group Chat Inviter</string>
-    <string name="invitation_cta">Appel à l\'action</string>
-    <string name="invitation_message">S\'il vous plaît joindre à moi pour une conversation amicale</string>
-    <string name="welcome_msg">Bienvenue!</string>
-    <string name="sign_out">Se déconnecter</string>
-    <string name="contacts_permission_rationale">L\'accès aux informations de compte est nécessaire pour vous connecter.</string>
-    <string name="invite_menu_label">Invitez</string>
-    <string name="sign_in">Se connecter</string>
-    <string name="forgot_your_password">Mot de passe oublié?</string>
-    <string name="forgot_password">Mot de passe oublié</string>
-    <string name="please_enter_username_or_email">S\'il vous plaît entrez le nom d\'utilisateur ou adresse e-mail</string>
-    <string name="information_emailed">L\'information a été envoyé par courriel</string>
-    <string name="find">Trouver</string>
-    <string name="login_with_google">Connectez-vous avec Google</string>
-    <string name="delete_message_question">Supprimer le message?</string>
-    <string name="sign_in_with_google">Connectez-vous avec Google</string>
-    <string name="sign_up">S\'inscrire</string>
-    <string name="success">Le succès!</string>
-    <string name="rationale_storage">Cette application lit les photos de votre appareil photo de sorte que vous pouvez télécharger les photos que vous choisissez de télécharger.</string>
-    <string name="new_account">Nouveau compte</string>
-    <string name="hint_username">Nom d\'utilisateur</string>
-    <string name="hint_email">Email</string>
-    <string name="hint_email_or_username">Nom d\'utilisateur ou email</string>
-    <string name="hint_password">Mot de passe</string>
-    <string name="invalid_email">Email invalide</string>
-    <string name="invalid_password">Mot de passe incorrect</string>
-    <string name="invalid_username">Nom d\'utilisateur invalide</string>
-    <string name="create_account">Créer un compte</string>
-    <string name="fresh_config">Config frais</string>
-    <string name="cause_crash">cause_crash</string>
-    <string name="general_api_error">Impossible de le faire. Veuillez réessayer. %s</string>
-    <string name="email_exists">S\'il vous plaît choisir un email différent. %s est déjà enregistré.</string>
-    <string name="username_exists">S\'il vous plaît choisir un nom de nom d\'utilisateur. %s est déjà pris.</string>
-    <string name="email_password_not_found">Compte non trouvé. Réessayer.</string>
-    <string name="wrong_password">Mauvais mot de passe. Réessayer.</string>
-    <string name="menu_choose_photo">Choisissez photo</string>
-    <string name="menu_take_photo">Prendre une photo</string>
-    <string name="message_hint">Envoyer un message amical ...</string>
-    <string name="error_send_photo">Désolé, ne pouvait pas télécharger de photos. Veuillez réessayer.</string>
-    <string name="is_your_new_username">%s est votre nouveau nom d\'utilisateur</string>
-    <string name="title_update_my_pic">Mettre à jour ma photo</string>
-    <string name="sent_via">Envoyé par %s</string>
-    <string name="preview_area">Zone de prévisualisation</string>
-    <string name="post_area">Poster Area</string>
-    <string name="no_thumbnail">Aucune miniature</string>
-    <string name="choose_thumbnail">Choisissez une miniature</string>
-    <string name="post">Poster</string>
-    <string name="photo">Photo</string>
-    <string name="group_chat_header">VIVRE</string>
-    <string name="private_chat_header">PRIVÉ</string>
-    <string name="could_not_send_message">Pardon! Impossible d\'envoyer un message. Veuillez réessayer.</string>
+    <string name="app_name">"Instachat"</string>
+    <string name="invitation_title">"Групповой чат Пригласить"</string>
+    <string name="invitation_cta">"Призыв к действию"</string>
+    <string name="invitation_message">"Пожалуйста, присоединяйтесь ко мне для дружеской беседы"</string>
+    <string name="welcome_msg">"О руководстве"</string>
+    <string name="sign_out">"Выход"</string>
+    <string name="contacts_permission_rationale">"Доступ к информации о счете требуется войти в систему."</string>
+    <string name="invite_menu_label">"Пригласить друзей"</string>
+    <string name="sign_in">"Войти"</string>
+    <string name="forgot_your_password">"Забыли пароль?"</string>
+    <string name="forgot_password">"Забыли пароль"</string>
+    <string name="please_enter_username_or_email">"Пожалуйста, введите имя пользователя или адрес электронной почты"</string>
+    <string name="information_emailed">"Информация была по электронной почте"</string>
+    <string name="find">"Найти"</string>
+    <string name="login_with_google">"Войти с помощью Google"</string>
+    <string name="delete_message_question">"Удалить номер для сообщений"</string>
+    <string name="block">"Блок"</string>
+    <string name="report">"Отчет"</string>
+    <string name="block_person_title">"Блоки %s?"</string>
+    <string name="block_person_question">"Вы уверены , что хотите этого? %s не сможет отправить вам прямые сообщения , и вы не увидите больше своих постов ни в одном из чатов. Если вы хотите, вы можете разблокировать позже."</string>
+    <string name="block_person_failed">"К сожалению! Мы не смогли блокировать %s . Пожалуйста, попробуйте еще раз."</string>
+    <string name="block_person_success">"Вы заблокировали %s"</string>
+
+    <string name="unblock_person_title">"Разблокирование %s?"</string>
+    <string name="unblock_person_question">"Вы уверены , что хотите этого? %s будет иметь возможность посылать вам прямые сообщения , и вы можете начать видеть свои сообщения в любой из комнат чата. Если вы хотите, вы можете заблокировать снова."</string>
+    <string name="unblock_person_failed">"К сожалению! Мы не смогли разблокировать %s . Пожалуйста, попробуйте еще раз."</string>
+    <string name="unblock_person_success">"Вы разблокировали %s"</string>
+
+    <string name="block_cannot_block_yourself">"Вы не можете блокировать себя глупо!"</string>
+    <string name="message_delete_title">"Удалить номер для сообщений"</string>
+    <string name="message_delete_question">"Вы уверены, что хотите удалить это? Никто не сможет увидеть его снова. Она исчезнет навсегда."</string>
+    <string name="message_delete_success">"Успешно удалено сообщение от разговора"</string>
+    <string name="message_delete_failed">"Не удалось удалить сообщение из разговора. Это, возможно, уже были удалены. Если нет, попробуйте еще раз."</string>
+    <string name="sign_in_with_google">"С помощью аккаунта Google+"</string>
+    <string name="sign_up">"Зарегистрироваться"</string>
+    <string name="success_exclamation">"Успех!"</string>
+    <string name="oops_exclamation">"Упс!"</string>
+    <string name="rationale_storage">"Это приложение читает фотографии с камеры, так что вы можете загрузить фотографии, которые Вы хотите загрузить."</string>
+    <string name="new_account">"Новый аккаунт"</string>
+    <string name="hint_username">"Логин"</string>
+    <string name="hint_email">"Электронная почта"</string>
+    <string name="hint_email_or_username">"Имя или E-mail"</string>
+    <string name="hint_password">"Пароль"</string>
+    <string name="invalid_email">"Неправильный e-mail"</string>
+    <string name="invalid_password">"Неправильный пароль."</string>
+    <string name="invalid_username">"Неверное имя пользователя"</string>
+    <string name="create_account">"Создать аккаунт"</string>
+    <string name="fresh_config">"Fresh Config"</string>
+    <string name="cause_crash">"вызвать зависание"</string>
+    <string name="general_api_error">"Не удалось это сделать. Пожалуйста , повторите попытку. %s"</string>
+    <string name="email_exists">"Пожалуйста , выберите другой адрес электронной почты. %s уже зарегистрирован."</string>
+    <string name="username_exists">"Пожалуйста , выберите другое имя имя пользователя. %s уже занято."</string>
+    <string name="email_password_not_found">"Аккаунт не найден. Попробуй еще раз."</string>
+    <string name="wrong_password">"Неправильный пароль. Попробуй еще раз."</string>
+    <string name="menu_choose_photo">"Выбрать фото"</string>
+    <string name="menu_take_photo">"Сфотографировать"</string>
+    <string name="message_hint">"Отправить сообщение ... дружественную"</string>
+    <string name="error_send_photo">"К сожалению, не удалось загрузить фотографию. Пожалуйста, попробуйте еще раз."</string>
+    <string name="is_your_new_username">"%s ваше новое имя пользователя"</string>
+    <string name="username_changed_dialog_title">"Изменено имя пользователя!"</string>
+    <string name="your_profile_has_been_updated_title">"Сохранено!"</string>
+    <string name="your_profile_has_been_updated_msg">"Ваш профиль был сохранен"</string>
+    <string name="title_update_my_pic">"Обновление Моя фотография"</string>
+    <string name="sent_via">"Отправлено через %s"</string>
+
+    <string name="preview_area">"Область предварительного просмотра"</string>
+    <string name="post_area">"сообщение Площадь"</string>
+    <string name="no_thumbnail">"Нет эскизов"</string>
+    <string name="choose_thumbnail">"Выберите эскиз"</string>
+    <string name="post">"Отправить"</string>
+    <string name="photo">"Фото"</string>
+    <string name="group_chat_header">"комнатам живых"</string>
+    <string name="private_chat_header">"Друзьями?"</string>
+
+    <string name="could_not_send_message">"Сожалею! Не удалось отправить сообщение. Пожалуйста, попробуйте еще раз."</string>
+    <string name="please_upload_photo">"Пожалуйста, загрузите дисплей фото, чтобы начать чат"</string>
+    <string name="bio">"Ваша Биография"</string>
+    <string name="hint_write_something_about_yourself">"Напиши что-нибудь о себе…"</string>
+
+    <!-- sweet alert dialog -->
+    <string name="sweet_alert_dialog_default_title">" "</string>
+    <string name="sweet_alert_dialog_ok">"@android:string/ok"</string>
+    <string name="sweet_alert_dialog_cancel">"@android:string/cancel"</string>
+    <string name="sweet_alert_loading_message">"Загрузка..."</string>
+
+    <string name="save_username">"Сохранить"</string>
+    <string name="share_message">"Доля сообщений"</string>
+    <string name="share_photo">"Делиться фотографией"</string>
+    <string name="please_choose_person_or_group">"Пожалуйста, выберите лицо или группу."</string>
+    <string name="people_in_group">"Смотрите, кто в сети"</string>
+    <string name="view_profile">"Профиль"</string>
+    <string name="options">"Опции"</string>
+    <string name="display_photo">"Перед тем, как отправлять сообщения, пожалуйста, добавьте фотографию в профиле себя."</string>
+    <string name="display_photo_title">"Добавить фото профиля"</string>
+    <string name="display_photo_tooltip">"Нажмите здесь, чтобы загрузить профиль фотографию себя."</string>
+    <string name="toolbar_user_profile_tooltip">"Нажмите здесь, чтобы посмотреть профиль снова."</string>
+    <string name="change_username_tooltip">"Нажмите здесь, чтобы изменить свое имя пользователя."</string>
+    <string name="change_bio_tooltip">"Нажмите здесь, чтобы изменить свой био."</string>
+    <string name="change_photo_tooltip">"Нажмите здесь, чтобы изменить свою фотографию."</string>
+    <string name="message_copied_to_clipboard">"Сообщение копируется в буфер обмена."</string>
+    <string name="manage_blocks">"Управление блоками 62"</string>
+    <string name="message_options_title">"параметры сообщения"</string>
+    <string name="cannot_chat_you_blocked_them">"Вы заблокировали %s в прошлый раз. Просто даю тебе знать."</string>
+
+    <!-- time ago -->
+    <string name="online_now">"сейчас в сети"</string>
+    <string name="just_now">"прямо сейчас"</string>
+    <string name="less_than_one_minute_ago">"менее чем 1 минуту назад"</string>
+    <string name="some_minutes_ago">"%s минут назад"</string>
+    <string name="one_hour_ago">"час назад"</string>
+    <string name="some_hours_ago">"%s часов назад"</string>
+    <string name="one_day_ago">"вчера"</string>
+    <string name="some_days_ago">"%s дней назад"</string>
+    <string name="some_months_ago">"%s месяц (ев) назад"</string>
+    <string name="more_than_one_year_ago">"более 1 года назад"</string>
+
+    <string name="send_photo_to_group_or_person">"Отправить фото на %s"</string>
+    <string name="anonymous_user">"Пользователь"</string>
+
+    <string name="reply">"Ответить"</string>
+    <string name="type_your_reply_here">"Введите ответ здесь ..."</string>
+
+    <!-- do not change the following hard-coded message options ordering! -->
+    <string name="send_normal">"Отправить как обычное сообщение"</string>
+    <string name="send_one_time">"Отправить как исчезая сообщение"</string>
+    <string name="what_is_one_time">"Что такое Исчезающие?"</string>
+    <string name="one_time_definition">"Исчезающим сообщение является сообщением, которое появляется размыто и может быть открыт только один раз, нажав на нее. После этого, она не может быть открыта снова. Тем не менее, отправитель может снова открыть его, другие не могут."</string>
+    <string name="copy_text">"Скопировать текст"</string>
+    <string name="delete_message">"Удалить номер для сообщений"</string>
+    <string name="delete_photo">"Удалить фото"</string>
+
+    <string-array name="message_options">
+        <item>"Скопировать текст"</item>
+        <item>"Удалить номер для сообщений"</item>
+        <item>"Блок"</item>
+        <item>"Отчет"</item>
+    </string-array>
+
+    <string name="logout_title">"Выйти"</string>
+    <string name="logout_question">"Конечно, вы хотите выйти сейчас? Он не использует ваш аккумулятор телефона или другие ресурсы, чтобы оставаться в системе."</string>
+    <string name="user_active_in_group">"Активность в: %s"</string>
+    <string name="web_clipping">"Web Clipping:"</string>
+    <string name="fetching_web_clipping">"Извлечение веб-вырезку ..."</string>
+
+    <string name="default_bio">"Привет всем! Я использую %s Отправить мне сообщение здесь!"</string>
+    <string name="like_singular">"погода."</string>
+    <string name="likes_plural">"%s любит"</string>
+    <string name="liked_my_posts_x_times">"Понравилось ваше сообщение %s раз"</string>
+    <string name="received_likes_title">"Ваши Likes"</string>
+    <string name="possible_explicit_content_warning">"Внимание: эта фотография может содержать некорректные или явное содержание"</string>
+    <string name="one_time_message_has_been_read_already">"Вы уже открыли этот исчезая сообщение, поэтому он не может быть открыт снова: D"</string>
+    <string name="one_time_message_notification_title">"Исчезновение сообщение"</string>
+    <string name="one_time_photo_notification_title">"Исчезновение фотография"</string>
+    <string name="send_option_protips">"Длительное нажатие для больше вариантов!"</string>
+    <string name="possible_explicit_content_warning_pls_choose_another">"Внимание: эта фотография может содержать некорректные или явное содержание. Пожалуйста, выберите другую фотографию."</string>
+    <string name="warning">"Предупредительный сигнал тревоги"</string>
 </resources>

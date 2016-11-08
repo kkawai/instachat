@@ -5,11 +5,9 @@
     <string name="invitation_cta">"Chamada à ação"</string>
     <string name="invitation_message">"Por favor, junte-me para uma conversa amigável"</string>
     <string name="welcome_msg">"Bem vindo!"</string>
-    <string name="sign_out">"Sair
-"</string>
+    <string name="sign_out">"Sair"</string>
     <string name="contacts_permission_rationale">"O acesso às informações da conta é necessária para fazer login."</string>
-    <string name="invite_menu_label">"Convidar Amigos
-"</string>
+    <string name="invite_menu_label">"Convidar Amigos"</string>
     <string name="sign_in">"Entrar"</string>
     <string name="forgot_your_password">"Esqueceu a sua password?"</string>
     <string name="forgot_password">"Esqueci-me da Palavra-Passe"</string>
@@ -84,8 +82,7 @@
     <!-- sweet alert dialog -->
     <string name="sweet_alert_dialog_default_title">" "</string>
     <string name="sweet_alert_dialog_ok">"@android:string/ok"</string>
-    <string name="sweet_alert_dialog_cancel">"@android:string/cancel
-"</string>
+    <string name="sweet_alert_dialog_cancel">"@android:string/cancel"</string>
     <string name="sweet_alert_loading_message">"A carrega…"</string>
 
     <string name="save_username">"Salvar"</string>
