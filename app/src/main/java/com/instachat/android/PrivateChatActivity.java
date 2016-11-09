@@ -278,7 +278,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                     PrivateChatSummary summary = new PrivateChatSummary();
                     summary.setName(mToUser.getUsername());
                     summary.setDpid(mToUser.getProfilePicUrl());
-                    ref.updateChildren(PrivateChatSummary.toMap(summary));
+                    ref.updateChildren(summary.toMap());
                 }
             }
 
@@ -421,30 +421,9 @@ public class PrivateChatActivity extends GroupChatActivity {
             ((TextView) findViewById(R.id.customTitleInToolbar)).setText(username);
             ((TextView) findViewById(R.id.customTitleInParallax)).setText(username);
         }
-        if (dpid != null && dpid.startsWith("http")) {
-            /*Glide.with(PrivateChatActivity.this)
-                    .load(dpid)
-                    .error(R.drawable.ic_anon_person_36dp)
-                    //.crossFade()
-                    .listener(new RequestListener<String, GlideDrawable>() {
-                        @Override
-                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                            if (isActivityDestroyed())
-                                return false;
-                            //collapseAppbarAfterDelay();
-                            return false;
-                        }
-
-                        @Override
-                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                            if (isActivityDestroyed())
-                                return false;
-                            //collapseAppbarAfterDelay();
-                            return false;
-                        }
-                    }).into(mProfilePic); */
-
-        }
+        /**
+         * don't load the image url since scene transition takes care of this
+         */
 
     }
 
@@ -758,8 +737,8 @@ public class PrivateChatActivity extends GroupChatActivity {
     }
 
     private void checkIfPartnerIsBlocked() {
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF() + sToUserid);
-        ref.addValueEventListener(new ValueEventListener() {
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF()).child(sToUserid + "");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 MLog.d(TAG, "onDataChange() snapshot: " + dataSnapshot, " ref: ", ref);
@@ -767,7 +746,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                 if (dataSnapshot.getValue() == null) {
                     //
                 } else {
-                    Toast.makeText(PrivateChatActivity.this, getString(R.string.cannot_chat_you_blocked_them,mToUser.getUsername()), Toast.LENGTH_LONG).show();
+                    Toast.makeText(PrivateChatActivity.this, getString(R.string.cannot_chat_you_blocked_them, mToUser.getUsername()), Toast.LENGTH_LONG).show();
                 }
             }
 

@@ -29,6 +29,7 @@ public class PrivateChatSummary implements Comparable {
     private int unreadMessageCount = -1;
     private int onlineStatus = -1;
     private long lastOnline;
+    private boolean accepted;
 
     public String getId() {
         return id;
@@ -102,28 +103,39 @@ public class PrivateChatSummary implements Comparable {
         this.lastOnline = lastOnline;
     }
 
+    public boolean isAccepted() {
+        return accepted;
+    }
+
+    public void setAccepted(boolean accepted) {
+        this.accepted = accepted;
+    }
+
     /**
      * @return returns only the fields you want
      * to update in cloud database
      */
-    public static Map<String, Object> toMap(PrivateChatSummary privateChatSummary) {
+    public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>(8);
-        if (privateChatSummary.getName() != null)
-            map.put("name", privateChatSummary.getName());
-        if (privateChatSummary.getDpid() != null)
-            map.put("dpid", privateChatSummary.getDpid());
-        if (privateChatSummary.getImageUrl() != null)
-            map.put("imageUrl", privateChatSummary.getImageUrl());
-        if (privateChatSummary.getLastMessage() != null)
-            map.put("lastMessage", privateChatSummary.getLastMessage());
-        if (privateChatSummary.getLastMessageSentTimestamp() != 0) {
-            map.put(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP, privateChatSummary.getLastMessageSentTimestamp());
+        if (getName() != null)
+            map.put("name", getName());
+        if (getDpid() != null)
+            map.put("dpid", getDpid());
+        if (getImageUrl() != null)
+            map.put("imageUrl", getImageUrl());
+        if (getLastMessage() != null)
+            map.put("lastMessage", getLastMessage());
+        if (getLastMessageSentTimestamp() != 0) {
+            map.put(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP, getLastMessageSentTimestamp());
         }
-        if (privateChatSummary.getUnreadMessageCount() >= 0) {
-            map.put("unreadMessageCount", privateChatSummary.getUnreadMessageCount());
+        if (getUnreadMessageCount() >= 0) {
+            map.put("unreadMessageCount", getUnreadMessageCount());
         }
-        if (privateChatSummary.getOnlineStatus() >= 0) {
-            map.put("onlineStatus", privateChatSummary.getOnlineStatus());
+        if (getOnlineStatus() >= 0) {
+            map.put("onlineStatus", getOnlineStatus());
+        }
+        if (isAccepted()) {
+            map.put("accepted", isAccepted());
         }
         return map;
     }

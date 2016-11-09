@@ -299,7 +299,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
                         return;
                     FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF()).
                             child(privateChatSummary.getId()).
-                            updateChildren(PrivateChatSummary.toMap(privateChatSummary));
+                            updateChildren(privateChatSummary.toMap());
                 } catch (Exception e) {
                     MLog.e(TAG, "", e);
                 }
