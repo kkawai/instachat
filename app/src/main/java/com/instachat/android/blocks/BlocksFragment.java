@@ -43,7 +43,7 @@ public class BlocksFragment extends BaseFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        TextView fragmentTitle = (TextView)getView().findViewById(R.id.customFragmentToolbarTitle);
+        TextView fragmentTitle = (TextView) getView().findViewById(R.id.customFragmentToolbarTitle);
         fragmentTitle.setText(R.string.manage_blocks);
         mUserClickedListener = new UserClickedListener() {
             @Override
@@ -102,7 +102,7 @@ public class BlocksFragment extends BaseFragment {
         PrivateChatSummary summary = new PrivateChatSummary();
         summary.setName(username);
         summary.setDpid(dpid);
-        ref.child(userid + "").updateChildren(PrivateChatSummary.toMap(summary));
+        ref.child(userid + "").updateChildren(summary.toMap());
     }
 
     @Override

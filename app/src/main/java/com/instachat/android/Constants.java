@@ -180,6 +180,14 @@ public final class Constants {
         return "/users/" + Preferences.getInstance().getUserId() + "/private_summaries/";
     }
 
+    public static String PRIVATE_REQUEST_STATUS_PARENT(int fromUserid, int toUserid) {
+        return "/users/" + toUserid + "/private_requests/" + fromUserid;
+    }
+
+    public static String PRIVATE_REQUEST_STATUS(int fromUserid, int toUserid) {
+        return PRIVATE_REQUEST_STATUS_PARENT(fromUserid, toUserid) + "/accepted";
+    }
+
     public static String MY_BLOCKS_REF() {
         return "/users/" + Preferences.getInstance().getUserId() + "/blocks/";
     }

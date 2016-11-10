@@ -1,5 +1,6 @@
 package com.instachat.android.messaging;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
@@ -24,6 +25,7 @@ import com.instachat.android.Constants;
 import com.instachat.android.PrivateChatActivity;
 import com.instachat.android.R;
 import com.instachat.android.model.FriendlyMessage;
+import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ThreadWrapper;
@@ -68,7 +70,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     }
 
                     final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF() + friendlyMessage.getUserid());
-                    ref.addValueEventListener(new ValueEventListener() {
+                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             MLog.d(TAG, "onDataChange() snapshot: " + dataSnapshot, " ref: ", ref);
@@ -164,24 +166,22 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         //builder.setContentTitle(friendlyMessage.getName());
 
         // Content text, which appears in smaller text below the title
+        String contentText = "";
         if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME && TextUtils.isEmpty(friendlyMessage.getText()))
-            builder.setContentText(getString(R.string.one_time_photo_notification_title));
+            contentText = getString(R.string.one_time_photo_notification_title);
         else if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME && !TextUtils.isEmpty(friendlyMessage.getText()))
-            builder.setContentText(getString(R.string.one_time_message_notification_title));
+            contentText = getString(R.string.one_time_message_notification_title);
         else if (TextUtils.isEmpty(friendlyMessage.getText()))
-            builder.setContentText(getString(R.string.photo));
+            contentText = getString(R.string.photo);
         else
-            builder.setContentText(friendlyMessage.getText() + "");
-
-
+            contentText = friendlyMessage.getText() + "";
+        builder.setContentText(contentText);
         // The subtext, which appears under the text on newer devices.
         // This will show-up in the devices with Android 4.2 and above only
         //builder.setSubText(getString(R.string.sent_via, c.getString(R.string.app_name)));
 
-        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        checkIfIAcceptedThisPersonYet(friendlyMessage, builder.build(), contentText);
 
-        // Will display the notification in the notification bar
-        notificationManager.notify(friendlyMessage.getUserid(), builder.build());
     }
 
     private int thumbSize() {
@@ -193,5 +193,50 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Map<String, Object> map = new HashMap<>(1);
         map.put("id", friendlyMessage.getId());
         ref.child(friendlyMessage.getUserid() + "").child(Constants.CHILD_UNREAD_MESSAGES).child(friendlyMessage.getId()).updateChildren(map);
+    }
+
+    private void checkIfIAcceptedThisPersonYet(final FriendlyMessage friendlyMessage, final Notification notification, final String notificationText) {
+
+        final int myUserid = Preferences.getInstance().getUserId();
+        final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (friendlyMessage.getUserid() == myUserid) {
+            /**
+             * let your own messages go thru; self-messages mainly for debugging purposes
+             */
+            notificationManager.notify(friendlyMessage.getUserid(), notification);
+            return;
+        }
+        /**
+         * check if I accepted this person
+         */
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS(friendlyMessage.getUserid(), myUserid));
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ref.removeEventListener(this);
+                if (dataSnapshot.exists() && dataSnapshot.getValue(Boolean.class)) {
+                    //I accepted this person
+
+                    //Display the notification in the notification bar
+                    notificationManager.notify(friendlyMessage.getUserid(), notification);
+                } else {
+                    //I have not accepted this person
+                    PrivateChatSummary privateChatSummary = new PrivateChatSummary();
+                    privateChatSummary.setDpid(friendlyMessage.getDpid());
+                    privateChatSummary.setName(friendlyMessage.getName());
+                    privateChatSummary.setLastMessage(notificationText);
+                    privateChatSummary.setLastMessageSentTimestamp(friendlyMessage.getTime());
+
+                    //Create PrivateChatSummary under private_requests
+                    FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT(friendlyMessage.getUserid(), myUserid)).setValue(privateChatSummary);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                ref.removeEventListener(this);
+            }
+        });
+
     }
 }
