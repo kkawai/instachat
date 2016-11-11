@@ -2,7 +2,7 @@
 <resources>
     <!-- <color name="colorPrimary">#87cefa</color> --> <!-- action title bar -->
     <color name="colorPrimary">#FFFFFF</color> <!-- action title bar -->
-    <color name="colorPrimaryDark">#FF425A</color> <!-- drawer, status bar -->
+    <color name="colorPrimaryDark">#d8dade</color> <!-- drawer, status bar -->
     <color name="colorAccent">#a8a8a8</color> <!-- button colors -->
     <color name="colorTitle">#ffffff</color>
     <color name="whiteOff">#f5f2f2</color>
@@ -49,7 +49,7 @@
     <color name="chat_web_cliping_url">#d0d0d0</color>
 
     <!-- left drawer list text and background colors -->
-    <color name="left_drawer_list_background_color">#FEFEFA</color>
+    <color name="left_drawer_list_background_color">#ffffff</color>
     <color name="left_drawer_list_name_text_color">#73757e</color>
     <color name="left_drawer_list_name_new_messages_text_color">#ff21272b</color>
     <color name="left_drawer_list_headers_text_color">#384449</color>

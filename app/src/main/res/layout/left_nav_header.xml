@@ -5,7 +5,8 @@
               android:layout_height="@dimen/left_drawer_header_height"
               android:focusableInTouchMode="true"
               android:orientation="vertical"
-              android:theme="@style/ThemeOverlay.AppCompat.Dark">
+              android:theme="@style/ThemeOverlay.AppCompat.Dark"
+              android:background="@color/jonPink">
 
     <EditText
         android:id="@+id/nav_username"
