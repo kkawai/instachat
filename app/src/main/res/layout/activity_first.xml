@@ -26,7 +26,7 @@
             android:layout_gravity="center_horizontal"
             android:background="@android:color/white"
             android:text="LOG IN"
-            android:textColor="#ff425a"
+            android:textColor="@color/jonPink"
             android:textSize="21sp"
             android:textStyle="bold"
             />
@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:layout_gravity="center_horizontal"
-            android:background="#ff425a"
+            android:background="@color/jonPink"
             android:text="SIGN UP"
             android:textColor="@android:color/white"
             android:textSize="21sp"
