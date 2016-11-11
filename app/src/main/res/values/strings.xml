@@ -37,11 +37,11 @@
     <string name="success_exclamation">Success!</string>
     <string name="oops_exclamation">Oops!</string>
     <string name="rationale_storage">This app reads photos from your camera so you can upload the photos that you choose to upload.</string>
-    <string name="new_account">New Account</string>
-    <string name="hint_username">Username</string>
-    <string name="hint_email">Email</string>
-    <string name="hint_email_or_username">Username or Email</string>
-    <string name="hint_password">Password</string>
+    <string name="new_account">Sign Up</string>
+    <string name="hint_username">USERNAME</string>
+    <string name="hint_email">EMAIL</string>
+    <string name="hint_email_or_username">USERNAME OR EMAIL</string>
+    <string name="hint_password">PASSWORD</string>
     <string name="invalid_email">Invalid Email</string>
     <string name="invalid_password">Invalid Password</string>
     <string name="invalid_username">Invalid Username</string>
