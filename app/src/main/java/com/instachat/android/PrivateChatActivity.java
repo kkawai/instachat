@@ -208,12 +208,12 @@ public class PrivateChatActivity extends GroupChatActivity {
                 MLog.d(TAG, "mAppBarLayout.height: " + appBarLayout.getHeight(), " verticalOffset ", verticalOffset, " toolbarHeight ", getToolbarHeight(), " alpha ", alpha);
                 if (verticalOffset == 0) {
                     mIsAppBarExpanded = true;
-                    invalidateOptionsMenu();
+                    //invalidateOptionsMenu();
 
                 } else if (Math.abs(verticalOffset) + getToolbarHeight() == appBarLayout.getHeight()) {
                     mIsAppBarExpanded = false;
                     checkIfSeenToolbarProfileTooltip(mProfilePic);
-                    invalidateOptionsMenu();
+                    //invalidateOptionsMenu();
                 }
             }
         });
@@ -530,17 +530,10 @@ public class PrivateChatActivity extends GroupChatActivity {
         menu.clear();
         MenuInflater inflater = getMenuInflater();
         if (sToUserid == myUserid()) {
-            if (!mIsAppBarExpanded)
-                inflater.inflate(R.menu.private_chat_options_menu_myself, menu);
-            else
-                inflater.inflate(R.menu.private_chat_options_menu_myself_no_view_profile, menu);
+            inflater.inflate(R.menu.private_chat_options_menu_myself, menu);
         } else {
-            if (!mIsAppBarExpanded)
-                inflater.inflate(R.menu.private_chat_options_menu, menu);
-            else
-                inflater.inflate(R.menu.private_chat_options_menu_no_view_profile, menu);
+            inflater.inflate(R.menu.private_chat_options_menu, menu);
         }
-
     }
 
     @Override
