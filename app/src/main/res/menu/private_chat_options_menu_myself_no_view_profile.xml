@@ -3,6 +3,10 @@
     >
 
     <item
+        android:id="@+id/pendingRequests"
+        android:title="@string/menu_option_pending_requests"/>
+
+    <item
         android:id="@+id/invite_menu"
         android:title="@string/invite_menu_label"/>
 

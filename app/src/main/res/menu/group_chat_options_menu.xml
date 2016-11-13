@@ -2,6 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item
+        android:id="@+id/pendingRequests"
+        android:title="@string/menu_option_pending_requests"/>
 
     <item
         android:id="@+id/people_in_group"

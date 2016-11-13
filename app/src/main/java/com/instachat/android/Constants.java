@@ -15,11 +15,11 @@ public final class Constants {
     private Constants() {
     }
 
-    public static final int MAX_USERNAME_LENGTH = 30;
+    public static final int MAX_USERNAME_LENGTH = 30;//also see dimens
     public static final int MIN_USERNAME_LENGTH = 2;
-    public static final int MAX_EMAIL_LENGTH = 128;
+    public static final int MAX_EMAIL_LENGTH = 128; //also see dimens
     public static final int MIN_EMAIL_LENGTH = 5;
-    public static final int MAX_PASSWORD_LENGTH = 10;
+    public static final int MAX_PASSWORD_LENGTH = 10;//also see dimens
     public static final int MIN_PASSWORD_LENGTH = 4;
     public static final int MAX_BIO_LENGTH = 512;
 
@@ -180,6 +180,10 @@ public final class Constants {
         return "/users/" + Preferences.getInstance().getUserId() + "/private_summaries/";
     }
 
+    public static String MY_PRIVATE_REQUESTS() {
+        return "/users/" + Preferences.getInstance().getUserId() + "/private_requests/";
+    }
+
     public static String PRIVATE_REQUEST_STATUS_PARENT(int fromUserid, int toUserid) {
         return "/users/" + toUserid + "/private_requests/" + fromUserid;
     }
@@ -282,6 +286,7 @@ public final class Constants {
     public static final String CHILD_DPID = "dpid";
     public static final String CHILD_USERNAME = "username";
     public static final String CHILD_MESSAGE_CONSUMED_BY_PARTNER = "consumedByPartner";
+    public static final String CHILD_ACCEPTED = "accepted";
 
     /**
      * Any message received by a user whose last message

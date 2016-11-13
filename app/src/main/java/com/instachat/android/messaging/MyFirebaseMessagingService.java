@@ -209,7 +209,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         /**
          * check if I accepted this person
          */
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS(friendlyMessage.getUserid(), myUserid));
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF()).child(friendlyMessage.getUserid() + "").child(Constants.CHILD_ACCEPTED);
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -225,8 +225,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     privateChatSummary.setDpid(friendlyMessage.getDpid());
                     privateChatSummary.setName(friendlyMessage.getName());
                     privateChatSummary.setLastMessage(notificationText);
-                    privateChatSummary.setLastMessageSentTimestamp(friendlyMessage.getTime());
-
+                    if (friendlyMessage.getImageUrl() != null)
+                        privateChatSummary.setImageUrl(friendlyMessage.getImageUrl());
+                    privateChatSummary.setLastMessageSentTimestamp(System.currentTimeMillis());
+                    privateChatSummary.setAccepted(false);
                     //Create PrivateChatSummary under private_requests
                     FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT(friendlyMessage.getUserid(), myUserid)).setValue(privateChatSummary);
                 }

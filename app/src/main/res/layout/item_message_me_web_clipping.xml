@@ -76,8 +76,8 @@
             android:layout_weight="1"
             app:cmv_arrowGravity="end"
             app:cmv_arrowPosition="left"
-            app:cmv_backgroundColor="@color/chat_background_screen_color"
-            app:cmv_backgroundColorPressed="#FFBABABA"
+            app:cmv_backgroundColor="@color/chat_bubble_background_color_me"
+            app:cmv_backgroundColorPressed="@color/chat_bubble_background_color_pressed_me"
             app:cmv_cornerRadius="6dp"
             app:cmv_showArrow="false">
 

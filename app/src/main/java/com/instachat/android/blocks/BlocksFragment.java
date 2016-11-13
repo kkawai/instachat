@@ -102,6 +102,7 @@ public class BlocksFragment extends BaseFragment {
         PrivateChatSummary summary = new PrivateChatSummary();
         summary.setName(username);
         summary.setDpid(dpid);
+        summary.setAccepted(true);
         ref.child(userid + "").updateChildren(summary.toMap());
     }
 

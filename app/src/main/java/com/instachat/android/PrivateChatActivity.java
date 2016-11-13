@@ -53,6 +53,8 @@ import com.tooltip.Tooltip;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Map;
+
 /**
  * Created by kevin on 9/16/2016.
  * The difference between Private and Group Chat:
@@ -111,7 +113,6 @@ public class PrivateChatActivity extends GroupChatActivity {
             public void onResponse(JSONObject response) {
                 try {
                     mToUser = User.fromResponse(response);
-                    createPrivateChatSummary();
                     populateUserProfile();
                     //getSupportActionBar().setTitle(mToUser.getUsername());
                     setCustomTitles(mToUser.getUsername(), mToUser.getLastOnline());
@@ -263,35 +264,16 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     private boolean mIsAppBarExpanded = true; //initially it's expanded
 
-    /**
-     * If the relationship has already been established, don't
-     * create it.  Otherwise, create it.
-     */
-    private void createPrivateChatSummary() {
+    private void initializePrivateChatSummary() {
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF())
                 .child(mToUser.getId() + "");
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() == null || !dataSnapshot.hasChild("name")) {
-                    ref.removeEventListener(this);
-                    PrivateChatSummary summary = new PrivateChatSummary();
-                    summary.setName(mToUser.getUsername());
-                    summary.setDpid(mToUser.getProfilePicUrl());
-                    ref.updateChildren(summary.toMap());
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void updatePrivateChatSummaryLastMessageSentTimestamp() {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
-        ref.child(mToUser.getId() + "").child(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP).setValue(ServerValue.TIMESTAMP);
+        PrivateChatSummary summary = new PrivateChatSummary();
+        summary.setName(mToUser.getUsername());
+        summary.setDpid(mToUser.getProfilePicUrl());
+        summary.setAccepted(true);
+        Map<String, Object> map = summary.toMap();
+        map.put(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP, ServerValue.TIMESTAMP);
+        ref.updateChildren(map);
     }
 
     @Override
@@ -339,7 +321,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         if (mIsAppBarExpanded) {
             mAppBarLayout.setExpanded(false, true);
         }
-        updatePrivateChatSummaryLastMessageSentTimestamp();
+        initializePrivateChatSummary();
     }
 
     @Override
@@ -564,15 +546,9 @@ public class PrivateChatActivity extends GroupChatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                onHomeClicked();
-                return true;
             case R.id.view_profile:
                 if (!mIsAppBarExpanded)
                     toggleAppbar();
-                return true;
-            case R.id.invite_menu:
-                sendInvitation();
                 return true;
             case R.id.block:
                 new BlockUserDialogHelper().showBlockUserQuestionDialog(this, mToUser.getId(),

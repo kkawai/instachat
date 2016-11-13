@@ -23,7 +23,7 @@
             app:cmv_arrowGravity="end"
             app:cmv_arrowPosition="left"
             app:cmv_backgroundColor="@color/chat_bubble_background_color"
-            app:cmv_backgroundColorPressed="#FFBABABA"
+            app:cmv_backgroundColorPressed="@color/chat_bubble_background_color_pressed"
             app:cmv_cornerRadius="6dp"
             app:cmv_showArrow="true">
 

@@ -1,7 +1,6 @@
 package com.instachat.android;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -22,8 +21,7 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.likes.UserLikedUserListener;
+import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.model.User;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
@@ -42,7 +41,8 @@ import com.tooltip.Tooltip;
 
 import org.json.JSONObject;
 
-import java.util.concurrent.RejectedExecutionException;
+import java.util.Hashtable;
+import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -54,7 +54,7 @@ public class LeftDrawerHelper {
     private Activity mActivity;
     private DrawerLayout mDrawerLayout;
     private View mHeaderLayout;
-    private MyProfilePicListener mMyProfilePicListener;
+    private LeftDrawerEventListener mLeftDrawerEventListener;
     private Tooltip mUsernameTooltip, mBioTooltip, mProfilePicTooltip;
     private ActivityState mActivityState;
 
@@ -64,19 +64,22 @@ public class LeftDrawerHelper {
     private View mHelpButton;
     private View mDrawerLikesParent;
     private TextView mDrawerLikesCountView;
+    private TextView mPendingRequests;
     private boolean mIsVirgin = true;
     private DatabaseReference mTotalLikesRef;
     private ValueEventListener mTotalLikesEventListener;
     private UserLikedUserListener mUserLikedUserListener;
+    private ChildEventListener privateChatRequestsListener;
+    private DatabaseReference privateChatRequestsRef;
 
-    public LeftDrawerHelper(@NonNull Activity activity, @NonNull ActivityState activityState, @NonNull DrawerLayout drawerLayout, @NonNull MyProfilePicListener listener) {
+    public LeftDrawerHelper(@NonNull Activity activity, @NonNull ActivityState activityState, @NonNull DrawerLayout drawerLayout, @NonNull LeftDrawerEventListener listener) {
         mActivity = activity;
         mActivityState = activityState;
         mDrawerLayout = drawerLayout;
-        mMyProfilePicListener = listener;
+        mLeftDrawerEventListener = listener;
     }
 
-    public void updateProfilePic(final int userid, final String profilePicUrl) {
+    public void updateProfilePic(final String profilePicUrl) {
         if (mActivityState == null || mActivityState.isActivityDestroyed())
             return;
         Glide.clear(mProfilePic);
@@ -125,6 +128,7 @@ public class LeftDrawerHelper {
         mSaveButton = mHeaderLayout.findViewById(R.id.save_username);
         mDrawerLikesParent = mHeaderLayout.findViewById(R.id.drawerLikesParent);
         mDrawerLikesCountView = (TextView) mHeaderLayout.findViewById(R.id.drawerLikes);
+        mPendingRequests = (TextView) navigationView.findViewById(R.id.pendingRequests);
         FontUtil.setTextViewFont(mDrawerLikesCountView);
         mHelpButton = mHeaderLayout.findViewById(R.id.help);
         setupUsernameAndBio();
@@ -258,6 +262,7 @@ public class LeftDrawerHelper {
         });
         setupProfilePic(user.getProfilePicUrl());
         listenForUpdatedLikeCount(user.getId());
+        listenForPrivateChatRequests();
     }
 
     private void checkForRemoteUpdatesToMyDP() {
@@ -298,16 +303,19 @@ public class LeftDrawerHelper {
                 MLog.e(TAG, "checkForRemoteUpdatesToMyDP(2) failed: " + error);
             }
         });
+
     }
 
     public void cleanup() {
         mActivityState = null;
         mActivity = null;
         mDrawerLayout = null;
-        mMyProfilePicListener = null;
+        mLeftDrawerEventListener = null;
         mUserLikedUserListener = null;
         if (mTotalLikesRef != null && mTotalLikesEventListener != null)
             mTotalLikesRef.removeEventListener(mTotalLikesEventListener);
+        if (privateChatRequestsRef != null && privateChatRequestsListener != null)
+            privateChatRequestsRef.removeEventListener(privateChatRequestsListener);
     }
 
     private void showChooseDialog() {
@@ -327,14 +335,14 @@ public class LeftDrawerHelper {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
-                mMyProfilePicListener.onProfilePicChangeRequest(true);
+                mLeftDrawerEventListener.onProfilePicChangeRequest(true);
             }
         });
         view.findViewById(R.id.menu_take_photo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
-                mMyProfilePicListener.onProfilePicChangeRequest(false);
+                mLeftDrawerEventListener.onProfilePicChangeRequest(false);
             }
         });
         dialog.show();
@@ -554,6 +562,65 @@ public class LeftDrawerHelper {
 
     public void setUserLikedUserListener(UserLikedUserListener listener) {
         mUserLikedUserListener = listener;
+    }
+
+    private void listenForPrivateChatRequests() {
+        mPendingRequests.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mLeftDrawerEventListener.onPendingRequestsClicked();
+            }
+        });
+        privateChatRequestsRef = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_REQUESTS());
+        privateChatRequestsListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                updatePendingRequestsMap(dataSnapshot);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                updatePendingRequestsMap(dataSnapshot);
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                outstandingRequestsMap.remove(dataSnapshot.getKey());
+                updatePendingRequestsView();
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        privateChatRequestsRef.addChildEventListener(privateChatRequestsListener);
+    }
+
+    private Map<String, Boolean> outstandingRequestsMap = new Hashtable<>();
+
+    private void updatePendingRequestsMap(DataSnapshot dataSnapshot) {
+        PrivateChatSummary privateChatSummary = dataSnapshot.getValue(PrivateChatSummary.class);
+        privateChatSummary.setId(dataSnapshot.getKey());
+        if (!privateChatSummary.isAccepted())
+            outstandingRequestsMap.put(privateChatSummary.getId(), false);//value doesn't matter
+        else
+            outstandingRequestsMap.remove(privateChatSummary.getId());
+        updatePendingRequestsView();
+    }
+
+    private void updatePendingRequestsView() {
+        if (outstandingRequestsMap.size() == 1) {
+            mPendingRequests.setText(mActivity.getString(R.string.left_drawer_pending_request_singular));
+        } else if (outstandingRequestsMap.size() > 1) {
+            mPendingRequests.setText(mActivity.getString(R.string.left_drawer_pending_requests_plural, "" + outstandingRequestsMap.size()));
+        }
+        mPendingRequests.setVisibility(outstandingRequestsMap.size() > 0 ? View.VISIBLE : View.GONE);
     }
 
 }

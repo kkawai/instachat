@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -17,9 +18,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.instachat.android.R;
-
 import com.instachat.android.font.FontUtil;
+import com.instachat.android.view.CircleTransform;
 import com.pnikosis.materialishprogress.ProgressWheel;
 
 import java.util.List;
@@ -50,6 +52,8 @@ public class SweetAlertDialog extends Dialog implements View.OnClickListener {
     private View mSuccessLeftMask;
     private View mSuccessRightMask;
     private Drawable mCustomImgDrawable;
+    private String mCustomImgUrl;
+    private int mCustomImgErrorResId;
     private ImageView mCustomImage;
     private Button mConfirmButton;
     private Button mCancelButton;
@@ -220,7 +224,10 @@ public class SweetAlertDialog extends Dialog implements View.OnClickListener {
                     mWarningFrame.setVisibility(View.VISIBLE);
                     break;
                 case CUSTOM_IMAGE_TYPE:
-                    setCustomImage(mCustomImgDrawable);
+                    if (mCustomImgDrawable != null)
+                        setCustomImage(mCustomImgDrawable);
+                    else
+                        setCustomImage(mCustomImgUrl, mCustomImgErrorResId);
                     break;
                 case PROGRESS_TYPE:
                     mProgressFrame.setVisibility(View.VISIBLE);
@@ -250,6 +257,23 @@ public class SweetAlertDialog extends Dialog implements View.OnClickListener {
         mTitleText = text;
         if (mTitleTextView != null && mTitleText != null) {
             mTitleTextView.setText(mTitleText);
+        }
+        return this;
+    }
+
+    public SweetAlertDialog setCustomImage(String imageUrl, int errorDrawableResId) {
+        if (TextUtils.isEmpty(imageUrl)) {
+            return setCustomImage(errorDrawableResId);
+        }
+        mCustomImgUrl = imageUrl;
+        mCustomImgErrorResId = errorDrawableResId;
+        if (mCustomImage != null) {
+            mCustomImage.setVisibility(View.VISIBLE);
+            Glide.with(getContext())
+                    .load(imageUrl)
+                    .transform(new CircleTransform(getContext()))
+                    .error(errorDrawableResId)
+                    .into(mCustomImage);
         }
         return this;
     }

@@ -87,6 +87,7 @@ import com.instachat.android.model.GroupChatSummary;
 import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.model.User;
 import com.instachat.android.options.MessageOptionsDialogHelper;
+import com.instachat.android.requests.RequestsFragment;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
@@ -205,6 +206,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
         mUsernameTyping = ((TextView) findViewById(R.id.usernameTyping));
         mMessageEditText = (EditText) findViewById(R.id.messageEditText);
+        FontUtil.setTextViewFont(mMessageEditText);
         mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter((int) mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_LENGTH))});
         mMessageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -716,6 +718,9 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             case R.id.download:
                 //beginDownload();
                 return true;
+            case R.id.pendingRequests:
+                onPendingRequestsClicked();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -842,10 +847,15 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         setupRightDrawerContent();
     }
 
-    private MyProfilePicListener mMyProfilePicListener = new MyProfilePicListener() {
+    private LeftDrawerEventListener mLeftDrawerEventListener = new LeftDrawerEventListener() {
         @Override
         public void onProfilePicChangeRequest(boolean isLaunchCamera) {
             GroupChatActivity.this.onProfilePicChangeRequest(isLaunchCamera);
+        }
+
+        @Override
+        public void onPendingRequestsClicked() {
+            GroupChatActivity.this.onPendingRequestsClicked();
         }
     };
 
@@ -863,7 +873,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         View drawerView = getLayoutInflater().inflate(R.layout.left_drawer_layout, navigationView, false);
         navigationView.addView(drawerView);
         navigationView.addHeaderView(headerView);
-        mLeftDrawerHelper = new LeftDrawerHelper(this, this, mDrawerLayout, mMyProfilePicListener);
+        mLeftDrawerHelper = new LeftDrawerHelper(this, this, mDrawerLayout, mLeftDrawerEventListener);
         mLeftDrawerHelper.setup(navigationView);
         mLeftDrawerHelper.setUserLikedUserListener(mUserLikedUserListener);
 
@@ -1245,7 +1255,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                     MLog.e(TAG, "saveUser() failed via uploadFromUri() ", error);
                 }
             });
-            mLeftDrawerHelper.updateProfilePic(myUserid(), photoUrl);
+            mLeftDrawerHelper.updateProfilePic(photoUrl);
         }
     }
 
@@ -1519,6 +1529,13 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                     tooltip.dismiss();
             }
         }, 2000);
+
+    }
+
+    private void onPendingRequestsClicked() {
+        closeLeftDrawer();
+        Fragment fragment = new RequestsFragment();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, RequestsFragment.TAG).addToBackStack(null).commit();
 
     }
 

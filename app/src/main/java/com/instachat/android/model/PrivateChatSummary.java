@@ -135,7 +135,7 @@ public class PrivateChatSummary implements Comparable {
             map.put("onlineStatus", getOnlineStatus());
         }
         if (isAccepted()) {
-            map.put("accepted", isAccepted());
+            map.put(Constants.CHILD_ACCEPTED, isAccepted());
         }
         return map;
     }
