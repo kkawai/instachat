@@ -69,8 +69,9 @@ public class LeftDrawerHelper {
     private DatabaseReference mTotalLikesRef;
     private ValueEventListener mTotalLikesEventListener;
     private UserLikedUserListener mUserLikedUserListener;
-    private ChildEventListener privateChatRequestsListener;
-    private DatabaseReference privateChatRequestsRef;
+    private ChildEventListener mPrivateChatRequestsListener;
+    private DatabaseReference mPrivateChatRequestsRef;
+    private Map<String, Boolean> mOutstandingRequestsMap = new Hashtable<>();
 
     public LeftDrawerHelper(@NonNull Activity activity, @NonNull ActivityState activityState, @NonNull DrawerLayout drawerLayout, @NonNull LeftDrawerEventListener listener) {
         mActivity = activity;
@@ -128,7 +129,7 @@ public class LeftDrawerHelper {
         mSaveButton = mHeaderLayout.findViewById(R.id.save_username);
         mDrawerLikesParent = mHeaderLayout.findViewById(R.id.drawerLikesParent);
         mDrawerLikesCountView = (TextView) mHeaderLayout.findViewById(R.id.drawerLikes);
-        mPendingRequests = (TextView) navigationView.findViewById(R.id.pendingRequests);
+        mPendingRequests = (TextView) navigationView.findViewById(R.id.menu_pending_requests);
         FontUtil.setTextViewFont(mDrawerLikesCountView);
         mHelpButton = mHeaderLayout.findViewById(R.id.help);
         setupUsernameAndBio();
@@ -314,8 +315,8 @@ public class LeftDrawerHelper {
         mUserLikedUserListener = null;
         if (mTotalLikesRef != null && mTotalLikesEventListener != null)
             mTotalLikesRef.removeEventListener(mTotalLikesEventListener);
-        if (privateChatRequestsRef != null && privateChatRequestsListener != null)
-            privateChatRequestsRef.removeEventListener(privateChatRequestsListener);
+        if (mPrivateChatRequestsRef != null && mPrivateChatRequestsListener != null)
+            mPrivateChatRequestsRef.removeEventListener(mPrivateChatRequestsListener);
     }
 
     private void showChooseDialog() {
@@ -571,8 +572,8 @@ public class LeftDrawerHelper {
                 mLeftDrawerEventListener.onPendingRequestsClicked();
             }
         });
-        privateChatRequestsRef = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_REQUESTS());
-        privateChatRequestsListener = new ChildEventListener() {
+        mPrivateChatRequestsRef = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_REQUESTS());
+        mPrivateChatRequestsListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 updatePendingRequestsMap(dataSnapshot);
@@ -585,7 +586,7 @@ public class LeftDrawerHelper {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                outstandingRequestsMap.remove(dataSnapshot.getKey());
+                mOutstandingRequestsMap.remove(dataSnapshot.getKey());
                 updatePendingRequestsView();
             }
 
@@ -599,28 +600,32 @@ public class LeftDrawerHelper {
 
             }
         };
-        privateChatRequestsRef.addChildEventListener(privateChatRequestsListener);
+        mPrivateChatRequestsRef.addChildEventListener(mPrivateChatRequestsListener);
     }
-
-    private Map<String, Boolean> outstandingRequestsMap = new Hashtable<>();
 
     private void updatePendingRequestsMap(DataSnapshot dataSnapshot) {
         PrivateChatSummary privateChatSummary = dataSnapshot.getValue(PrivateChatSummary.class);
         privateChatSummary.setId(dataSnapshot.getKey());
         if (!privateChatSummary.isAccepted())
-            outstandingRequestsMap.put(privateChatSummary.getId(), false);//value doesn't matter
+            mOutstandingRequestsMap.put(privateChatSummary.getId(), false);//value doesn't matter
         else
-            outstandingRequestsMap.remove(privateChatSummary.getId());
+            mOutstandingRequestsMap.remove(privateChatSummary.getId());
         updatePendingRequestsView();
     }
 
     private void updatePendingRequestsView() {
-        if (outstandingRequestsMap.size() == 1) {
+        if (mOutstandingRequestsMap.size() == 1) {
             mPendingRequests.setText(mActivity.getString(R.string.left_drawer_pending_request_singular));
-        } else if (outstandingRequestsMap.size() > 1) {
-            mPendingRequests.setText(mActivity.getString(R.string.left_drawer_pending_requests_plural, "" + outstandingRequestsMap.size()));
+        } else if (mOutstandingRequestsMap.size() > 1) {
+            mPendingRequests.setText(mActivity.getString(R.string.left_drawer_pending_requests_plural, "" + mOutstandingRequestsMap.size()));
         }
-        mPendingRequests.setVisibility(outstandingRequestsMap.size() > 0 ? View.VISIBLE : View.GONE);
+        if (mOutstandingRequestsMap.size() > 0) {
+            mPendingRequests.setVisibility(View.VISIBLE);
+            mLeftDrawerEventListener.onPendingRequestsAvailable();
+        } else {
+            mPendingRequests.setVisibility(View.GONE);
+            mLeftDrawerEventListener.onPendingRequestsCleared();
+        }
     }
 
 }

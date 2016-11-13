@@ -24,7 +24,7 @@
     </FrameLayout>
 
     <com.instachat.android.view.CustomFontTextView
-        android:id="@+id/pendingRequests"
+        android:id="@+id/menu_pending_requests"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimaryDark"

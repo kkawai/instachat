@@ -522,34 +522,25 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        selectMenu(menu);
-        return true;
-    }
-
-    private void selectMenu(Menu menu) {
-        menu.clear();
         MenuInflater inflater = getMenuInflater();
-        if (sToUserid == myUserid()) {
-            inflater.inflate(R.menu.private_chat_options_menu_myself, menu);
-        } else {
-            inflater.inflate(R.menu.private_chat_options_menu, menu);
-        }
+        inflater.inflate(R.menu.private_chat_options_menu, menu);
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.view_profile:
+            case R.id.menu_view_profile:
                 if (!mIsAppBarExpanded)
                     toggleAppbar();
                 return true;
-            case R.id.block:
+            case R.id.menu_block_user:
                 new BlockUserDialogHelper().showBlockUserQuestionDialog(this, mToUser.getId(),
                         mToUser.getUsername(),
                         mToUser.getProfilePicUrl(),
                         getBlockedUserListener());
                 return true;
-            case R.id.report:
+            case R.id.menu_report_user:
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -727,4 +718,17 @@ public class PrivateChatActivity extends GroupChatActivity {
         });
     }
 
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (menu == null) return false;
+        if (sToUserid == myUserid()) {
+            if (menu.findItem(R.id.menu_block_user) != null) {
+                menu.removeItem(R.id.menu_block_user);
+            }
+            if (menu.findItem(R.id.menu_report_user) != null) {
+                menu.removeItem(R.id.menu_report_user);
+            }
+        }
+        return super.onMenuOpened(featureId, menu);
+    }
 }

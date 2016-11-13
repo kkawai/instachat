@@ -7,4 +7,6 @@ package com.instachat.android;
 public interface LeftDrawerEventListener {
     void onProfilePicChangeRequest(boolean isLaunchCamera);
     void onPendingRequestsClicked();
+    void onPendingRequestsAvailable();
+    void onPendingRequestsCleared();
 }

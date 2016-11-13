@@ -142,6 +142,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private Uri mSharePhotoUri;
     private String mShareText;
     private long mGroupId = 0L;
+    private boolean mIsPendingRequestsAvailable;
 
     protected int getLayout() {
         return R.layout.activity_main;
@@ -684,14 +685,14 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             case android.R.id.home:
                 onHomeClicked();
                 return true;
-            case R.id.manage_blocks:
+            case R.id.menu_manage_blocks:
                 if (isLeftDrawerOpen()) {
                     closeLeftDrawer();
                 }
                 Fragment fragment = new BlocksFragment();
                 getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, BlocksFragment.TAG).addToBackStack(null).commit();
                 return true;
-            case R.id.people_in_group:
+            case R.id.menu_who_is_online:
                 if (isLeftDrawerOpen()) {
                     closeLeftDrawer();
                 }
@@ -699,14 +700,14 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                     openRightDrawer();
                 }
                 return true;
-            case R.id.invite_menu:
+            case R.id.menu_invite:
                 sendInvitation();
                 return true;
             case R.id.crash_menu:
                 FirebaseCrash.logcat(Log.ERROR, TAG, "crash caused");
                 causeCrash();
                 return true;
-            case R.id.sign_out_menu:
+            case R.id.menu_sign_out:
                 signout();
                 return true;
             case R.id.fresh_config_menu:
@@ -718,7 +719,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             case R.id.download:
                 //beginDownload();
                 return true;
-            case R.id.pendingRequests:
+            case R.id.menu_pending_requests:
                 onPendingRequestsClicked();
                 return true;
             default:
@@ -856,6 +857,16 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         @Override
         public void onPendingRequestsClicked() {
             GroupChatActivity.this.onPendingRequestsClicked();
+        }
+
+        @Override
+        public void onPendingRequestsAvailable() {
+            mIsPendingRequestsAvailable = true;
+        }
+
+        @Override
+        public void onPendingRequestsCleared() {
+            mIsPendingRequestsAvailable = false;
         }
     };
 
@@ -1536,7 +1547,18 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         closeLeftDrawer();
         Fragment fragment = new RequestsFragment();
         getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, RequestsFragment.TAG).addToBackStack(null).commit();
-
     }
 
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (menu == null) return false;
+        if (!mIsPendingRequestsAvailable) {
+            if (menu.findItem(R.id.menu_pending_requests) != null)
+                menu.removeItem(R.id.menu_pending_requests);
+        } else {
+            if (menu.findItem(R.id.menu_pending_requests) == null)
+                menu.add(0, R.id.menu_pending_requests, 0, getString(R.string.menu_option_pending_requests));
+        }
+        return super.onMenuOpened(featureId, menu);
+    }
 }
