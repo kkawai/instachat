@@ -26,6 +26,7 @@ public final class Constants {
     public static final int ADMIN_USERID = 3733523; //me
 
     //remote configuration with default values
+    public static final boolean DEFAULT_DO_SHORTEN_IMAGE_URLS = true;
     public static final boolean DEFAULT_ALLOW_DELETE_OTHER_MESSAGES = false;
     public static final int DEFAULT_MAX_MESSAGE_HISTORY = 1000;
     public static final int DEFAULT_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS = 3500;
@@ -42,6 +43,7 @@ public final class Constants {
     public static String KEY_MAX_MESSAGE_LENGTH = "MAX_MESSAGE_LENGTH";
     public static String KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM = "MAX_PERISCOPABLE_LIKES_PER_ITEM";
     public static String KEY_ALLOW_DELETE_OTHER_MESSAGES = "ALLOW_DELETE_OTHER_MESSAGES";
+    public static String KEY_DO_SHORTEN_IMAGE_URLS = "DO_SHORTEN_IMAGE_URLS";
 
     /*
      * CHANGE THESE WHEN MAKING PRODUCTION BUILDS

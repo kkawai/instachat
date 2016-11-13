@@ -2,18 +2,18 @@ package com.instachat.android.util;
 
 import android.util.Log;
 
+import com.instachat.android.Constants;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MLog {
 
-    private static boolean globalEnabled = true;
-
     private MLog() {
     }
 
     private static boolean isEnabled(String tag) {
-        return globalEnabled;
+        return Constants.IS_LOGGING_ENABLED;
     }
 
     public static void i(String tag, Object... vals) {

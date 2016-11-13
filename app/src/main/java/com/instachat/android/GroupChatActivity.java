@@ -180,12 +180,12 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setStackFromEnd(true);
 
-        try {
-            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-            MLog.w(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) succeeded");
-        } catch (Exception e) {
-            //MLog.e(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) failed: " + e);
-        }
+//        try {
+//            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+//            MLog.w(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) succeeded");
+//        } catch (Exception e) {
+//            //MLog.e(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) failed: " + e);
+//        }
 
         initRemoteConfig();
         fetchConfig();
@@ -455,11 +455,11 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     final void setDatabaseRoot(final String root) {
         mDatabaseRoot = root;
-        try {
-            FirebaseDatabase.getInstance().getReference(mDatabaseRoot).keepSynced(true);
-        } catch (Exception e) {
-            MLog.e(TAG, "", e);
-        }
+//        try {
+//            FirebaseDatabase.getInstance().getReference(mDatabaseRoot).keepSynced(true);
+//        } catch (Exception e) {
+//            MLog.e(TAG, "", e);
+//        }
     }
 
     private void setEnableSendButton(final boolean isEnable) {
@@ -1504,6 +1504,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         defaultConfigMap.put(Constants.KEY_MAX_MESSAGE_LENGTH, Constants.DEFAULT_MAX_MESSAGE_LENGTH);
         defaultConfigMap.put(Constants.KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM, Constants.DEFAULT_MAX_PERISCOPABLE_LIKES_PER_ITEM);
         defaultConfigMap.put(Constants.KEY_ALLOW_DELETE_OTHER_MESSAGES, Constants.DEFAULT_ALLOW_DELETE_OTHER_MESSAGES);
+        defaultConfigMap.put(Constants.KEY_DO_SHORTEN_IMAGE_URLS, Constants.DEFAULT_DO_SHORTEN_IMAGE_URLS);
 
         // Apply config settings and default values.
         mFirebaseRemoteConfig.setConfigSettings(firebaseRemoteConfigSettings);
