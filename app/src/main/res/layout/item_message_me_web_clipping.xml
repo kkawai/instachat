@@ -228,12 +228,13 @@
 
         </me.himanshusoni.chatmessageview.ChatMessageView>
 
+        <!--
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:paddingLeft="-1px"
-            android:src="@drawable/right_chat_arrow"/>
+            android:src="@drawable/right_chat_arrow"/> -->
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/messengerImageView"
