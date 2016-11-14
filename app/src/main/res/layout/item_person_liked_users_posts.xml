@@ -10,7 +10,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingBottom="13dp"
-        android:paddingLeft="16dp">
+        android:paddingLeft="0dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/userPic"
@@ -19,8 +19,8 @@
             android:src="@drawable/ic_anon_person_36dp"
             android:transitionName="image"
             app:civ_border_color="@color/colorAccent"
-            app:civ_border_overlay="true"
-            app:civ_border_width="2px"/>
+            app:civ_border_overlay="false"
+            app:civ_border_width="0px"/>
 
         <com.instachat.android.view.CustomFontTextView
             android:id="@+id/username"
@@ -40,7 +40,7 @@
             android:text="Likes my posts 56 times"
             android:textColor="@android:color/black"
             android:textSize="15sp"
-            app:font="Lato-Bold.ttf"/>
+            app:font="Lato-Regular.ttf"/>
 
     </LinearLayout>
 

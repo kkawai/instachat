@@ -2,14 +2,14 @@
 <resources>
     <!-- <color name="colorPrimary">#87cefa</color> --> <!-- action title bar -->
     <color name="colorPrimary">#FFFFFF</color> <!-- action title bar -->
-    <color name="colorPrimaryDark">#FF425A</color> <!-- drawer, status bar -->
+    <color name="colorPrimaryDark">#B8BDC7</color> <!-- drawer, status bar -->
     <color name="colorAccent">#a8a8a8</color> <!-- button colors -->
     <color name="colorTitle">#ffffff</color>
     <color name="whiteOff">#f5f2f2</color>
     <color name="material_grey">#f5f2f2</color>
 
     <!-- send message button colors -->
-    <color name="send_button_disabled_color">#a8a8a8</color>
+    <color name="send_button_disabled_color">#B8BDC7</color>
     <color name="send_button_normal_color">#FF425A</color>
     <color name="send_button_pressed_color">#FFA0AC</color>
     <color name="send_button_ripple_color">#99FFFFFF</color>
@@ -37,15 +37,11 @@
 
     <!-- chat colors! these are very important -->
     <color name="chat_like_button_inactive_state">#edeff1</color>
-    <color name="chat_like_button_active_state">#575757</color>
+    <color name="chat_like_button_active_state">#edeff1</color>
     <color name="chat_background_screen_color">@android:color/white</color>
-
-    <color name="chat_bubble_background_color">#F7F8FA</color>
-    <color name="chat_bubble_background_color_pressed">#f2f3f5</color>
-
-    <color name="chat_bubble_background_color_me">@android:color/white</color>
-    <color name="chat_bubble_background_color_pressed_me">#f7f6f6</color>
-
+    <color name="chat_bubble_background_color">@android:color/white</color>
+    <color name="chat_bubble_background_color_me">@color/jonGray</color>
+    <color name="chat_bubble_background_color_pressed">@color/jonGreen</color>
     <color name="chat_sender_username">@android:color/black</color>
     <color name="chat_time_message_sent">#a8a8a8</color>
     <color name="chat_message_color">@android:color/black</color>
@@ -54,12 +50,12 @@
     <color name="chat_web_cliping_url">#d0d0d0</color>
 
     <!-- left drawer list text and background colors -->
-    <color name="left_drawer_list_background_color">#FEFEFA</color>
+    <color name="left_drawer_list_background_color">#ffffff</color>
     <color name="left_drawer_list_name_text_color">#73757e</color>
     <color name="left_drawer_list_name_new_messages_text_color">#ff21272b</color>
     <color name="left_drawer_list_headers_text_color">#384449</color>
-    <color name="left_drawer_groups_label_text_color">@color/colorPrimaryDark</color>
-    <color name="left_drawer_privates_label_text_color">@color/light_turquoise</color>
+    <color name="left_drawer_groups_label_text_color">@color/jonPink</color>
+    <color name="left_drawer_privates_label_text_color">@color/jonGreen</color>
     <color name="left_drawer_list_room_name_text_color">#696f71</color>
 
     <!-- sweet alert dialog -->

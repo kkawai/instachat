@@ -2,21 +2,21 @@
 <resources>
     <string name="app_name">"Instachat"</string>
     <string name="invitation_title">"群聊邀請"</string>
-    <string name="invitation_cta">"來電採取行動"</string>
+    <string name="invitation_cta">"呼籲採取行動"</string>
     <string name="invitation_message">"請加入我友好的交談"</string>
-    <string name="welcome_msg">"歡迎"</string>
-    <string name="sign_out">"退出"</string>
+    <string name="welcome_msg">"歡迎！"</string>
+    <string name="sign_out">"登錄"</string>
     <string name="contacts_permission_rationale">"需要訪問帳戶信息登錄。"</string>
     <string name="invite_menu_label">"邀請朋友"</string>
     <string name="sign_in">"登入"</string>
-    <string name="forgot_your_password">"忘記密碼了嗎？"</string>
-    <string name="forgot_password">"忘記密碼啦？"</string>
+    <string name="forgot_your_password">"忘記密碼？"</string>
+    <string name="forgot_password">"忘記密碼"</string>
     <string name="please_enter_username_or_email">"請輸入用戶名或郵箱地址"</string>
     <string name="information_emailed">"資料已通過電子郵件發送"</string>
-    <string name="find">"找到."</string>
+    <string name="find">"找"</string>
     <string name="login_with_google">"登錄與谷歌"</string>
     <string name="delete_message_question">"刪除消息？"</string>
-    <string name="block">"格擋"</string>
+    <string name="block">"塊"</string>
     <string name="report">"報告"</string>
     <string name="block_person_title">"阻止%s ？"</string>
     <string name="block_person_question">"你確定你要嗎？ %s將無法向您發送直接消息，你將不會看到任何更多的他或她的職位在任何聊天室。如果你願意，你可以解除封鎖。"</string>
@@ -34,19 +34,19 @@
     <string name="message_delete_success">"成功地從對話中刪除消息"</string>
     <string name="message_delete_failed">"無法從對話中刪除消息。它可能已被刪除。如果沒有，請重試。"</string>
     <string name="sign_in_with_google">"在與谷歌"</string>
-    <string name="sign_up">"註冊"</string>
-    <string name="success_exclamation">"成功!"</string>
-    <string name="oops_exclamation">"糟糕！"</string>
-    <string name="rationale_storage">"這個應用程序從相機中讀取照片，以便您可以上傳您選擇上傳的照片。"</string>
-    <string name="new_account">"新增資產"</string>
+    <string name="sign_up">"報名"</string>
+    <string name="success_exclamation">"成功！"</string>
+    <string name="oops_exclamation">"糟糕!"</string>
+    <string name="rationale_storage">"此應用從相機中讀取照片，以便您上傳選擇上傳的照片"</string>
+    <string name="new_account">"新賬戶"</string>
     <string name="hint_username">"用戶名"</string>
     <string name="hint_email">"電子郵件"</string>
     <string name="hint_email_or_username">"用戶名或電子郵件"</string>
     <string name="hint_password">"密碼"</string>
-    <string name="invalid_email">"電子郵件格式無效"</string>
+    <string name="invalid_email">"不合規電郵"</string>
     <string name="invalid_password">"無效的密碼"</string>
     <string name="invalid_username">"無效的用戶名"</string>
-    <string name="create_account">"創建帳號 "</string>
+    <string name="create_account">"創建帳號"</string>
     <string name="fresh_config">"新鮮配置"</string>
     <string name="cause_crash">"導致崩潰"</string>
     <string name="general_api_error">"無法做到這一點。請重試。 %s"</string>
@@ -60,7 +60,7 @@
     <string name="error_send_photo">"很抱歉，無法上傳照片。請再試一次。"</string>
     <string name="is_your_new_username">"%s是你的新的用戶名"</string>
     <string name="username_changed_dialog_title">"用戶名改變了！"</string>
-    <string name="your_profile_has_been_updated_title">"得救了！"</string>
+    <string name="your_profile_has_been_updated_title">"你拯救了生命"</string>
     <string name="your_profile_has_been_updated_msg">"您的個人資料已被保存"</string>
     <string name="title_update_my_pic">"更新我的照片"</string>
     <string name="sent_via">"通過發送%s"</string>
@@ -70,22 +70,22 @@
     <string name="no_thumbnail">"沒有縮略圖"</string>
     <string name="choose_thumbnail">"選擇一個縮略圖"</string>
     <string name="post">"崗位"</string>
-    <string name="photo">"圖片"</string>
-    <string name="group_chat_header">"客房"</string>
-    <string name="private_chat_header">"朋友"</string>
+    <string name="photo">"照片"</string>
+    <string name="group_chat_header">"LIVE ROOMS"</string>
+    <string name="private_chat_header">"FRIENDS"</string>
 
     <string name="could_not_send_message">"抱歉!無法將消息發送。請再試一次。"</string>
     <string name="please_upload_photo">"請上傳一張照片顯示，開始聊天"</string>
-    <string name="bio">"我的簡介"</string>
+    <string name="bio">"生物"</string>
     <string name="hint_write_something_about_yourself">"寫一些關於自己..."</string>
 
     <!-- sweet alert dialog -->
     <string name="sweet_alert_dialog_default_title">" "</string>
     <string name="sweet_alert_dialog_ok">"@android:string/ok"</string>
     <string name="sweet_alert_dialog_cancel">"@android:string/cancel"</string>
-    <string name="sweet_alert_loading_message">"載入中..."</string>
+    <string name="sweet_alert_loading_message">"載入中…"</string>
 
-    <string name="save_username">"儲存"</string>
+    <string name="save_username">"保存"</string>
     <string name="share_message">"分享留言"</string>
     <string name="share_photo">"分享圖片"</string>
     <string name="please_choose_person_or_group">"請選擇個人或團體。"</string>
@@ -117,7 +117,7 @@
     <string name="more_than_one_year_ago">"1年多前"</string>
 
     <string name="send_photo_to_group_or_person">"將照片發送到%s"</string>
-    <string name="anonymous_user">"使用者"</string>
+    <string name="anonymous_user">"用戶"</string>
 
     <string name="reply">"回复"</string>
     <string name="type_your_reply_here">"在此處鍵入您的回复..."</string>
@@ -134,7 +134,7 @@
     <string-array name="message_options">
         <item>"複製文本"</item>
         <item>"刪除郵件"</item>
-        <item>"格擋"</item>
+        <item>"塊"</item>
         <item>"報告"</item>
     </string-array>
 
@@ -145,15 +145,15 @@
     <string name="fetching_web_clipping">"抓取Web剪輯..."</string>
 
     <string name="default_bio">"你好啊！我使用%s給我一個消息就在這裡！"</string>
-    <string name="like_singular">"像..."</string>
+    <string name="like_singular">"像1"</string>
     <string name="likes_plural">"%s喜歡"</string>
     <string name="liked_my_posts_x_times">"喜歡您的訊息%s次"</string>
     <string name="received_likes_title">"你的喜好"</string>
     <string name="possible_explicit_content_warning">"警告：這張照片可能包含不當或色情內容"</string>
-    <string name="one_time_message_has_been_read_already">"你已經打開了這個消息消失，所以不能再次打開：D"</string>
+    <string name="one_time_message_has_been_read_already">"你已經打開了這個消息消失，所以不能再次打開 :D"</string>
     <string name="one_time_message_notification_title">"消失的消息"</string>
     <string name="one_time_photo_notification_title">"消失的照片"</string>
     <string name="send_option_protips">"長按為更多的選擇！"</string>
     <string name="possible_explicit_content_warning_pls_choose_another">"警告：這張照片可能包含不適當的或色情內容。請選擇其他照片。"</string>
-    <string name="warning">"警告"</string>
+    <string name="warning">"警告！"</string>
 </resources>
