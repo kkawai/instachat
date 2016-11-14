@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.ath.fuel.FuelInjector;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
@@ -54,6 +55,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import jp.wasabeef.glide.transformations.BlurTransformation;
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 import static com.instachat.android.view.TextViewUtil.blurText;
 
@@ -354,13 +358,32 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         if (viewHolder.messagePhotoViewParent != null) {
             if (friendlyMessage.getImageUrl() != null) {
                 viewHolder.messagePhotoViewParent.setVisibility(View.VISIBLE);
-                Glide.with(mActivity.get()).load(friendlyMessage.getImageUrl()).crossFade().into(viewHolder.messagePhotoView);
+                if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
+                    Glide.with(mActivity.get()).
+                            load(friendlyMessage.getImageUrl()).
+                            bitmapTransform(
+                                    //no need to center crop, image will be blurred anyways!
+                                    //new CenterCrop(mActivity.get()),
+                                    new BlurTransformation(mActivity.get(), 75),
+                                    new RoundedCornersTransformation(mActivity.get(), 30, 0, RoundedCornersTransformation.CornerType.ALL)).
+                            crossFade().
+                            into(viewHolder.messagePhotoView);
+                } else {
+                    Glide.with(mActivity.get()).
+                            load(friendlyMessage.getImageUrl()).
+                            bitmapTransform(
+                                    new CenterCrop(mActivity.get()),
+                                    new RoundedCornersTransformation(mActivity.get(), 30, 0, RoundedCornersTransformation.CornerType.ALL)).
+                            crossFade().
+                            into(viewHolder.messagePhotoView);
+                }
                 if (payloads != null && payloads.contains(PAYLOAD_IMAGE_REVEAL)) {
                     MLog.d(TAG, "populate messagePhotoViewParent got reveal payload");
                     viewHolder.messagePhotoView.setVisibility(View.VISIBLE);
                     viewHolder.messagePhotoWarningView.setVisibility(View.GONE);
                     AnimationUtil.scaleInFromCenter(viewHolder.messagePhotoViewParent);
-                } else if (friendlyMessage.isPossibleAdultImage() || friendlyMessage.isPossibleViolentImage()) {
+                } else if (friendlyMessage.isPossibleAdultImage() || friendlyMessage.isPossibleViolentImage() &&
+                        (friendlyMessage.getMessageType() != FriendlyMessage.MESSAGE_TYPE_ONE_TIME)) {
                     MLog.d(TAG, "populate messagePhotoViewParent did not get reveal payload");
                     viewHolder.messagePhotoView.setVisibility(View.INVISIBLE);
                     viewHolder.messagePhotoWarningView.setVisibility(View.VISIBLE);

@@ -80,6 +80,8 @@
 -keep class hanks.xyz.** { *; }
 -keep class me.himanshusoni.chatmessageview.** { *; }
 -keep class com.github.silvestrpredko.** { *; }
+-keep class jp.wasabeef.** { *; }
+-keep class jp.co.cyberagent.android.gpuimage.** { *; }
 
 # below was necessary for making proguard work with flurry jar
 -keep class com.flurry.** { *; }

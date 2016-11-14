@@ -135,15 +135,7 @@
                     <ImageView
                         android:id="@+id/messagePhotoView"
                         android:layout_width="@dimen/posted_photo_size"
-                        android:layout_height="@dimen/posted_photo_size"
-                        android:adjustViewBounds="true"
-                        android:padding="@dimen/posted_photo_rounded_corner_padding"
-                        android:scaleType="centerCrop"/>
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/rounded_corner_photo_me"/>
+                        android:layout_height="@dimen/posted_photo_size"/>
 
                     <LinearLayout
                         android:id="@+id/messagePhotoWarningView"
