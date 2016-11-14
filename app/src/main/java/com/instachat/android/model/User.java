@@ -162,7 +162,7 @@ public class User extends DomainObject {
         if (bio != null)
             map.put("bio", bio);
         if (includeTimestamp)
-            map.put(Constants.LAST_ONLINE_CHILD, ServerValue.TIMESTAMP);
+            map.put(Constants.CHILD_LAST_ONLINE, ServerValue.TIMESTAMP);
         if (currentGroupName != null) {
             map.put(Constants.FIELD_CURRENT_GROUP_NAME, currentGroupName);
             map.put(Constants.FIELD_CURRENT_GROUP_ID, currentGroupId);

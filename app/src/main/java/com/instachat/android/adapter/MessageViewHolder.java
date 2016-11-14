@@ -42,7 +42,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
 
     public MessageViewHolder(View v) {
         super(v);
-        messageTextParent = itemView.findViewById(R.id.messageTextParent);
+        messageTextParent = itemView.findViewById(R.id.contentMessageChat);
         messageTextView = (TextView) itemView.findViewById(R.id.messageTextView);
         messengerTextView = (TextView) itemView.findViewById(R.id.messengerTextView);
         messengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);

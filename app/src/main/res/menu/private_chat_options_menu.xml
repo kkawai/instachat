@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     >
+
     <item
-        android:id="@+id/view_profile"
+        android:id="@+id/menu_pending_requests"
+        android:title="@string/menu_option_pending_requests"/>
+
+    <item
+        android:id="@+id/menu_view_profile"
         android:title="@string/view_profile"/>
 
     <item
-        android:id="@+id/invite_menu"
+        android:id="@+id/menu_invite"
         android:title="@string/invite_menu_label"/>
 
     <item
-        android:id="@+id/manage_blocks"
+        android:id="@+id/menu_manage_blocks"
         android:title="@string/manage_blocks"/>
 
     <item
-        android:id="@+id/block"
+        android:id="@+id/menu_block_user"
         android:title="@string/block"/>
 
     <item
-        android:id="@+id/report"
+        android:id="@+id/menu_report_user"
         android:title="@string/report"/>
 </menu>

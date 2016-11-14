@@ -155,4 +155,20 @@
     <string name="send_option_protips">Long-press for more options!</string>
     <string name="possible_explicit_content_warning_pls_choose_another">Warning: this photo may contain inappropriate or explicit content.  Please choose another photo.</string>
     <string name="warning">Warning</string>
+
+    <!-- after 11/10/2016 -->
+    <string name="menu_option_pending_requests">New Pending Requests!</string>
+    <string name="left_drawer_pending_request_singular">1 new pending request!</string>
+    <string name="left_drawer_pending_requests_plural">%s new pending requests!</string>
+    <string name="pending_requests_title">Pending Requests</string>
+
+    <string name="accept_request_title">Accept %s?</string>
+    <string name="accept_request_question">%s would like to have a fun and friendly chat with you!</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="report_person_title">Report %s?</string>
+    <string name="report_person_question">Are you reporting this person for internet chat abuse?  We take these things seriously.  We will investigate this person and if found to be truly abusive, we will take action.  Thank you.</string>
+    <string name="report_person_failed">Oops!  You could not report %s.  Please try again.</string>
+    <string name="report_person_success">You have reported %s</string>
 </resources>

@@ -4,11 +4,12 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
 
-    <FrameLayout android:id="@+id/sign_in_layout"
-                 android:layout_width="match_parent"
-                 android:layout_height="match_parent"
-                 android:gravity="center"
-                 tools:context="com.instachat.login.SignInActivity">
+    <FrameLayout
+        android:id="@+id/sign_in_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        tools:context="com.instachat.login.SignInActivity">
 
         <TextView
             android:layout_width="wrap_content"
@@ -38,7 +39,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_email_or_username"
-                    android:inputType="textEmailAddress"/>
+                    android:inputType="textEmailAddress"
+                    android:maxLength="@integer/max_email_length"/>
 
             </android.support.design.widget.TextInputLayout>
 
@@ -53,7 +55,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_password"
-                    android:inputType="textPassword"/>
+                    android:inputType="textPassword"
+                    android:maxLength="@integer/max_password_length"/>
 
             </android.support.design.widget.TextInputLayout>
 
@@ -68,11 +71,11 @@
                 />
 
             <Button
-                android:layout_marginTop="18dp"
                 android:id="@+id/sign_in_with_email_button"
                 android:layout_width="280dp"
                 android:layout_height="75dp"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="18dp"
                 android:text="@string/sign_in"
                 android:textAllCaps="true"
                 android:textSize="21sp"

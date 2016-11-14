@@ -37,6 +37,7 @@ public class FriendlyMessage implements Parcelable {
     private int likes;
     private boolean consumedByPartner;
     private boolean isBlocked; //NOT persisted, volatile
+
     public FriendlyMessage() {
     }
 
@@ -202,6 +203,9 @@ public class FriendlyMessage implements Parcelable {
         if (!canAppend(friendlyMessage)) {
             return false;
         }
+        if (!TextUtils.isEmpty(friendlyMessage.getDpid()))
+            dpid = friendlyMessage.getDpid();
+        name = friendlyMessage.getName();
         time = friendlyMessage.getTime();
         if (friendlyMessage.imageUrl != null)
             imageUrl = friendlyMessage.imageUrl;

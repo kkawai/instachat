@@ -1,10 +1,5 @@
 package com.instachat.android;
 
-import android.net.Uri;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.instachat.android.util.Preferences;
 
 /**
@@ -15,17 +10,18 @@ public final class Constants {
     private Constants() {
     }
 
-    public static final int MAX_USERNAME_LENGTH = 30;
+    public static final int MAX_USERNAME_LENGTH = 30;//also see dimens
     public static final int MIN_USERNAME_LENGTH = 2;
-    public static final int MAX_EMAIL_LENGTH = 128;
+    public static final int MAX_EMAIL_LENGTH = 128; //also see dimens
     public static final int MIN_EMAIL_LENGTH = 5;
-    public static final int MAX_PASSWORD_LENGTH = 10;
+    public static final int MAX_PASSWORD_LENGTH = 10;//also see dimens
     public static final int MIN_PASSWORD_LENGTH = 4;
     public static final int MAX_BIO_LENGTH = 512;
 
     public static final int ADMIN_USERID = 3733523; //me
 
     //remote configuration with default values
+    public static final boolean DEFAULT_DO_SHORTEN_IMAGE_URLS = true;
     public static final boolean DEFAULT_ALLOW_DELETE_OTHER_MESSAGES = false;
     public static final int DEFAULT_MAX_MESSAGE_HISTORY = 1000;
     public static final int DEFAULT_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS = 3500;
@@ -42,6 +38,7 @@ public final class Constants {
     public static String KEY_MAX_MESSAGE_LENGTH = "MAX_MESSAGE_LENGTH";
     public static String KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM = "MAX_PERISCOPABLE_LIKES_PER_ITEM";
     public static String KEY_ALLOW_DELETE_OTHER_MESSAGES = "ALLOW_DELETE_OTHER_MESSAGES";
+    public static String KEY_DO_SHORTEN_IMAGE_URLS = "DO_SHORTEN_IMAGE_URLS";
 
     /*
      * CHANGE THESE WHEN MAKING PRODUCTION BUILDS
@@ -155,16 +152,9 @@ public final class Constants {
     public static final String KEY_FRIENDLY_MESSAGE_DATABASE = "key_fm_database";
     public static final String KEY_STARTING_POS = "key_starting_pos";
 
-    public static void DP_URL(int userid, String dpid, OnCompleteListener<Uri> onCompleteListener) {
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference();
-        storageReference.child(DP_STORAGE_BASE_REF(userid) + dpid).getDownloadUrl().addOnCompleteListener(onCompleteListener);
-    }
-
     public static String USER_INFO_REF(int userid) {
         return "/users/" + userid + "/info";
     }
-
-    public static final String LAST_ONLINE_CHILD = "lastOnline";
 
     public static String PRIVATE_CHAT_REF(int toUserid) {
         final int myUserid = Preferences.getInstance().getUserId();
@@ -180,12 +170,12 @@ public final class Constants {
         return "/users/" + Preferences.getInstance().getUserId() + "/private_summaries/";
     }
 
-    public static String PRIVATE_REQUEST_STATUS_PARENT(int fromUserid, int toUserid) {
-        return "/users/" + toUserid + "/private_requests/" + fromUserid;
+    public static String MY_PRIVATE_REQUESTS_REF() {
+        return "/users/" + Preferences.getInstance().getUserId() + "/private_requests/";
     }
 
-    public static String PRIVATE_REQUEST_STATUS(int fromUserid, int toUserid) {
-        return PRIVATE_REQUEST_STATUS_PARENT(fromUserid, toUserid) + "/accepted";
+    public static String PRIVATE_REQUEST_STATUS_PARENT_REF(int fromUserid, int toUserid) {
+        return "/users/" + toUserid + "/private_requests/" + fromUserid;
     }
 
     public static String MY_BLOCKS_REF() {
@@ -206,6 +196,10 @@ public final class Constants {
 
     public static String GROUP_CHAT_USERS_TYPING_PARENT_REF(long groupid) {
         return "/public_group_users_typing/" + groupid;
+    }
+
+    public static String REPORTS_REF(int userid) {
+        return "/reports/" + userid;
     }
 
     public static String PUBLIC_CHATS_SUMMARY_PARENT_REF = "/public_group_summaries/";
@@ -279,9 +273,10 @@ public final class Constants {
     public static final String CHILD_UNREAD_MESSAGES = "unread_messages";
     public static final String CHILD_LIKES = "likes";
     public static final String CHILD_TYPING = "isTyping";
-    public static final String CHILD_DPID = "dpid";
     public static final String CHILD_USERNAME = "username";
     public static final String CHILD_MESSAGE_CONSUMED_BY_PARTNER = "consumedByPartner";
+    public static final String CHILD_ACCEPTED = "accepted";
+    public static final String CHILD_LAST_ONLINE = "lastOnline";
 
     /**
      * Any message received by a user whose last message

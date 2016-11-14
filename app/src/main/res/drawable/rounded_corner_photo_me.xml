@@ -10,5 +10,5 @@
     <corners android:radius="@dimen/posted_photo_rounded_corner_radius"/>
     <stroke
         android:width="@dimen/posted_photo_rounded_corner_padding"
-        android:color="@color/chat_bubble_background_color"/>
+        android:color="@color/chat_bubble_background_color_me"/>
 </shape>

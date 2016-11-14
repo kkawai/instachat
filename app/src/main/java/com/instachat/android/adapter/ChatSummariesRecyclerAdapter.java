@@ -77,7 +77,9 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
                 if (!dataSnapshot.hasChild("name")) {
                     return;
                 }
-                PrivateChatSummary privateChatSummary = getPrivateChatSummary(dataSnapshot);
+                if (!dataSnapshot.hasChild(Constants.CHILD_ACCEPTED) || !dataSnapshot.child(Constants.CHILD_ACCEPTED).getValue(Boolean.class))
+                    return;
+                PrivateChatSummary privateChatSummary = privateChatSummaryFrom(dataSnapshot);
                 insertPrivateChatSummary(privateChatSummary);
             }
 
@@ -90,8 +92,13 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
                 if (!dataSnapshot.hasChild("name")) {
                     return;
                 }
-                PrivateChatSummary privateChatSummary = getPrivateChatSummary(dataSnapshot);
-                updatePrivateChatSummary(privateChatSummary);
+                if (!dataSnapshot.hasChild(Constants.CHILD_ACCEPTED) || !dataSnapshot.child(Constants.CHILD_ACCEPTED).getValue(Boolean.class))
+                    return;
+                PrivateChatSummary privateChatSummary = privateChatSummaryFrom(dataSnapshot);
+                if (data.contains(privateChatSummary))
+                    updatePrivateChatSummary(privateChatSummary);
+                else
+                    insertPrivateChatSummary(privateChatSummary);
             }
 
             @Override
@@ -103,7 +110,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
                 if (!dataSnapshot.hasChild("name")) {
                     return;
                 }
-                PrivateChatSummary privateChatSummary = getPrivateChatSummary(dataSnapshot);
+                PrivateChatSummary privateChatSummary = privateChatSummaryFrom(dataSnapshot);
                 removePrivateChatSummary(privateChatSummary);
 
             }
@@ -164,10 +171,9 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
         };
         publicGroupChatsSummaryReference.addChildEventListener(publicGroupChatsSummaryListener);
         privateChatsSummaryReference.addChildEventListener(privateChatsSummaryListener);
-
     }
 
-    private PrivateChatSummary getPrivateChatSummary(DataSnapshot dataSnapshot) {
+    private PrivateChatSummary privateChatSummaryFrom(DataSnapshot dataSnapshot) {
         PrivateChatSummary privateChatSummary = dataSnapshot.getValue(PrivateChatSummary.class);
         privateChatSummary.setId(dataSnapshot.getKey());
         if (dataSnapshot.hasChild(Constants.CHILD_UNREAD_MESSAGES)) {
@@ -515,8 +521,10 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
     }
 
     public void cleanup() {
-        privateChatsSummaryReference.removeEventListener(privateChatsSummaryListener);
-        publicGroupChatsSummaryReference.removeEventListener(publicGroupChatsSummaryListener);
+        if (privateChatsSummaryReference != null)
+            privateChatsSummaryReference.removeEventListener(privateChatsSummaryListener);
+        if (publicGroupChatsSummaryReference != null)
+            publicGroupChatsSummaryReference.removeEventListener(publicGroupChatsSummaryListener);
         for (long groupid : publicGroupChatPresenceReferences.keySet()) {
             Map.Entry<DatabaseReference, ChildEventListener> entry = publicGroupChatPresenceReferences.get(groupid);
             entry.getKey().removeEventListener(entry.getValue());
@@ -661,4 +669,5 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
             }
         }
     }
+
 }

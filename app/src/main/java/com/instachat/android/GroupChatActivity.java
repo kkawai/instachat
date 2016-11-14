@@ -87,6 +87,7 @@ import com.instachat.android.model.GroupChatSummary;
 import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.model.User;
 import com.instachat.android.options.MessageOptionsDialogHelper;
+import com.instachat.android.requests.RequestsFragment;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
@@ -133,7 +134,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private LeftDrawerHelper mLeftDrawerHelper;
     private String mDatabaseRoot;
     private boolean mIsStartedAnimation;
-    //private AnimatedDotLoadingView mDotsLoader;
     private View mDotsLayoutParent;
     private ChatSummariesRecyclerAdapter mChatsRecyclerViewAdapter;
     private GroupChatUsersRecyclerAdapter mGroupChatUsersRecyclerAdapter;
@@ -141,6 +141,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private Uri mSharePhotoUri;
     private String mShareText;
     private long mGroupId = 0L;
+    private boolean mIsPendingRequestsAvailable;
 
     protected int getLayout() {
         return R.layout.activity_main;
@@ -178,12 +179,12 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setStackFromEnd(true);
 
-        try {
-            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-            MLog.w(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) succeeded");
-        } catch (Exception e) {
-            //MLog.e(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) failed: " + e);
-        }
+//        try {
+//            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+//            MLog.w(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) succeeded");
+//        } catch (Exception e) {
+//            //MLog.e(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) failed: " + e);
+//        }
 
         initRemoteConfig();
         fetchConfig();
@@ -205,6 +206,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
         mUsernameTyping = ((TextView) findViewById(R.id.usernameTyping));
         mMessageEditText = (EditText) findViewById(R.id.messageEditText);
+        FontUtil.setTextViewFont(mMessageEditText);
         mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter((int) mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_LENGTH))});
         mMessageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -452,11 +454,11 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     final void setDatabaseRoot(final String root) {
         mDatabaseRoot = root;
-        try {
-            FirebaseDatabase.getInstance().getReference(mDatabaseRoot).keepSynced(true);
-        } catch (Exception e) {
-            MLog.e(TAG, "", e);
-        }
+//        try {
+//            FirebaseDatabase.getInstance().getReference(mDatabaseRoot).keepSynced(true);
+//        } catch (Exception e) {
+//            MLog.e(TAG, "", e);
+//        }
     }
 
     private void setEnableSendButton(final boolean isEnable) {
@@ -527,11 +529,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         // Show loading spinner
         showProgressDialog();
     }*/
-
-    private void showMessageDialog(String title, String message) {
-        AlertDialog ad = new AlertDialog.Builder(this).setTitle(title).setMessage(message).create();
-        ad.show();
-    }
 
     private void showProgressDialog() {
         if (mProgressDialog == null) {
@@ -682,14 +679,14 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             case android.R.id.home:
                 onHomeClicked();
                 return true;
-            case R.id.manage_blocks:
+            case R.id.menu_manage_blocks:
                 if (isLeftDrawerOpen()) {
                     closeLeftDrawer();
                 }
                 Fragment fragment = new BlocksFragment();
                 getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, BlocksFragment.TAG).addToBackStack(null).commit();
                 return true;
-            case R.id.people_in_group:
+            case R.id.menu_who_is_online:
                 if (isLeftDrawerOpen()) {
                     closeLeftDrawer();
                 }
@@ -697,14 +694,14 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                     openRightDrawer();
                 }
                 return true;
-            case R.id.invite_menu:
+            case R.id.menu_invite:
                 sendInvitation();
                 return true;
             case R.id.crash_menu:
                 FirebaseCrash.logcat(Log.ERROR, TAG, "crash caused");
                 causeCrash();
                 return true;
-            case R.id.sign_out_menu:
+            case R.id.menu_sign_out:
                 signout();
                 return true;
             case R.id.fresh_config_menu:
@@ -715,6 +712,9 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 return true;
             case R.id.download:
                 //beginDownload();
+                return true;
+            case R.id.menu_pending_requests:
+                onPendingRequestsClicked();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -842,10 +842,25 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         setupRightDrawerContent();
     }
 
-    private MyProfilePicListener mMyProfilePicListener = new MyProfilePicListener() {
+    private LeftDrawerEventListener mLeftDrawerEventListener = new LeftDrawerEventListener() {
         @Override
         public void onProfilePicChangeRequest(boolean isLaunchCamera) {
             GroupChatActivity.this.onProfilePicChangeRequest(isLaunchCamera);
+        }
+
+        @Override
+        public void onPendingRequestsClicked() {
+            GroupChatActivity.this.onPendingRequestsClicked();
+        }
+
+        @Override
+        public void onPendingRequestsAvailable() {
+            mIsPendingRequestsAvailable = true;
+        }
+
+        @Override
+        public void onPendingRequestsCleared() {
+            mIsPendingRequestsAvailable = false;
         }
     };
 
@@ -863,7 +878,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         View drawerView = getLayoutInflater().inflate(R.layout.left_drawer_layout, navigationView, false);
         navigationView.addView(drawerView);
         navigationView.addHeaderView(headerView);
-        mLeftDrawerHelper = new LeftDrawerHelper(this, this, mDrawerLayout, mMyProfilePicListener);
+        mLeftDrawerHelper = new LeftDrawerHelper(this, this, mDrawerLayout, mLeftDrawerEventListener);
         mLeftDrawerHelper.setup(navigationView);
         mLeftDrawerHelper.setUserLikedUserListener(mUserLikedUserListener);
 
@@ -1245,7 +1260,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                     MLog.e(TAG, "saveUser() failed via uploadFromUri() ", error);
                 }
             });
-            mLeftDrawerHelper.updateProfilePic(myUserid(), photoUrl);
+            mLeftDrawerHelper.updateProfilePic(photoUrl);
         }
     }
 
@@ -1483,6 +1498,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         defaultConfigMap.put(Constants.KEY_MAX_MESSAGE_LENGTH, Constants.DEFAULT_MAX_MESSAGE_LENGTH);
         defaultConfigMap.put(Constants.KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM, Constants.DEFAULT_MAX_PERISCOPABLE_LIKES_PER_ITEM);
         defaultConfigMap.put(Constants.KEY_ALLOW_DELETE_OTHER_MESSAGES, Constants.DEFAULT_ALLOW_DELETE_OTHER_MESSAGES);
+        defaultConfigMap.put(Constants.KEY_DO_SHORTEN_IMAGE_URLS, Constants.DEFAULT_DO_SHORTEN_IMAGE_URLS);
 
         // Apply config settings and default values.
         mFirebaseRemoteConfig.setConfigSettings(firebaseRemoteConfigSettings);
@@ -1522,4 +1538,22 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     }
 
+    private void onPendingRequestsClicked() {
+        closeLeftDrawer();
+        Fragment fragment = new RequestsFragment();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, RequestsFragment.TAG).addToBackStack(null).commit();
+    }
+
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (menu == null) return false;
+        if (!mIsPendingRequestsAvailable) {
+            if (menu.findItem(R.id.menu_pending_requests) != null)
+                menu.removeItem(R.id.menu_pending_requests);
+        } else {
+            if (menu.findItem(R.id.menu_pending_requests) == null)
+                menu.add(0, R.id.menu_pending_requests, 0, getString(R.string.menu_option_pending_requests));
+        }
+        return super.onMenuOpened(featureId, menu);
+    }
 }

@@ -21,6 +21,7 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.services.urlshortener.Urlshortener;
 import com.google.api.services.urlshortener.model.Url;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -350,6 +351,11 @@ public class PhotoUploadHelper {
     }
 
     private void postProcessPhoto(final String photoUrl, final boolean isPossibleAdult, final boolean isPossibleViolence) {
+
+        if (!FirebaseRemoteConfig.getInstance().getBoolean(Constants.KEY_ALLOW_DELETE_OTHER_MESSAGES)) {
+            mListener.onPhotoUploadSuccess(photoUrl, isPossibleAdult, isPossibleViolence);
+            return;
+        }
         ThreadWrapper.executeInWorkerThread(new Runnable() {
             @Override
             public void run() {
@@ -362,6 +368,13 @@ public class PhotoUploadHelper {
                     url = urlshortener.url().insert(url).setKey(Constants.GOOGLE_API_KEY).execute();
                 } catch (Exception e) {
                     MLog.e(TAG, "", e);
+                    ThreadWrapper.executeInUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mListener.onPhotoUploadSuccess(photoUrl, isPossibleAdult, isPossibleViolence);
+                        }
+                    });
+                    return;
                 }
                 final String newUrl = url != null && url.getId() != null ? url.getId() : photoUrl;
                 MLog.d(TAG, "shortened url: " + newUrl);

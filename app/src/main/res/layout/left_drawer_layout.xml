@@ -1,15 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="@dimen/left_drawer_header_height">
+    android:layout_marginTop="@dimen/left_drawer_header_height"
+    android:orientation="vertical">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/drawerRecyclerView"
+    <FrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/left_drawer_list_background_color"
-        />
-</FrameLayout>
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/drawerRecyclerView"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/left_drawer_list_background_color"
+            />
+
+    </FrameLayout>
+
+    <com.instachat.android.view.CustomFontTextView
+        android:id="@+id/menu_pending_requests"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark"
+        android:drawableLeft="@drawable/ic_notifications_white_18dp"
+        android:drawablePadding="6dp"
+        android:paddingBottom="8dp"
+        android:paddingLeft="6dp"
+        android:paddingTop="8dp"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        android:textStyle="bold|italic"
+        android:visibility="gone"
+        app:font="Lato-HeavyItalic.ttf"/>
+</LinearLayout>

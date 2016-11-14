@@ -40,6 +40,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.blocks.BlockUserDialogHelper;
+import com.instachat.android.blocks.ReportUserDialogHelper;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.model.GroupChatSummary;
 import com.instachat.android.model.PrivateChatSummary;
@@ -52,6 +53,8 @@ import com.tooltip.Tooltip;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Map;
 
 /**
  * Created by kevin on 9/16/2016.
@@ -111,7 +114,6 @@ public class PrivateChatActivity extends GroupChatActivity {
             public void onResponse(JSONObject response) {
                 try {
                     mToUser = User.fromResponse(response);
-                    createPrivateChatSummary();
                     populateUserProfile();
                     //getSupportActionBar().setTitle(mToUser.getUsername());
                     setCustomTitles(mToUser.getUsername(), mToUser.getLastOnline());
@@ -207,12 +209,12 @@ public class PrivateChatActivity extends GroupChatActivity {
                 MLog.d(TAG, "mAppBarLayout.height: " + appBarLayout.getHeight(), " verticalOffset ", verticalOffset, " toolbarHeight ", getToolbarHeight(), " alpha ", alpha);
                 if (verticalOffset == 0) {
                     mIsAppBarExpanded = true;
-                    invalidateOptionsMenu();
+                    //invalidateOptionsMenu();
 
                 } else if (Math.abs(verticalOffset) + getToolbarHeight() == appBarLayout.getHeight()) {
                     mIsAppBarExpanded = false;
                     checkIfSeenToolbarProfileTooltip(mProfilePic);
-                    invalidateOptionsMenu();
+                    //invalidateOptionsMenu();
                 }
             }
         });
@@ -263,35 +265,16 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     private boolean mIsAppBarExpanded = true; //initially it's expanded
 
-    /**
-     * If the relationship has already been established, don't
-     * create it.  Otherwise, create it.
-     */
-    private void createPrivateChatSummary() {
+    private void initializePrivateChatSummary() {
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF())
                 .child(mToUser.getId() + "");
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() == null || !dataSnapshot.hasChild("name")) {
-                    ref.removeEventListener(this);
-                    PrivateChatSummary summary = new PrivateChatSummary();
-                    summary.setName(mToUser.getUsername());
-                    summary.setDpid(mToUser.getProfilePicUrl());
-                    ref.updateChildren(summary.toMap());
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void updatePrivateChatSummaryLastMessageSentTimestamp() {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
-        ref.child(mToUser.getId() + "").child(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP).setValue(ServerValue.TIMESTAMP);
+        PrivateChatSummary summary = new PrivateChatSummary();
+        summary.setName(mToUser.getUsername());
+        summary.setDpid(mToUser.getProfilePicUrl());
+        summary.setAccepted(true);
+        Map<String, Object> map = summary.toMap();
+        map.put(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP, ServerValue.TIMESTAMP);
+        ref.updateChildren(map);
     }
 
     @Override
@@ -339,7 +322,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         if (mIsAppBarExpanded) {
             mAppBarLayout.setExpanded(false, true);
         }
-        updatePrivateChatSummaryLastMessageSentTimestamp();
+        initializePrivateChatSummary();
     }
 
     @Override
@@ -540,47 +523,28 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        selectMenu(menu);
-        return true;
-    }
-
-    private void selectMenu(Menu menu) {
-        menu.clear();
         MenuInflater inflater = getMenuInflater();
-        if (sToUserid == myUserid()) {
-            if (!mIsAppBarExpanded)
-                inflater.inflate(R.menu.private_chat_options_menu_myself, menu);
-            else
-                inflater.inflate(R.menu.private_chat_options_menu_myself_no_view_profile, menu);
-        } else {
-            if (!mIsAppBarExpanded)
-                inflater.inflate(R.menu.private_chat_options_menu, menu);
-            else
-                inflater.inflate(R.menu.private_chat_options_menu_no_view_profile, menu);
-        }
-
+        inflater.inflate(R.menu.private_chat_options_menu, menu);
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                onHomeClicked();
-                return true;
-            case R.id.view_profile:
+            case R.id.menu_view_profile:
                 if (!mIsAppBarExpanded)
                     toggleAppbar();
                 return true;
-            case R.id.invite_menu:
-                sendInvitation();
-                return true;
-            case R.id.block:
+            case R.id.menu_block_user:
                 new BlockUserDialogHelper().showBlockUserQuestionDialog(this, mToUser.getId(),
                         mToUser.getUsername(),
                         mToUser.getProfilePicUrl(),
                         getBlockedUserListener());
                 return true;
-            case R.id.report:
+            case R.id.menu_report_user:
+                new ReportUserDialogHelper().showReportUserQuestionDialog(this, mToUser.getId(),
+                        mToUser.getUsername(),
+                        mToUser.getProfilePicUrl());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -758,4 +722,17 @@ public class PrivateChatActivity extends GroupChatActivity {
         });
     }
 
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (menu == null) return false;
+        if (sToUserid == myUserid()) {
+            if (menu.findItem(R.id.menu_block_user) != null) {
+                menu.removeItem(R.id.menu_block_user);
+            }
+            if (menu.findItem(R.id.menu_report_user) != null) {
+                menu.removeItem(R.id.menu_report_user);
+            }
+        }
+        return super.onMenuOpened(featureId, menu);
+    }
 }
