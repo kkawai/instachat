@@ -54,7 +54,7 @@ public final class OneTimeMessageDb {
 
     }
 
-    public static final String getDbName() {
+    private static final String getDbName() {
         return Preferences.getInstance().getUserId() + ".db";
     }
 
