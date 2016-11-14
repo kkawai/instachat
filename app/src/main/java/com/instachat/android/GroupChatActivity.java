@@ -134,7 +134,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private LeftDrawerHelper mLeftDrawerHelper;
     private String mDatabaseRoot;
     private boolean mIsStartedAnimation;
-    //private AnimatedDotLoadingView mDotsLoader;
     private View mDotsLayoutParent;
     private ChatSummariesRecyclerAdapter mChatsRecyclerViewAdapter;
     private GroupChatUsersRecyclerAdapter mGroupChatUsersRecyclerAdapter;
@@ -530,11 +529,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         // Show loading spinner
         showProgressDialog();
     }*/
-
-    private void showMessageDialog(String title, String message) {
-        AlertDialog ad = new AlertDialog.Builder(this).setTitle(title).setMessage(message).create();
-        ad.show();
-    }
 
     private void showProgressDialog() {
         if (mProgressDialog == null) {
