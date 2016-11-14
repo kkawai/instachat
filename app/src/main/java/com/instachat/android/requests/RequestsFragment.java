@@ -55,7 +55,7 @@ public class RequestsFragment extends BaseFragment {
                 acceptUserPrompt(userid, username, dpid, transitionImageView);
             }
         };
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_REQUESTS());
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_REQUESTS_REF());
         mRequestsAdapter = new RequestsAdapter(PrivateChatSummary.class, R.layout.item_request, MessageViewHolder.class, ref);
         mRequestsAdapter.setUserClickedListener(mUserClickedListener);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -76,7 +76,7 @@ public class RequestsFragment extends BaseFragment {
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
                         sweetAlertDialog.cancel();
-                        FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT(userid, Preferences.getInstance().getUserId())).removeValue();
+                        FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(userid, Preferences.getInstance().getUserId())).removeValue();
                         FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF()).child("" + userid).removeValue();
                     }
                 }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
@@ -102,7 +102,7 @@ public class RequestsFragment extends BaseFragment {
                         /**
                          * remove the person from your pending requests
                          */
-                        FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT(userid, Preferences.getInstance().getUserId())).
+                        FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(userid, Preferences.getInstance().getUserId())).
                                 removeValue().
                                 addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override

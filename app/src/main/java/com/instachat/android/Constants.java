@@ -1,10 +1,5 @@
 package com.instachat.android;
 
-import android.net.Uri;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.instachat.android.util.Preferences;
 
 /**
@@ -157,16 +152,9 @@ public final class Constants {
     public static final String KEY_FRIENDLY_MESSAGE_DATABASE = "key_fm_database";
     public static final String KEY_STARTING_POS = "key_starting_pos";
 
-    public static void DP_URL(int userid, String dpid, OnCompleteListener<Uri> onCompleteListener) {
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference();
-        storageReference.child(DP_STORAGE_BASE_REF(userid) + dpid).getDownloadUrl().addOnCompleteListener(onCompleteListener);
-    }
-
     public static String USER_INFO_REF(int userid) {
         return "/users/" + userid + "/info";
     }
-
-    public static final String LAST_ONLINE_CHILD = "lastOnline";
 
     public static String PRIVATE_CHAT_REF(int toUserid) {
         final int myUserid = Preferences.getInstance().getUserId();
@@ -182,11 +170,11 @@ public final class Constants {
         return "/users/" + Preferences.getInstance().getUserId() + "/private_summaries/";
     }
 
-    public static String MY_PRIVATE_REQUESTS() {
+    public static String MY_PRIVATE_REQUESTS_REF() {
         return "/users/" + Preferences.getInstance().getUserId() + "/private_requests/";
     }
 
-    public static String PRIVATE_REQUEST_STATUS_PARENT(int fromUserid, int toUserid) {
+    public static String PRIVATE_REQUEST_STATUS_PARENT_REF(int fromUserid, int toUserid) {
         return "/users/" + toUserid + "/private_requests/" + fromUserid;
     }
 
@@ -208,6 +196,10 @@ public final class Constants {
 
     public static String GROUP_CHAT_USERS_TYPING_PARENT_REF(long groupid) {
         return "/public_group_users_typing/" + groupid;
+    }
+
+    public static String REPORTS_REF(int userid) {
+        return "/reports/" + userid;
     }
 
     public static String PUBLIC_CHATS_SUMMARY_PARENT_REF = "/public_group_summaries/";
@@ -284,6 +276,7 @@ public final class Constants {
     public static final String CHILD_USERNAME = "username";
     public static final String CHILD_MESSAGE_CONSUMED_BY_PARTNER = "consumedByPartner";
     public static final String CHILD_ACCEPTED = "accepted";
+    public static final String CHILD_LAST_ONLINE = "lastOnline";
 
     /**
      * Any message received by a user whose last message

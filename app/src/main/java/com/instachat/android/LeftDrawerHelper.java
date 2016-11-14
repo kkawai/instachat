@@ -572,7 +572,7 @@ public class LeftDrawerHelper {
                 mLeftDrawerEventListener.onPendingRequestsClicked();
             }
         });
-        mPrivateChatRequestsRef = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_REQUESTS());
+        mPrivateChatRequestsRef = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_REQUESTS_REF());
         mPrivateChatRequestsListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {

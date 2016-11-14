@@ -230,7 +230,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     privateChatSummary.setLastMessageSentTimestamp(System.currentTimeMillis());
                     privateChatSummary.setAccepted(false);
                     //Create PrivateChatSummary under private_requests
-                    FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT(friendlyMessage.getUserid(), myUserid)).setValue(privateChatSummary);
+                    FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(friendlyMessage.getUserid(), myUserid)).setValue(privateChatSummary);
                 }
             }
 

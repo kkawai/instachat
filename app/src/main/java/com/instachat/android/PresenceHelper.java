@@ -40,7 +40,7 @@ public class PresenceHelper {
 
                     //myConnectionsRef.onDisconnect().removeValue();
                     //userInfoRef.updateChildren(me.toMap(true));
-                    userInfoRef.child(Constants.LAST_ONLINE_CHILD).setValue(ServerValue.TIMESTAMP);
+                    userInfoRef.child(Constants.CHILD_LAST_ONLINE).setValue(ServerValue.TIMESTAMP);
                     // when I disconnect, update the last time I was seen online
                 }
             }

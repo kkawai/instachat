@@ -40,6 +40,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.blocks.BlockUserDialogHelper;
+import com.instachat.android.blocks.ReportUserDialogHelper;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.model.GroupChatSummary;
 import com.instachat.android.model.PrivateChatSummary;
@@ -541,6 +542,9 @@ public class PrivateChatActivity extends GroupChatActivity {
                         getBlockedUserListener());
                 return true;
             case R.id.menu_report_user:
+                new ReportUserDialogHelper().showReportUserQuestionDialog(this, mToUser.getId(),
+                        mToUser.getUsername(),
+                        mToUser.getProfilePicUrl());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
