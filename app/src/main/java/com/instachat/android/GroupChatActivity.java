@@ -112,7 +112,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private View mSendButton, mAttachButton;
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
-    private MessagesRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
+    private MessagesRecyclerAdapter<FriendlyMessage, MessageViewHolder> mMessagesAdapter;
     private ProgressBar mProgressBar;
     private FirebaseAuth mFirebaseAuth;
     //private FirebaseUser mFirebaseUser;
@@ -192,7 +192,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         FuelInjector.ignite(this, this);
 
         mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mMessageRecyclerView.setAdapter(mFirebaseAdapter);
+        mMessageRecyclerView.setAdapter(mMessagesAdapter);
 
         // Initialize and request AdMob ad.
         /*
@@ -416,8 +416,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     public void onDestroy() {
         if (mPhotoUploadHelper != null)
             mPhotoUploadHelper.cleanup();
-        if (mFirebaseAdapter != null)
-            mFirebaseAdapter.cleanup();
+        if (mMessagesAdapter != null)
+            mMessagesAdapter.cleanup();
         if (mLeftDrawerHelper != null)
             mLeftDrawerHelper.cleanup();
         if (mAdView != null)
@@ -624,7 +624,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     private void sendText(FriendlyMessage friendlyMessage) {
         try {
-            mFirebaseAdapter.sendFriendlyMessage(friendlyMessage);
+            mMessagesAdapter.sendFriendlyMessage(friendlyMessage);
             mMessageEditText.setText("");//fast double taps on send can cause 2x sends!
         } catch (Exception e) {
             MLog.e(TAG, "", e);
@@ -669,7 +669,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         try {
             if (isActivityDestroyed())
                 return;
-            mMessageRecyclerView.scrollToPosition(mFirebaseAdapter.getItemCount() - 1);
+            mMessageRecyclerView.scrollToPosition(mMessagesAdapter.getItemCount() - 1);
             updateLastActiveTimestamp();
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
@@ -1026,7 +1026,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     @Override
     public FriendlyMessage getFriendlyMessage(int position) {
-        return mFirebaseAdapter.getItem(position);
+        return mMessagesAdapter.getItem(position);
     }
 
     @Override
@@ -1036,7 +1036,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     @Override
     public int getFriendlyMessageCount() {
-        return mFirebaseAdapter.getItemCount();
+        return mMessagesAdapter.getItemCount();
     }
 
     @Override
@@ -1071,10 +1071,17 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         public void onUserBlocked(int userid) {
             GroupChatActivity.this.onUserBlocked(userid);
         }
+
+        @Override
+        public void onUserUnblocked(int userid) {
+            GroupChatActivity.this.onUserUnblocked(userid);
+        }
     };
 
     protected void onUserBlocked(int userid) {
+    }
 
+    protected void onUserUnblocked(int userid) {
     }
 
     protected boolean isPrivateChat() {
@@ -1082,35 +1089,35 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     }
 
     private void initFirebaseAdapter() {
-        mFirebaseAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class, R.layout.item_message, MessageViewHolder.class,
+        mMessagesAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class, R.layout.item_message, MessageViewHolder.class,
                 FirebaseDatabase.getInstance().
                         getReference(mDatabaseRoot).
                         limitToLast((int) mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)));
-        mFirebaseAdapter.setIsPrivateChat(isPrivateChat());
-        mFirebaseAdapter.setDatabaseRoot(mDatabaseRoot);
-        mFirebaseAdapter.setActivity(this, this, (FrameLayout) findViewById(R.id.fragment_content));
-        mFirebaseAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {
+        mMessagesAdapter.setIsPrivateChat(isPrivateChat());
+        mMessagesAdapter.setDatabaseRoot(mDatabaseRoot);
+        mMessagesAdapter.setActivity(this, this, (FrameLayout) findViewById(R.id.fragment_content));
+        mMessagesAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {
             @Override
             public void onViewHolderPopulated() {
                 if (mProgressBar.isShown())
                     mProgressBar.setVisibility(ProgressBar.GONE);
             }
         });
-        mFirebaseAdapter.setMessageTextClickedListener(new MessageTextClickedListener() {
+        mMessagesAdapter.setMessageTextClickedListener(new MessageTextClickedListener() {
             @Override
             public void onMessageClicked(final int position) {
                 openFullScreenTextView(position);
             }
         });
-        mFirebaseAdapter.setBlockedUserListener(mBlockedUserListener);
-        mFirebaseAdapter.setFriendlyMessageListener(this);
-        mFirebaseAdapter.setUserThumbClickedListener(this);
-        mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+        mMessagesAdapter.setBlockedUserListener(mBlockedUserListener);
+        mMessagesAdapter.setFriendlyMessageListener(this);
+        mMessagesAdapter.setUserThumbClickedListener(this);
+        mMessagesAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
 
                 super.onItemRangeInserted(positionStart, itemCount);
-                int friendlyMessageCount = mFirebaseAdapter.getItemCount();
+                int friendlyMessageCount = mMessagesAdapter.getItemCount();
                 int lastVisiblePosition = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
                 // If the recycler view is initially being loaded or the user is at the bottom of the list, scroll
                 // to the bottom of the list to show the newly added message.
@@ -1261,7 +1268,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             friendlyMessage.setMessageType(mAttachPhotoMessageType);
             MLog.d(TAG, "uploadFromUri:onSuccess photoUrl: " + photoUrl, " debug possibleAdult: ", friendlyMessage.isPossibleAdultImage(), " parameter: ", isPossiblyAdultImage);
             try {
-                mFirebaseAdapter.sendFriendlyMessage(friendlyMessage);
+                mMessagesAdapter.sendFriendlyMessage(friendlyMessage);
             } catch (final Exception e) {
                 MLog.e(TAG, "", e);
             }
@@ -1575,6 +1582,14 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         } else {
             if (menu.findItem(R.id.menu_pending_requests) == null)
                 menu.add(0, R.id.menu_pending_requests, 0, getString(R.string.menu_option_pending_requests));
+        }
+        if (mMessagesAdapter != null && mMessagesAdapter.getNumBlockedUsers() > 0) {
+            if (menu.findItem(R.id.menu_manage_blocks) == null) {
+                menu.add(0, R.id.menu_manage_blocks, 1, getString(R.string.manage_blocks));
+            }
+        } else {
+            if (menu.findItem(R.id.menu_manage_blocks) != null)
+                menu.removeItem(R.id.menu_manage_blocks);
         }
         return super.onMenuOpened(featureId, menu);
     }
