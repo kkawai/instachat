@@ -86,6 +86,7 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.Theme_App);
         super.onCreate(savedInstanceState);
         MLog.d(TAG, "onCreate() ");
         onNewIntent(getIntent());
@@ -568,6 +569,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         if (userid == getActiveUserid()) {
             finish();
         }
+        super.onUserBlocked(userid);
     }
 
     private long mLastOnlineTimestamp = 0;
