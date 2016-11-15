@@ -79,7 +79,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private static final int PAYLOAD_IMAGE_REVEAL = 1;
 
     private StorageReference mStorageRef;
-    private DatabaseReference mFirebaseDatabaseReference;
+    private DatabaseReference mMessagesRef;
     private WeakReference<Activity> mActivity;
     private ActivityState mActivityState;
     private AdapterPopulateHolderListener mAdapterPopulateHolderListener;
@@ -95,7 +95,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
     public MessagesRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref) {
         super(modelClass, modelLayout, viewHolderClass, ref);
-        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mMessagesRef = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mMaxPeriscopesPerItem = (int) FirebaseRemoteConfig.getInstance().getLong(Constants.KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM);
         mMyUserid = Preferences.getInstance().getUserId();
@@ -305,7 +305,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
     private void likeFriendlyMessage(MessageViewHolder holder) {
         final FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
-        DatabaseReference ref = mFirebaseDatabaseReference.child(mDatabaseRef).child(friendlyMessage.getId()).child(Constants.CHILD_LIKES);
+        DatabaseReference ref = mMessagesRef.child(mDatabaseRef).child(friendlyMessage.getId()).child(Constants.CHILD_LIKES);
         LikesHelper.getInstance().likeFriendlyMessage(friendlyMessage, ref);
     }
 
@@ -443,7 +443,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 if (mMyUserid != friendlyMessage.getUserid() && friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_NORMAL) {
                     //my partner reading the message for the first time
                     friendlyMessage.setConsumedByPartner(true);//set locally for optimization purposes
-                    mFirebaseDatabaseReference.child(mDatabaseRef).child(friendlyMessage.getId()).child(Constants.CHILD_MESSAGE_CONSUMED_BY_PARTNER).setValue(true); //save remotely
+                    mMessagesRef.child(mDatabaseRef).child(friendlyMessage.getId()).child(Constants.CHILD_MESSAGE_CONSUMED_BY_PARTNER).setValue(true); //save remotely
                     viewHolder.messageReadConfirmationView.setImageResource(R.drawable.ic_done_all_black_18dp);
                 } else {
                     //just me reading my own message again
@@ -481,7 +481,8 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         mAdapterPopulateHolderListener = null;
         mMessageTextClickedListener = null;
         mBlockedUserListener = null;
-        mFirebaseDatabaseReference.child(Constants.MY_BLOCKS_REF()).removeEventListener(mBlockedUsersListener);
+        if (mBlockedUsersRef != null && mBlockedUsersListener != null)
+            mBlockedUsersRef.removeEventListener(mBlockedUsersListener);
     }
 
     public void sendFriendlyMessage(final FriendlyMessage friendlyMessage) {
@@ -508,7 +509,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                         if (!currdpid.equals(lastdpid)) {
                             lastFriendlyMessage.setDpid(currdpid);
                         }
-                        mFirebaseDatabaseReference.child(mDatabaseRef).child(lastFriendlyMessage.getId()).updateChildren(lastFriendlyMessage.toMap()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        mMessagesRef.child(mDatabaseRef).child(lastFriendlyMessage.getId()).updateChildren(lastFriendlyMessage.toMap()).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
@@ -530,14 +531,14 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             }
         }
 
-        mFirebaseDatabaseReference.child(mDatabaseRef).push().addListenerForSingleValueEvent(new ValueEventListener() {
+        mMessagesRef.child(mDatabaseRef).push().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (mActivityState == null || mActivityState.isActivityDestroyed())
                     return;
                 friendlyMessage.setId(dataSnapshot.getKey());
                 MLog.d(TAG, "pushed message. debug possibleAdult content ", friendlyMessage.isPossibleAdultImage());
-                mFirebaseDatabaseReference.child(mDatabaseRef).child(friendlyMessage.getId()).setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
+                mMessagesRef.child(mDatabaseRef).child(friendlyMessage.getId()).setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
@@ -566,6 +567,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     }
 
     private ChildEventListener mBlockedUsersListener;
+    private DatabaseReference mBlockedUsersRef;
     private Map<Integer, Boolean> mBlockedUsers = new Hashtable<>(20);
     private boolean mIsListeningForBlockedUsers;
 
@@ -615,7 +617,8 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
                     }
                 };
-                mFirebaseDatabaseReference.child(Constants.MY_BLOCKS_REF()).addChildEventListener(mBlockedUsersListener);
+                mBlockedUsersRef = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF());
+                mBlockedUsersRef.addChildEventListener(mBlockedUsersListener);
             }
         }, 2000);
     }

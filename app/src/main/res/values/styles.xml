@@ -1,8 +1,15 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="Theme.App" parent="Theme.Base.App">
+    <style name="Theme.Launcher" parent="@style/Theme.AppCompat.Light">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@drawable/splash_drawable</item>
     </style>
+
+    <!-- Base application theme. -->
+    <style name="Theme.App" parent="Theme.Base.App"/>
 
     <style name="Theme.Base.App" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your theme here. -->

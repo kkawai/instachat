@@ -75,7 +75,8 @@
 
         <activity
             android:name=".PrivateChatActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Launcher">
         </activity>
 
         <activity
@@ -83,8 +84,9 @@
         </activity>
 
         <activity
-            android:name=".login.FirstActivity"
-            android:screenOrientation="portrait">
+            android:name=".login.LauncherActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
