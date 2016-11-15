@@ -322,6 +322,14 @@ public class FriendlyMessage implements Parcelable {
         return imageUrl;
     }
 
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
     public int getUserid() {
         return userid;
     }

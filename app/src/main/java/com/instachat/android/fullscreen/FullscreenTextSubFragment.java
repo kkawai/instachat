@@ -73,7 +73,18 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
             }
         });
 
+        final String photoNotAvailable = getResources().getString(R.string.photo_not_available);
+
         MLog.d(TAG, "onActivityCreated() friendlyMessage: " + mFriendlyMessage.toString());
+
+        if (mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
+            if (OneTimeMessageDb.getInstance().messageExists(mFriendlyMessage.getId())) {
+                if (!TextUtils.isEmpty(mFriendlyMessage.getImageUrl())) {
+                    mFriendlyMessage.setImageUrl(null);
+                    mFriendlyMessage.setText(photoNotAvailable);
+                }
+            }
+        }
 
         if (!TextUtils.isEmpty(mFriendlyMessage.getImageUrl())) {
             mZoomableImageView.setZoomableImageListener(this);
@@ -100,12 +111,14 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
 
         if (mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
             if (OneTimeMessageDb.getInstance().messageExists(mFriendlyMessage.getId())) {
-                mAutoResizeTextView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        TextViewUtil.blurText(mAutoResizeTextView, true);
-                    }
-                });
+                if (!mFriendlyMessage.getText().equals(photoNotAvailable)) {
+                    mAutoResizeTextView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            TextViewUtil.blurText(mAutoResizeTextView, true);
+                        }
+                    });
+                }
             }
         }
 

@@ -1,8 +1,10 @@
 package com.instachat.android.adapter;
 
+import android.content.Context;
+
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.instachat.android.MyApp;
-import com.instachat.android.R;
 import com.instachat.android.db.RssDb;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.model.Rss;
@@ -10,6 +12,8 @@ import com.instachat.android.util.MLog;
 import com.leocardz.link.preview.library.LinkPreviewCallback;
 import com.leocardz.link.preview.library.SourceContent;
 import com.leocardz.link.preview.library.TextCrawler;
+
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 /**
  * Created by kevin on 9/20/2016.
@@ -44,7 +48,14 @@ public class WebLinkHelper {
                 viewHolder.webLinkTitle.setText(sourceContent.getTitle() + "");
                 viewHolder.webLinkUrl.setText(sourceContent.getCannonicalUrl() + "");
                 if (sourceContent.getImages().size() > 0) {
-                    Glide.with(MyApp.getInstance()).load(sourceContent.getImages().get(0)).into(viewHolder.webLinkImageView);
+                    final Context c = viewHolder.webLinkImageView.getContext();
+                    Glide.with(viewHolder.webLinkImageView.getContext()).
+                            load(sourceContent.getImages().get(0)).
+                            bitmapTransform(
+                                    new CenterCrop(c),
+                                    new RoundedCornersTransformation(c, 30, 0, RoundedCornersTransformation.CornerType.ALL)).
+                            crossFade().
+                            into(viewHolder.webLinkImageView);
                     rss.setImageUrl(sourceContent.getImages().get(0));
                 }
                 MLog.d(TAG, "saved link in rss db. basic link: " + rss.getBasicLink() + " main rss link: " + rss.getLink());

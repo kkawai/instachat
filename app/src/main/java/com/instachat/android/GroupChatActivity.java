@@ -16,7 +16,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -573,6 +572,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         };
     }*/
 
+    private int mAttachPhotoMessageType;
+
     private void initButtons() {
         mSendButton = findViewById(R.id.sendButton);
         mAttachButton = findViewById(R.id.attachButton);
@@ -596,7 +597,27 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             public void onClick(View view) {
                 if (isNeedsDp())
                     return;
+                mAttachPhotoMessageType = FriendlyMessage.MESSAGE_TYPE_NORMAL;
                 showFileOptions();
+            }
+        });
+        mAttachButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                new MessageOptionsDialogHelper().showSendOptions(GroupChatActivity.this, mAttachButton, null, new MessageOptionsDialogHelper.SendOptionsListener() {
+                    @Override
+                    public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
+                        mAttachPhotoMessageType = FriendlyMessage.MESSAGE_TYPE_NORMAL;
+                        showFileOptions();
+                    }
+
+                    @Override
+                    public void onSendOneTimeRequested(FriendlyMessage friendlyMessage) {
+                        mAttachPhotoMessageType = FriendlyMessage.MESSAGE_TYPE_ONE_TIME;
+                        showFileOptions();
+                    }
+                });
+                return true;
             }
         });
     }
@@ -1237,6 +1258,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             final FriendlyMessage friendlyMessage = new FriendlyMessage("", myUsername(), myUserid(), myDpid(),
                     photoUrl, isPossiblyAdultImage, isPossiblyViolentImage, null,
                     System.currentTimeMillis());
+            friendlyMessage.setMessageType(mAttachPhotoMessageType);
             MLog.d(TAG, "uploadFromUri:onSuccess photoUrl: " + photoUrl, " debug possibleAdult: ", friendlyMessage.isPossibleAdultImage(), " parameter: ", isPossiblyAdultImage);
             try {
                 mFirebaseAdapter.sendFriendlyMessage(friendlyMessage);

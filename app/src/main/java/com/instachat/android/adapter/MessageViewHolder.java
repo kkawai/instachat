@@ -58,7 +58,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         messageReadConfirmationView = (ImageView)itemView.findViewById(R.id.messageReadConfirmationView);
 
         webLinkParent = itemView.findViewById(R.id.web_clipping_parent);
-        webLinkImageView = (ImageView) itemView.findViewById(R.id.image_post);
+        webLinkImageView = (ImageView) itemView.findViewById(R.id.web_link_image);
         webLinkTitle = (TextView) itemView.findViewById(R.id.title);
         webLinkUrl = (TextView) itemView.findViewById(R.id.url);
         webLinkDescription = (TextView) itemView.findViewById(R.id.description);

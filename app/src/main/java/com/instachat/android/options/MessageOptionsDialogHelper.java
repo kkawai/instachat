@@ -47,7 +47,7 @@ public class MessageOptionsDialogHelper {
     public void showSendOptions(
             @NonNull final Context context,
             @NonNull final View anchor,
-            @NonNull final FriendlyMessage friendlyMessage,
+            final FriendlyMessage friendlyMessage,
             @NonNull final SendOptionsListener listener) {
 
         PopupMenu popupMenu = new PopupMenu(context, anchor);

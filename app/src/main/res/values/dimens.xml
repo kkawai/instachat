@@ -37,11 +37,6 @@
     <dimen name="profile_header_height">380dp</dimen>
     <dimen name="private_activity_profile_pic_size">200dp</dimen>
 
-    <!-- posted photos -->
-    <dimen name="posted_photo_rounded_corner_reverse_padding">-6dp</dimen>
-    <dimen name="posted_photo_rounded_corner_padding">6dp</dimen>
-    <dimen name="posted_photo_rounded_corner_radius">18dp</dimen>
-
     <!-- sweet alert dialog -->
     <dimen name="alert_width">290dp</dimen>
     <dimen name="common_circle_width">3dp</dimen>
