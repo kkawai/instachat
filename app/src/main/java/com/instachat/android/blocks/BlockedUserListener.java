@@ -6,4 +6,5 @@ package com.instachat.android.blocks;
 
 public interface BlockedUserListener {
     void onUserBlocked(int userid);
+    void onUserUnblocked(int userid);
 }

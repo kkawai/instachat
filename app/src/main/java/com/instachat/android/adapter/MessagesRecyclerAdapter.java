@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.ClipboardManager;
@@ -39,6 +40,7 @@ import com.instachat.android.R;
 import com.instachat.android.blocks.BlockUserDialogHelper;
 import com.instachat.android.blocks.BlockedUser;
 import com.instachat.android.blocks.BlockedUserListener;
+import com.instachat.android.blocks.ReportUserDialogHelper;
 import com.instachat.android.db.OneTimeMessageDb;
 import com.instachat.android.likes.LikesHelper;
 import com.instachat.android.model.FriendlyMessage;
@@ -95,7 +97,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         super(modelClass, modelLayout, viewHolderClass, ref);
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
-        listenForBlockedUsers();
         mMaxPeriscopesPerItem = (int) FirebaseRemoteConfig.getInstance().getLong(Constants.KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM);
         mMyUserid = Preferences.getInstance().getUserId();
     }
@@ -143,6 +144,11 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         public void onUserBlocked(int userid) {
             blockUser(userid);
             mBlockedUserListener.onUserBlocked(userid);
+        }
+
+        @Override
+        public void onUserUnblocked(int userid) {
+
         }
     };
 
@@ -402,7 +408,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             return;
         }
 
-        mAdapterPopulateHolderListener.onViewHolderPopulated();
+        listenForBlockedUsers();
 
         int type = getItemViewType(position);
         if (type == ITEM_VIEW_TYPE_WEB_LINK || type == ITEM_VIEW_TYPE_WEB_LINK_ME) {
@@ -561,40 +567,57 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
     private ChildEventListener mBlockedUsersListener;
     private Map<Integer, Boolean> mBlockedUsers = new Hashtable<>(20);
+    private boolean mIsListeningForBlockedUsers;
+
+    public int getNumBlockedUsers() {
+        return mBlockedUsers.size();
+    }
 
     private void listenForBlockedUsers() {
-        mBlockedUsersListener = new ChildEventListener() {
+        if (mIsListeningForBlockedUsers)
+            return;
+        mAdapterPopulateHolderListener.onViewHolderPopulated();
+        mIsListeningForBlockedUsers = true;
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                BlockedUser blockedUser = dataSnapshot.getValue(BlockedUser.class);
-                blockedUser.id = Integer.parseInt(dataSnapshot.getKey());
-                mBlockedUsers.put(blockedUser.id, false);
-                blockUser(blockedUser.id);
+            public void run() {
+                if (mActivityState == null || mActivityState.isActivityDestroyed())
+                    return;
+                mBlockedUsersListener = new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        BlockedUser blockedUser = dataSnapshot.getValue(BlockedUser.class);
+                        blockedUser.id = Integer.parseInt(dataSnapshot.getKey());
+                        mBlockedUsers.put(blockedUser.id, false);
+                        blockUser(blockedUser.id);
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+                        BlockedUser blockedUser = dataSnapshot.getValue(BlockedUser.class);
+                        blockedUser.id = Integer.parseInt(dataSnapshot.getKey());
+                        mBlockedUsers.remove(blockedUser.id);
+                        mBlockedUserListener.onUserUnblocked(blockedUser.id);
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                };
+                mFirebaseDatabaseReference.child(Constants.MY_BLOCKS_REF()).addChildEventListener(mBlockedUsersListener);
             }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                BlockedUser blockedUser = dataSnapshot.getValue(BlockedUser.class);
-                blockedUser.id = Integer.parseInt(dataSnapshot.getKey());
-                mBlockedUsers.remove(blockedUser.id);
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        mFirebaseDatabaseReference.child(Constants.MY_BLOCKS_REF()).addChildEventListener(mBlockedUsersListener);
+        }, 2000);
     }
 
     private void showMessageOptions(final View tempAnchorView, FriendlyMessage friendlyMessage) {
@@ -631,10 +654,10 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
             @Override
             public void onReportPersonRequested(FriendlyMessage friendlyMessage) {
-                if (Preferences.getInstance().getUserId() == friendlyMessage.getUserid()) {
-                    //todo
-                    return; //cannot report yourself dummy!
-                }
+                new ReportUserDialogHelper().showReportUserQuestionDialog(mActivity.get(),
+                        friendlyMessage.getUserid(),
+                        friendlyMessage.getName(),
+                        friendlyMessage.getDpid());
             }
         });
     }

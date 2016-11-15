@@ -568,6 +568,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         if (userid == getActiveUserid()) {
             finish();
         }
+        super.onUserBlocked(userid);
     }
 
     private long mLastOnlineTimestamp = 0;
