@@ -42,6 +42,7 @@
     <color name="chat_bubble_background_color">@android:color/white</color>
     <color name="chat_bubble_background_color_me">@color/jonGray</color>
     <color name="chat_bubble_background_color_pressed">@color/jonGreen</color>
+    <color name-"chat_bubble_background_color_pressed_me">@color/jonGreen</color>
     <color name="chat_sender_username">@android:color/black</color>
     <color name="chat_time_message_sent">#a8a8a8</color>
     <color name="chat_message_color">@android:color/black</color>
