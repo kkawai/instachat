@@ -58,10 +58,15 @@ public class BlockUserDialogHelper {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            new SweetAlertDialog(activity, SweetAlertDialog.SUCCESS_TYPE)
+                            /*new SweetAlertDialog(activity, SweetAlertDialog.SUCCESS_TYPE)
                                     .setTitleText(activity.getString(R.string.success_exclamation))
                                     .setContentText(activity.getString(R.string.block_person_success, username))
-                                    .show();
+                                    .show();*/
+                            /**
+                             * in this case, it's better to show the toast since blocking a user
+                             * happens in private chat, which will be finished
+                             */
+                            Toast.makeText(activity, activity.getString(R.string.block_person_success, username), Toast.LENGTH_SHORT).show();
                             listener.onUserBlocked(userid);
                             FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF())
                                     .child(userid + "")
