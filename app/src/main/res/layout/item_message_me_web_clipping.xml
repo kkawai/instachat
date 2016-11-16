@@ -78,7 +78,7 @@
             app:cmv_arrowPosition="left"
             app:cmv_backgroundColor="@color/chat_bubble_background_color_me"
             app:cmv_backgroundColorPressed="@color/chat_bubble_background_color_pressed_me"
-            app:cmv_cornerRadius="6dp"
+            app:cmv_cornerRadius="18dp"
             app:cmv_showArrow="false">
 
             <LinearLayout

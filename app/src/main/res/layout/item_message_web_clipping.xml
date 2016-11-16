@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,7 +27,7 @@
             app:cmv_arrowPosition="left"
             app:cmv_backgroundColor="@color/chat_bubble_background_color"
             app:cmv_backgroundColorPressed="@color/chat_bubble_background_color_pressed"
-            app:cmv_cornerRadius="6dp"
+            app:cmv_cornerRadius="18dp"
             app:cmv_showArrow="true">
 
             <LinearLayout
