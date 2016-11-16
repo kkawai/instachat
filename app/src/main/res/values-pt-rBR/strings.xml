@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">"Instachat"</string>
+    <string name="invitation_title">"Grupo Chat Convidar"</string>
+    <string name="invitation_cta">"Chamar para ação"</string>
+    <string name="invitation_message">"Por favor, junte-me para uma conversa amigável"</string>
+    <string name="welcome_msg">"Bem-vindo!"</string>
+    <string name="sign_out">"Sair"</string>
+    <string name="contacts_permission_rationale">"O acesso às informações da conta é necessária para fazer login."</string>
+    <string name="invite_menu_label">"Convide Amigos"</string>
+    <string name="sign_in">"Entrar"</string>
+    <string name="forgot_your_password">"Esqueceu sua senha?"</string>
+    <string name="forgot_password">"Esqueceu a senha"</string>
+    <string name="please_enter_username_or_email">"Por favor, indique nome de usuário ou endereço de email"</string>
+    <string name="information_emailed">"Informação foi enviada por email"</string>
+    <string name="find">"Encontrar"</string>
+    <string name="login_with_google">"Entre com o Google"</string>
+    <string name="delete_message_question">"Excluir mensagem"</string>
+    <string name="block">"Bloco"</string>
+    <string name="report">"Reportar"</string>
+    <string name="block_person_title">"Bloqueios %s?"</string>
+    <string name="block_person_question">"Tem certeza de que quer isso? %s não será capaz de enviar mensagens diretas e você não verá mais nenhuma das suas mensagens em qualquer uma das salas de chat. Se desejar, você pode desbloquear mais tarde."</string>
+    <string name="block_person_failed">"Ops! Nós não poderia bloquear %s . Por favor, tente novamente."</string>
+    <string name="block_person_success">"\"Você bloqueou %s?\""</string>
+
+    <string name="unblock_person_title">"Desbloquear %s ?"</string>
+    <string name="unblock_person_question">"Tem certeza de que quer isso? %s será capaz de enviar-lhe mensagens diretas e você pode começar a ver as suas mensagens em qualquer uma das salas de chat. Se desejar, você pode bloquear novamente."</string>
+    <string name="unblock_person_failed">"Ops! Nós não poderia desbloquear %s . Por favor, tente novamente."</string>
+    <string name="unblock_person_success">"Você desbloqueou %s"</string>
+
+    <string name="block_cannot_block_yourself">"Você não pode bloquear-se tolo!"</string>
+    <string name="message_delete_title">"Excluir mensagem?"</string>
+    <string name="message_delete_question">"Tem certeza de que deseja excluir este? Ninguém será capaz de vê-lo novamente. Ele terá desaparecido para sempre."</string>
+    <string name="message_delete_success">"apagado com sucesso mensagem da conversa"</string>
+    <string name="message_delete_failed">"Não foi possível apagar a mensagem de conversa. Pode já ter sido eliminada. Se não, tente novamente."</string>
+    <string name="sign_in_with_google">"Entrar com a conta do Google"</string>
+    <string name="sign_up">"Cadastre-se"</string>
+    <string name="success_exclamation">"Sucesso!"</string>
+    <string name="oops_exclamation">"Ops!"</string>
+    <string name="rationale_storage">"Este aplicativo lê fotos de sua câmera para que você possa enviar as fotos que você escolher para fazer o upload."</string>
+    <string name="new_account">"Nova conta"</string>
+    <string name="hint_username">"Nome de usuário"</string>
+    <string name="hint_email">"O email"</string>
+    <string name="hint_email_or_username">"Nome de usuário ou e-mail"</string>
+    <string name="hint_password">"Senha"</string>
+    <string name="invalid_email">"E-mail inválido"</string>
+    <string name="invalid_password">"Senha inválida!"</string>
+    <string name="invalid_username">"Nome de usuário Inválido."</string>
+    <string name="create_account">"Criar Conta"</string>
+    <string name="fresh_config">"Configuração fresco"</string>
+    <string name="cause_crash">"Porque Bater"</string>
+    <string name="general_api_error">"Não foi possível fazê-lo. Por favor tente novamente. %s"</string>
+    <string name="email_exists">"Por favor, escolha um e-mail diferente. %s já está registrado."</string>
+    <string name="username_exists">"Por favor, escolha um nome de usuário diferente. %s já está tomada."</string>
+    <string name="email_password_not_found">"Conta não encontrada. Tente novamente."</string>
+    <string name="wrong_password">"Senha incorreta. Tente novamente."</string>
+    <string name="menu_choose_photo">"Escolher Foto"</string>
+    <string name="menu_take_photo">"Tirar Foto"</string>
+    <string name="message_hint">"Enviar uma mensagem amigável..."</string>
+    <string name="error_send_photo">"Desculpe, não poderia fazer o upload da foto. Por favor, tente novamente."</string>
+    <string name="is_your_new_username">"%s é o seu novo nome de usuário"</string>
+    <string name="username_changed_dialog_title">"Nome de usuário mudou!"</string>
+    <string name="your_profile_has_been_updated_title">"Salvou!"</string>
+    <string name="your_profile_has_been_updated_msg">"Seu perfil foi salvo"</string>
+    <string name="title_update_my_pic">"Atualizar Minha Foto"</string>
+    <string name="sent_via">"Enviada via %s"</string>
+
+    <string name="preview_area">"Área de Visualização"</string>
+    <string name="post_area">"Pós Área"</string>
+    <string name="no_thumbnail">"Sem Thumbnail"</string>
+    <string name="choose_thumbnail">"Escolha um Thumbnail"</string>
+    <string name="post">"Postar"</string>
+    <string name="photo">"Foto"</string>
+    <string name="group_chat_header">"QUARTOS AO VIVO"</string>
+    <string name="private_chat_header">"AMIGOS"</string>
+
+    <string name="could_not_send_message">"Desculpa! Não foi possível enviar mensagem. Por favor, tente novamente."</string>
+    <string name="please_upload_photo">"Faça o upload de uma foto de exibição para começar a conversar"</string>
+    <string name="bio">"Sobre você"</string>
+    <string name="hint_write_something_about_yourself">"Escreva algo sobre si mesmo..."</string>
+
+    <!-- sweet alert dialog -->
+    <string name="sweet_alert_dialog_default_title">" "</string>
+    <string name="sweet_alert_dialog_ok">"@android:string/ok"</string>
+    <string name="sweet_alert_dialog_cancel">"@android:string/cancel"</string>
+    <string name="sweet_alert_loading_message">"Carregando..."</string>
+
+    <string name="save_username">"Salvar"</string>
+    <string name="share_message">"Compartilhar Mensagem"</string>
+    <string name="share_photo">"Compartilhar Foto"</string>
+    <string name="please_choose_person_or_group">"Por favor, escolha pessoa ou grupo."</string>
+    <string name="people_in_group">"Veja on-line The Who"</string>
+    <string name="view_profile">"Ver Perfil"</string>
+    <string name="options">"Opções"</string>
+    <string name="display_photo">"Antes de poder enviar mensagens, por favor, adicione uma foto de perfil de si mesmo."</string>
+    <string name="display_photo_title">"Adicionar foto do perfil"</string>
+    <string name="display_photo_tooltip">"Toque aqui para fazer upload de uma foto de perfil de si mesmo."</string>
+    <string name="toolbar_user_profile_tooltip">"Toque aqui para ver o perfil novamente."</string>
+    <string name="change_username_tooltip">"Toque aqui para alterar seu nome de usuário."</string>
+    <string name="change_bio_tooltip">"Toque aqui para alterar a sua bio."</string>
+    <string name="change_photo_tooltip">"Toque aqui para alterar sua foto."</string>
+    <string name="message_copied_to_clipboard">"Mensagem copiado para área de transferência."</string>
+    <string name="manage_blocks">"Gerenciar Blocks"</string>
+    <string name="message_options_title">"Opções de Mensagens"</string>
+    <string name="cannot_chat_you_blocked_them">"Você bloqueou %s em uma ocasião anterior. Basta deixá-lo saber."</string>
+
+    <!-- time ago -->
+    <string name="online_now">"online agora"</string>
+    <string name="just_now">"agora mesmo"</string>
+    <string name="less_than_one_minute_ago">"menos de 1 minuto atrás"</string>
+    <string name="some_minutes_ago">"%s minutos atrás"</string>
+    <string name="one_hour_ago">"1 hora atrás"</string>
+    <string name="some_hours_ago">"%s hora atrás"</string>
+    <string name="one_day_ago">"1 dia atrás"</string>
+    <string name="some_days_ago">"%s dias atrás"</string>
+    <string name="some_months_ago">"%s meses atrás"</string>
+    <string name="more_than_one_year_ago">"mais de 1 ano atrás"</string>
+
+    <string name="send_photo_to_group_or_person">"Enviar fotos para %s"</string>
+    <string name="anonymous_user">"usuário"</string>
+
+    <string name="reply">"Resposta"</string>
+    <string name="type_your_reply_here">"Digite sua resposta aqui..."</string>
+
+    <!-- do not change the following hard-coded message options ordering! -->
+    <string name="send_normal">"Enviar como Mensagem Normal"</string>
+    <string name="send_one_time">"Enviar como DESAPARECIMENTO Mensagem"</string>
+    <string name="what_is_one_time">"O que está a Desaparecer?"</string>
+    <string name="one_time_definition">"Uma Mensagem de Desaparecimento é uma mensagem que aparece borrada e só pode ser aberto uma vez tocando nele. Depois disso, ele não pode ser aberta novamente. No entanto, o remetente pode abri-lo novamente, os outros não podem."</string>
+    <string name="copy_text">"Copiar Texto"</string>
+    <string name="delete_message">"Excluir Mensagem"</string>
+    <string name="delete_photo">"Excluir Foto"</string>
+
+    <string-array name="message_options">
+        <item>"Copiar Texto"</item>
+        <item>"Excluir Mensagem"</item>
+        <item>"Bloco"</item>
+        <item>"Reportar"</item>
+    </string-array>
+
+    <string name="logout_title">"Sair"</string>
+    <string name="logout_question">"Certeza de que deseja sair agora? Não consome a bateria do telefone ou outros recursos para permanecer ligado."</string>
+    <string name="user_active_in_group">"Ativo em: %s"</string>
+    <string name="web_clipping">"Clipping Web:"</string>
+    <string name="fetching_web_clipping">"Buscando recorte web..."</string>
+
+    <string name="default_bio">"Olá! Eu estou usando %s Envie-me uma mensagem aqui!"</string>
+    <string name="like_singular">"1 gostos"</string>
+    <string name="likes_plural">"%s gostos"</string>
+    <string name="liked_my_posts_x_times">"gostei do seu pós %s vezes"</string>
+    <string name="received_likes_title">"Seus Gostos"</string>
+    <string name="possible_explicit_content_warning">"Atenção: esta foto pode conter conteúdo impróprio ou explícita"</string>
+    <string name="one_time_message_has_been_read_already">"Você já abriram este Disappearing mensagem, por isso não pode ser aberto novamente: D"</string>
+    <string name="one_time_message_notification_title">"Disappearing Mensagem"</string>
+    <string name="one_time_photo_notification_title">"Disappearing Foto"</string>
+    <string name="send_option_protips">"Prima longamente para mais opções!"</string>
+    <string name="possible_explicit_content_warning_pls_choose_another">"Atenção: esta foto pode conter conteúdo impróprio ou explícita. Por favor, escolha outra foto."</string>
+    <string name="warning">"Atenção"</string>
+</resources>
