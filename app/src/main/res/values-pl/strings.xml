@@ -156,4 +156,24 @@
     <string name="send_option_protips">"Naciśnij długo po więcej informacji!"</string>
     <string name="possible_explicit_content_warning_pls_choose_another">"Uwaga: to zdjęcie może zawierać niewłaściwe lub nieodpowiednie treści. Proszę wybrać inną fotografię."</string>
     <string name="warning">"Ostrzeżenie"</string>
+
+
+    <!-- after 11/10/2016 -->
+    <string name="menu_option_pending_requests">"Nowe oczekujących żądań!"</string>
+    <string name="left_drawer_pending_request_singular">"1 nowa oczekującego żądania!"</string>
+    <string name="left_drawer_pending_requests_plural">"%s nowe oczekujących żądań!"</string>
+    <string name="pending_requests_title">"Oczekujące"</string>
+
+    <string name="accept_request_title">"Zebrane %s?"</string>
+    <string name="accept_request_question">"%s chciałby mieć zabawę i miłą pogawędkę z wami!"</string>
+    <string name="yes">"Tak"</string>
+    <string name="no">"Nie"</string>
+
+    <string name="report_person_title">"Raporty %s?"</string>
+    <string name="report_person_question">"Zgłaszasz tą osobę nadużycie czat internetowy? Traktujemy te sprawy poważnie. Zbadamy tę osobę, a jeśli okaże się naprawdę obraźliwych, podejmiemy działania. Dziękuję Ci."</string>
+    <string name="report_person_failed">"Ups! Nie można zgłosić %s. Proszę spróbuj ponownie."</string>
+    <string name="report_person_success">"Aś %s"</string>
+
+    <string name="photo_not_available">"Znikający zdjęcie nie jest już dostępne"</string>
+
 </resources>

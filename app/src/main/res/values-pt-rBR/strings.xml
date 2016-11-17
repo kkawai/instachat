@@ -156,4 +156,24 @@
     <string name="send_option_protips">"Prima longamente para mais opções!"</string>
     <string name="possible_explicit_content_warning_pls_choose_another">"Atenção: esta foto pode conter conteúdo impróprio ou explícita. Por favor, escolha outra foto."</string>
     <string name="warning">"Atenção"</string>
+
+
+    <!-- after 11/10/2016 -->
+    <string name="menu_option_pending_requests">"Novas solicitações pendentes!"</string>
+    <string name="left_drawer_pending_request_singular">"1 novo pedido pendente!"</string>
+    <string name="left_drawer_pending_requests_plural">"%s novas solicitações pendentes!"</string>
+    <string name="pending_requests_title">"Solicitações Pendentes"</string>
+
+    <string name="accept_request_title">"Aceitar %s ?"</string>
+    <string name="accept_request_question">"%s gostaria de ter um divertimento e um bate-papo amigável com você!"</string>
+    <string name="yes">"Sim"</string>
+    <string name="no">"Não"</string>
+
+    <string name="report_person_title">"Relatórios %s?"</string>
+    <string name="report_person_question">"Está a denunciar esta pessoa por abuso internet bate-papo? Tomamos essas coisas a sério. Vamos investigar essa pessoa e, se for encontrado para ser verdadeiramente abusivo, tomaremos medidas. Obrigado."</string>
+    <string name="report_person_failed">"Ops! Você não poderia relatar %s . Por favor, tente novamente."</string>
+    <string name="report_person_success">"Você relataram %s"</string>
+
+    <string name="photo_not_available">"Disappearing Foto não está mais disponível"</string>
+
 </resources>

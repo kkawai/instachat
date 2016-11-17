@@ -81,10 +81,8 @@
 
     <!-- sweet alert dialog -->
     <string name="sweet_alert_dialog_default_title">" "</string>
-    <string name="sweet_alert_dialog_ok">"@android:string/ok
-"</string>
-    <string name="sweet_alert_dialog_cancel">"@android:string/cancel
-"</string>
+    <string name="sweet_alert_dialog_ok">"@android:string/ok"</string>
+    <string name="sweet_alert_dialog_cancel">"@android:string/cancel"</string>
     <string name="sweet_alert_loading_message">"打击开始阅览..."</string>
 
     <string name="save_username">"保存"</string>
@@ -158,4 +156,25 @@
     <string name="send_option_protips">"长按为更多的选择！"</string>
     <string name="possible_explicit_content_warning_pls_choose_another">"警告：这张照片可能包含不适当的或色情内容。请选择其他照片。"</string>
     <string name="warning">"警告"</string>
+
+
+    <!-- after 11/10/2016 -->
+    <string name="menu_option_pending_requests">"新挂起的申请！"</string>
+    <string name="left_drawer_pending_request_singular">"1个新的未决请求！"</string>
+    <string name="left_drawer_pending_requests_plural">"%s新挂起的请求！"</string>
+    <string name="pending_requests_title">"待处理的请求"</string>
+
+    <string name="accept_request_title">"接受%s ？"</string>
+    <string name="accept_request_question">"%s想有一个有趣的和友好的交谈与您合作！"</string>
+    <string name="yes">"是"</string>
+    <string name="no">"没有"</string>
+
+    <string name="report_person_title">"报告%s?"</string>
+    <string name="report_person_question">"要举报这个人互联网聊天滥用？我们把这些东西当回事。我们将调查这个人，如果发现是真正的虐待，我们会采取行动。谢谢。"</string>
+    <string name="report_person_failed">"哎呀！您无法在%s 。请再试一次。"</string>
+    <string name="report_person_success">"您报道%s"</string>
+
+    <string name="photo_not_available">"消失的照片已不存在"</string>
+
+
 </resources>

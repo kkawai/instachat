@@ -156,4 +156,25 @@
     <string name="send_option_protips">"더 많은 옵션에 대한 장기 누르십시오!"</string>
     <string name="possible_explicit_content_warning_pls_choose_another">"경고 :이 사진은 부적절하거나 노골적인 내용을 포함 할 수있다. 다른 사진을 선택하세요."</string>
     <string name="warning">"경고"</string>
+
+
+    <!-- after 11/10/2016 -->
+    <string name="menu_option_pending_requests">"새로운 보류 요청!"</string>
+    <string name="left_drawer_pending_request_singular">"1 새 보류중인 요청!"</string>
+    <string name="left_drawer_pending_requests_plural">"%s 새로운 보류중인 요청!"</string>
+    <string name="pending_requests_title">"요청을 보류"</string>
+
+    <string name="accept_request_title">"동의 %s?"</string>
+    <string name="accept_request_question">"%s 당신과 함께 재미와 친근한 대화를하고 싶습니다!"</string>
+    <string name="yes">"예"</string>
+    <string name="no">"아니요"</string>
+
+    <string name="report_person_title">"보고서 %s?"</string>
+    <string name="report_person_question">"당신은 인터넷 채팅 불량이 사람을보고 있습니까? 우리는 심각하게이 일을. 우리는이 사람을 조사하고 진정으로 학대 것으로 확인하면, 우리는 조치를 취할 것입니다. 고맙습니다."</string>
+    <string name="report_person_failed">"아차! 당신은보고 할 수 없습니다 %s . 다시 시도하십시오."</string>
+    <string name="report_person_success">"당신은보고 %s"</string>
+
+    <string name="photo_not_available">"사라지는 사진은 더 이상 사용할 수 없습니다"</string>
+
+
 </resources>

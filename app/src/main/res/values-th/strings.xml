@@ -156,4 +156,27 @@
     <string name="send_option_protips">"ลองกดหาตัวเลือกอื่น ๆ !"</string>
     <string name="possible_explicit_content_warning_pls_choose_another">"คำเตือน: ภาพนี้อาจมีเนื้อหาที่ไม่เหมาะสมหรืออย่างชัดเจน โปรดเลือกภาพอื่น"</string>
     <string name="warning">"คำเตือน"</string>
+
+
+    <!-- after 11/10/2016 -->
+    <string name="menu_option_pending_requests">"ร้องขอที่ค้างอยู่ใหม่!"</string>
+    <string name="left_drawer_pending_request_singular">"1 ร้องขอที่ค้างอยู่ใหม่!"</string>
+    <string name="left_drawer_pending_requests_plural">"%s ร้องขอที่ค้างอยู่ใหม่!"</string>
+    <string name="pending_requests_title">"รอดำเนินการจอง"</string>
+
+
+    <string name="accept_request_title">"ยอมรับ %s ?"</string>
+    <string name="accept_request_question">"%s ต้องการที่จะมีความสนุกสนานและพูดคุยเป็นมิตรกับคุณ!"</string>
+    <string name="yes">"ได้"</string>
+    <string name="no">"ไม่ได้"</string>
+
+
+    <string name="report_person_title">"รายงาน %s?"</string>
+    <string name="report_person_question">"คุณกำลังรายงานคนนี้ทำผิดกฎอินเทอร์เน็ตแชท? เราจะใช้สิ่งเหล่านี้อย่างจริงจัง เราจะตรวจสอบบุคคลนี้และหากพบว่ามีความไม่เหมาะสมอย่างแท้จริงเราจะดำเนินการ ขอขอบคุณ."</string>
+    <string name="report_person_failed">"อ๊ะ! คุณไม่สามารถรายงาน %s s กรุณาลองอีกครั้ง."</string>
+    <string name="report_person_success">"คุณได้รายงาน %s"</string>
+
+
+    <string name="photo_not_available">"หายไปรูปภาพไม่สามารถใช้ได้อีกต่อไป"</string>
+
 </resources>

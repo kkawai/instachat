@@ -156,4 +156,25 @@
     <string name="send_option_protips">"より多くのオプションのための長押し！"</string>
     <string name="possible_explicit_content_warning_pls_choose_another">"警告：この写真は不適切または明示的な内容を含んでいてもよいです。別の写真を選択してください。"</string>
     <string name="warning">"警告"</string>
+
+
+    <!-- after 11/10/2016 -->
+    <string name="menu_option_pending_requests">"新しい保留中の要求！"</string>
+    <string name="left_drawer_pending_request_singular">"1新しい保留中の要求！"</string>
+    <string name="left_drawer_pending_requests_plural">"%s新しい保留中のリクエスト！"</string>
+    <string name="pending_requests_title">"保留中の要求"</string>
+
+    <string name="accept_request_title">"行っている%s?"</string>
+    <string name="accept_request_question">"%sあなたと楽しさとフレンドリーなチャットを持っていると思います！"</string>
+    <string name="yes">"はい"</string>
+    <string name="no">"いいえ"</string>
+
+    <string name="report_person_title">"レポート %s?"</string>
+    <string name="report_person_question">"あなたは、インターネットのチャット乱用のこの人を報告していますか？我々は真剣にこれらの事を取ります。私たちは、この人を調査し、本当に虐待であることが判明した場合、我々は行動を取るだろう。ありがとうございました。"</string>
+    <string name="report_person_failed">"おっとっと！あなたは報告しませんでした%s 。もう一度やり直してください。"</string>
+    <string name="report_person_success">"あなたが報告している%s"</string>
+
+    <string name="photo_not_available">"消える写真はもう利用できません"</string>
+
+
 </resources>

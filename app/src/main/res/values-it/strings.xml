@@ -157,4 +157,24 @@
     <string name="send_option_protips">"Premere a lungo per altre opzioni!"</string>
     <string name="possible_explicit_content_warning_pls_choose_another">"Attenzione: questa foto può contenere contenuti non appropriati o esplicita. Scegliere un'altra foto."</string>
     <string name="warning">"Attenzione"</string>
+
+    <!-- after 11/10/2016 -->
+    <string name="menu_option_pending_requests">"Nuove Richieste in sospeso!"</string>
+    <string name="left_drawer_pending_request_singular">"1 nuova richiesta in sospeso!"</string>
+    <string name="left_drawer_pending_requests_plural">"%s nuove richieste in sospeso!"</string>
+    <string name="pending_requests_title">"Richieste in Sospeso"</string>
+
+    <string name="accept_request_title">"Accetta %s?"</string>
+    <string name="accept_request_question">"%s vorrebbe avere un divertimento e chiacchierata amichevole con voi!"</string>
+    <string name="yes">"Sì"</string>
+    <string name="no">"No."</string>
+
+    <string name="report_person_title">"Resoconti %s?"</string>
+    <string name="report_person_question">"Stai segnalando questa persona per Internet Chat abuso? Prendiamo queste cose sul serio. Indagheremo questa persona e se trovato per essere veramente abusivo, agiremo. Grazie."</string>
+    <string name="report_person_failed">"Oops! Non si poteva riferire %s. Riprova."</string>
+    <string name="report_person_success">"Hai segnalato %s"</string>
+
+    <string name="photo_not_available">"Disappearing Photo non è più disponibile"</string>
+
+
 </resources>

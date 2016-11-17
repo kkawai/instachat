@@ -156,4 +156,24 @@
     <string name="send_option_protips">"Длительное нажатие для больше вариантов!"</string>
     <string name="possible_explicit_content_warning_pls_choose_another">"Внимание: эта фотография может содержать некорректные или явное содержание. Пожалуйста, выберите другую фотографию."</string>
     <string name="warning">"Предупредительный сигнал тревоги"</string>
+
+    <!-- after 11/10/2016 -->
+    <string name="menu_option_pending_requests">"Новые ожидающие запросы!"</string>
+    <string name="left_drawer_pending_request_singular">"1 новый отложенный запрос!"</string>
+    <string name="left_drawer_pending_requests_plural">"%s новых запросов , ожидающих рассмотрения!"</string>
+    <string name="pending_requests_title">"Ожидающие запросы"</string>
+
+    <string name="accept_request_title">"Принятие %s?"</string>
+    <string name="accept_request_question">"%s хотели бы иметь удовольствие и дружескую беседу с вами!"</string>
+    <string name="yes">"да"</string>
+    <string name="no">"Нет"</string>
+
+    <string name="report_person_title">"Отчеты %s?"</string>
+    <string name="report_person_question">"Отчитываетесь ли вы этого человека за злоупотребление интернет-чат? Мы принимаем эти вещи серьезно. Мы будем исследовать этого человека и, если установлено, что по-настоящему оскорбительного, мы примем меры. Спасибо."</string>
+    <string name="report_person_failed">"К сожалению! Вы не могли бы сообщить %s . Пожалуйста, попробуйте еще раз."</string>
+    <string name="report_person_success">"Вы сообщили , %s"</string>
+
+    <string name="photo_not_available">"Исчезновение Фото не доступен больше"</string>
+
+
 </resources>

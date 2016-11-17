@@ -156,4 +156,24 @@
     <string name="send_option_protips">"長按為更多的選擇！"</string>
     <string name="possible_explicit_content_warning_pls_choose_another">"警告：這張照片可能包含不適當的或色情內容。請選擇其他照片。"</string>
     <string name="warning">"警告"</string>
+
+
+    <!-- after 11/10/2016 -->
+    <string name="menu_option_pending_requests">"新掛起的申請！"</string>
+    <string name="left_drawer_pending_request_singular">"1個新的未決請求！"</string>
+    <string name="left_drawer_pending_requests_plural">"%s新掛起的請求！"</string>
+    <string name="pending_requests_title">"待處理的請求"</string>
+
+    <string name="accept_request_title">"接受%s ？"</string>
+    <string name="accept_request_question">"%s想有一個有趣的和友好的交談與您合作！"</string>
+    <string name="yes">"是"</string>
+    <string name="no">"沒有"</string>
+
+    <string name="report_person_title">"報表相關事項%s?"</string>
+    <string name="report_person_question">"要舉報這個人互聯網聊天濫用？我們把這些東西當回事。我們將調查這個人，如果發現是真正的虐待，我們會採取行動。謝謝。"</string>
+    <string name="report_person_failed">"哎呀！您無法在%s。請再試一次。"</string>
+    <string name="report_person_success">"您報導%s"</string>
+
+    <string name="photo_not_available">"消失的照片已不存在"</string>
+
 </resources>

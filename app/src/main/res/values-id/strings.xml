@@ -156,4 +156,25 @@
     <string name="send_option_protips">"Tekan lama untuk lebih banyak pilihan!"</string>
     <string name="possible_explicit_content_warning_pls_choose_another">"Peringatan: foto ini mungkin berisi konten yang tidak pantas atau eksplisit. Silahkan pilih foto lain."</string>
     <string name="warning">"Peringatan"</string>
+
+
+    <!-- after 11/10/2016 -->
+    <string name="menu_option_pending_requests">"Permintaan Tertunda baru!"</string>
+    <string name="left_drawer_pending_request_singular">"1 permintaan tertunda baru!"</string>
+    <string name="left_drawer_pending_requests_plural">"%s permintaan tertunda baru!"</string>
+    <string name="pending_requests_title">"permintaan tertunda"</string>
+
+    <string name="accept_request_title">"Terima %s?"</string>
+    <string name="accept_request_question">"%s ingin bersenang-senang dan ramah chatting dengan Anda!"</string>
+    <string name="yes">"Ya"</string>
+    <string name="no">"Tidak"</string>
+
+    <string name="report_person_title">"Laporan %s?"</string>
+    <string name="report_person_question">"Anda melaporkan orang ini untuk internet chatting melanggar? Kami mengambil hal-hal serius. Kami akan menyelidiki orang ini dan jika ditemukan harus benar-benar kasar, kami akan mengambil tindakan. Terima kasih."</string>
+    <string name="report_person_failed">"Ups! Anda tidak bisa melaporkan %s. Silakan coba lagi."</string>
+    <string name="report_person_success">"Anda telah melaporkan %s"</string>
+
+    <string name="photo_not_available">"Menghilang Foto tidak tersedia lagi"</string>
+
+
 </resources>

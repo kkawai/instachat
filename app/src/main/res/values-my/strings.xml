@@ -156,4 +156,24 @@
     <string name="send_option_protips">"ပိုမိုရွေးချယ်ရန် Long-စာနယ်ဇင်း!"</string>
     <string name="possible_explicit_content_warning_pls_choose_another">"သတိပေးချက်: ဒီဓါတ်ပုံကိုမသင့်လျော်သောသို့မဟုတ်အကဲဆတ်သောအကြောင်းအရာဆံ့နိုငျသညျ။ အခြားဓါတ်ပုံကိုရွေးချယ်ပါ။"</string>
     <string name="warning">"အပမအ၄ပ၃၅အ"</string>
+
+    <!-- after 11/10/2016 -->
+    <string name="menu_option_pending_requests">"နယူးရွှေ့ဆိုင်းတောင်းဆိုချက်များ!"</string>
+    <string name="left_drawer_pending_request_singular">"သစ် 1 ဆိုင်းငံ့ထားတောင်းဆိုမှု!"</string>
+    <string name="left_drawer_pending_requests_plural">"%s အသစ်ဆိုင်းငံ့ထားတောင်းဆိုမှုများ!"</string>
+    <string name="pending_requests_title">"ဆိုင်းငံ့တောင်းဆိုချက်များ"</string>
+
+    <string name="accept_request_title">"Accept %s ?"</string>
+    <string name="accept_request_question">"%s သင်တို့နှင့်အတူပျော်စရာနှင့်ဖော်ရွေချက်တင်ရှိသည်ဖို့ချင်ပါတယ်!"</string>
+    <string name="yes">"ဟုတ်ကဲ့"</string>
+    <string name="no">"အဘယ်သူမျှမ"</string>
+
+    <string name="report_person_title">"အစီရင်ခံစာ %s ?"</string>
+    <string name="report_person_question">"သငျသညျအင်တာနက်ချက်တင်အလွဲသုံးမှုအဘို့ဤပုဂ္ဂိုလ်သတင်းပို့ကြသလော ကျနော်တို့အလေးအနက်ထားဤအရာတို့ကိုယူပါ။ ငါတို့သည်ဤပုဂ္ဂိုလ်ကိုစုံစမ်းစစ်ဆေးရန်မည်ဖြစ်ပြီးအမှန်တကယ်မတော်မတရားဖြစ်တွေ့ရှိလျှင်, ငါတို့သည်အရေးယူပါလိမ့်မယ်။ ကျေးဇူးတင်ပါတယ်။"</string>
+    <string name="report_person_failed">"သည်းခံပါ! သငျသညျသတင်းပို့နိုင်ဘဲ %s ။ ထပ်ကြိုးစားပါ။"</string>
+    <string name="report_person_success">"သငျသညျဖော်ပြခဲ့သည်ပြီ %s"</string>
+
+    <string name="photo_not_available">"ပျောက်ကွယ်သွားဓာတ်ပုံတော့ဘူးမရရှိနိုင်"</string>
+
+
 </resources>
