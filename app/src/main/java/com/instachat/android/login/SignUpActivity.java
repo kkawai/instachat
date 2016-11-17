@@ -23,7 +23,6 @@ import com.instachat.android.api.NetworkApi;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.User;
 import com.instachat.android.util.ActivityUtil;
-import com.instachat.android.util.EmailUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ScreenUtil;
@@ -100,7 +99,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         username = usernameLayout.getEditText().getText().toString().trim();
         usernameLayout.getEditText().setOnFocusChangeListener(this);
 
-        if (!EmailUtil.isValidEmail(email)) {
+        if (!StringUtil.isValidEmail(email)) {
             emailLayout.setError(getString(R.string.invalid_email));
         } else if (!StringUtil.isValidUsername(username)) {
             usernameLayout.setError(getString(R.string.invalid_username));

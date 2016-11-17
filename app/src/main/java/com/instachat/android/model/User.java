@@ -567,7 +567,7 @@ public class User extends DomainObject {
     public static final int FollowStatusUnknown = 0;
 
     public interface StatusChangeListener {
-        public void onStatusChanged(boolean isOnline);
+        void onStatusChanged(boolean isOnline);
     }
 
     public static User fromResponse(JSONObject response) throws Exception {

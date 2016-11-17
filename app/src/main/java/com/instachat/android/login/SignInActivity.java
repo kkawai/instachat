@@ -15,14 +15,18 @@
  */
 package com.instachat.android.login;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -37,7 +41,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.instachat.android.BaseActivity;
 import com.instachat.android.GroupChatActivity;
 import com.instachat.android.MyApp;
 import com.instachat.android.R;
@@ -45,15 +49,15 @@ import com.instachat.android.api.NetworkApi;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.User;
 import com.instachat.android.util.ActivityUtil;
-import com.instachat.android.util.EmailUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
+import com.instachat.android.view.ThemedAlertDialog;
 
 import org.json.JSONObject;
 
-public class SignInActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,
+public class SignInActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener,
         View.OnClickListener, View.OnFocusChangeListener {
 
     private static final String TAG = "SignInActivity";
@@ -64,6 +68,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     private String thirdPartyProfilePicUrl;
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth mFirebaseAuth;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +109,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         password = passwordLayout.getEditText().getText().toString().trim();
         passwordLayout.getEditText().setOnFocusChangeListener(this);
 
-        if (email.contains("@") && !EmailUtil.isValidEmail(email)) {
+        if (email.contains("@") && !StringUtil.isValidEmail(email)) {
             emailLayout.setError(getString(R.string.invalid_email));
             return;
         } else if (!email.contains("@") && !StringUtil.isValidUsername(email)) {
@@ -119,26 +124,39 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
 
         emailLayout.setError("");
         passwordLayout.setError("");
-        signInWithEmailOrUsernamePassword(email, password);
+        signInWithEmailOrUsernamePassword(email, password, null);
     }
 
-    private void signInWithEmailOrUsernamePassword(final String email, final String password) {
-        NetworkApi.getUserByEmailPassword(this, email, password, new Response.Listener<JSONObject>() {
+    private void signInWithEmailOrUsernamePassword(final String email, final String password, final String ltuEmail) {
+        showProgressDialog();
+        NetworkApi.getUserByEmailOrUsernamePassword(this, email, password, ltuEmail, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(final JSONObject response) {
                 try {
                     final String status = response.getString(NetworkApi.KEY_RESPONSE_STATUS);
                     if (status.equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
+                        final JSONObject data = response.getJSONObject(NetworkApi.RESPONSE_DATA);
+                        if (data.has("needsNewEmail")) {
+                            /**
+                             * Welcome the user back and prompt him to enter an email address
+                             * If he enters an email address make sure it's unique.
+                             * If the email is valid and unique, save the user and signIntoFirebase
+                             *
+                             */
+                            hideProgressDialog();
+                            showNewEmailDialog(SignInActivity.this, email, password);
+                            return;
+                        }
                         final User user = User.fromResponse(response);
                         Preferences.getInstance().saveUser(user);
                         Preferences.getInstance().saveLastSignIn(email);
-                        signIntoFirebase(user.getEmail(), password);
+                        signIntoFirebase(user.getEmail(), password, ltuEmail != null);
                     } else {
                         showErrorToast(R.string.email_password_not_found);
                     }
                 } catch (final Exception e) {
                     MLog.e(TAG, e);
-                    showErrorToast("1");
+                    showErrorToast("bad response 1");
                 }
 
             }
@@ -146,32 +164,51 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
             @Override
             public void onErrorResponse(final VolleyError error) {
                 MLog.e(TAG, "signInWithEmailOrUsernamePassword() failed: " + error);
-                showErrorToast("2");
+                showErrorToast("network 1");
             }
         });
     }
 
-    private void signIntoFirebase(final String email, final String password) {
-        mFirebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                MLog.d(TAG, "signIntoFirebase:onComplete:" + task.isSuccessful());
-                if (!task.isSuccessful()) {
-                    MLog.w(TAG, "signIntoFirebase", task.getException());
-                    showErrorToast("Firebase Account Creation Error");
-                } else {
+    private void signIntoFirebase(final String email, final String password, boolean createAccount) {
 
-                    User user = Preferences.getInstance().getUser();
-                    if (StringUtil.isEmpty(user.getProfilePicUrl())) {
-                        if (!TextUtils.isEmpty(thirdPartyProfilePicUrl)) {
-                            NetworkApi.saveThirdPartyPhoto(thirdPartyProfilePicUrl);
-                        }
+        if (createAccount) {
+            mFirebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    hideProgressDialog();
+                    MLog.d(TAG, "mFirebaseAuth.createUserWithEmailAndPassword(): " + task.isSuccessful());
+                    if (!task.isSuccessful()) {
+                        MLog.w(TAG, "mFirebaseAuth.createUserWithEmailAndPassword(): ", task.getException());
+                        showErrorToast("Account Create Error");
+                    } else {
+                        startActivity(new Intent(SignInActivity.this, GroupChatActivity.class));
+                        finish();
                     }
-                    startActivity(new Intent(SignInActivity.this, GroupChatActivity.class));
-                    finish();
                 }
-            }
-        });
+            });
+        } else {
+            mFirebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    hideProgressDialog();
+                    MLog.d(TAG, "mFirebaseAuth.signInWithEmailAndPassword(): " + task.isSuccessful());
+                    if (!task.isSuccessful()) {
+                        MLog.w(TAG, "mFirebaseAuth.signInWithEmailAndPassword(): ", task.getException());
+                        showErrorToast("Sign In Error");
+                    } else {
+
+                        User user = Preferences.getInstance().getUser();
+                        if (StringUtil.isEmpty(user.getProfilePicUrl())) {
+                            if (!TextUtils.isEmpty(thirdPartyProfilePicUrl)) {
+                                NetworkApi.saveThirdPartyPhoto(thirdPartyProfilePicUrl);
+                            }
+                        }
+                        startActivity(new Intent(SignInActivity.this, GroupChatActivity.class));
+                        finish();
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -234,6 +271,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         if (acct.getPhotoUrl() != null && !TextUtils.isEmpty(acct.getPhotoUrl().toString())) {
             thirdPartyProfilePicUrl = acct.getPhotoUrl().toString();
         }
+        showProgressDialog();
         NetworkApi.getUserByEmail(this, acct.getEmail(), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(final JSONObject response) {
@@ -242,8 +280,9 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                         final User user = User.fromResponse(response);
                         Preferences.getInstance().saveUser(user);
                         Preferences.getInstance().saveLastSignIn(user.getUsername());
-                        signIntoFirebase(user.getEmail(), user.getPassword());
-                    } else { //user does not exist
+                        signIntoFirebase(user.getEmail(), user.getPassword(), false);
+                    } else { //user does not exist go to sign up activity
+                        hideProgressDialog();
                         final Intent intent = new Intent(SignInActivity.this, SignUpActivity.class);
                         if (acct.getPhotoUrl() != null)
                             intent.putExtra("photo", acct.getPhotoUrl().toString());
@@ -283,22 +322,86 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        MyApp.getInstance().getRequestQueue().cancelAll(this);
-        super.onDestroy();
-    }
-
     private String errorMessage(final int stringResId, final String str) {
         return getString(stringResId, str);
     }
 
     private void showErrorToast(final String distinctScreenCode) {
+        hideProgressDialog();
         Toast.makeText(this, getString(R.string.general_api_error, distinctScreenCode), Toast.LENGTH_SHORT).show();
     }
 
     private void showErrorToast(final int stringResId) {
+        hideProgressDialog();
         Toast.makeText(this, stringResId, Toast.LENGTH_SHORT).show();
+    }
+
+    private AlertDialog showNewEmailDialog(@NonNull final Context context, final String username, final String password) {
+        final Object tag = new Object();
+        final View view = getLayoutInflater().inflate(R.layout.dialog_input_email, null);
+        FontUtil.setTextViewFont((TextView) view.findViewById(R.id.input_email));
+        final AlertDialog dialog = new ThemedAlertDialog.Builder(context).
+                setView(view).
+                setCancelable(false).
+                setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        final String ltuEmail = ((TextView) view.findViewById(R.id.input_email)).getText().toString();
+                        final TextInputLayout textInputLayout = (TextInputLayout) view.findViewById(R.id.input_email_layout);
+                        if (!StringUtil.isValidEmail(ltuEmail)) {
+                            textInputLayout.setError(getString(R.string.invalid_email));
+                            return;
+                        }
+                        showProgressDialog();
+                        NetworkApi.isExistsEmail(tag, ltuEmail, new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                if (isActivityDestroyed())
+                                    return;
+                                try {
+                                    if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK) && response.getJSONObject("data").getBoolean("exists")) {
+                                        textInputLayout.setError(errorMessage(R.string.email_exists, ltuEmail));
+                                    } else {
+                                        signInWithEmailOrUsernamePassword(username, password, ltuEmail);
+                                    }
+                                } catch (Exception e) {
+                                    showErrorToast("bad response");
+                                    MLog.e(TAG, "response: ", response);
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                showErrorToast("bad network");
+                                MLog.e(TAG, "", error);
+                            }
+                        });
+                    }
+                })
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
+                        MyApp.getInstance().getRequestQueue().cancelAll(tag);
+                    }
+                }).show();
+        return dialog;
+    }
+
+    private void showProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            return;
+        }
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.setTitle(R.string.loading);
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+        }
     }
 
 }

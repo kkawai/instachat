@@ -148,6 +148,14 @@ public class StringUtil {
         return sb.toString();
     }
 
+    public static boolean isValidEmail(final CharSequence target) {
+        if (target.length() < Constants.MIN_EMAIL_LENGTH || target.length() > Constants.MAX_EMAIL_LENGTH) {
+            return false;
+        } else {
+            return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+        }
+    }
+
     public static boolean isValidUsername(final String username) {
         if (username == null || username.trim().length() <= Constants.MIN_USERNAME_LENGTH || username.trim().length() > Constants.MAX_USERNAME_LENGTH) {
             return false;

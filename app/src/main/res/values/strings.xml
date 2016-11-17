@@ -173,4 +173,8 @@
     <string name="report_person_success">You have reported %s</string>
 
     <string name="photo_not_available">Disappearing Photo is not available anymore</string>
+
+    <!-- after 11/17/2016 -->
+    <string name="welcome_back_old_user">So happy to see you again!  Please enter your email address to complete your account!  Thank you!</string>
+    <string name="loading">loading...</string>
 </resources>

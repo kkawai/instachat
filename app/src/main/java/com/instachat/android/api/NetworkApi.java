@@ -40,6 +40,7 @@ public final class NetworkApi {
     private static final int REQUEST_TIMEOUT_MS = 10000;
 
     public static final String RESPONSE_OK = "OK";
+    public static final String RESPONSE_DATA = "data";
     public static final String KEY_RESPONSE_STATUS = "status";
 
     private static final DefaultRetryPolicy DEFAULT_RETRY_POLICY = new DefaultRetryPolicy(REQUEST_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -78,9 +79,11 @@ public final class NetworkApi {
         MyApp.getInstance().getRequestQueue().add(request);
     }
 
-    public static void getUserByEmailPassword(final Object cancelTag, final String email, final String pw, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+    public static void getUserByEmailOrUsernamePassword(final Object cancelTag, final String email, final String pw, String ltuEmail, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
 
-        final String url = Constants.API_BASE_URL + "/getu?em=" + email + "&pd=" + Base64.encodeWebSafe(pw.getBytes(), false);
+        String url = Constants.API_BASE_URL + "/getu?em=" + email + "&pd=" + Base64.encodeWebSafe(pw.getBytes(), false);
+        if (ltuEmail != null)
+            url = url + "&nem=" + ltuEmail;
         final Request request = new ApiGetRequest(url, listener, errorListener);
         request.setShouldCache(false).setRetryPolicy(DEFAULT_RETRY_POLICY).setTag(cancelTag);
         MyApp.getInstance().getRequestQueue().add(request);
