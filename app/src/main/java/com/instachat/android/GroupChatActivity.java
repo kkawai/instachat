@@ -1329,7 +1329,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     public void onUserClicked(int userid, String username, String dpid, View transitionImageView) {
         closeBothDrawers();
         ScreenUtil.hideVirtualKeyboard(mMessageEditText);
-        PrivateChatActivity.startPrivateChatActivity(this, userid, username, dpid, transitionImageView, null, null);
+        PrivateChatActivity.startPrivateChatActivity(this, userid, username, dpid, false, transitionImageView, null, null);
     }
 
     protected void onRemoteUserTyping(int userid, String username, String dpid) {
@@ -1374,7 +1374,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     @Override
     public void onPrivateChatClicked(PrivateChatSummary privateChatSummary) {
         closeBothDrawers();
-        PrivateChatActivity.startPrivateChatActivity(this, Integer.parseInt(privateChatSummary.getId()), mSharePhotoUri, mShareText);
+        PrivateChatActivity.startPrivateChatActivity(this, Integer.parseInt(privateChatSummary.getId()), privateChatSummary.getName(), privateChatSummary.getDpid(), false, null, mSharePhotoUri, mShareText);
         mSharePhotoUri = null;
         mShareText = null;
     }

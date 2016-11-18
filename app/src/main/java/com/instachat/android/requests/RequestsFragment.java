@@ -83,42 +83,7 @@ public class RequestsFragment extends BaseFragment {
             @Override
             public void onClick(SweetAlertDialog sweetAlertDialog) {
                 sweetAlertDialog.dismiss();
-                PrivateChatActivity.startPrivateChatActivity(getActivity(), userid, username, dpid, transitionImageView, null, null);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        /**
-                         * add the person to your private chat summaries - to your left drawer!
-                         */
-                        PrivateChatSummary privateChatSummary = new PrivateChatSummary();
-                        privateChatSummary.setName(username);
-                        privateChatSummary.setDpid(dpid);
-                        privateChatSummary.setAccepted(true);
-                        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF())
-                                .child(userid + "");
-                        ref.updateChildren(privateChatSummary.toMap());
-
-                        /**
-                         * remove the person from your pending requests
-                         */
-                        FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(userid, Preferences.getInstance().getUserId())).
-                                removeValue().
-                                addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (isActivityDestroyed())
-                                            return;
-                                        /**
-                                         * close pending requests fragment if there are none left
-                                         */
-                                        if (mRequestsAdapter != null && mRequestsAdapter.getItemCount() == 0)
-                                            getActivity().onBackPressed();
-                                    }
-                                });
-
-                    }
-                }, 1500);
+                PrivateChatActivity.startPrivateChatActivity(getActivity(), userid, username, dpid, true, transitionImageView, null, null);
             }
         }).setCustomImage(dpid, R.drawable.ic_anon_person_48dp).
                 show();

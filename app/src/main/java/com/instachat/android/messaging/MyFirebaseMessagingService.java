@@ -129,7 +129,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         .build();
 
         // This intent is fired when notification is clicked
-        Intent intent = DirectReplyActivity.newIntent(this, friendlyMessage.getUserid());
+        Intent intent = DirectReplyActivity.newIntent(this, friendlyMessage.getUserid(), friendlyMessage.getName(), friendlyMessage.getDpid());
         PendingIntent pendingIntent = PendingIntent.getActivity(this, friendlyMessage.getUserid(), intent, 0);
 
         Uri customSound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE

@@ -45,7 +45,7 @@ public class UserLikedUserFragment extends BaseFragment {
         mUserClickedListener = new UserClickedListener() {
             @Override
             public void onUserClicked(final int userid, final String username, final String dpid, View transitionImageView) {
-                PrivateChatActivity.startPrivateChatActivity(getActivity(), userid, username, dpid, transitionImageView, null,null);
+                PrivateChatActivity.startPrivateChatActivity(getActivity(), userid, username, dpid, false, transitionImageView, null,null);
             }
         };
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.USER_RECEIVED_LIKES_REF(Preferences.getInstance().getUserId()));

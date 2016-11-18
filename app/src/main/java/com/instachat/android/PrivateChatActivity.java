@@ -69,8 +69,6 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     private static final String TAG = "PrivateChatActivity";
     private User mToUser;
-    private static boolean sIsActive;
-    private static int sToUserid;
     private long mLastTypingTime;
     private ValueEventListener mUserInfoValueEventListener = null;
     private FirebaseRemoteConfig mConfig;
@@ -78,6 +76,9 @@ public class PrivateChatActivity extends GroupChatActivity {
     private ImageView mProfilePic;
     private AppBarLayout mAppBarLayout;
     private GestureDetectorCompat mGestureDetector;
+    private static boolean sIsActive;
+    private static int sUserid;
+    private static String sUsername, sProfilePicUrl;
 
     @Override
     protected int getLayout() {
@@ -106,11 +107,11 @@ public class PrivateChatActivity extends GroupChatActivity {
         mMessageRecyclerViewParent = findViewById(R.id.messageRecyclerViewParent);
         mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
         getSupportActionBar().setTitle("");
-        final int toUserid = getIntent().getIntExtra(Constants.KEY_USERID, 0);
-        MLog.d(TAG, "onNewIntent() toUserid : " + toUserid);
-        preloadUserIfPossible();
-        sToUserid = toUserid;
-        NetworkApi.getUserById(this, toUserid, new Response.Listener<JSONObject>() {
+        sUserid = getIntent().getIntExtra(Constants.KEY_USERID, 0);
+        sUsername = getIntent().getStringExtra(Constants.KEY_USERNAME);
+        sProfilePicUrl = getIntent().getStringExtra(Constants.KEY_PROFILE_PIC_URL);
+        loadIntentData();
+        NetworkApi.getUserById(this, sUserid, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -121,7 +122,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                     listenForPartnerTyping();
                     checkIfPartnerIsBlocked();
 
-                    mUserInfoValueEventListener = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(sToUserid)).addValueEventListener(new ValueEventListener() {
+                    mUserInfoValueEventListener = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(sUserid)).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if (isActivityDestroyed())
@@ -178,14 +179,14 @@ public class PrivateChatActivity extends GroupChatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                MLog.e(TAG, "NetworkApi.getUserById(" + toUserid + ") failed in onCreate()", error);
+                MLog.e(TAG, "NetworkApi.getUserById(" + sUserid + ") failed in onCreate()", error);
                 Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, "2"), Toast.LENGTH_SHORT).show();
             }
         });
         final NotificationManager notificationManager = ((NotificationManager) getSystemService(NOTIFICATION_SERVICE));
-        notificationManager.cancel(toUserid);
-        MLog.d(TAG, "Cancelled notification " + toUserid);
-        clearPrivateUnreadMessages(toUserid);
+        notificationManager.cancel(sUserid);
+        MLog.d(TAG, "Cancelled notification " + sUserid);
+        clearPrivateUnreadMessages(sUserid);
 
         final View customTitlePairInParallax = findViewById(R.id.customTitlePairInParallax);
         final View customTitlePairInToolbar = findViewById(R.id.customTitlePairInToolbar);
@@ -195,7 +196,6 @@ public class PrivateChatActivity extends GroupChatActivity {
         mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                //android.R.attr.actionBarSize
                 float alpha = 1 - (float) (Math.abs(verticalOffset) + getToolbarHeight()) / appBarLayout.getHeight();
                 if (verticalOffset == 0) {
                     alpha = 1;
@@ -210,12 +210,9 @@ public class PrivateChatActivity extends GroupChatActivity {
                 MLog.d(TAG, "mAppBarLayout.height: " + appBarLayout.getHeight(), " verticalOffset ", verticalOffset, " toolbarHeight ", getToolbarHeight(), " alpha ", alpha);
                 if (verticalOffset == 0) {
                     mIsAppBarExpanded = true;
-                    //invalidateOptionsMenu();
-
                 } else if (Math.abs(verticalOffset) + getToolbarHeight() == appBarLayout.getHeight()) {
                     mIsAppBarExpanded = false;
                     checkIfSeenToolbarProfileTooltip(mProfilePic);
-                    //invalidateOptionsMenu();
                 }
             }
         });
@@ -294,7 +291,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     public void onDestroy() {
         if (mUserInfoValueEventListener != null) {
             try {
-                FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(sToUserid)).removeEventListener(mUserInfoValueEventListener);
+                FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(sUserid)).removeEventListener(mUserInfoValueEventListener);
             } catch (Exception e) {
                 MLog.e(TAG, "", e);
             }
@@ -316,7 +313,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         super.onFriendlyMessageSuccess(friendlyMessage);
 
         try {
-            NetworkApi.gcmsend(sToUserid, Constants.GcmMessageType.msg, friendlyMessage.toLightweightJSONObject());
+            NetworkApi.gcmsend(sUserid, Constants.GcmMessageType.msg, friendlyMessage.toLightweightJSONObject());
         } catch (JSONException e) {
             MLog.e(TAG, "", e);
         }
@@ -332,28 +329,17 @@ public class PrivateChatActivity extends GroupChatActivity {
             if (System.currentTimeMillis() - mLastTypingTime < 3000) {
                 return;
             }
-            FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHAT_TYPING_REF(sToUserid)).child("" + myUserid()).child(Constants.CHILD_TYPING).setValue(true);
+            FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHAT_TYPING_REF(sUserid)).child("" + myUserid()).child(Constants.CHILD_TYPING).setValue(true);
             mLastTypingTime = System.currentTimeMillis();
         } catch (Exception e) {
             MLog.e(TAG, "onMeTyping() failed", e);
         }
     }
 
-    public static void startPrivateChatActivity(final Activity activity, final int userid, final String username, final String profilePicUrl,
+    public static void startPrivateChatActivity(Activity activity, int userid, String username, String profilePicUrl,
+                                                final boolean autoAddUser,
                                                 final View transitionImageView,
-                                                final Uri sharePhotoUri, final String shareMessage) {
-
-        startPrivateChatActivityInternal(activity, userid, username, profilePicUrl, transitionImageView, sharePhotoUri, shareMessage);
-    }
-
-    public static void startPrivateChatActivity(final Activity activity, final int userid,
-                                                final Uri sharePhotoUri, final String shareMessage) {
-        startPrivateChatActivity(activity, userid, null, null, null, sharePhotoUri, shareMessage);
-    }
-
-    private static void startPrivateChatActivityInternal(Activity activity, int userid, String username, String profilePicUrl,
-                                                         final View transitionImageView,
-                                                         Uri sharePhotoUri, String shareMessage) {
+                                                Uri sharePhotoUri, String shareMessage) {
         Intent intent = newIntent(activity, userid);
         if (sharePhotoUri != null)
             intent.putExtra(Constants.KEY_SHARE_PHOTO_URI, sharePhotoUri);
@@ -363,6 +349,7 @@ public class PrivateChatActivity extends GroupChatActivity {
             intent.putExtra(Constants.KEY_USERNAME, username);
         if (profilePicUrl != null)
             intent.putExtra(Constants.KEY_PROFILE_PIC_URL, profilePicUrl);
+        intent.putExtra(Constants.KEY_AUTO_ADD_PERSON, autoAddUser);
 
         if (transitionImageView != null) {
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, transitionImageView, "profilePic");
@@ -377,7 +364,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         intent.putExtra(Constants.KEY_USERID, userid);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
                 | Intent.FLAG_ACTIVITY_NEW_TASK);
-        MLog.d(TAG, "instantiated intent with userid: " + userid);
+        MLog.d(TAG, "instantiated intent with sUserid: " + userid);
         return intent;
     }
 
@@ -386,29 +373,40 @@ public class PrivateChatActivity extends GroupChatActivity {
     }
 
     public static int getActiveUserid() {
-        return sToUserid;
+        return sUserid;
     }
 
     @Override
     protected void onRemoteUserTyping(int userid, String username, String dpid) {
-        if (isActivityDestroyed() || !sIsActive || sToUserid != userid) {
+        if (isActivityDestroyed() || !sIsActive || this.sUserid != userid) {
             return;
         }
         showTypingDots();
     }
 
-    private void preloadUserIfPossible() {
+    private void loadIntentData() {
 
-        String username = getIntent().hasExtra(Constants.KEY_USERNAME) ? getIntent().getStringExtra(Constants.KEY_USERNAME) : null;
-        String dpid = getIntent().hasExtra(Constants.KEY_PROFILE_PIC_URL) ? getIntent().getStringExtra(Constants.KEY_PROFILE_PIC_URL) : null;
-        if (username != null) {
-            ((TextView) findViewById(R.id.customTitleInToolbar)).setText(username);
-            ((TextView) findViewById(R.id.customTitleInParallax)).setText(username);
+        if (sUsername != null) {
+            ((TextView) findViewById(R.id.customTitleInToolbar)).setText(sUsername);
+            ((TextView) findViewById(R.id.customTitleInParallax)).setText(sUsername);
         }
-        /**
-         * don't load the image url since scene transition takes care of this
-         */
 
+        if (!getIntent().getBooleanExtra(Constants.KEY_AUTO_ADD_PERSON, false))
+            return;
+
+        //add this person to my left drawer and remove them from pending requests
+        PrivateChatSummary privateChatSummary = new PrivateChatSummary();
+        privateChatSummary.setName(sUsername);
+        privateChatSummary.setDpid(sProfilePicUrl);
+        privateChatSummary.setAccepted(true);
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF())
+                .child(sUserid + "");
+        ref.updateChildren(privateChatSummary.toMap());
+
+        /**
+         * remove the person from your pending requests
+         */
+        FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(sUserid, Preferences.getInstance().getUserId())).removeValue();
     }
 
     private void populateUserProfile() {
@@ -606,8 +604,8 @@ public class PrivateChatActivity extends GroupChatActivity {
     private ValueEventListener mTypingValueEventListener;
 
     private void listenForPartnerTyping() {
-        mTypingReference = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHAT_TYPING_REF(sToUserid)).
-                child("" + sToUserid).child(Constants.CHILD_TYPING);
+        mTypingReference = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHAT_TYPING_REF(sUserid)).
+                child("" + sUserid).child(Constants.CHILD_TYPING);
         mTypingReference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -621,7 +619,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                             boolean isTyping = dataSnapshot.getValue(Boolean.class);
                             MLog.d(TAG, "isTyping: ", isTyping);
                             if (isTyping) {
-                                onRemoteUserTyping(sToUserid, mToUser.getUsername(), mToUser.getProfilePicUrl());
+                                onRemoteUserTyping(sUserid, mToUser.getUsername(), mToUser.getProfilePicUrl());
                                 mTypingReference.setValue(false);
                             }
                         }
@@ -654,7 +652,7 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     @Override
     public void onUserClicked(int userid, String username, String dpid, View transitionImageView) {
-        if (userid == sToUserid) {
+        if (userid == this.sUserid) {
             mAppBarLayout.setExpanded(true, true);
         } else {
             super.onUserClicked(userid, username, dpid, transitionImageView);
@@ -703,7 +701,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     }
 
     private void checkIfPartnerIsBlocked() {
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF()).child(sToUserid + "");
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF()).child(sUserid + "");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -727,7 +725,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     @Override
     public boolean onMenuOpened(int featureId, Menu menu) {
         if (menu == null) return false;
-        if (sToUserid == myUserid()) {
+        if (sUserid == myUserid()) {
             if (menu.findItem(R.id.menu_block_user) != null) {
                 menu.removeItem(R.id.menu_block_user);
             }

@@ -69,7 +69,7 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
         getView().findViewById(R.id.toolbar).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PrivateChatActivity.startPrivateChatActivity(getActivity(), mFriendlyMessage.getUserid(), null, null);
+                PrivateChatActivity.startPrivateChatActivity(getActivity(), mFriendlyMessage.getUserid(), mFriendlyMessage.getName(), mFriendlyMessage.getDpid(), false, null, null, null);
             }
         });
 

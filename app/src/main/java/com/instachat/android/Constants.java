@@ -254,12 +254,13 @@ public final class Constants {
 
     public static final String KEY_GROUPID = "group_id";
     public static final String KEY_GROUP_NAME = "group_name";
-    public static final String KEY_USERID = "user_id";
+    public static final String KEY_USERID = "key_user_id";
     public static final String KEY_GCM_MSG_TYPE = "key_gcm_type";
     public static final String KEY_SHARE_PHOTO_URI = "key_share_photo_uri";
     public static final String KEY_SHARE_MESSAGE = "key_share_message";
     public static final String KEY_PROFILE_PIC_URL = "key_profile_pic_url";
     public static final String KEY_USERNAME = "key_username";
+    public static final String KEY_AUTO_ADD_PERSON = "key_auto_add_person";
 
     public enum GcmMessageType {
         msg, typing

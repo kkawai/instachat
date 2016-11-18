@@ -33,9 +33,11 @@ public class DirectReplyActivity extends AppCompatActivity {
 
     public static final String TAG = "DirectReplyActivity";
 
-    public static Intent newIntent(Context context, int userid) {
+    public static Intent newIntent(Context context, int userid, String username, String dpid) {
         Intent intent = new Intent(context, DirectReplyActivity.class);
         intent.putExtra(Constants.KEY_USERID, userid);
+        intent.putExtra(Constants.KEY_USERNAME, username);
+        intent.putExtra(Constants.KEY_PROFILE_PIC_URL, dpid);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
                 | Intent.FLAG_ACTIVITY_NEW_TASK);
         MLog.d(TAG, "instantiated intent with userid: " + userid);
@@ -55,6 +57,8 @@ public class DirectReplyActivity extends AppCompatActivity {
             myDirectReply = remoteInput.getCharSequence(Constants.KEY_TEXT_REPLY).toString();
         }
         final int userid = intent.getIntExtra(Constants.KEY_USERID, 0);
+        final String username = intent.getStringExtra(Constants.KEY_USERNAME);
+        final String profilePicUrl = intent.getStringExtra(Constants.KEY_PROFILE_PIC_URL);
         MLog.d(TAG, " to user id: ", userid, " direct reply: ", myDirectReply);
 
 //        Notification repliedNotification =
@@ -67,7 +71,7 @@ public class DirectReplyActivity extends AppCompatActivity {
 //        notificationManager.notify(userid, repliedNotification);
 
         if (TextUtils.isEmpty(myDirectReply)) {
-            PrivateChatActivity.startPrivateChatActivity(this, userid, null, null);
+            PrivateChatActivity.startPrivateChatActivity(this, userid, username, profilePicUrl, false, null, null, null);
             finish();
         } else {
             User me = Preferences.getInstance().getUser();
