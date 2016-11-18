@@ -21,7 +21,6 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.services.urlshortener.Urlshortener;
 import com.google.api.services.urlshortener.model.Url;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -363,7 +362,7 @@ public class PhotoUploadHelper {
                 try {
                     url = urlshortener.url().insert(url).setKey(Constants.GOOGLE_API_KEY).execute();
                 } catch (Exception e) {
-                    MLog.e(TAG, "", e);
+                    MLog.e(TAG, "shorten url error: ", e);
                     ThreadWrapper.executeInUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -373,7 +372,7 @@ public class PhotoUploadHelper {
                     return;
                 }
                 final String newUrl = url != null && url.getId() != null ? url.getId() : photoUrl;
-                MLog.d(TAG, "shortened url: " + newUrl);
+                MLog.d(TAG, "shorten url success: " + newUrl);
                 ThreadWrapper.executeInUiThread(new Runnable() {
                     @Override
                     public void run() {

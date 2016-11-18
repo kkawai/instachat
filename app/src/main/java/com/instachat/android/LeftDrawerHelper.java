@@ -64,6 +64,7 @@ public class LeftDrawerHelper {
     private View mHelpButton;
     private View mDrawerLikesParent;
     private TextView mDrawerLikesCountView;
+    private View mDrawerLikesIcon;
     private TextView mPendingRequests;
     private boolean mIsVirgin = true;
     private DatabaseReference mTotalLikesRef;
@@ -129,6 +130,7 @@ public class LeftDrawerHelper {
         mSaveButton = mHeaderLayout.findViewById(R.id.save_username);
         mDrawerLikesParent = mHeaderLayout.findViewById(R.id.drawerLikesParent);
         mDrawerLikesCountView = (TextView) mHeaderLayout.findViewById(R.id.drawerLikes);
+        mDrawerLikesIcon = mHeaderLayout.findViewById(R.id.drawerLikesIcon);
         mPendingRequests = (TextView) navigationView.findViewById(R.id.menu_pending_requests);
         FontUtil.setTextViewFont(mDrawerLikesCountView);
         mHelpButton = mHeaderLayout.findViewById(R.id.help);
@@ -543,6 +545,8 @@ public class LeftDrawerHelper {
                 if (dataSnapshot.exists()) {
                     if (mDrawerLikesParent.getVisibility() != View.VISIBLE) {
                         mDrawerLikesParent.setVisibility(View.VISIBLE);
+                        mDrawerLikesIcon.setVisibility(View.VISIBLE);
+                        mDrawerLikesCountView.setVisibility(View.VISIBLE);
                     }
                     long count = dataSnapshot.getValue(Long.class);
                     if (count == 1) {
