@@ -107,9 +107,9 @@ public class PrivateChatActivity extends GroupChatActivity {
         mMessageRecyclerViewParent = findViewById(R.id.messageRecyclerViewParent);
         mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
         getSupportActionBar().setTitle("");
-        sUserid = getIntent().getIntExtra(Constants.KEY_USERID, 0);
-        sUsername = getIntent().getStringExtra(Constants.KEY_USERNAME);
-        sProfilePicUrl = getIntent().getStringExtra(Constants.KEY_PROFILE_PIC_URL);
+        sUserid = intent.getIntExtra(Constants.KEY_USERID, 0);
+        sUsername = intent.getStringExtra(Constants.KEY_USERNAME);
+        sProfilePicUrl = intent.getStringExtra(Constants.KEY_PROFILE_PIC_URL);
         loadIntentData();
         NetworkApi.getUserById(this, sUserid, new Response.Listener<JSONObject>() {
             @Override
@@ -304,8 +304,7 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     @Override
     void initDatabaseRef() {
-        int toUserid = getIntent().getIntExtra(Constants.KEY_USERID, 0);
-        setDatabaseRoot(Constants.PRIVATE_CHAT_REF(toUserid));
+        setDatabaseRoot(Constants.PRIVATE_CHAT_REF(sUserid));
     }
 
     @Override
@@ -386,10 +385,8 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     private void loadIntentData() {
 
-        if (sUsername != null) {
-            ((TextView) findViewById(R.id.customTitleInToolbar)).setText(sUsername);
-            ((TextView) findViewById(R.id.customTitleInParallax)).setText(sUsername);
-        }
+        ((TextView) findViewById(R.id.customTitleInToolbar)).setText(sUsername);
+        ((TextView) findViewById(R.id.customTitleInParallax)).setText(sUsername);
 
         if (!getIntent().getBooleanExtra(Constants.KEY_AUTO_ADD_PERSON, false))
             return;
