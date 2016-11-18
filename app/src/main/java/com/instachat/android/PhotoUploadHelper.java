@@ -352,10 +352,6 @@ public class PhotoUploadHelper {
 
     private void postProcessPhoto(final String photoUrl, final boolean isPossibleAdult, final boolean isPossibleViolence) {
 
-        if (!FirebaseRemoteConfig.getInstance().getBoolean(Constants.KEY_ALLOW_DELETE_OTHER_MESSAGES)) {
-            mListener.onPhotoUploadSuccess(photoUrl, isPossibleAdult, isPossibleViolence);
-            return;
-        }
         ThreadWrapper.executeInWorkerThread(new Runnable() {
             @Override
             public void run() {

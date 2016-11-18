@@ -94,7 +94,7 @@ public class MessageOptionsDialogHelper {
             popupMenu.getMenu().findItem(R.id.menu_delete_message).setTitle(R.string.delete_photo);
         }
         if (!FirebaseRemoteConfig.getInstance().getBoolean(Constants.KEY_ALLOW_DELETE_OTHER_MESSAGES)) {
-            if (Preferences.getInstance().getUserId() != friendlyMessage.getUserid() && friendlyMessage.getUserid() != Constants.ADMIN_USERID) {
+            if (Preferences.getInstance().getUserId() != friendlyMessage.getUserid()) {
                 popupMenu.getMenu().removeItem(R.id.menu_delete_message);
             }
         }

@@ -18,8 +18,6 @@ public final class Constants {
     public static final int MIN_PASSWORD_LENGTH = 4;
     public static final int MAX_BIO_LENGTH = 512;
 
-    public static final int ADMIN_USERID = 3733523; //me
-
     //remote configuration with default values
     public static final boolean DEFAULT_DO_SHORTEN_IMAGE_URLS = true;
     public static final boolean DEFAULT_ALLOW_DELETE_OTHER_MESSAGES = false;
