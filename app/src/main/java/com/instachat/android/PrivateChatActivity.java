@@ -68,7 +68,6 @@ import java.util.Map;
 public class PrivateChatActivity extends GroupChatActivity {
 
     private static final String TAG = "PrivateChatActivity";
-    private User mToUser;
     private long mLastTypingTime;
     private ValueEventListener mUserInfoValueEventListener = null;
     private FirebaseRemoteConfig mConfig;
@@ -115,10 +114,13 @@ public class PrivateChatActivity extends GroupChatActivity {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    mToUser = User.fromResponse(response);
-                    populateUserProfile();
+                    final User toUser = User.fromResponse(response);
+                    sUserid = toUser.getId();
+                    sUsername = toUser.getUsername();
+                    sProfilePicUrl = toUser.getProfilePicUrl();
+                    populateUserProfile(toUser);
                     //getSupportActionBar().setTitle(mToUser.getUsername());
-                    setCustomTitles(mToUser.getUsername(), mToUser.getLastOnline());
+                    setCustomTitles(toUser.getUsername(), toUser.getLastOnline());
                     listenForPartnerTyping();
                     checkIfPartnerIsBlocked();
 
@@ -133,29 +135,29 @@ public class PrivateChatActivity extends GroupChatActivity {
 
                                     //check if only the last active time changed
                                     boolean onlyUpdateLastActiveTime = true;
-                                    if (!mToUser.getUsername().equals(user.getUsername())) {
+                                    if (!toUser.getUsername().equals(user.getUsername())) {
                                         onlyUpdateLastActiveTime = false;
-                                        mToUser.setUsername(user.getUsername());
+                                        toUser.setUsername(user.getUsername());
                                     }
-                                    if (!mToUser.getProfilePicUrl().equals(user.getProfilePicUrl())) {
+                                    if (!toUser.getProfilePicUrl().equals(user.getProfilePicUrl())) {
                                         onlyUpdateLastActiveTime = false;
-                                        mToUser.setProfilePicUrl(user.getProfilePicUrl());
+                                        toUser.setProfilePicUrl(user.getProfilePicUrl());
                                     }
-                                    String existingBio = mToUser.getBio();
+                                    String existingBio = toUser.getBio();
                                     String newBio = user.getBio();
                                     if (!existingBio.equals(newBio)) {
                                         onlyUpdateLastActiveTime = false;
-                                        mToUser.setBio(user.getBio());
+                                        toUser.setBio(user.getBio());
                                     }
 
-                                    if (mToUser.getCurrentGroupId() != user.getCurrentGroupId()) {
+                                    if (toUser.getCurrentGroupId() != user.getCurrentGroupId()) {
                                         onlyUpdateLastActiveTime = false;
-                                        mToUser.setCurrentGroupName(user.getCurrentGroupName());
-                                        mToUser.setCurrentGroupId(user.getCurrentGroupId());
+                                        toUser.setCurrentGroupName(user.getCurrentGroupName());
+                                        toUser.setCurrentGroupId(user.getCurrentGroupId());
                                     }
                                     setCustomTitles(user.getUsername(), user.getLastOnline());
                                     if (!onlyUpdateLastActiveTime) {
-                                        populateUserProfile();
+                                        populateUserProfile(toUser);
                                     }
                                     MLog.d(TAG, "user info changed onlyUpdateLastActiveTime: ", onlyUpdateLastActiveTime);
 
@@ -265,10 +267,10 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     private void initializePrivateChatSummary() {
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF())
-                .child(mToUser.getId() + "");
+                .child(sUserid + "");
         PrivateChatSummary summary = new PrivateChatSummary();
-        summary.setName(mToUser.getUsername());
-        summary.setDpid(mToUser.getProfilePicUrl());
+        summary.setName(sUsername);
+        summary.setDpid(sProfilePicUrl);
         summary.setAccepted(true);
         Map<String, Object> map = summary.toMap();
         map.put(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP, ServerValue.TIMESTAMP);
@@ -406,13 +408,13 @@ public class PrivateChatActivity extends GroupChatActivity {
         FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(sUserid, Preferences.getInstance().getUserId())).removeValue();
     }
 
-    private void populateUserProfile() {
-        if (mToUser == null || isActivityDestroyed()) return;
+    private void populateUserProfile(final User toUser) {
+        if (toUser == null || isActivityDestroyed()) return;
         final ImageView toolbarProfileImageView = (ImageView) findViewById(R.id.topCornerUserThumb);
         final ImageView miniPic = (ImageView) findViewById(R.id.superSmallProfileImage);
         final TextView bio = (TextView) findViewById(R.id.bio);
 
-        if (TextUtils.isEmpty(mToUser.getProfilePicUrl())) {
+        if (TextUtils.isEmpty(toUser.getProfilePicUrl())) {
             toolbarProfileImageView.setImageResource(R.drawable.ic_anon_person_36dp);
             miniPic.setImageResource(R.drawable.ic_anon_person_36dp);
             mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
@@ -420,7 +422,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         } else {
             try {
                 Glide.with(PrivateChatActivity.this)
-                        .load(mToUser.getProfilePicUrl())
+                        .load(toUser.getProfilePicUrl())
                         .error(R.drawable.ic_anon_person_36dp)
                         //.crossFade()
                         .listener(new RequestListener<String, GlideDrawable>() {
@@ -442,12 +444,12 @@ public class PrivateChatActivity extends GroupChatActivity {
                         })
                         .into(mProfilePic);
                 Glide.with(PrivateChatActivity.this)
-                        .load(mToUser.getProfilePicUrl())
+                        .load(toUser.getProfilePicUrl())
                         .error(R.drawable.ic_anon_person_36dp)
                         .crossFade()
                         .into(miniPic);
                 Glide.with(PrivateChatActivity.this)
-                        .load(mToUser.getProfilePicUrl())
+                        .load(toUser.getProfilePicUrl())
                         .error(R.drawable.ic_anon_person_36dp)
                         .crossFade()
                         .into(toolbarProfileImageView);
@@ -458,20 +460,20 @@ public class PrivateChatActivity extends GroupChatActivity {
                 collapseAppbarAfterDelay();
             }
         }
-        bio.setVisibility(TextUtils.isEmpty(mToUser.getBio()) ? View.GONE : View.VISIBLE);
-        String bioStr = mToUser.getBio() + "";
+        bio.setVisibility(TextUtils.isEmpty(toUser.getBio()) ? View.GONE : View.VISIBLE);
+        String bioStr = toUser.getBio() + "";
         bioStr = bioStr.equals("null") ? "" : bioStr;
         bio.setText(bioStr);
         TextView activeGroup = (TextView) findViewById(R.id.activeGroup);
-        if (mToUser.getCurrentGroupId() != 0 && !TextUtils.isEmpty(mToUser.getCurrentGroupName())) {
+        if (toUser.getCurrentGroupId() != 0 && !TextUtils.isEmpty(toUser.getCurrentGroupName())) {
             activeGroup.setVisibility(View.VISIBLE);
-            activeGroup.setText(getString(R.string.user_active_in_group, mToUser.getCurrentGroupName()));
+            activeGroup.setText(getString(R.string.user_active_in_group, toUser.getCurrentGroupName()));
             activeGroup.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     GroupChatSummary groupChatSummary = new GroupChatSummary();
-                    groupChatSummary.setId(mToUser.getCurrentGroupId());
-                    groupChatSummary.setName(mToUser.getCurrentGroupName());
+                    groupChatSummary.setId(toUser.getCurrentGroupId());
+                    groupChatSummary.setName(toUser.getCurrentGroupName());
                     onGroupChatClicked(groupChatSummary);
                 }
             });
@@ -532,15 +534,15 @@ public class PrivateChatActivity extends GroupChatActivity {
                     toggleAppbar();
                 return true;
             case R.id.menu_block_user:
-                new BlockUserDialogHelper().showBlockUserQuestionDialog(this, mToUser.getId(),
-                        mToUser.getUsername(),
-                        mToUser.getProfilePicUrl(),
+                new BlockUserDialogHelper().showBlockUserQuestionDialog(this, sUserid,
+                        sUsername,
+                        sProfilePicUrl,
                         getBlockedUserListener());
                 return true;
             case R.id.menu_report_user:
-                new ReportUserDialogHelper().showReportUserQuestionDialog(this, mToUser.getId(),
-                        mToUser.getUsername(),
-                        mToUser.getProfilePicUrl());
+                new ReportUserDialogHelper().showReportUserQuestionDialog(this, sUserid,
+                        sUsername,
+                        sProfilePicUrl);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -616,7 +618,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                             boolean isTyping = dataSnapshot.getValue(Boolean.class);
                             MLog.d(TAG, "isTyping: ", isTyping);
                             if (isTyping) {
-                                onRemoteUserTyping(sUserid, mToUser.getUsername(), mToUser.getProfilePicUrl());
+                                onRemoteUserTyping(sUserid, sUsername, sProfilePicUrl);
                                 mTypingReference.setValue(false);
                             }
                         }
@@ -707,7 +709,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                 if (dataSnapshot.getValue() == null) {
                     //
                 } else {
-                    Toast.makeText(PrivateChatActivity.this, getString(R.string.cannot_chat_you_blocked_them, mToUser.getUsername()), Toast.LENGTH_LONG).show();
+                    Toast.makeText(PrivateChatActivity.this, getString(R.string.cannot_chat_you_blocked_them, sUsername), Toast.LENGTH_LONG).show();
                 }
             }
 
