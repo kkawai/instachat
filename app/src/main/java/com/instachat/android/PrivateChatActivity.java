@@ -119,7 +119,6 @@ public class PrivateChatActivity extends GroupChatActivity {
                     sUsername = toUser.getUsername();
                     sProfilePicUrl = toUser.getProfilePicUrl();
                     populateUserProfile(toUser);
-                    //getSupportActionBar().setTitle(mToUser.getUsername());
                     setCustomTitles(toUser.getUsername(), toUser.getLastOnline());
                     listenForPartnerTyping();
                     checkIfPartnerIsBlocked();
@@ -651,7 +650,7 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     @Override
     public void onUserClicked(int userid, String username, String dpid, View transitionImageView) {
-        if (userid == this.sUserid) {
+        if (userid == sUserid) {
             mAppBarLayout.setExpanded(true, true);
         } else {
             super.onUserClicked(userid, username, dpid, transitionImageView);
