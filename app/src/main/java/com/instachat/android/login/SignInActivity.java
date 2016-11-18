@@ -41,6 +41,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.instachat.android.BaseActivity;
 import com.instachat.android.GroupChatActivity;
 import com.instachat.android.MyApp;
@@ -127,9 +128,9 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
         signInWithEmailOrUsernamePassword(email, password, null);
     }
 
-    private void signInWithEmailOrUsernamePassword(final String email, final String password, final String ltuEmail) {
+    private void signInWithEmailOrUsernamePassword(final String emailOrUsername, final String password, final String ltuEmail) {
         showProgressDialog();
-        NetworkApi.getUserByEmailOrUsernamePassword(this, email, password, ltuEmail, new Response.Listener<JSONObject>() {
+        NetworkApi.getUserByEmailOrUsernamePassword(this, emailOrUsername, password, ltuEmail, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(final JSONObject response) {
                 try {
@@ -144,13 +145,13 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
                              *
                              */
                             hideProgressDialog();
-                            showNewEmailDialog(SignInActivity.this, email, password);
+                            showNewEmailDialog(SignInActivity.this, emailOrUsername, password);
                             return;
                         }
                         final User user = User.fromResponse(response);
                         Preferences.getInstance().saveUser(user);
-                        Preferences.getInstance().saveLastSignIn(email);
-                        signIntoFirebase(user.getEmail(), password, ltuEmail != null);
+                        Preferences.getInstance().saveLastSignIn(emailOrUsername);
+                        signIntoFirebase(user.getEmail(), password);
                     } else {
                         showErrorToast(R.string.email_password_not_found);
                     }
@@ -169,46 +170,51 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
         });
     }
 
-    private void signIntoFirebase(final String email, final String password, boolean createAccount) {
+    private void signIntoFirebase(final String email, final String password) {
 
-        if (createAccount) {
-            mFirebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    hideProgressDialog();
-                    MLog.d(TAG, "mFirebaseAuth.createUserWithEmailAndPassword(): " + task.isSuccessful());
-                    if (!task.isSuccessful()) {
-                        MLog.w(TAG, "mFirebaseAuth.createUserWithEmailAndPassword(): ", task.getException());
-                        showErrorToast("Account Create Error");
-                    } else {
-                        startActivity(new Intent(SignInActivity.this, GroupChatActivity.class));
-                        finish();
+        mFirebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                MLog.d(TAG, "mFirebaseAuth.signInWithEmailAndPassword(): " + task.isSuccessful());
+                if (!task.isSuccessful()) {
+                    if (task.getException() instanceof FirebaseAuthInvalidUserException) {
+                        createFirebaseAccount(email, password);
+                        return;
                     }
+                    MLog.w(TAG, "mFirebaseAuth.signInWithEmailAndPassword(): ", task.getException());
+                    showErrorToast("Sign In Error");
+                } else {
+                    finallyGoChat();
                 }
-            });
-        } else {
-            mFirebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    hideProgressDialog();
-                    MLog.d(TAG, "mFirebaseAuth.signInWithEmailAndPassword(): " + task.isSuccessful());
-                    if (!task.isSuccessful()) {
-                        MLog.w(TAG, "mFirebaseAuth.signInWithEmailAndPassword(): ", task.getException());
-                        showErrorToast("Sign In Error");
-                    } else {
+            }
+        });
+    }
 
-                        User user = Preferences.getInstance().getUser();
-                        if (StringUtil.isEmpty(user.getProfilePicUrl())) {
-                            if (!TextUtils.isEmpty(thirdPartyProfilePicUrl)) {
-                                NetworkApi.saveThirdPartyPhoto(thirdPartyProfilePicUrl);
-                            }
-                        }
-                        startActivity(new Intent(SignInActivity.this, GroupChatActivity.class));
-                        finish();
-                    }
-                }
-            });
+    private void finallyGoChat() {
+        hideProgressDialog();
+        User user = Preferences.getInstance().getUser();
+        if (StringUtil.isEmpty(user.getProfilePicUrl())) {
+            if (!TextUtils.isEmpty(thirdPartyProfilePicUrl)) {
+                NetworkApi.saveThirdPartyPhoto(thirdPartyProfilePicUrl);
+            }
         }
+        startActivity(new Intent(SignInActivity.this, GroupChatActivity.class));
+        finish();
+    }
+
+    private void createFirebaseAccount(final String email, final String password) {
+
+        mFirebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                MLog.d(TAG, "mFirebaseAuth.createFirebaseAccount(): " + task.isSuccessful());
+                if (!task.isSuccessful()) {
+                    showErrorToast("Sign In Error");
+                } else {
+                    finallyGoChat();
+                }
+            }
+        });
     }
 
     @Override
@@ -280,7 +286,7 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
                         final User user = User.fromResponse(response);
                         Preferences.getInstance().saveUser(user);
                         Preferences.getInstance().saveLastSignIn(user.getUsername());
-                        signIntoFirebase(user.getEmail(), user.getPassword(), false);
+                        signIntoFirebase(user.getEmail(), user.getPassword());
                     } else { //user does not exist go to sign up activity
                         hideProgressDialog();
                         final Intent intent = new Intent(SignInActivity.this, SignUpActivity.class);
@@ -339,17 +345,19 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
     private AlertDialog showNewEmailDialog(@NonNull final Context context, final String username, final String password) {
         final Object tag = new Object();
         final View view = getLayoutInflater().inflate(R.layout.dialog_input_email, null);
-        FontUtil.setTextViewFont((TextView) view.findViewById(R.id.input_email));
+        final TextView textView = (TextView) view.findViewById(R.id.input_email);
+        final TextInputLayout textInputLayout = (TextInputLayout) view.findViewById(R.id.input_email_layout);
+        FontUtil.setTextViewFont(textView);
         final AlertDialog dialog = new ThemedAlertDialog.Builder(context).
                 setView(view).
                 setCancelable(false).
                 setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        final String ltuEmail = ((TextView) view.findViewById(R.id.input_email)).getText().toString();
-                        final TextInputLayout textInputLayout = (TextInputLayout) view.findViewById(R.id.input_email_layout);
+                        final String ltuEmail = textView.getText().toString();
                         if (!StringUtil.isValidEmail(ltuEmail)) {
                             textInputLayout.setError(getString(R.string.invalid_email));
+                            Toast.makeText(SignInActivity.this, getString(R.string.invalid_email), Toast.LENGTH_SHORT).show();
                             return;
                         }
                         showProgressDialog();
@@ -361,6 +369,8 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
                                 try {
                                     if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK) && response.getJSONObject("data").getBoolean("exists")) {
                                         textInputLayout.setError(errorMessage(R.string.email_exists, ltuEmail));
+                                        hideProgressDialog();
+                                        Toast.makeText(SignInActivity.this, errorMessage(R.string.email_exists, ltuEmail), Toast.LENGTH_SHORT).show();
                                     } else {
                                         signInWithEmailOrUsernamePassword(username, password, ltuEmail);
                                     }
