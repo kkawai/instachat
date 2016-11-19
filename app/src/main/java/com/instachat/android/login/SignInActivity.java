@@ -175,7 +175,7 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
         mFirebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                MLog.d(TAG, "mFirebaseAuth.signInWithEmailAndPassword(): " + task.isSuccessful());
+                MLog.d(TAG, "mFirebaseAuth.signInWithEmailAndPassword(): " + task.isSuccessful(), " ", email, " ", password);
                 if (!task.isSuccessful()) {
                     if (task.getException() instanceof FirebaseAuthInvalidUserException) {
                         createFirebaseAccount(email, password);
@@ -207,8 +207,9 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
         mFirebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                MLog.d(TAG, "mFirebaseAuth.createFirebaseAccount(): " + task.isSuccessful());
+                MLog.d(TAG, "mFirebaseAuth.createFirebaseAccount(): " + task.isSuccessful(), " ", email, " ", password);
                 if (!task.isSuccessful()) {
+                    MLog.w(TAG, "mFirebaseAuth.createUserWithEmailAndPassword(): ", task.getException());
                     showErrorToast("Sign In Error");
                 } else {
                     finallyGoChat();

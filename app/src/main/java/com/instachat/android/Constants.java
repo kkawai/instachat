@@ -14,8 +14,8 @@ public final class Constants {
     public static final int MIN_USERNAME_LENGTH = 2;
     public static final int MAX_EMAIL_LENGTH = 128; //also see dimens
     public static final int MIN_EMAIL_LENGTH = 5;
-    public static final int MAX_PASSWORD_LENGTH = 10;//also see dimens
-    public static final int MIN_PASSWORD_LENGTH = 4;
+    public static final int MAX_PASSWORD_LENGTH = 20;//also see dimens
+    public static final int MIN_PASSWORD_LENGTH = 6;
     public static final int MAX_BIO_LENGTH = 512;
 
     //remote configuration with default values
@@ -252,8 +252,8 @@ public final class Constants {
     public static final int MAX_PROFILE_PIC_SIZE_BYTES = 400000;
     public static final float MAX_FULLSCREEN_FONT_SIZE = 199f;
 
-    public static final String KEY_GROUPID = "group_id";
-    public static final String KEY_GROUP_NAME = "group_name";
+    public static final String KEY_GROUPID = "_key_group_id";
+    public static final String KEY_GROUP_NAME = "key_group_name";
     public static final String KEY_USERID = "key_user_id";
     public static final String KEY_GCM_MSG_TYPE = "key_gcm_type";
     public static final String KEY_SHARE_PHOTO_URI = "key_share_photo_uri";
@@ -267,8 +267,8 @@ public final class Constants {
     }
 
     public static final String ACTION_USER_TYPING = "action_user_typing";
-    public static final String KEY_GCM_MESSAGE = "msg";
-    public static final String KEY_TO_USERID = "toid";
+    public static final String KEY_GCM_MESSAGE = "key_msg";
+    public static final String KEY_TO_USERID = "key_toid";
     public static final String CHILD_UNREAD_MESSAGES = "unread_messages";
     public static final String CHILD_LIKES = "likes";
     public static final String CHILD_TYPING = "isTyping";
