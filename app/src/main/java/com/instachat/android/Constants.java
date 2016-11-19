@@ -267,8 +267,8 @@ public final class Constants {
     }
 
     public static final String ACTION_USER_TYPING = "action_user_typing";
-    public static final String KEY_GCM_MESSAGE = "key_msg";
-    public static final String KEY_TO_USERID = "key_toid";
+    public static final String KEY_GCM_MESSAGE = "msg"; //DO NOT CHANGE, SERVER DEPENDENT
+    public static final String KEY_TO_USERID = "toid";//DO NOT CHANGE, SERVER DEPENDENT
     public static final String CHILD_UNREAD_MESSAGES = "unread_messages";
     public static final String CHILD_LIKES = "likes";
     public static final String CHILD_TYPING = "isTyping";

@@ -219,8 +219,8 @@ public final class NetworkApi {
                 try {
                     msg.put(Constants.KEY_GCM_MSG_TYPE, messageType.name());
                     final HashMap<String, String> params = new HashMap<>();
-                    params.put(Constants.KEY_TO_USERID, toid + "");
-                    params.put(Constants.KEY_GCM_MESSAGE, msg.toString());
+                    params.put(Constants.KEY_TO_USERID, toid + ""); //DON'T CHANGE KEY, SERVER DEPENDENT
+                    params.put(Constants.KEY_GCM_MESSAGE, msg.toString()); //DON'T CHANGE KEY, SERVER
                     final JSONObject response = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/gcmsend").post(params));
                     if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                         MLog.i(TAG, "sent gcm message to server: " + response.optString("descr"));

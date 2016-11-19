@@ -2,7 +2,6 @@ package com.instachat.android;
 
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -106,20 +105,19 @@ public class PrivateChatActivity extends GroupChatActivity {
         mMessageRecyclerViewParent = findViewById(R.id.messageRecyclerViewParent);
         mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
         getSupportActionBar().setTitle("");
-        sUserid = intent.getIntExtra(Constants.KEY_USERID, 0);
-        sUsername = intent.getStringExtra(Constants.KEY_USERNAME);
-        sProfilePicUrl = intent.getStringExtra(Constants.KEY_PROFILE_PIC_URL);
-        loadIntentData();
+        sUserid = getIntent().getIntExtra(Constants.KEY_USERID, 0);
+        sUsername = getIntent().getStringExtra(Constants.KEY_USERNAME);
+        sProfilePicUrl = getIntent().getStringExtra(Constants.KEY_PROFILE_PIC_URL);
+        loadBasicData(getIntent());
         NetworkApi.getUserById(this, sUserid, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     final User toUser = User.fromResponse(response);
-                    sUserid = toUser.getId();
                     sUsername = toUser.getUsername();
                     sProfilePicUrl = toUser.getProfilePicUrl();
                     populateUserProfile(toUser);
-                    setCustomTitles(toUser.getUsername(), toUser.getLastOnline());
+                    setCustomTitles(toUser.getUsername(), 0);
                     listenForPartnerTyping();
                     checkIfPartnerIsBlocked();
 
@@ -340,16 +338,18 @@ public class PrivateChatActivity extends GroupChatActivity {
                                                 final boolean autoAddUser,
                                                 final View transitionImageView,
                                                 Uri sharePhotoUri, String shareMessage) {
-        Intent intent = newIntent(activity, userid);
+        Intent intent = new Intent(activity, PrivateChatActivity.class);
+        intent.putExtra(Constants.KEY_USERID, userid);
+        intent.putExtra(Constants.KEY_USERNAME, username);
+        intent.putExtra(Constants.KEY_PROFILE_PIC_URL, profilePicUrl);
+        intent.putExtra(Constants.KEY_AUTO_ADD_PERSON, autoAddUser);
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                | Intent.FLAG_ACTIVITY_NEW_TASK);
         if (sharePhotoUri != null)
             intent.putExtra(Constants.KEY_SHARE_PHOTO_URI, sharePhotoUri);
         if (shareMessage != null)
             intent.putExtra(Constants.KEY_SHARE_MESSAGE, shareMessage);
-        if (username != null)
-            intent.putExtra(Constants.KEY_USERNAME, username);
-        if (profilePicUrl != null)
-            intent.putExtra(Constants.KEY_PROFILE_PIC_URL, profilePicUrl);
-        intent.putExtra(Constants.KEY_AUTO_ADD_PERSON, autoAddUser);
 
         if (transitionImageView != null) {
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, transitionImageView, "profilePic");
@@ -357,15 +357,6 @@ public class PrivateChatActivity extends GroupChatActivity {
         } else {
             activity.startActivity(intent);
         }
-    }
-
-    public static Intent newIntent(Context context, int userid) {
-        Intent intent = new Intent(context, PrivateChatActivity.class);
-        intent.putExtra(Constants.KEY_USERID, userid);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-                | Intent.FLAG_ACTIVITY_NEW_TASK);
-        MLog.d(TAG, "instantiated intent with sUserid: " + userid);
-        return intent;
     }
 
     public static boolean isActive() {
@@ -384,27 +375,27 @@ public class PrivateChatActivity extends GroupChatActivity {
         showTypingDots();
     }
 
-    private void loadIntentData() {
+    private void loadBasicData(Intent intent) {
 
         ((TextView) findViewById(R.id.customTitleInToolbar)).setText(sUsername);
         ((TextView) findViewById(R.id.customTitleInParallax)).setText(sUsername);
 
-        if (!getIntent().getBooleanExtra(Constants.KEY_AUTO_ADD_PERSON, false))
-            return;
+        if (intent.getBooleanExtra(Constants.KEY_AUTO_ADD_PERSON, false)) {
+            //add this person to my left drawer and remove them from pending requests
+            PrivateChatSummary privateChatSummary = new PrivateChatSummary();
+            privateChatSummary.setName(sUsername);
+            privateChatSummary.setDpid(sProfilePicUrl);
+            privateChatSummary.setAccepted(true);
+            final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF())
+                    .child(sUserid + "");
+            ref.updateChildren(privateChatSummary.toMap());
 
-        //add this person to my left drawer and remove them from pending requests
-        PrivateChatSummary privateChatSummary = new PrivateChatSummary();
-        privateChatSummary.setName(sUsername);
-        privateChatSummary.setDpid(sProfilePicUrl);
-        privateChatSummary.setAccepted(true);
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF())
-                .child(sUserid + "");
-        ref.updateChildren(privateChatSummary.toMap());
+            /**
+             * remove the person from your pending requests
+             */
+            FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(sUserid, Preferences.getInstance().getUserId())).removeValue();
+        }
 
-        /**
-         * remove the person from your pending requests
-         */
-        FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(sUserid, Preferences.getInstance().getUserId())).removeValue();
     }
 
     private void populateUserProfile(final User toUser) {
