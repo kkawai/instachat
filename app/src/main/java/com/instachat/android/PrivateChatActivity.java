@@ -108,6 +108,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         sUserid = getIntent().getIntExtra(Constants.KEY_USERID, 0);
         sUsername = getIntent().getStringExtra(Constants.KEY_USERNAME);
         sProfilePicUrl = getIntent().getStringExtra(Constants.KEY_PROFILE_PIC_URL);
+        MLog.d(TAG, "before grab from server, intent data: sUserid: ", sUserid, " sUsernane: ", sUsername, " sProfilePicUrl: ", sProfilePicUrl);
         loadBasicData(getIntent());
         NetworkApi.getUserById(this, sUserid, new Response.Listener<JSONObject>() {
             @Override
@@ -116,6 +117,7 @@ public class PrivateChatActivity extends GroupChatActivity {
                     final User toUser = User.fromResponse(response);
                     sUsername = toUser.getUsername();
                     sProfilePicUrl = toUser.getProfilePicUrl();
+                    MLog.d(TAG, "after grab from server: toUser: ", toUser.getId(), " ", toUser.getUsername(), " ", toUser.getProfilePicUrl());
                     populateUserProfile(toUser);
                     setCustomTitles(toUser.getUsername(), 0);
                     listenForPartnerTyping();
@@ -303,7 +305,7 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     @Override
     void initDatabaseRef() {
-        setDatabaseRoot(Constants.PRIVATE_CHAT_REF(sUserid));
+        setDatabaseRoot(Constants.PRIVATE_CHAT_REF(getIntent().getIntExtra(Constants.KEY_USERID, 0)));
     }
 
     @Override
