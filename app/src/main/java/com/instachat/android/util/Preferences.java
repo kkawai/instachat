@@ -164,7 +164,7 @@ public final class Preferences {
             JSONObject json = new JSONObject(mPrefs.getString(
                     PREFERENCE_USER, null));
             final User user = new User();
-            user.copyFrom(json, null);
+            user.copyFrom(json);
             return user;
         } catch (JSONException e) {
             // e.printStackTrace();

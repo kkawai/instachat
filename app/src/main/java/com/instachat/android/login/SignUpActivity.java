@@ -191,7 +191,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     final JSONObject response = new JSONObject(string);
                     MLog.i("test", "savedUser: " + string);
                     if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
-                        user.copyFrom(response.getJSONObject("data"), null);
+                        user.copyFrom(response.getJSONObject("data"));
                         Preferences.getInstance().saveUser(user);
                         Preferences.getInstance().saveLastSignIn(username);
                         createFirebaseAccount();

@@ -5,7 +5,9 @@ import android.content.ContentValues;
 import com.google.firebase.database.ServerValue;
 import com.instachat.android.Constants;
 import com.instachat.android.model.UserManager.UserColumns;
+import com.instachat.android.util.MLog;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.sql.Timestamp;
@@ -14,7 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class User extends DomainObject {
+public class User {
 
     private static final long serialVersionUID = 3121394108242466120L;
 
@@ -570,10 +572,68 @@ public class User extends DomainObject {
         void onStatusChanged(boolean isOnline);
     }
 
+    public JSONObject toJSON() {
+        JSONObject object = new JSONObject();
+        try {
+            object.put("id", id);
+            if (username != null)
+                object.put("username", username);
+            if (password != null)
+                object.put("password", password);
+            if (email != null)
+                object.put("email", email);
+            if (bio != null)
+                object.put("bio", bio);
+            if (location != null)
+                object.put("location", location);
+            if (website != null)
+                object.put("website", website);
+            if (profilePicUrl != null)
+                object.put("profilePicUrl", profilePicUrl);
+            if (age != 0)
+                object.put("age", age);
+            if (gender != null)
+                object.put("gender", gender);
+            if (lastOnline != 0)
+                object.put("lastOnline", lastOnline);
+            if (currentGroupName != null)
+                object.put("currentGroupName", currentGroupName);
+            if (currentGroupId != 0)
+                object.put("currentGroupId", currentGroupId);
+            if (likes != 0)
+                object.put("likes", likes);
+            if (unread != 0)
+                object.put("unread", unread);
+        } catch (final JSONException e) {
+            MLog.e("User", "", e);
+        }
+        return object;
+    }
+
+    public void copyFrom(JSONObject object) {
+        id = object.optInt("id");
+        username = object.optString("username");
+        password = object.optString("password");
+        email = object.optString("email");
+        bio = object.optString("bio");
+        location = object.optString("location");
+        website = object.optString("website");
+        profilePicUrl = object.optString("profilePicUrl");
+        age = object.optInt("age");
+        gender = object.optString("gender");
+        lastOnline = object.optLong("lastOnline");
+        isOnline = object.optBoolean("isOnline");
+        isInstalled = object.optBoolean("isInstalled");
+        currentGroupName = object.optString("currentGroupName");
+        currentGroupId = object.optLong("currentGroupId");
+        likes = object.optInt("likes");
+        unread = object.optInt("unread");
+    }
+
     public static User fromResponse(JSONObject response) throws Exception {
         final JSONObject data = response.getJSONObject("data");
         final User remote = new User();
-        remote.copyFrom(data, null);
+        remote.copyFrom(data);
         return remote;
     }
 
