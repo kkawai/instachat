@@ -123,7 +123,6 @@ public class LeftDrawerHelper {
     private int mWhichDrawerLastOpened;
 
     public void setup(NavigationView navigationView) {
-        final User user = Preferences.getInstance().getUser();
         mHeaderLayout = navigationView.getHeaderView(0); // 0-index header
         mBioEditText = (EditText) mHeaderLayout.findViewById(R.id.input_bio);
         mUsernameEditText = (EditText) mHeaderLayout.findViewById(R.id.nav_username);
@@ -185,7 +184,7 @@ public class LeftDrawerHelper {
 
                 MLog.d(TAG, "onDrawerOpened() LEFT drawer");
                 ScreenUtil.hideKeyboard(mActivity);
-                if (TextUtils.isEmpty(user.getProfilePicUrl())) {
+                if (TextUtils.isEmpty(Preferences.getInstance().getUser().getProfilePicUrl())) {
                     mProfilePicTooltip = new Tooltip.Builder(mProfilePic, R.style.drawer_tooltip).setText(mActivity.getString(R.string.display_photo_tooltip)).show();
                 }
                 showViews(true);
@@ -214,10 +213,10 @@ public class LeftDrawerHelper {
                 showViews(false);
                 hideTooltips();
 
-                final String existingUsername = user.getUsername();
+                final String existingUsername = Preferences.getInstance().getUser().getUsername();
                 final String newUsername = mUsernameEditText.getText().toString();
 
-                final String existingBio = user.getBio();
+                final String existingBio = Preferences.getInstance().getUser().getBio();
                 final String newBio = mBioEditText.getText().toString();
 
                 /**
@@ -238,7 +237,7 @@ public class LeftDrawerHelper {
                     }
                 }
 
-                saveUser(user, newUsername, newBio, bioChanged, usernameChanged);
+                saveUser(Preferences.getInstance().getUser(), newUsername, newBio, bioChanged, usernameChanged);
             }
 
             @Override
@@ -247,11 +246,11 @@ public class LeftDrawerHelper {
             }
         });
 
-        mUsernameEditText.setText(user.getUsername());
-        if (TextUtils.isEmpty(user.getBio())) {
+        mUsernameEditText.setText(Preferences.getInstance().getUser().getUsername());
+        if (TextUtils.isEmpty(Preferences.getInstance().getUser().getBio())) {
             mBioEditText.setHint(R.string.hint_write_something_about_yourself);
         } else {
-            String bioStr = user.getBio() + "";
+            String bioStr = Preferences.getInstance().getUser().getBio() + "";
             bioStr = bioStr.equals("null") ? "" : bioStr;
             mBioEditText.setText(bioStr);
         }
@@ -263,8 +262,8 @@ public class LeftDrawerHelper {
                 return true;
             }
         });
-        setupProfilePic(user.getProfilePicUrl());
-        listenForUpdatedLikeCount(user.getId());
+        setupProfilePic(Preferences.getInstance().getUser().getProfilePicUrl());
+        listenForUpdatedLikeCount(Preferences.getInstance().getUser().getId());
         listenForPrivateChatRequests();
     }
 
