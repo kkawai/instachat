@@ -132,7 +132,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private PhotoUploadHelper mPhotoUploadHelper;
     private LeftDrawerHelper mLeftDrawerHelper;
     private String mDatabaseRoot;
-    private boolean mIsStartedAnimation;
     private View mDotsLayoutParent;
     private ChatSummariesRecyclerAdapter mChatsRecyclerViewAdapter;
     private GroupChatUsersRecyclerAdapter mGroupChatUsersRecyclerAdapter;
@@ -216,14 +215,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
 
                 int length = mMessageEditText.getText().toString().trim().length();
-                long now = System.currentTimeMillis();
-                long lastDelta = now - temp;
-                MLog.i(TAG, "input onTextChanged() text [start]: " + start + " [before]: " + before + " [count]: " + count, " last delta: ", lastDelta, " length: ", length);
-                temp = System.currentTimeMillis();
-                //if (lastDelta < 10)
-                //    return;
-                //if (before > 0 && count == 0)
-                //    return;
+                //MLog.i(TAG, "input onTextChanged() text [start]: " + start + " [before]: " + before + " [count]: " + count, " last delta: ", lastDelta, " length: ", length);
 
                 if (length > 0) {
                     setEnableSendButton(true);
@@ -272,8 +264,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         listenForTyping();
     }
 
-    private long temp;
-
     private DatabaseReference mGroupSummaryRef;
     private ValueEventListener mGroupSummaryListener;
 
@@ -282,9 +272,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             mGroupSummaryRef.removeEventListener(mGroupSummaryListener);
         }
     }
-
-    private long prevInputTime;
-    private int prevInputCount;
 
     private long mLastTypingTime;
 
@@ -466,11 +453,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
         mSendButton.setEnabled(isEnable);
 
-        if (1 == 1) return;  //dont do animation right now
-
-        if (mIsStartedAnimation)
-            mSendButton.clearAnimation();
-
         final Animation hideAnimation = AnimationUtils.loadAnimation(GroupChatActivity.this, R.anim.fab_scale_down);
         final Animation showAnimation = AnimationUtils.loadAnimation(GroupChatActivity.this, R.anim.fab_scale_up);
 
@@ -490,7 +472,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
-                        mIsStartedAnimation = false;
                     }
 
                     @Override
@@ -499,7 +480,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                     }
                 });
                 mSendButton.startAnimation(showAnimation);
-                mSendButton.setEnabled(isEnable);
+                //mSendButton.setEnabled(isEnable);
             }
 
             @Override
@@ -507,7 +488,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
             }
         });
-        mIsStartedAnimation = true;
         mSendButton.startAnimation(hideAnimation);
     }
 
