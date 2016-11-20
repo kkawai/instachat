@@ -215,20 +215,17 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
 
-                if (before > 3 && count > 0) {
-                    prevInputTime = System.currentTimeMillis();
-                    prevInputCount = count;
-                }
-                if (before > 3 && count == 0 && prevInputCount > 0) {
-                    if (System.currentTimeMillis() - prevInputTime < 1500L) {
-                        return;  //fix weird voice input bug
-                        //where onTextChanged incorrectly reports a count of 0
-                        //when using voice input
-                    }
-                }
+                int length = mMessageEditText.getText().toString().trim().length();
+                long now = System.currentTimeMillis();
+                long lastDelta = now - temp;
+                MLog.i(TAG, "input onTextChanged() text [start]: " + start + " [before]: " + before + " [count]: " + count, " last delta: ", lastDelta, " length: ", length);
+                temp = System.currentTimeMillis();
+                //if (lastDelta < 10)
+                //    return;
+                //if (before > 0 && count == 0)
+                //    return;
 
-                MLog.i(TAG, "input onTextChanged() text start: " + start + " before: " + before + " count: " + count);
-                if (charSequence.toString().trim().length() > 0) {
+                if (length > 0) {
                     setEnableSendButton(true);
                     onMeTyping();
                     showSendOptionsTooltip(mSendButton);
@@ -274,6 +271,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         addUserPresenceToGroup();
         listenForTyping();
     }
+
+    private long temp;
 
     private DatabaseReference mGroupSummaryRef;
     private ValueEventListener mGroupSummaryListener;
@@ -462,8 +461,15 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     private void setEnableSendButton(final boolean isEnable) {
 
-        if (isEnable && mSendButton.isEnabled() || !isEnable && !mSendButton.isEnabled() || mIsStartedAnimation)
+        if (isEnable && mSendButton.isEnabled() || !isEnable && !mSendButton.isEnabled())
             return; //already set
+
+        mSendButton.setEnabled(isEnable);
+
+        if (1 == 1) return;  //dont do animation right now
+
+        if (mIsStartedAnimation)
+            mSendButton.clearAnimation();
 
         final Animation hideAnimation = AnimationUtils.loadAnimation(GroupChatActivity.this, R.anim.fab_scale_down);
         final Animation showAnimation = AnimationUtils.loadAnimation(GroupChatActivity.this, R.anim.fab_scale_up);

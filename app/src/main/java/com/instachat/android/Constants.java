@@ -41,7 +41,7 @@ public final class Constants {
     /*
      * CHANGE THESE WHEN MAKING PRODUCTION BUILDS
      */
-    public static final boolean IS_LOGGING_ENABLED = false;
+    public static final boolean IS_LOGGING_ENABLED = true;
     public static final boolean IS_FOR_AMAZON_ONLY = false;//CHANGE PER AMAZON BUILD!!!
     public static final boolean IS_AMAZON_ADS_ENABLED = false;//CHANGE PER AMAZON BUILD!!!
     public static final boolean IS_AMAZON_DEBUG_AD = false; //CHANGE PER AMAZON BUILD!!!
