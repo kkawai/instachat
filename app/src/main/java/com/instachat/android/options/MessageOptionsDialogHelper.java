@@ -1,22 +1,17 @@
 package com.instachat.android.options;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
-import com.instachat.android.font.FontUtil;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.util.Preferences;
-import com.instachat.android.view.ThemedAlertDialog;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -137,6 +132,17 @@ public class MessageOptionsDialogHelper {
 
     }
 
+    /*
+    defined in strings.xml
+
+    <string-array name="message_options">
+        <item>Copy Text</item>
+        <item>Delete Message</item>
+        <item>Block</item>
+        <item>Report</item>
+    </string-array>
+
+
     public AlertDialog showMessageOptions(@NonNull final Context context,
                                           @NonNull final FriendlyMessage friendlyMessage,
                                           @NonNull final MessageOptionsListener listener) {
@@ -180,4 +186,5 @@ public class MessageOptionsDialogHelper {
         dialog.show();
         return dialog;
     }
+    */
 }

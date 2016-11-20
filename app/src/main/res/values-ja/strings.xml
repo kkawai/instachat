@@ -42,7 +42,6 @@
     <string name="hint_username">"ユーザ名"</string>
     <string name="hint_email">"Eメール"</string>
     <string name="hint_email_or_username">"ユーザー名または電子メール"</string>
-    <string name="hint_password">"パスワード"</string>
     <string name="invalid_email">"*無効な電子メール"</string>
     <string name="invalid_password">"無効なパスワード！"</string>
     <string name="invalid_username">"ユーザー名が無効です。"</string>
@@ -131,12 +130,12 @@
     <string name="delete_message">"メッセージを削除する"</string>
     <string name="delete_photo">"写真を削除"</string>
 
-    <string-array name="message_options">
+    <!-- <string-array name="message_options">
         <item>"テキストをコピー"</item>
         <item>"メッセージを削除する"</item>
         <item>"ブロック"</item>
         <item>"レポート"</item>
-    </string-array>
+    </string-array> -->
 
     <string name="logout_title">"ログアウト"</string>
     <string name="logout_question">"確かにあなたは今ログアウトしたいですか？これは、ログインして滞在するあなたの携帯電話のバッテリーやその他のリソースを消費しません。"</string>
@@ -176,5 +175,8 @@
 
     <string name="photo_not_available">"消える写真はもう利用できません"</string>
 
+    <string name="welcome_back_old_user">もう一度お会いできて嬉しく思います！ あなたのアカウントを完成させるためにあなたのメールアドレスを入力してください！ ありがとうございました！</string>
+    <string name="loading">読み込み中...</string>
+    <string name="hint_password">パスワード（6〜20文字）</string>
 
 </resources>

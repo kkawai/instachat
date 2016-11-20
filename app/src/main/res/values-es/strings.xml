@@ -18,13 +18,11 @@
     <string name="delete_message_question">"¿Borrar mensaje?"</string>
     <string name="sign_in_with_google">"Inicia sesión con Google"</string>
     <string name="sign_up">"Regístrate"</string>
-    <string name="success">"¡Éxito!"</string>
     <string name="rationale_storage">"Esta aplicación lee fotos de tu cámara para que puedas subir las fotos que elijas cargar."</string>
     <string name="new_account">"Nueva Cuenta"</string>
     <string name="hint_username">"Nombre de Usuario"</string>
     <string name="hint_email">"Email"</string>
     <string name="hint_email_or_username">"Nombre de usuario o Email"</string>
-    <string name="hint_password">"Contraseña"</string>
     <string name="invalid_email">"Email Inválido"</string>
     <string name="invalid_password">"Contraseña Invalida"</string>
     <string name="invalid_username">"Nombre de Usuario no Válido"</string>
@@ -36,7 +34,6 @@
     <string name="username_exists">"Por favor, elija un nombre de usuario diferente. %s ya está tomado."</string>
     <string name="email_password_not_found">"Cuenta no encontrada. Inténtalo de nuevo."</string>
     <string name="wrong_password">"Contraseña incorrecta. Inténtalo de nuevo."</string>
-    <string name="banner_ad_unit_id">"ca-app-pub-3940256099942544/6300978111 "</string>
     <string name="menu_choose_photo">"Escoge una Foto"</string>
     <string name="menu_take_photo">"Tomar Foto"</string>
     <string name="message_hint">"Enviar un mensaje amistoso..."</string>
@@ -44,13 +41,10 @@
     <string name="is_your_new_username">"%s es su nuevo nombre de usuario"</string>
     <string name="title_update_my_pic">"Actualizar Mi Foto"</string>
     <string name="sent_via">"Enviado a través de %s"</string>
-    <string name="empty">"Vacío"</string>
     <string name="preview_area">"Área de Previsualización"</string>
     <string name="post_area">"Área de Publicación"</string>
     <string name="no_thumbnail">"Sin Miniatura"</string>
     <string name="choose_thumbnail">"Elige una Miniatura"</string>
-    <string name="previous">"←"</string>
-    <string name="forward">"→"</string>
     <string name="post">"Mensaje"</string>
     <string name="photo">"Foto"</string>
     <string name="group_chat_header">"HABITACIONES"</string>
@@ -164,9 +158,11 @@
     <string name="report_person_failed">"Ups! No se podía reportar %s . Por favor, inténtelo de nuevo."</string>
     <string name="report_person_success">"Usted ha informado %s"</string>
 
-
     <string name="photo_not_available">"Desaparición de fotos ya no está disponible"</string>
 
+    <string name="welcome_back_old_user">Bienvenido de nuevo y muy feliz de verte de nuevo! Ingrese su dirección de correo electrónico para completar su cuenta. ¡Gracias!</string>
+    <string name="loading">Corriendo...</string>
+    <string name="hint_password">Contraseña (6-20 caracteres)</string>
 
 
 </resources>

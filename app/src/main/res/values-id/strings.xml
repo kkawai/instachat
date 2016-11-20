@@ -42,7 +42,6 @@
     <string name="hint_username">"Nama"</string>
     <string name="hint_email">"E-mail"</string>
     <string name="hint_email_or_username">"Username atau E-mail"</string>
-    <string name="hint_password">"Kata Sandi"</string>
     <string name="invalid_email">"Email Tidak Valid"</string>
     <string name="invalid_password">"Kata Sandi Salah"</string>
     <string name="invalid_username">"Nama Pengguna Tidak Valid"</string>
@@ -131,12 +130,13 @@
     <string name="delete_message">"Hapus Pesan"</string>
     <string name="delete_photo">"Hapus Foto"</string>
 
+    <!--
     <string-array name="message_options">
         <item>"Salin Teks"</item>
         <item>"Hapus Pesan"</item>
         <item>"Blokir"</item>
         <item>"Laporan"</item>
-    </string-array>
+    </string-array> -->
 
     <string name="logout_title">"Logout"</string>
     <string name="logout_question">"Tentu Anda ingin logout sekarang? Ini tidak mengkonsumsi baterai ponsel atau sumber daya lain untuk tetap masuk."</string>
@@ -176,5 +176,8 @@
 
     <string name="photo_not_available">"Menghilang Foto tidak tersedia lagi"</string>
 
+    <string name="welcome_back_old_user">Selamat datang kembali dan sangat senang melihat Anda lagi! Masukkan alamat email Anda untuk menyelesaikan akun Anda! Terima kasih!</string>
+    <string name="loading">Kerja...</string>
+    <string name="hint_password">Sandi (6-20 karakter)</string>
 
 </resources>

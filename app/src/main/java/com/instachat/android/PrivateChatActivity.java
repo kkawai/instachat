@@ -586,7 +586,6 @@ public class PrivateChatActivity extends GroupChatActivity {
     public void onGroupChatClicked(GroupChatSummary groupChatSummary) {
         if (Preferences.getInstance().getLastGroupChatRoomVisited() == groupChatSummary.getId()) {
             finish();
-            return;
         }
         super.onGroupChatClicked(groupChatSummary);
     }

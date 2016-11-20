@@ -194,8 +194,7 @@
                             <ImageView
                                 android:id="@+id/web_link_image"
                                 android:layout_width="@dimen/web_clipping_image_size"
-                                android:layout_height="@dimen/web_clipping_image_size"
-                                android:contentDescription="@string/empty"/>
+                                android:layout_height="@dimen/web_clipping_image_size"/>
 
                         </LinearLayout>
 

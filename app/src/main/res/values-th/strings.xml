@@ -42,7 +42,6 @@
     <string name="hint_username">"ชื่อผู้ใช้"</string>
     <string name="hint_email">"อีเมล์"</string>
     <string name="hint_email_or_username">"ชื่อผู้ใช้หรืออีเมล์"</string>
-    <string name="hint_password">"รหัสผ่าน"</string>
     <string name="invalid_email">"อีเมลไม่ถูกต้อง"</string>
     <string name="invalid_password">"รหัสผ่านไม่ถูกต้อง"</string>
     <string name="invalid_username">"ชื่อผู้ใช้ที่ไม่ถูกต้อง"</string>
@@ -131,12 +130,12 @@
     <string name="delete_message">"ลบข้อความ"</string>
     <string name="delete_photo">"ลบภาพ"</string>
 
-    <string-array name="message_options">
+    <!-- <string-array name="message_options">
         <item>"คัดลอกข้อความ"</item>
         <item>"ลบข้อความ"</item>
         <item>"บล็อค"</item>
         <item>"รายงาน"</item>
-    </string-array>
+    </string-array> -->
 
     <string name="logout_title">"ออกจากระบบ"</string>
     <string name="logout_question">"แน่ใจว่าคุณต้องการที่จะออกจากระบบตอนนี้หรือไม่ มันไม่ได้ใช้พลังงานจากแบตเตอรี่โทรศัพท์ของคุณหรือทรัพยากรอื่น ๆ ที่อยู่ในระบบ"</string>
@@ -176,7 +175,10 @@
     <string name="report_person_failed">"อ๊ะ! คุณไม่สามารถรายงาน %s s กรุณาลองอีกครั้ง."</string>
     <string name="report_person_success">"คุณได้รายงาน %s"</string>
 
-
     <string name="photo_not_available">"หายไปรูปภาพไม่สามารถใช้ได้อีกต่อไป"</string>
+
+    <string name="welcome_back_old_user">ต้อนรับการกลับมาและมีความสุขมากที่จะเห็นคุณอีกครั้ง! โปรดป้อนที่อยู่อีเมลของคุณที่จะเสร็จสมบูรณ์ในบัญชีของคุณ! ขอขอบคุณ!</string>
+    <string name="loading">การทำงาน...</string>
+    <string name="hint_password">รหัสผ่าน (6-20 ตัวอักษร)</string>
 
 </resources>

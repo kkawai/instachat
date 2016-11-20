@@ -42,7 +42,6 @@
     <string name="hint_username">"Логин"</string>
     <string name="hint_email">"Электронная почта"</string>
     <string name="hint_email_or_username">"Имя или E-mail"</string>
-    <string name="hint_password">"Пароль"</string>
     <string name="invalid_email">"Неправильный e-mail"</string>
     <string name="invalid_password">"Неправильный пароль."</string>
     <string name="invalid_username">"Неверное имя пользователя"</string>
@@ -131,12 +130,12 @@
     <string name="delete_message">"Удалить номер для сообщений"</string>
     <string name="delete_photo">"Удалить фото"</string>
 
-    <string-array name="message_options">
+    <!-- <string-array name="message_options">
         <item>"Скопировать текст"</item>
         <item>"Удалить номер для сообщений"</item>
         <item>"Блок"</item>
         <item>"Отчет"</item>
-    </string-array>
+    </string-array> -->
 
     <string name="logout_title">"Выйти"</string>
     <string name="logout_question">"Конечно, вы хотите выйти сейчас? Он не использует ваш аккумулятор телефона или другие ресурсы, чтобы оставаться в системе."</string>
@@ -175,5 +174,8 @@
 
     <string name="photo_not_available">"Исчезновение Фото не доступен больше"</string>
 
+    <string name="welcome_back_old_user">Добро пожаловать и очень рады видеть Вас снова! Пожалуйста, введите свой адрес электронной почты, чтобы завершить свой счет! Спасибо!</string>
+    <string name="loading">За работой...</string>
+    <string name="hint_password">Пароль (6-20 символов)</string>
 
 </resources>

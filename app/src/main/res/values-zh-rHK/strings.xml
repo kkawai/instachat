@@ -42,7 +42,6 @@
     <string name="hint_username">"用戶名"</string>
     <string name="hint_email">"電子郵件"</string>
     <string name="hint_email_or_username">"用戶名或電子郵件"</string>
-    <string name="hint_password">"密碼"</string>
     <string name="invalid_email">"不合規電郵"</string>
     <string name="invalid_password">"無效的密碼"</string>
     <string name="invalid_username">"無效的用戶名"</string>
@@ -131,12 +130,12 @@
     <string name="delete_message">"刪除郵件"</string>
     <string name="delete_photo">"刪除照片"</string>
 
-    <string-array name="message_options">
+    <!-- <string-array name="message_options">
         <item>"複製文本"</item>
         <item>"刪除郵件"</item>
         <item>"塊"</item>
         <item>"報告"</item>
-    </string-array>
+    </string-array> -->
 
     <string name="logout_title">"登出"</string>
     <string name="logout_question">"當然你現在要註銷？它不會消耗你手機電池或其他資源來保持登錄狀態。"</string>
@@ -175,5 +174,9 @@
     <string name="report_person_success">"您報導%s"</string>
 
     <string name="photo_not_available">"消失的照片已不存在"</string>
+
+    <string name="welcome_back_old_user">欢迎回来，非常高兴再次见到你！ 请输入您的电子邮件地址以完成您的帐户！ 谢谢！</string>
+    <string name="loading">加工...</string>
+    <string name="hint_password">密码（6-20个字符）</string>
 
 </resources>

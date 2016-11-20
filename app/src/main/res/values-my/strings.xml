@@ -42,7 +42,6 @@
     <string name="hint_username">"username"</string>
     <string name="hint_email">"အီးမေလ်"</string>
     <string name="hint_email_or_username">"username သို့မဟုတ်အီးမေးလ်"</string>
-    <string name="hint_password">"လွ်ိဳဝက္နံပါတ္"</string>
     <string name="invalid_email">"မှားနေသောအီးမေးလ်"</string>
     <string name="invalid_password">"မှားနေသော Password ကို"</string>
     <string name="invalid_username">"မှားနေသောအသုံးပြုသူအမည်"</string>
@@ -131,12 +130,12 @@
     <string name="delete_message">"ကို Message ကိုဖျက်မည်"</string>
     <string name="delete_photo">"ဓာတ်ပုံကိုဖျက်မည်"</string>
 
-    <string-array name="message_options">
+    <!-- <string-array name="message_options">
         <item>"Copy ကူးစာသား"</item>
         <item>"ကို Message ကိုဖျက်မည်"</item>
         <item>"ပိတ်ဆို့"</item>
         <item>"အစီရင်ခံစာ"</item>
-    </string-array>
+    </string-array> -->
 
     <string name="logout_title">"logout"</string>
     <string name="logout_question">"သေချာတာပေါ့သင်သည်ယခုနေ log out လုပ်ဖို့လိုသလား? ဒါဟာအတွက် logged နေဖို့သင့်ရဲ့ဖုန်းကိုဘက်ထရီသို့မဟုတ်အခြားအရင်းအမြစ်များကိုမပယ်မရှားပါဘူး။"</string>
@@ -175,5 +174,8 @@
 
     <string name="photo_not_available">"ပျောက်ကွယ်သွားဓာတ်ပုံတော့ဘူးမရရှိနိုင်"</string>
 
+    <string name="welcome_back_old_user">Selamat kembali dan sangat gembira melihat anda lagi! Sila masukkan alamat e-mel anda untuk melengkapkan akaun anda! Terima kasih!</string>
+    <string name="loading">Kerja...</string>
+    <string name="hint_password">Kata laluan (6-20 aksara)</string>
 
 </resources>

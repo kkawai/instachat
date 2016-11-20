@@ -18,13 +18,11 @@
     <string name="delete_message_question">"Supprimer le message?"</string>
     <string name="sign_in_with_google">"Connectez-vous avec Google"</string>
     <string name="sign_up">"S'inscrire"</string>
-    <string name="success">"Le succès!"</string>
     <string name="rationale_storage">"Cette application lit les photos de votre appareil photo de sorte que vous pouvez télécharger les photos que vous choisissez de télécharger."</string>
     <string name="new_account">"Nouveau Compte"</string>
     <string name="hint_username">"Nom D'utilisateur"</string>
     <string name="hint_email">"Email"</string>
     <string name="hint_email_or_username">"Nom D'utilisateur ou Email"</string>
-    <string name="hint_password">"Mot de Passe"</string>
     <string name="invalid_email">"Email Invalide"</string>
     <string name="invalid_password">"Mot de Passe Incorrect"</string>
     <string name="invalid_username">"Nom D'utilisateur Invalide"</string>
@@ -36,7 +34,6 @@
     <string name="username_exists">"S'il vous plaît choisir un nom de nom d'utilisateur. %s est déjà pris."</string>
     <string name="email_password_not_found">"Compte non trouvé. Réessayer."</string>
     <string name="wrong_password">"Mauvais mot de passe. Réessayer."</string>
-    <string name="banner_ad_unit_id">"banner_ad_unit_id"</string>
     <string name="menu_choose_photo">"Choisissez Photo"</string>
     <string name="menu_take_photo">"Prendre une Photo"</string>
     <string name="message_hint">"Envoyer un message amical ..."</string>
@@ -44,13 +41,10 @@
     <string name="is_your_new_username">"%s est votre nouveau nom d'utilisateur"</string>
     <string name="title_update_my_pic">"Mettre à Jour Ma Photo"</string>
     <string name="sent_via">"Envoyé par %s"</string>
-    <string name="empty">"vide"</string>
     <string name="preview_area">"Zone de Prévisualisation"</string>
     <string name="post_area">"Poster Area"</string>
     <string name="no_thumbnail">"Pas de Photo"</string>
     <string name="choose_thumbnail">"Choisissez une Miniature"</string>
-    <string name="previous">"précédent"</string>
-    <string name="forward">"vers l'avant"</string>
     <string name="post">"Poster"</string>
     <string name="photo">"Photo"</string>
     <string name="group_chat_header">"CHAMBRES"</string>
@@ -164,5 +158,9 @@
     <string name="report_person_success">"Tu as signalé %s"</string>
 
     <string name="photo_not_available">"Disappearing photo ne sont plus disponible"</string>
+
+    <string name="welcome_back_old_user">Bienvenue et très heureux de vous revoir! Veuillez entrer votre adresse e-mail pour compléter votre compte! Je vous remercie!</string>
+    <string name="loading">En traitement...</string>
+    <string name="hint_password">Mot de passe (6-20 caractères)</string>
 
 </resources>

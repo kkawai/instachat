@@ -42,7 +42,6 @@
     <string name="hint_username">"Nome de usuário"</string>
     <string name="hint_email">"O email"</string>
     <string name="hint_email_or_username">"Nome de usuário ou e-mail"</string>
-    <string name="hint_password">"Senha"</string>
     <string name="invalid_email">"E-mail inválido"</string>
     <string name="invalid_password">"Senha inválida!"</string>
     <string name="invalid_username">"Nome de usuário Inválido."</string>
@@ -131,12 +130,12 @@
     <string name="delete_message">"Excluir Mensagem"</string>
     <string name="delete_photo">"Excluir Foto"</string>
 
-    <string-array name="message_options">
+    <!-- <string-array name="message_options">
         <item>"Copiar Texto"</item>
         <item>"Excluir Mensagem"</item>
         <item>"Bloco"</item>
         <item>"Reportar"</item>
-    </string-array>
+    </string-array> -->
 
     <string name="logout_title">"Sair"</string>
     <string name="logout_question">"Certeza de que deseja sair agora? Não consome a bateria do telefone ou outros recursos para permanecer ligado."</string>
@@ -175,5 +174,9 @@
     <string name="report_person_success">"Você relataram %s"</string>
 
     <string name="photo_not_available">"Disappearing Foto não está mais disponível"</string>
+
+    <string name="welcome_back_old_user">Bem-vindo de volta e muito feliz em vê-lo novamente! Digite seu endereço de e-mail para completar sua conta! Obrigado!</string>
+    <string name="loading">Trabalhando...</string>
+    <string name="hint_password">Senha (6-20 caracteres)</string>
 
 </resources>

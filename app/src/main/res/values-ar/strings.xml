@@ -18,13 +18,11 @@
     <string name="delete_message_question">"حذف الرسائل؟"</string>
     <string name="sign_in_with_google">"تسجيل الدخول مع جوجل"</string>
     <string name="sign_up">"سجل"</string>
-    <string name="success">"نجاح"</string>
     <string name="rationale_storage">"هذا التطبيق يقرأ الصور من الكاميرا حتى تتمكن من تحميل الصور التي تختارها لتحميل."</string>
     <string name="new_account">"حساب جديد"</string>
     <string name="hint_username">"اسم المستخدم"</string>
     <string name="hint_email">"البريد الإلكتروني"</string>
     <string name="hint_email_or_username">"اسم المستخدم أو البريد الالكتروني"</string>
-    <string name="hint_password">"كلمه السر"</string>
     <string name="invalid_email">"بريد إلكتروني خاطئ"</string>
     <string name="invalid_password">"بريد إلكتروني خاطئ"</string>
     <string name="invalid_username">"اسم المستخدم غير صالح"</string>
@@ -36,7 +34,6 @@
     <string name="username_exists">"يرجى اختيار اسم المستخدم مختلفة. s% تم اخده بالفعل."</string>
     <string name="email_password_not_found">"الحساب غير موجود. حاول ثانية."</string>
     <string name="wrong_password">"كلمة مرور خاطئة. حاول ثانية."</string>
-    <string name="banner_ad_unit_id">"banner_ad_unit_id"</string>
     <string name="menu_choose_photo">"اختيار صور"</string>
     <string name="menu_take_photo">"تصوير"</string>
     <string name="message_hint">"إرسال رسالة ودية ..."</string>
@@ -44,13 +41,10 @@
     <string name="is_your_new_username">"s% غير اسم المستخدم الجديد"</string>
     <string name="title_update_my_pic">"تحديث معرض"</string>
     <string name="sent_via">"أرسلت عبر s%"</string>
-    <string name="empty">"فارغة"</string>
     <string name="preview_area">"معاينة منطقة"</string>
     <string name="post_area">"آخر منطقة"</string>
     <string name="no_thumbnail">"لا صورة مصغرة"</string>
     <string name="choose_thumbnail">"لا صورة مصغرة"</string>
-    <string name="previous">"سابق"</string>
-    <string name="forward">"إلى الأمام"</string>
     <string name="post">"بريد"</string>
     <string name="photo">"صورة فوتوغرافية"</string>
     <string name="group_chat_header">"الغرف الحقيقية"</string>
@@ -163,5 +157,9 @@
     <string name="report_person_success">"لقد ذكرت %s"</string>
 
     <string name="photo_not_available">"اختفاء الصور هو لم يعد متوفر"</string>
+
+    <string name="welcome_back_old_user">أهلا بكم من جديد وسعيد جدا لرؤيتكم مرة أخرى! يرجى إدخال عنوان البريد الإلكتروني الخاص بك لإكمال الحساب الخاص بك! شكرا!</string>
+    <string name="loading">تشغيل...</string>
+    <string name="hint_password">كلمة السر (6-20 حرفا)</string>
 
 </resources>
