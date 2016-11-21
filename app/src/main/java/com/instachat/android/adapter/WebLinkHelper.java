@@ -49,13 +49,17 @@ public class WebLinkHelper {
                 viewHolder.webLinkUrl.setText(sourceContent.getCannonicalUrl() + "");
                 if (sourceContent.getImages().size() > 0) {
                     final Context c = viewHolder.webLinkImageView.getContext();
-                    Glide.with(viewHolder.webLinkImageView.getContext()).
-                            load(sourceContent.getImages().get(0)).
-                            bitmapTransform(
-                                    new CenterCrop(c),
-                                    new RoundedCornersTransformation(c, 30, 0, RoundedCornersTransformation.CornerType.ALL)).
-                            crossFade().
-                            into(viewHolder.webLinkImageView);
+                    try {
+                        Glide.with(viewHolder.webLinkImageView.getContext()).
+                                load(sourceContent.getImages().get(0)).
+                                bitmapTransform(
+                                        new CenterCrop(c),
+                                        new RoundedCornersTransformation(c, 30, 0, RoundedCornersTransformation.CornerType.ALL)).
+                                crossFade().
+                                into(viewHolder.webLinkImageView);
+                    } catch (Exception e) {
+                        //activity probably destroyed and processing web link took too long
+                    }
                     rss.setImageUrl(sourceContent.getImages().get(0));
                 }
                 MLog.d(TAG, "saved link in rss db. basic link: " + rss.getBasicLink() + " main rss link: " + rss.getLink());

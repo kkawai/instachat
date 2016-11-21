@@ -174,7 +174,11 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void showErrorToast(final String distinctScreenCode) {
-        Toast.makeText(this, getString(R.string.general_api_error, distinctScreenCode), Toast.LENGTH_SHORT).show();
+        try {
+            Toast.makeText(this, getString(R.string.general_api_error, distinctScreenCode), Toast.LENGTH_SHORT).show();
+        }catch (Exception e){
+            MLog.e(TAG,"",e);
+        }
     }
 
     private void createAccount() {

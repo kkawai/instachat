@@ -335,7 +335,11 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
 
     private void showErrorToast(final String distinctScreenCode) {
         hideProgressDialog();
-        Toast.makeText(this, getString(R.string.general_api_error, distinctScreenCode), Toast.LENGTH_SHORT).show();
+        try {
+            Toast.makeText(this, getString(R.string.general_api_error, distinctScreenCode), Toast.LENGTH_SHORT).show();
+        }catch (Exception e) {
+            MLog.e(TAG,"",e);
+        }
     }
 
     private void showErrorToast(final int stringResId) {

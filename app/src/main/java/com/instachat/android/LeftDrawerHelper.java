@@ -372,14 +372,14 @@ public class LeftDrawerHelper {
                         }
                     } catch (Exception e) {
                         MLog.e(TAG, "", e);
-                        Toast.makeText(mActivity, mActivity.getString(R.string.general_api_error, "(user1)"), Toast.LENGTH_SHORT).show();
+                        showErrorToast("leftd 1");
                     }
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     MLog.d(TAG, "error response: ", error);
-                    Toast.makeText(mActivity, mActivity.getString(R.string.general_api_error, "(user2)"), Toast.LENGTH_SHORT).show();
+                    showErrorToast("leftd 2");
                 }
             });
 
@@ -440,6 +440,14 @@ public class LeftDrawerHelper {
             });
         }
 
+    }
+
+    private void showErrorToast(String extra) {
+        try {
+            Toast.makeText(mActivity, mActivity.getString(R.string.general_api_error, extra), Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            MLog.e(TAG, "", e);
+        }
     }
 
     private void clearEditableFocus() {

@@ -174,14 +174,14 @@ public class PrivateChatActivity extends GroupChatActivity {
 
 
                 } catch (Exception e) {
-                    Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, "1"), Toast.LENGTH_SHORT).show();
+                    showErrorToast("pca 1");
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 MLog.e(TAG, "NetworkApi.getUserById(" + sUserid + ") failed in onCreate()", error);
-                Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, "2"), Toast.LENGTH_SHORT).show();
+                showErrorToast("pca 2");
             }
         });
         final NotificationManager notificationManager = ((NotificationManager) getSystemService(NOTIFICATION_SERVICE));
@@ -252,6 +252,14 @@ public class PrivateChatActivity extends GroupChatActivity {
             }
         }, mConfig.getLong(Constants.KEY_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME));
 
+    }
+
+    private void showErrorToast(String extra) {
+        try {
+            Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, extra), Toast.LENGTH_SHORT).show();
+        }catch (Exception e) {
+            MLog.e(TAG,"",e);
+        }
     }
 
     private void toggleAppbar() {
@@ -707,7 +715,7 @@ public class PrivateChatActivity extends GroupChatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 ref.removeEventListener(this);
-                Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, "(c)"), Toast.LENGTH_SHORT).show();
+                showErrorToast("p");
             }
         });
     }
