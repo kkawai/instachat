@@ -318,27 +318,33 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
 
                     //Now, see if this user accepted me. If yes, then notify them that
                     //I just got online
-                    if (!isPrivateChat && privateChatSummary.getOnlineStatus() != Constants.USER_OFFLINE && Integer.parseInt(privateChatSummary.getId()) != Preferences.getInstance().getUserId())
-                        FirebaseDatabase.getInstance().getReference("/users/" + privateChatSummary.getId() + "/private_summaries/" + Preferences.getInstance().getUserId() + "/accepted")
-                                .addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        if (dataSnapshot.exists() && dataSnapshot.getValue(Boolean.class)) {
-                                            try {
-                                                JSONObject msg = new JSONObject();
-                                                msg.put(Constants.KEY_USERNAME, Preferences.getInstance().getUsername());
-                                                NetworkApi.gcmsend(Integer.parseInt(privateChatSummary.getId()), Constants.GcmMessageType.notify_friend_in, msg);
-                                            } catch (Exception e) {
-                                                MLog.e(TAG, "", e);
+                    if (!isPrivateChat && privateChatSummary.getOnlineStatus() != Constants.USER_OFFLINE && Integer.parseInt(privateChatSummary.getId()) != Preferences.getInstance().getUserId()) {
+
+                        if (!ChatSummariesPrefs.isNotifiedRecently(privateChatSummary.getId())) {
+
+                            FirebaseDatabase.getInstance().getReference("/users/" + privateChatSummary.getId() + "/private_summaries/" + Preferences.getInstance().getUserId() + "/accepted")
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.exists() && dataSnapshot.getValue(Boolean.class)) {
+                                                try {
+                                                    JSONObject msg = new JSONObject();
+                                                    msg.put(Constants.KEY_USERNAME, Preferences.getInstance().getUsername());
+                                                    NetworkApi.gcmsend(Integer.parseInt(privateChatSummary.getId()), Constants.GcmMessageType.notify_friend_in, msg);
+                                                    ChatSummariesPrefs.updateLastNotifiedTime(privateChatSummary.getId());
+                                                } catch (Exception e) {
+                                                    MLog.e(TAG, "", e);
+                                                }
                                             }
                                         }
-                                    }
 
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
 
-                                    }
-                                });
+                                        }
+                                    });
+                        }
+                    }
                 } catch (Exception e) {
                     MLog.e(TAG, "", e);
                 }

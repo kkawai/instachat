@@ -38,7 +38,7 @@
     <string name="menu_take_photo">"تصوير"</string>
     <string name="message_hint">"إرسال رسالة ودية ..."</string>
     <string name="error_send_photo">"عذرا، لا يمكن تحميل الصورة. حاول مرة اخرى."</string>
-    <string name="is_your_new_username">"s% غير اسم المستخدم الجديد"</string>
+    <string name="is_your_new_username">"%s غير اسم المستخدم الجديد"</string>
     <string name="title_update_my_pic">"تحديث معرض"</string>
     <string name="sent_via">"أرسلت عبر s%"</string>
     <string name="preview_area">"معاينة منطقة"</string>
@@ -52,14 +52,14 @@
     <string name="could_not_send_message">"آسف! لا يمكن أن ترسل رسالة. حاول مرة اخرى."</string>
     <string name="block">"منع"</string>
     <string name="report">"تقرير"</string>
-    <string name="block_person_title">"منع S%؟"</string>
+    <string name="block_person_title">"منع s%؟"</string>
     <string name="block_person_question">"هل أنت متأكد أنك تريد هذا؟ و٪ الصورة لن تكون قادرة على إرسال رسائل مباشرة وأنك لن ترى أي أكثر من له أو لها مشاركات في أي من غرف الدردشة. إذا كنت ترغب في ذلك، يمكنك كسر الجمود في وقت لاحق."</string>
     <string name="block_person_failed">"عفوا! لم نتمكن من منع٪ الصورة. حاول مرة اخرى."</string>
-    <string name="block_person_success">"لقد سدت S%"</string>
-    <string name="unblock_person_title">"رفع الحظرS%؟"</string>
+    <string name="block_person_success">"لقد سدت s%"</string>
+    <string name="unblock_person_title">"رفع الحظرs%؟"</string>
     <string name="unblock_person_question">"هل أنت متأكد أنك تريد هذا؟ ٪ الصورة سوف تكون قادرة على إرسال رسائل مباشرة والبدء في رؤية له أو لها مشاركات في أي من غرف الدردشة. إذا كنت ترغب في ذلك، يمكنك منع مرة أخرى."</string>
-    <string name="unblock_person_failed">"عفوا! لم نتمكن من كسر الجم S% الصورة. حاول مرة اخرى."</string>
-    <string name="unblock_person_success">"لقد أفرS% الصورة"</string>
+    <string name="unblock_person_failed">"عفوا! لم نتمكن من كسر الجم s% الصورة. حاول مرة اخرى."</string>
+    <string name="unblock_person_success">"لقد أفرs% الصورة"</string>
     <string name="block_cannot_block_yourself">"لا يمكنك منع نفسك سخيفة!"</string>
     <string name="message_delete_title">"حذف الرسائل؟"</string>
     <string name="message_delete_question">"هل أنت متأكد أنك تريد حذف هذا؟ لا أحد سيكون قادرا على رؤية ذلك مرة أخرى. ستزول إلى الأبد."</string>
@@ -96,7 +96,7 @@
     <string name="message_copied_to_clipboard">"رسالة نسخها إلى الحافظة."</string>
     <string name="manage_blocks">"إدارة كتل"</string>
     <string name="message_options_title">"خيارات الرسالة"</string>
-    <string name="cannot_chat_you_blocked_them">"لقد حج %s الصورة في مناسبة سابقة. فقط لكي تعلم."</string>
+    <string name="cannot_chat_you_blocked_them">"لقد حج s% الصورة في مناسبة سابقة. فقط لكي تعلم."</string>
 
     <!-- time ago -->
     <string name="online_now">"متواجد حاليا"</string>
@@ -106,10 +106,10 @@
     <string name="one_hour_ago">"منذ 1 ساعة"</string>
     <string name="some_hours_ago">"%s منذ ساعات"</string>
     <string name="one_day_ago">"1 منذ يوم"</string>
-    <string name="some_days_ago">"s% أيام مضت"</string>
-    <string name="some_months_ago">"S% منذ اشهر"</string>
+    <string name="some_days_ago">"%s أيام مضت"</string>
+    <string name="some_months_ago">"%s منذ اشهر"</string>
     <string name="more_than_one_year_ago">"منذ أكثر من 1 سنة"</string>
-    <string name="send_photo_to_group_or_person">"إرسال الصور إلى S%"</string>
+    <string name="send_photo_to_group_or_person">"إرسال الصور إلى s%"</string>
     <string name="anonymous_user">"مستخدم"</string>
     <string name="reply">"الرد"</string>
     <string name="type_your_reply_here">"اكتب الرد هنا ..."</string>
@@ -124,7 +124,7 @@
     <string name="delete_photo">"حذف الصورة"</string>
     <string name="logout_title">"خروج"</string>
     <string name="logout_question">"هل أنت متأكد أنك تريد تسجيل الخروج الآن؟ فإنه لا يستهلك طاقة بطارية الهاتف الخاص بك أو غيرها من الموارد للبقاء متصلا."</string>
-    <string name="user_active_in_group">"نشط في: S%"</string>
+    <string name="user_active_in_group">"نشط في: s%"</string>
     <string name="web_clipping">"لقطة على شبكة الإنترنت: "</string>
     <string name="fetching_web_clipping">"جلب لقطة على شبكة الإنترنت ..."</string>
     <string name="default_bio">"Hey there!  I am using %s  Send me a message on here! "</string>
@@ -146,15 +146,15 @@
     <string name="left_drawer_pending_requests_plural">"%s طلبات معلقة جديدة!"</string>
     <string name="pending_requests_title">"الطلبات المعلقة"</string>
 
-    <string name="accept_request_title">"استعرض %s ؟"</string>
+    <string name="accept_request_title">"استعرض s% ؟"</string>
     <string name="accept_request_question">"%s يود أن يكون متعة ومحادثة ودية مع لكم!"</string>
     <string name="yes">"نعم فعلا"</string>
     <string name="no">"لا"</string>
 
-    <string name="report_person_title">"بلغ %s ؟"</string>
+    <string name="report_person_title">"بلغ s% ؟"</string>
     <string name="report_person_question">"تقوم بالتبليغ عن هذا الشخص لتعاطي الدردشة عبر الإنترنت؟ نحن نأخذ هذه الأمور على محمل الجد. سوف نقوم بالتحقيق هذا الشخص وإذا وجدت لتكون مسيئة حقا، وسوف نتخذ الإجراءات اللازمة. شكرا."</string>
-    <string name="report_person_failed">"عفوا! أنت لا تستطيع أن تقدم تقريرا %s . حاول مرة اخرى."</string>
-    <string name="report_person_success">"لقد ذكرت %s"</string>
+    <string name="report_person_failed">"عفوا! أنت لا تستطيع أن تقدم تقريرا s% . حاول مرة اخرى."</string>
+    <string name="report_person_success">"لقد ذكرت s%"</string>
 
     <string name="photo_not_available">"اختفاء الصور هو لم يعد متوفر"</string>
 

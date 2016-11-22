@@ -111,7 +111,7 @@
     <string name="one_hour_ago">"1 ชั่วโมงที่แล้ว"</string>
     <string name="some_hours_ago">"%s ชั่วโมงที่ผ่านมา"</string>
     <string name="one_day_ago">"1 วันที่ผ่านมา"</string>
-    <string name="some_days_ago">"%1$s วันที่ผ่านมา"</string>
+    <string name="some_days_ago">"%s วันที่ผ่านมา"</string>
     <string name="some_months_ago">"%s เดือน (s) ที่ผ่านมา"</string>
     <string name="more_than_one_year_ago">"มากกว่า 1 ปีที่แล้ว"</string>
 
