@@ -1,5 +1,6 @@
 package com.instachat.android;
 
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -81,6 +82,7 @@ import com.instachat.android.likes.UserLikedUserFragment;
 import com.instachat.android.likes.UserLikedUserListener;
 import com.instachat.android.login.LogoutDialogHelper;
 import com.instachat.android.login.SignInActivity;
+import com.instachat.android.messaging.MyFirebaseMessagingService;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.model.GroupChatSummary;
 import com.instachat.android.model.PrivateChatSummary;
@@ -262,6 +264,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         }
         addUserPresenceToGroup();
         listenForTyping();
+        final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.cancel(MyFirebaseMessagingService.NOTIFICATION_ID_PENDING_REQUESTS);
     }
 
     private DatabaseReference mGroupSummaryRef;
@@ -863,11 +867,17 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         @Override
         public void onPendingRequestsAvailable() {
             mIsPendingRequestsAvailable = true;
+            ActionBar ab = getSupportActionBar();
+            if (ab != null)
+                ab.setHomeAsUpIndicator(R.drawable.ic_menu_new);
         }
 
         @Override
         public void onPendingRequestsCleared() {
             mIsPendingRequestsAvailable = false;
+            ActionBar ab = getSupportActionBar();
+            if (ab != null)
+                ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
     };
 
@@ -1578,5 +1588,9 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 menu.removeItem(R.id.menu_manage_blocks);
         }
         return super.onMenuOpened(featureId, menu);
+    }
+
+    private void notifyMyFollowers() {
+
     }
 }

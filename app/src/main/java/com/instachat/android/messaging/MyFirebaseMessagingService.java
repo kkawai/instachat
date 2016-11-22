@@ -8,12 +8,15 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v4.app.RemoteInput;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,6 +27,7 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.instachat.android.Constants;
 import com.instachat.android.PrivateChatActivity;
 import com.instachat.android.R;
+import com.instachat.android.login.LauncherActivity;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.util.MLog;
@@ -39,6 +43,10 @@ import java.util.Map;
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = "MyFMService";
+
+    //all pending request notifications will have the same id
+    //2 will not conflict with any user id
+    public static final int NOTIFICATION_ID_PENDING_REQUESTS = 2;
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -145,7 +153,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // Use NotificationCompat.Builder to set up our notification.
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.addAction(replyAction)
-                //.setPriority(Notification.PRIORITY_HIGH)  hold off until we figure things out
+                .setPriority(Notification.PRIORITY_HIGH) //todo: control with settings
                 .setContentTitle(friendlyMessage.getName())
                 .setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp)
                 .setLargeIcon(bitmap == null ? BitmapFactory.decodeResource(getResources(), R.drawable.ic_anon_person_36dp) : bitmap)
@@ -230,7 +238,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     privateChatSummary.setLastMessageSentTimestamp(System.currentTimeMillis());
                     privateChatSummary.setAccepted(false);
                     //Create PrivateChatSummary under private_requests
-                    FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(friendlyMessage.getUserid(), myUserid)).setValue(privateChatSummary);
+                    FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(friendlyMessage.getUserid(), myUserid))
+                            .setValue(privateChatSummary)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    notifyPendingRequests();
+                                }
+                            });
                 }
             }
 
@@ -240,5 +255,29 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             }
         });
 
+    }
+
+    /**
+     * Simply notify user that there are pending requests from other users wanting
+     * to chat with him.  Use PRIORITY_LOW
+     * User can open the app and decide whether to accept or not
+     */
+    private void notifyPendingRequests() {
+
+        // This intent is fired when notification is clicked
+        Intent intent = new Intent(this, LauncherActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID_PENDING_REQUESTS, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // Use NotificationCompat.Builder to set up our notification.
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        builder.setPriority(Notification.PRIORITY_LOW) //todo: control with settings
+                .setContentTitle("")
+                .setContentText(getString(R.string.menu_option_pending_requests))
+                .setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp)
+                .setContentIntent(pendingIntent)
+                .setSubText(getString(R.string.sent_via, getString(R.string.app_name)));
+
+        final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFICATION_ID_PENDING_REQUESTS, builder.build());
     }
 }
