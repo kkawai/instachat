@@ -263,7 +263,7 @@ public final class Constants {
     public static final String KEY_AUTO_ADD_PERSON = "key_auto_add_person";
 
     public enum GcmMessageType {
-        msg, typing
+        msg, notify_friend_in
     }
 
     public static final String ACTION_USER_TYPING = "action_user_typing";

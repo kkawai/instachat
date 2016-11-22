@@ -25,7 +25,10 @@ import com.instachat.android.model.PrivateChatHeader;
 import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.model.User;
 import com.instachat.android.util.MLog;
+import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ThreadWrapper;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,11 +59,16 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
     private Map<Long, Map.Entry<DatabaseReference, ChildEventListener>> publicGroupChatPresenceReferences = new HashMap<>();
     private ActivityState activityState;
     private List<Map.Entry<DatabaseReference, ValueEventListener>> userInfoRefs = new Vector<>(128);
+    private boolean isPrivateChat;
 
     public ChatSummariesRecyclerAdapter(@NonNull ChatsItemClickedListener chatsItemClickedListener,
                                         @NonNull ActivityState activityState) {
         this.chatsItemClickedListener = chatsItemClickedListener;
         this.activityState = activityState;
+    }
+
+    public void setIsPrivateChat(boolean isPrivateChat) {
+        this.isPrivateChat = isPrivateChat;
     }
 
     public void populateData() {
@@ -303,9 +311,34 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
                     }
                     if (activityState == null || activityState.isActivityDestroyed())
                         return;
-                    FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF()).
+                    FirebaseDatabase.getInstance().
+                            getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF()).
                             child(privateChatSummary.getId()).
                             updateChildren(privateChatSummary.toMap());
+
+                    //Now, see if this user accepted me. If yes, then notify them that
+                    //I just got online
+                    if (!isPrivateChat && privateChatSummary.getOnlineStatus() != Constants.USER_OFFLINE)
+                        FirebaseDatabase.getInstance().getReference("/users/" + privateChatSummary.getId() + "/private_summaries/" + Preferences.getInstance().getUserId() + "/accepted")
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot.exists() && dataSnapshot.getValue(Boolean.class)) {
+                                            try {
+                                                JSONObject msg = new JSONObject();
+                                                msg.put(Constants.KEY_USERNAME, privateChatSummary.getName());
+                                                NetworkApi.gcmsend(Integer.parseInt(privateChatSummary.getId()), Constants.GcmMessageType.notify_friend_in, msg);
+                                            } catch (Exception e) {
+                                                MLog.e(TAG, "", e);
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
                 } catch (Exception e) {
                     MLog.e(TAG, "", e);
                 }

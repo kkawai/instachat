@@ -156,7 +156,6 @@
     <string name="possible_explicit_content_warning_pls_choose_another">Warning: this photo may contain inappropriate or explicit content.  Please choose another photo.</string>
     <string name="warning">Warning</string>
 
-    <!-- after 11/10/2016 -->
     <string name="menu_option_pending_requests">New Pending Requests!</string>
     <string name="left_drawer_pending_request_singular">1 new pending request!</string>
     <string name="left_drawer_pending_requests_plural">%s new pending requests!</string>
@@ -174,8 +173,11 @@
 
     <string name="photo_not_available">Disappearing Photo is not available anymore</string>
 
-    <!-- after 11/17/2016 -->
     <string name="welcome_back_old_user">Welcome back and very happy to see you again!  Please enter your email address to complete your account!  Thank you!</string>
     <string name="loading">Loading...</string>
     <string name="hint_password">Password (6-20 characters)</string>
+
+    <!-- after 11/22/2016 -->
+    <string name="friend_just_jumped_in">Jumped in!  Tap to see what\'s going on!</string>
+    <string name="pending_requests_text">People want to chat with you now!</string>
 </resources>

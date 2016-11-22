@@ -10,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.RemoteInput;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
 
@@ -47,6 +46,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     //all pending request notifications will have the same id
     //2 will not conflict with any user id
     public static final int NOTIFICATION_ID_PENDING_REQUESTS = 2;
+    public static final int NOTIFICATION_ID_FRIEND_JUMPED_IN = 3;
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -61,10 +61,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             JSONObject object = new JSONObject(remoteMessage.getData());
             if (object.has(Constants.KEY_GCM_MESSAGE)) {
                 JSONObject msg = new JSONObject(object.getString(Constants.KEY_GCM_MESSAGE));
-                if (msg.has(Constants.KEY_GCM_MSG_TYPE) && msg.getString(Constants.KEY_GCM_MSG_TYPE).equals(Constants.GcmMessageType.typing.name())) {
-                    Intent intent = new Intent(Constants.ACTION_USER_TYPING);
-                    intent.putExtra(Constants.KEY_USERID, msg.getInt(Constants.KEY_USERID));
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                if (msg.has(Constants.KEY_GCM_MSG_TYPE) && msg.getString(Constants.KEY_GCM_MSG_TYPE).equals(Constants.GcmMessageType.notify_friend_in.name())) {
+                    notifyFriendJumpedIn(msg.getString(Constants.KEY_USERNAME));
                 } else if (msg.has(Constants.KEY_GCM_MSG_TYPE) && msg.getString(Constants.KEY_GCM_MSG_TYPE).equals(Constants.GcmMessageType.msg.name())) {
                     final FriendlyMessage friendlyMessage = FriendlyMessage.fromJSONObject(msg);
 
@@ -257,26 +255,51 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     }
 
+    private void notifyFriendJumpedIn(String username) {
+
+        Uri customSound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
+                + "://" + getPackageName() + "/raw/arpeggio");
+        // This intent is fired when notification is clicked
+        Intent intent = new Intent(this, LauncherActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID_FRIEND_JUMPED_IN, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // Use NotificationCompat.Builder to set up our notification.
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        builder.setPriority(Notification.PRIORITY_DEFAULT) //todo: control with settings
+                .setContentTitle(username)
+                .setContentText(getString(R.string.friend_just_jumped_in))
+                .setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp)
+                .setContentIntent(pendingIntent)
+                .setSound(customSound)
+                .setSubText(getString(R.string.sent_via, getString(R.string.app_name)));
+
+        final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFICATION_ID_FRIEND_JUMPED_IN, builder.build());
+    }
+
     /**
      * Simply notify user that there are pending requests from other users wanting
-     * to chat with him.  Use PRIORITY_LOW
+     * to chat with him.  Do not use HIGH priority
      * User can open the app and decide whether to accept or not
      */
     private void notifyPendingRequests() {
 
+        Uri customSound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
+                + "://" + getPackageName() + "/raw/sound_i_demand_attention");
+
         // This intent is fired when notification is clicked
         Intent intent = new Intent(this, LauncherActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID_PENDING_REQUESTS, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID_FRIEND_JUMPED_IN, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Use NotificationCompat.Builder to set up our notification.
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setPriority(Notification.PRIORITY_LOW) //todo: control with settings
-                .setContentTitle("")
-                .setContentText(getString(R.string.menu_option_pending_requests))
+                .setContentTitle(getString(R.string.pending_requests_title))
+                .setContentText(getString(R.string.pending_requests_text))
                 .setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp)
                 .setContentIntent(pendingIntent)
+                .setSound(customSound)
                 .setSubText(getString(R.string.sent_via, getString(R.string.app_name)));
-
         final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFICATION_ID_PENDING_REQUESTS, builder.build());
     }
