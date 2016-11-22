@@ -318,7 +318,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
 
                     //Now, see if this user accepted me. If yes, then notify them that
                     //I just got online
-                    if (!isPrivateChat && privateChatSummary.getOnlineStatus() != Constants.USER_OFFLINE)
+                    if (!isPrivateChat && privateChatSummary.getOnlineStatus() != Constants.USER_OFFLINE && Integer.parseInt(privateChatSummary.getId()) != Preferences.getInstance().getUserId())
                         FirebaseDatabase.getInstance().getReference("/users/" + privateChatSummary.getId() + "/private_summaries/" + Preferences.getInstance().getUserId() + "/accepted")
                                 .addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
