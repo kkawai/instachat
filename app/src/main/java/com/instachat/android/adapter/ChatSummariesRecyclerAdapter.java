@@ -326,7 +326,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
                                         if (dataSnapshot.exists() && dataSnapshot.getValue(Boolean.class)) {
                                             try {
                                                 JSONObject msg = new JSONObject();
-                                                msg.put(Constants.KEY_USERNAME, privateChatSummary.getName());
+                                                msg.put(Constants.KEY_USERNAME, Preferences.getInstance().getUsername());
                                                 NetworkApi.gcmsend(Integer.parseInt(privateChatSummary.getId()), Constants.GcmMessageType.notify_friend_in, msg);
                                             } catch (Exception e) {
                                                 MLog.e(TAG, "", e);
