@@ -83,6 +83,10 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
      *                        combination of <code>limit()</code>, <code>startAt()</code>, and <code>endAt()</code>
      */
     public BaseMessagesAdapter(final Class<T> modelClass, int modelLayout, Class<VH> viewHolderClass, Query ref) {
+        try {
+            ref.keepSynced(true);
+        } catch (Exception e) {
+        }
         mModelClass = modelClass;
         mModelLayout = modelLayout;
         mViewHolderClass = viewHolderClass;

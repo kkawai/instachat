@@ -2,6 +2,14 @@ package com.instachat.android;
 
 public class Events {
 
+    public static final String MESSAGE_PRIVATE_SENT_EVENT = "private_message_sent";
+    public static final String MESSAGE_GROUP_SENT_EVENT = "group_message_sent";
+    public static final String MESSAGE_FAILED = "message_failed";
+    public static final String SAVED_PROFILE = "saved_profile";
+    public static final String SAVED_PROFILE_FAILED = "saved_profile_failed";
+    public static final String USER_BLOCKED = "user_blocked";
+    public static final String USER_UNBLOCKED = "user_unblocked";
+
     public static final String IG_LOGIN_SUCESS = "IG_LOGIN_SUCESS";
     public static final String IG_LOGIN_FAIL = "IG_LOGIN_FAIL";
     public static final String IG_LOGOUT = "IG_LOGOUT";

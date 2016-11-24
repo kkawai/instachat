@@ -30,6 +30,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -257,8 +258,8 @@ public class PrivateChatActivity extends GroupChatActivity {
     private void showErrorToast(String extra) {
         try {
             Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, extra), Toast.LENGTH_SHORT).show();
-        }catch (Exception e) {
-            MLog.e(TAG,"",e);
+        } catch (Exception e) {
+            MLog.e(TAG, "", e);
         }
     }
 
@@ -329,6 +330,14 @@ public class PrivateChatActivity extends GroupChatActivity {
             mAppBarLayout.setExpanded(false, true);
         }
         initializePrivateChatSummary();
+        if (isPrivateChat()) {
+            Bundle payload = new Bundle();
+            payload.putString("to", sUsername);
+            payload.putString("from", myUsername());
+            payload.putString("type", friendlyMessage.getImageUrl() != null ? "photo" : "text");
+            payload.putBoolean("one-time", friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
+            FirebaseAnalytics.getInstance(this).logEvent(Events.MESSAGE_PRIVATE_SENT_EVENT, payload);
+        }
     }
 
     @Override
@@ -467,7 +476,11 @@ public class PrivateChatActivity extends GroupChatActivity {
         TextView activeGroup = (TextView) findViewById(R.id.activeGroup);
         if (toUser.getCurrentGroupId() != 0 && !TextUtils.isEmpty(toUser.getCurrentGroupName())) {
             activeGroup.setVisibility(View.VISIBLE);
-            activeGroup.setText(getString(R.string.user_active_in_group, toUser.getCurrentGroupName()));
+            try {
+                activeGroup.setText(getString(R.string.user_active_in_group, toUser.getCurrentGroupName()));
+            } catch (Exception e) {
+                activeGroup.setText(toUser.getCurrentGroupName());
+            }
             activeGroup.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

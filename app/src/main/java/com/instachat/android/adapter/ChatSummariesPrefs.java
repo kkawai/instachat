@@ -16,14 +16,14 @@ public final class ChatSummariesPrefs {
 
     private static final String PREFS = "chat_summaries";
     private static SharedPreferences chatSummariesPrefs;
-    private static final long TWENTY_MINUTES = 1000 * 60 * 20L;
+    private static final long THIRTY_MINUTES = 1000 * 60 * 30L;
 
     public static boolean isNotifiedRecently(String userid) {
         if (chatSummariesPrefs == null) {
             chatSummariesPrefs = MyApp.getInstance().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         }
         long last = chatSummariesPrefs.getLong(userid, 0);
-        return System.currentTimeMillis() - last < TWENTY_MINUTES;
+        return System.currentTimeMillis() - last < THIRTY_MINUTES;
     }
 
     public static void updateLastNotifiedTime(String userid) {

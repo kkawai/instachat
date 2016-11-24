@@ -1,6 +1,7 @@
 package com.instachat.android;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -374,12 +376,17 @@ public class LeftDrawerHelper {
                         MLog.e(TAG, "", e);
                         showErrorToast("leftd 1");
                     }
+                    FirebaseAnalytics.getInstance(MyApp.getInstance()).logEvent(Events.SAVED_PROFILE, null);
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     MLog.d(TAG, "error response: ", error);
                     showErrorToast("leftd 2");
+                    Bundle payload = new Bundle();
+                    payload.putString("why", error.toString());
+                    payload.putString("username", Preferences.getInstance().getUsername() + "");
+                    FirebaseAnalytics.getInstance(MyApp.getInstance()).logEvent(Events.SAVED_PROFILE_FAILED, payload);
                 }
             });
 
@@ -412,12 +419,19 @@ public class LeftDrawerHelper {
                                     } catch (Exception e) {
                                         mUsernameEditText.setText(Preferences.getInstance().getUsername());
                                     }
+                                    Bundle payload = new Bundle();
+                                    payload.putString("username", Preferences.getInstance().getUsername() + "");
+                                    FirebaseAnalytics.getInstance(MyApp.getInstance()).logEvent(Events.SAVED_PROFILE, payload);
                                 }
                             }, new Response.ErrorListener() {
                                 @Override
                                 public void onErrorResponse(VolleyError error) {
                                     MLog.d(TAG, "error response: ", error);
                                     mUsernameEditText.setText(Preferences.getInstance().getUsername());
+                                    Bundle payload = new Bundle();
+                                    payload.putString("why", error.toString());
+                                    payload.putString("username", Preferences.getInstance().getUsername() + "");
+                                    FirebaseAnalytics.getInstance(MyApp.getInstance()).logEvent(Events.SAVED_PROFILE_FAILED, payload);
                                 }
                             });
 
@@ -475,12 +489,16 @@ public class LeftDrawerHelper {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (!Preferences.getInstance().getUsername().equals(charSequence.toString())) {
-                    mIsUsernameChanged = true;
-                    setSaveButtonVisibility(mIsUsernameChanged, mIsBioChanged);
-                } else {
-                    mIsUsernameChanged = false;
-                    setSaveButtonVisibility(mIsUsernameChanged, mIsBioChanged);
+                try {
+                    if (!Preferences.getInstance().getUsername().equals(charSequence.toString())) {
+                        mIsUsernameChanged = true;
+                        setSaveButtonVisibility(mIsUsernameChanged, mIsBioChanged);
+                    } else {
+                        mIsUsernameChanged = false;
+                        setSaveButtonVisibility(mIsUsernameChanged, mIsBioChanged);
+                    }
+                } catch (Exception e) {
+                    MLog.e(TAG, "", e);
                 }
             }
 

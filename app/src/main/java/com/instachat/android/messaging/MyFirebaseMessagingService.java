@@ -257,6 +257,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private void notifyFriendJumpedIn(String username) {
 
+        /**
+         * fix bug from older version
+         */
+        try {
+            if (username.equals(Preferences.getInstance().getUsername())) {
+                return;
+            }
+        } catch (Exception e) {
+        }
+
         Uri customSound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
                 + "://" + getPackageName() + "/raw/arpeggio");
         // This intent is fired when notification is clicked

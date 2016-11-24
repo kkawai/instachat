@@ -108,7 +108,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private static final String TAG = "GroupChatActivity";
 
     private static final int REQUEST_INVITE = 1;
-    private static final String MESSAGE_SENT_EVENT = "message_sent";
 
     private Toolbar mToolbar;
     private View mSendButton, mAttachButton;
@@ -118,7 +117,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private ProgressBar mProgressBar;
     private FirebaseAuth mFirebaseAuth;
     //private FirebaseUser mFirebaseUser;
-    private FirebaseAnalytics mFirebaseAnalytics;
     private EditText mMessageEditText;
     private TextView mUsernameTyping;
     private AdView mAdView;
@@ -179,12 +177,12 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setStackFromEnd(true);
 
-//        try {
-//            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-//            MLog.w(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) succeeded");
-//        } catch (Exception e) {
-//            //MLog.e(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) failed: " + e);
-//        }
+        try {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            MLog.w(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) succeeded");
+        } catch (Exception e) {
+            //MLog.e(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) failed: " + e);
+        }
 
         initRemoteConfig();
         fetchConfig();
@@ -201,8 +199,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
         */
-        // Initialize Firebase Measurement.
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         mUsernameTyping = ((TextView) findViewById(R.id.usernameTyping));
         mMessageEditText = (EditText) findViewById(R.id.messageEditText);
@@ -664,13 +660,21 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
         }
-        mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
+        if (!isPrivateChat()) {
+            Bundle payload = new Bundle();
+            payload.putString("from", myUsername());
+            payload.putString("type", friendlyMessage.getImageUrl() != null ? "photo" : "text");
+            payload.putLong("group", mGroupId);
+            payload.putBoolean("one-time", friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
+            FirebaseAnalytics.getInstance(this).logEvent(Events.MESSAGE_GROUP_SENT_EVENT, payload);
+        }
     }
 
     @Override
     public void onFriendlyMessageFail(FriendlyMessage friendlyMessage) {
         mMessageEditText.setText(friendlyMessage.getText());
         new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE).setContentText(getString(R.string.could_not_send_message)).show();
+        FirebaseAnalytics.getInstance(this).logEvent(Events.MESSAGE_FAILED, null);
     }
 
     @Override
@@ -780,12 +784,14 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 // Check how many invitations were sent and log.
                 String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
                 MLog.d(TAG, "Invitations sent: " + ids.length);
+                payload.putInt("num_inv", ids.length);
+                payload.putString("username", myUsername());
+                FirebaseAnalytics.getInstance(this).logEvent(FirebaseAnalytics.Event.SHARE, payload);
             } else {
                 // Use Firebase Measurement to log that invitation was not sent
                 Bundle payload = new Bundle();
                 payload.putString(FirebaseAnalytics.Param.VALUE, "inv_not_sent");
-                mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SHARE, payload);
-
+                FirebaseAnalytics.getInstance(this).logEvent(FirebaseAnalytics.Event.SHARE, payload);
                 // Sending failed or it was canceled, show failure message to the user
                 MLog.d(TAG, "Failed to send invitation.");
             }
@@ -1076,9 +1082,17 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     };
 
     protected void onUserBlocked(int userid) {
+        Bundle payload = new Bundle();
+        payload.putString("by", myUsername());
+        payload.putInt("userid", userid);
+        FirebaseAnalytics.getInstance(this).logEvent(Events.USER_BLOCKED, payload);
     }
 
     protected void onUserUnblocked(int userid) {
+        Bundle payload = new Bundle();
+        payload.putString("by", myUsername());
+        payload.putInt("userid", userid);
+        FirebaseAnalytics.getInstance(this).logEvent(Events.USER_UNBLOCKED, payload);
     }
 
     protected boolean isPrivateChat() {
