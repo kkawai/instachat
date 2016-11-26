@@ -152,6 +152,13 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             // old ones being restored.
             savedInstanceState.remove("android:support:fragments");
         }
+        if (!Preferences.getInstance().isLoggedIn() || Preferences.getInstance().getUser() == null || Preferences.getInstance().getUsername() == null) {
+            // Not signed in, launch the Sign In activity
+            startActivity(new Intent(this, SignInActivity.class));
+            finish();
+            return;
+        }
+
         super.onCreate(savedInstanceState);
         initDatabaseRef();
         DataBindingUtil.setContentView(this, getLayout());
@@ -163,12 +170,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
-        if (!Preferences.getInstance().isLoggedIn()) {
-            // Not signed in, launch the Sign In activity
-            startActivity(new Intent(this, SignInActivity.class));
-            finish();
-            return;
-        }
 
         GCMHelper.onCreate(this);
 
