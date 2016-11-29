@@ -1602,7 +1602,10 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             if (menu.findItem(R.id.menu_manage_blocks) != null)
                 menu.removeItem(R.id.menu_manage_blocks);
         }
-        if (!isPrivateChat()) {
+        /**
+         * very hacky!
+         */
+        if (!isPrivateChat() && myUserid() > 10) {
             if (menu.findItem(R.id.menu_sign_out) != null) {
                 menu.removeItem(R.id.menu_sign_out);
             }
