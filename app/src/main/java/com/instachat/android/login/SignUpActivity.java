@@ -14,8 +14,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.instachat.android.Events;
 import com.instachat.android.GroupChatActivity;
 import com.instachat.android.MyApp;
 import com.instachat.android.R;
@@ -176,8 +178,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     private void showErrorToast(final String distinctScreenCode) {
         try {
             Toast.makeText(this, getString(R.string.general_api_error, distinctScreenCode), Toast.LENGTH_SHORT).show();
-        }catch (Exception e){
-            MLog.e(TAG,"",e);
+        } catch (Exception e) {
+            MLog.e(TAG, "", e);
         }
     }
 
@@ -230,6 +232,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     if (!TextUtils.isEmpty(thirdPartyProfilePicUrl))
                         NetworkApi.saveThirdPartyPhoto(thirdPartyProfilePicUrl);
                     startActivity(new Intent(SignUpActivity.this, GroupChatActivity.class));
+                    FirebaseAnalytics.getInstance(SignUpActivity.this).logEvent(Events.SIGNUP_SUCCESS, null);
                     finish();
                 }
             }

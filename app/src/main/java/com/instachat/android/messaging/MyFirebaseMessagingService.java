@@ -16,6 +16,7 @@ import android.text.TextUtils;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.instachat.android.Constants;
+import com.instachat.android.Events;
 import com.instachat.android.PrivateChatActivity;
 import com.instachat.android.R;
 import com.instachat.android.login.LauncherActivity;
@@ -312,5 +314,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .setSubText(getString(R.string.sent_via, getString(R.string.app_name)));
         final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFICATION_ID_PENDING_REQUESTS, builder.build());
+        FirebaseAnalytics.getInstance(this).logEvent(Events.PENDING_REQUEST_ISSUED, null);
     }
 }

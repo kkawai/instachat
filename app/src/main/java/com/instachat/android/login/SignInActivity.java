@@ -39,10 +39,12 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.instachat.android.BaseActivity;
+import com.instachat.android.Events;
 import com.instachat.android.GroupChatActivity;
 import com.instachat.android.MyApp;
 import com.instachat.android.R;
@@ -199,6 +201,7 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
             }
         }
         startActivity(new Intent(SignInActivity.this, GroupChatActivity.class));
+        FirebaseAnalytics.getInstance(this).logEvent(Events.LOGIN_SUCCESS, null);
         finish();
     }
 

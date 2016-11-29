@@ -13,10 +13,12 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.BaseFragment;
 import com.instachat.android.Constants;
+import com.instachat.android.Events;
 import com.instachat.android.PrivateChatActivity;
 import com.instachat.android.R;
 import com.instachat.android.adapter.MessageViewHolder;
@@ -78,12 +80,14 @@ public class RequestsFragment extends BaseFragment {
                         sweetAlertDialog.cancel();
                         FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(userid, Preferences.getInstance().getUserId())).removeValue();
                         FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF()).child("" + userid).removeValue();
+                        FirebaseAnalytics.getInstance(getActivity()).logEvent(Events.PENDING_REQUEST_DENIED, null);
                     }
                 }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
             @Override
             public void onClick(SweetAlertDialog sweetAlertDialog) {
                 sweetAlertDialog.dismiss();
                 PrivateChatActivity.startPrivateChatActivity(getActivity(), userid, username, dpid, true, transitionImageView, null, null);
+                FirebaseAnalytics.getInstance(getActivity()).logEvent(Events.PENDING_REQUEST_ACCEPTED, null);
             }
         }).setCustomImage(dpid, R.drawable.ic_anon_person_48dp).
                 show();

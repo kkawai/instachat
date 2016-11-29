@@ -52,15 +52,23 @@ public class MessagesDialogHelper {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            new SweetAlertDialog(context, SweetAlertDialog.SUCCESS_TYPE)
-                                    .setTitleText(context.getString(R.string.success_exclamation))
-                                    .setContentText(context.getString(R.string.message_delete_success))
-                                    .show();
+                            try {
+                                new SweetAlertDialog(context, SweetAlertDialog.SUCCESS_TYPE)
+                                        .setTitleText(context.getString(R.string.success_exclamation))
+                                        .setContentText(context.getString(R.string.message_delete_success))
+                                        .show();
+                            } catch (Exception e) {
+                                MLog.e(TAG, "", e);
+                            }
                         } else {
-                            new SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
-                                    .setTitleText(context.getString(R.string.oops_exclamation))
-                                    .setContentText(context.getString(R.string.message_delete_failed))
-                                    .show();
+                            try {
+                                new SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
+                                        .setTitleText(context.getString(R.string.oops_exclamation))
+                                        .setContentText(context.getString(R.string.message_delete_failed))
+                                        .show();
+                            } catch (Exception e) {
+                                MLog.e(TAG, "", e);
+                            }
                         }
                     }
                 });

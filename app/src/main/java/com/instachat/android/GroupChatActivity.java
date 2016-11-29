@@ -96,6 +96,7 @@ import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
+import com.instachat.android.util.ThreadWrapper;
 import com.instachat.android.view.ThemedAlertDialog;
 import com.tooltip.Tooltip;
 
@@ -266,6 +267,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         listenForTyping();
         final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.cancel(MyFirebaseMessagingService.NOTIFICATION_ID_PENDING_REQUESTS);
+        checkForNoData();
     }
 
     private DatabaseReference mGroupSummaryRef;
@@ -356,14 +358,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        // Register download receiver
-        //LocalBroadcastManager.getInstance(this)
-        //        .registerReceiver(mDownloadReceiver, MyDownloadService.getIntentFilter());
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         if (mAdView != null) {
@@ -373,11 +367,12 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         if (Preferences.getInstance().isLoggedIn()) {
             GCMHelper.onResume(this);
             showFirstMessageDialog(GroupChatActivity.this);
+            if (mExternalSendIntentConsumer != null)
+                mExternalSendIntentConsumer.consumeIntent(getIntent());
         } else {
             finish();
         }
-        if (mExternalSendIntentConsumer != null)
-            mExternalSendIntentConsumer.consumeIntent(getIntent());
+
     }
 
     @Override
@@ -678,6 +673,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     @Override
     public void onFriendlyMessageFail(FriendlyMessage friendlyMessage) {
+        if (isActivityDestroyed())
+            return;
         mMessageEditText.setText(friendlyMessage.getText());
         new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE).setContentText(getString(R.string.could_not_send_message)).show();
         FirebaseAnalytics.getInstance(this).logEvent(Events.MESSAGE_FAILED, null);
@@ -1632,6 +1629,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                             Preferences.getInstance().setShownSendFirstMessageDialog(true);
                             final FriendlyMessage friendlyMessage = new FriendlyMessage(text, myUsername(), myUserid(), myDpid(), null, false, false, null, System.currentTimeMillis());
                             sendText(friendlyMessage);
+                            FirebaseAnalytics.getInstance(GroupChatActivity.this).logEvent(Events.WELCOME_MESSAGE_SENT, null);
                         }
                     }
                 }).setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -1642,5 +1640,27 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 }
             }
         }).show();
+    }
+
+    private void checkForNoData() {
+        /**
+         * if after 12 seconds and there is no chat data from firebase, log it
+         */
+        ThreadWrapper.executeInWorkerThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(10000);
+                    if (isActivityDestroyed())
+                        return;
+                    if (mMessagesAdapter == null || mMessagesAdapter.getItemCount() == 0) {
+                        FirebaseAnalytics.getInstance(GroupChatActivity.this).logEvent(Events.NO_DATA_AFTER_8_SEC, null);
+                    } else {
+                        FirebaseAnalytics.getInstance(GroupChatActivity.this).logEvent(Events.GOT_DATA, null);
+                    }
+                } catch (InterruptedException e) {
+                }
+            }
+        });
     }
 }
