@@ -94,7 +94,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginRight="3dp"
                         android:scaleType="fitXY"
-                        android:src="@drawable/ic_favorite_white_18dp"
+                        android:src="@drawable/ic_favorite_black_18dp"
                         android:visibility="visible"/>
 
                     <com.instachat.android.view.CustomFontTextView
@@ -108,7 +108,7 @@
                         android:visibility="visible"
                         app:font="Lato-Bold.ttf"/>
                 </LinearLayout>
-
+`
                 <com.instachat.android.view.CustomFontTextView
                     android:id="@+id/bio"
                     android:layout_width="match_parent"
