@@ -267,6 +267,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         listenForTyping();
         final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.cancel(MyFirebaseMessagingService.NOTIFICATION_ID_PENDING_REQUESTS);
+        notificationManager.cancel(MyFirebaseMessagingService.NOTIFICATION_ID_FRIEND_JUMPED_IN);
         checkForNoData();
     }
 
