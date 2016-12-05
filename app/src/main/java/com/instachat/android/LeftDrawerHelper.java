@@ -176,6 +176,9 @@ public class LeftDrawerHelper {
             @Override
             public void onDrawerOpened(View drawerView) {
 
+                if (mDrawerLayout == null)
+                    return;
+
                 if (mDrawerLayout.isDrawerOpen(GravityCompat.START))
                     mWhichDrawerLastOpened = GravityCompat.START;
                 else
