@@ -182,7 +182,6 @@
     <string name="pending_requests_text">People want to chat with you now!</string>
 
     <!-- added after 11/28/2016 -->
-    <string name="enter_first_comment">Hi!  Introduce yourself to the community.  Enter your first
-     message!</string>
+    <string name="enter_first_comment">Hi %s!  Share what is on your mind right now...</string>
 
 </resources>
