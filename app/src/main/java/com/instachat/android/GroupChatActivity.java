@@ -355,6 +355,21 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
          }
       };
       mTypingInRoomReference.addChildEventListener(mTypingInRoomEventListener);
+
+      UsersInGroupListener usersInGroupListener = new UsersInGroupListener() {
+         @Override
+         public void onNumUsersUpdated(long groupId, String groupName, int numUsers) {
+            if (getSupportActionBar() != null && groupId == mGroupId)
+               getSupportActionBar().setTitle(groupName + getCount(numUsers));
+         }
+      };
+      mChatsRecyclerViewAdapter.setUsersInGroupListener(usersInGroupListener);
+   }
+
+   private String getCount(int count) {
+      if (count > 0)
+         return " (" + count + ")";
+      return "";
    }
 
    @Override
@@ -1013,7 +1028,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
       if (closeBothDrawers()) {
          return;
       }
-      if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
+      if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
          getSupportFragmentManager().popBackStack();
          return;
       }
@@ -1454,7 +1469,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
          public void onDataChange(DataSnapshot dataSnapshot) {
             if (dataSnapshot.hasChildren()) {
                final GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
-               getSupportActionBar().setTitle(groupChatSummary.getName());
                getSupportActionBar().setSubtitle(R.string.app_name);
 
                /**
@@ -1564,6 +1578,10 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
       @Override
       public void onMyLikersClicked() {
          Fragment fragment = new UserLikedUserFragment();
+         Bundle bundle = new Bundle();
+         bundle.putInt(Constants.KEY_USERID, myUserid());
+         bundle.putString(Constants.KEY_USERNAME, myUsername());
+         fragment.setArguments(bundle);
          getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, UserLikedUserFragment.TAG).addToBackStack(null).commit();
       }
    };
@@ -1681,4 +1699,5 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
          }
       });
    }
+
 }

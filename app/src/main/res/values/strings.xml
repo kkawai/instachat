@@ -183,5 +183,6 @@
 
     <!-- added after 11/28/2016 -->
     <string name="enter_first_comment">Hi %s!  Share what is on your mind right now...</string>
-
+    <string name="gave_like_singular">gave 1 like</string>
+    <string name="gave_likes_plural">gave %s likes</string>
 </resources>

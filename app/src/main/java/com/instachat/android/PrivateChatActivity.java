@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -41,6 +42,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.blocks.BlockUserDialogHelper;
 import com.instachat.android.blocks.ReportUserDialogHelper;
+import com.instachat.android.likes.UserLikedUserFragment;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.model.GroupChatSummary;
 import com.instachat.android.model.PrivateChatSummary;
@@ -78,6 +80,8 @@ public class PrivateChatActivity extends GroupChatActivity {
    private static boolean sIsActive;
    private static int sUserid;
    private static String sUsername, sProfilePicUrl;
+   private View mLikesParent;
+   private TextView mLikesCount;
 
    @Override
    protected int getLayout() {
@@ -105,6 +109,8 @@ public class PrivateChatActivity extends GroupChatActivity {
       mProfilePic = (ImageView) findViewById(R.id.profile_pic);
       mMessageRecyclerViewParent = findViewById(R.id.messageRecyclerViewParent);
       mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
+      mLikesParent = findViewById(R.id.likesParent);
+      mLikesCount = (TextView) findViewById(R.id.likesCount);
       getSupportActionBar().setTitle("");
       sUserid = getIntent().getIntExtra(Constants.KEY_USERID, 0);
       sUsername = getIntent().getStringExtra(Constants.KEY_USERNAME);
@@ -233,6 +239,7 @@ public class PrivateChatActivity extends GroupChatActivity {
          }
       });
       updateLastActiveTimestamp();
+      listenForUpdatedLikeCount(sUserid);
    }
 
    private void checkIfSeenToolbarProfileTooltip(View anchor) {
@@ -305,6 +312,8 @@ public class PrivateChatActivity extends GroupChatActivity {
       if (mTypingValueEventListener != null && mTypingReference != null) {
          mTypingReference.removeEventListener(mTypingValueEventListener);
       }
+      if (mTotalLikesRef != null)
+         mTotalLikesRef.removeEventListener(mTotalLikesEventListener);
       super.onDestroy();
    }
 
@@ -397,6 +406,7 @@ public class PrivateChatActivity extends GroupChatActivity {
          privateChatSummary.setName(sUsername);
          privateChatSummary.setDpid(sProfilePicUrl);
          privateChatSummary.setAccepted(true);
+         privateChatSummary.setLastMessageSentTimestamp(System.currentTimeMillis());
          final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF()).child(sUserid + "");
          ref.updateChildren(privateChatSummary.toMap());
 
@@ -631,6 +641,12 @@ public class PrivateChatActivity extends GroupChatActivity {
 
    @Override
    public void onBackPressed() {
+
+      if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+         getSupportFragmentManager().popBackStack();
+         return;
+      }
+
       if (mIsAppBarExpanded) {
          toggleAppbar();
          return;
@@ -729,6 +745,48 @@ public class PrivateChatActivity extends GroupChatActivity {
          }
       }
       return super.onMenuOpened(featureId, menu);
+   }
+
+   private DatabaseReference mTotalLikesRef;
+   private ValueEventListener mTotalLikesEventListener;
+
+   private void listenForUpdatedLikeCount(int userid) {
+      mTotalLikesRef = FirebaseDatabase.getInstance().getReference(Constants.USER_TOTAL_LIKES_RECEIVED_REF(userid));
+      mTotalLikesEventListener = new ValueEventListener() {
+         @Override
+         public void onDataChange(DataSnapshot dataSnapshot) {
+            if (dataSnapshot.exists()) {
+               if (mLikesParent.getVisibility() != View.VISIBLE) {
+                  mLikesParent.setVisibility(View.VISIBLE);
+                  mLikesCount.setVisibility(View.VISIBLE);
+               }
+               long count = dataSnapshot.getValue(Long.class);
+               if (count == 1) {
+                  mLikesCount.setText(getString(R.string.like_singular));
+               } else {
+                  mLikesCount.setText(getString(R.string.likes_plural, count + ""));
+               }
+            }
+         }
+
+         @Override
+         public void onCancelled(DatabaseError databaseError) {
+
+         }
+      };
+      mTotalLikesRef.addValueEventListener(mTotalLikesEventListener);
+      mLikesParent.setOnClickListener(new View.OnClickListener() {
+         @Override
+         public void onClick(View view) {
+            Fragment fragment = new UserLikedUserFragment();
+            Bundle bundle = new Bundle();
+            bundle.putInt(Constants.KEY_USERID, sUserid);
+            bundle.putString(Constants.KEY_USERNAME, sUsername);
+            fragment.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, UserLikedUserFragment.TAG).addToBackStack(null).commit();
+
+         }
+      });
    }
 
 }
