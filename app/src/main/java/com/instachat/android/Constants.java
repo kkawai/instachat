@@ -18,6 +18,8 @@ public final class Constants {
    public static final int MIN_PASSWORD_LENGTH = 6;
    public static final int MAX_BIO_LENGTH = 512;
 
+   public static final int MAX_USERS_IN_ROOM = 100;
+
    //remote configuration with default values
    public static final boolean DEFAULT_DO_SHOW_SIGNOUT_BUTTON = false;
    public static final boolean DEFAULT_DO_SHORTEN_IMAGE_URLS = true;

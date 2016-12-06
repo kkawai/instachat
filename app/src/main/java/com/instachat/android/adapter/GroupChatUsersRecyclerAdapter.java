@@ -64,6 +64,8 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter {
                 User user = dataSnapshot.getValue(User.class);
                 user.setId(Integer.parseInt(dataSnapshot.getKey()));
                 synchronized (GroupChatUsersRecyclerAdapter.this) {
+                    if (data.size() > Constants.MAX_USERS_IN_ROOM)
+                        return;
                     data.add(user);
                     notifyItemInserted(data.size() - 1);
                     listenForUserUpdates(user);

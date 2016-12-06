@@ -16,8 +16,8 @@ android {
         applicationId "com.instachat.android"
         minSdkVersion 16
         targetSdkVersion 24
-        versionCode 80
-        versionName "2.1.0"
+        versionCode 81
+        versionName "2.1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -61,7 +61,7 @@ dependencies {
     // Google
     compile 'com.google.android.gms:play-services-auth:9.6.1'
     compile 'com.google.android.gms:play-services-appinvite:9.6.1'
-    compile 'com.google.android.gms:play-services-ads:9.6.1'
+    //compile 'com.google.android.gms:play-services-ads:9.6.1'
     compile 'com.google.android.gms:play-services-gcm:9.6.1'
     compile 'com.google.android.gms:play-services-plus:9.6.1'
 
