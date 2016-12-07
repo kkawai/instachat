@@ -42,6 +42,7 @@ public final class NetworkApi {
     public static final String RESPONSE_OK = "OK";
     public static final String RESPONSE_DATA = "data";
     public static final String KEY_RESPONSE_STATUS = "status";
+    public static final String KEY_EXISTS = "exists";
 
     private static final DefaultRetryPolicy DEFAULT_RETRY_POLICY = new DefaultRetryPolicy(REQUEST_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 
@@ -54,7 +55,7 @@ public final class NetworkApi {
 
     public static JSONObject getRemoteSettings() {
         try {
-            final JSONObject r = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/settings").getString()).getJSONObject("data");
+            final JSONObject r = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/settings").getString()).getJSONObject(NetworkApi.RESPONSE_DATA);
             sPair = new Pair<>(r.getString("a"), r.getString("s"));
             return r;
         } catch (final Exception e) {

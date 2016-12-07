@@ -402,7 +402,7 @@ public class LeftDrawerHelper {
                if (mActivityState == null || mActivityState.isActivityDestroyed())
                   return;
                try {
-                  if (!response.getJSONObject("data").getBoolean("exists")) {
+                  if (!response.getJSONObject(NetworkApi.RESPONSE_DATA).getBoolean(NetworkApi.KEY_EXISTS)) {
                      user.setUsername(newUsername);
                      NetworkApi.saveUser(mActivity, user, new Response.Listener<String>() {
                         @Override

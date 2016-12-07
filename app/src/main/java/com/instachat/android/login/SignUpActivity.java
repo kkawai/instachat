@@ -125,7 +125,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                         try {
                             if (!response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                                 showErrorToast("1");
-                            } else if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK) && response.getJSONObject("data").getBoolean("exists")) {
+                            } else if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK) && response.getJSONObject(NetworkApi.RESPONSE_DATA).getBoolean(NetworkApi.KEY_EXISTS)) {
                                 emailLayout.setError(errorMessage(R.string.email_exists, email));
                             } else {
                                 remotelyValidateUsername();
@@ -153,7 +153,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                         try {
                             if (!response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                                 showErrorToast("1");
-                            } else if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK) && response.getJSONObject("data").getBoolean("exists")) {
+                            } else if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK) && response.getJSONObject(NetworkApi.RESPONSE_DATA).getBoolean(NetworkApi.KEY_EXISTS)) {
                                 usernameLayout.setError(errorMessage(R.string.username_exists, username));
                             } else {
                                 createAccount();
@@ -197,7 +197,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     final JSONObject response = new JSONObject(string);
                     MLog.i("test", "savedUser: " + string);
                     if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
-                        user.copyFrom(response.getJSONObject("data"));
+                        user.copyFrom(response.getJSONObject(NetworkApi.RESPONSE_DATA));
                         Preferences.getInstance().saveUser(user);
                         Preferences.getInstance().saveLastSignIn(username);
                         createFirebaseAccount();

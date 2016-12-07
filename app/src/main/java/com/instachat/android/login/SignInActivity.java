@@ -340,8 +340,8 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
         hideProgressDialog();
         try {
             Toast.makeText(this, getString(R.string.general_api_error, distinctScreenCode), Toast.LENGTH_SHORT).show();
-        }catch (Exception e) {
-            MLog.e(TAG,"",e);
+        } catch (Exception e) {
+            MLog.e(TAG, "", e);
         }
     }
 
@@ -375,7 +375,7 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
                                 if (isActivityDestroyed())
                                     return;
                                 try {
-                                    if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK) && response.getJSONObject("data").getBoolean("exists")) {
+                                    if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK) && response.getJSONObject(NetworkApi.RESPONSE_DATA).getBoolean(NetworkApi.KEY_EXISTS)) {
                                         textInputLayout.setError(errorMessage(R.string.email_exists, ltuEmail));
                                         hideProgressDialog();
                                         Toast.makeText(SignInActivity.this, errorMessage(R.string.email_exists, ltuEmail), Toast.LENGTH_SHORT).show();
