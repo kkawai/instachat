@@ -91,25 +91,6 @@
                 android:textColor="#0095c4"
                 />
 
-            <!--
-            <com.google.android.gms.common.SignInButton
-                android:id="@+id/sign_in_with_google_button"
-                android:layout_width="@dimen/sign_in_button_widths"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/login_with_google"
-                android:visibility="visible"/>  -->
-
-            <Button
-                android:id="@+id/sign_up_button"
-                android:layout_width="@dimen/sign_in_button_widths"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="16dp"
-                android:text="@string/new_account"
-                android:visibility="invisible"
-                />
-
         </LinearLayout>
 
     </FrameLayout>

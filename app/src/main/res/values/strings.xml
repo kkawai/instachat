@@ -37,7 +37,6 @@
     <string name="success_exclamation">Success!</string>
     <string name="oops_exclamation">Oops!</string>
     <string name="rationale_storage">This app reads photos from your camera so you can upload the photos that you choose to upload.</string>
-    <string name="new_account">New Account</string>
     <string name="hint_username">Username</string>
     <string name="hint_email">Email</string>
     <string name="hint_email_or_username">Username or Email</string>
@@ -195,4 +194,5 @@
 
     <string name="invalid_roomname">Oops... invalid Room Name.  Please try a different name
         .</string>
+    <string name="get_started">Get Started!</string>
 </resources>
