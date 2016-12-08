@@ -20,6 +20,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.instachat.android.BaseActivity;
@@ -45,6 +46,7 @@ public class ClaimRoomActivity extends BaseActivity implements View.OnClickListe
       roomNameLayout = (TextInputLayout) findViewById(R.id.input_room_name_layout);
       findViewById(R.id.next).setOnClickListener(this);
       findViewById(R.id.skip).setOnClickListener(this);
+      ((TextView) findViewById(R.id.everybody_gets_own_room)).setText(getString(R.string.every_gets_own_room, getString(R.string.app_name)));
       FontUtil.setTextViewFont(roomNameLayout);
    }
 
