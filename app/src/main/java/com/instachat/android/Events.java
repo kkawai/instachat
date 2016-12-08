@@ -13,6 +13,8 @@ public class Events {
     public static final String PENDING_REQUEST_DENIED = "pending_request_denied";
     public static final String PENDING_REQUEST_ACCEPTED = "pending_request_accepted";
     public static final String LOGIN_SUCCESS = "login_success";
+    public static final String ROOM_NAME_CHOSEN = "room_name_chosen";
+    public static final String ROOM_NAME_SKIPPED = "room_name_skipped";
     public static final String SIGNUP_SUCCESS = "signup_success";
     public static final String WELCOME_MESSAGE_SENT = "welcome_message_sent";
     public static final String NO_DATA_AFTER_8_SEC = "no_data_after_8_sec";

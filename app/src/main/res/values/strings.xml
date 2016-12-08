@@ -185,4 +185,14 @@
     <string name="enter_first_comment">Hi %s!  Share what is on your mind right now...</string>
     <string name="gave_like_singular">gave 1 like</string>
     <string name="gave_likes_plural">gave %s likes</string>
+
+    <string name="name_your_room">Name Your Room</string>
+    <string name="room_name">ROOM NAME</string>
+    <string name="every_gets_own_room">In %s, everybody gets their own personal chat room!</string>
+    <string name="next">NEXT</string>
+    <string name="no_thanks_dont_need_room_skip">No thanks, I do not need my own room.  Skip.</string>
+    <string name="nice_room_name">Awesome room name!  We will notify you when it is ready!</string>
+
+    <string name="invalid_roomname">Oops... invalid Room Name.  Please try a different name
+        .</string>
 </resources>
