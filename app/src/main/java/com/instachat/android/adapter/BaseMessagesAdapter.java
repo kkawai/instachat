@@ -258,10 +258,6 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
         return mSnapshots;
     }
 
-    protected void removeItemRemotely(String ref, OnCompleteListener onCompleteListener) {
-        FirebaseDatabase.getInstance().getReference(ref).removeValue().addOnCompleteListener(onCompleteListener);
-    }
-
     protected void removeItemLocally(int position) {
         synchronized (this) {
             mSnapshots.remove(position);

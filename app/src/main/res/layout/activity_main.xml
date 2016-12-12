@@ -128,18 +128,28 @@
                         fab:fab_colorPressed="@color/colorPrimaryDark"
                         fab:fab_colorRipple="@color/colorPrimaryDark"/>
 
-                    <EditText
-                        android:id="@+id/messageEditText"
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:id="@+id/messageEditTextParent"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
-                        android:layout_weight="1"
-                        android:backgroundTint="@color/jonPink"
-                        android:hint="@string/message_hint"
-                        android:imeOptions="actionSend|flagNoEnterAction"
-                        android:inputType="textShortMessage|textAutoCorrect|textCapSentences|textMultiLine"/>
+                        android:layout_weight="1"/>
+
+                    <!--<EditText-->
+                    <!--android:id="@+id/messageEditText"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="center_vertical"-->
+                    <!--android:layout_marginLeft="10dp"-->
+                    <!--android:layout_marginRight="10dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:backgroundTint="@color/jonPink"-->
+                    <!--android:hint="@string/message_hint"-->
+                    <!--android:imeOptions="actionSend|flagNoEnterAction"-->
+                    <!--android:inputType="textShortMessage|textAutoCorrect|textCapSentences|textMultiLine"/>-->
 
                     <!-- at.markushi.ui.CircleButton
                     <at.markushi.ui.CircleButton

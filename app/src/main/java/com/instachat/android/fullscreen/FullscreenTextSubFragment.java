@@ -180,7 +180,8 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
 
     @Override
     public void onDestroy() {
-        if (mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
+        if (mFriendlyMessage != null &&
+                mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
             if (mFriendlyMessage.getUserid() != Preferences.getInstance().getUserId()) {
                 OneTimeMessageDb.getInstance().insertMessageId(mFriendlyMessage.getId());
             }

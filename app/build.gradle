@@ -9,13 +9,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
 
     defaultConfig {
         applicationId "com.instachat.android"
         minSdkVersion 16
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 82
         versionName "2.1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -53,35 +53,36 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
 
-    compile 'com.android.support:design:24.2.1'
+    compile 'com.android.support:design:25.0.1'
     compile 'com.github.bumptech.glide:glide:3.6.1'
     compile 'de.hdodenhof:circleimageview:2.1.0'
-    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:appcompat-v7:25.0.1'
+    compile 'com.android.support:support-v13:25.0.1'
 
     // Google
-    compile 'com.google.android.gms:play-services-auth:9.6.1'
-    compile 'com.google.android.gms:play-services-appinvite:9.6.1'
+    compile 'com.google.android.gms:play-services-auth:10.0.1'
+    compile 'com.google.android.gms:play-services-appinvite:10.0.1'
     //compile 'com.google.android.gms:play-services-ads:9.6.1'
-    compile 'com.google.android.gms:play-services-gcm:9.6.1'
-    compile 'com.google.android.gms:play-services-plus:9.6.1'
+    compile 'com.google.android.gms:play-services-gcm:10.0.1'
+    compile 'com.google.android.gms:play-services-plus:10.0.1'
 
     // Firebase
-    compile 'com.google.firebase:firebase-core:9.6.1'
-    compile 'com.google.firebase:firebase-database:9.6.1'
-    compile 'com.google.firebase:firebase-auth:9.6.1'
-    compile 'com.google.firebase:firebase-storage:9.6.1'
-    compile 'com.google.firebase:firebase-config:9.6.1'
-    compile 'com.google.firebase:firebase-messaging:9.6.1'
-    compile 'com.google.firebase:firebase-crash:9.6.1'
-    compile 'com.google.firebase:firebase-analytics:9.6.1'
+    compile 'com.google.firebase:firebase-core:10.0.1'
+    compile 'com.google.firebase:firebase-database:10.0.1'
+    compile 'com.google.firebase:firebase-auth:10.0.1'
+    compile 'com.google.firebase:firebase-storage:10.0.1'
+    compile 'com.google.firebase:firebase-config:10.0.1'
+    compile 'com.google.firebase:firebase-messaging:10.0.1'
+    compile 'com.google.firebase:firebase-crash:10.0.1'
+    compile 'com.google.firebase:firebase-analytics:10.0.1'
     // Firebase UI
     compile 'com.firebaseui:firebase-ui-database:0.4.0'
 
     // Testing dependencies
-    androidTestCompile 'junit:junit:4.12'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'com.android.support:support-annotations:24.2.1'
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    testCompile 'junit:junit:4.12'
 
     provided files('external-libs/amazon-device-messaging-1.0.1.jar')
     compile 'com.amazonaws:aws-android-sdk-core:2.+'

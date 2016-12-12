@@ -195,4 +195,6 @@
     <string name="invalid_roomname">Oops... invalid Room Name.  Please try a different name
         .</string>
     <string name="get_started">Get Started!</string>
+
+    <string name="could_not_open_url">Sorry!  Could not open.  Try copying comment and open in browser</string>
 </resources>

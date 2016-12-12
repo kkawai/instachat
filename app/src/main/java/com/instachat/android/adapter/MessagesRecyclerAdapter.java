@@ -269,8 +269,13 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 @Override
                 public void onClick(View view) {
                     final FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
-                    final Uri uri = Uri.parse(friendlyMessage.getText());
-                    mActivity.get().startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                    final Uri uri = Uri.parse(StringUtil.correctUrl(friendlyMessage.getText()));
+                    try {
+                        mActivity.get().startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                    } catch (Exception e) {
+                        MLog.e(TAG, "", e);
+                        Toast.makeText(mActivity.get(), R.string.could_not_open_url, Toast.LENGTH_SHORT).show();
+                    }
                 }
             };
             holder.webLinkParent.setOnClickListener(webLinkClickListener);

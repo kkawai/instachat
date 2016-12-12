@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 public class StringUtil {
 
     // private static final Pattern emojiRegexp =
-    private static final Pattern hashRegexp = Pattern.compile("(#\\w+)", 2);
     private static final Pattern mentionRegexp = Pattern.compile("(^|[^a-zA-Z0-9_]+)(@([a-zA-Z0-9_]+))", 2);
     private static final Pattern whiteSpacePattern = Pattern.compile("\\s+");
 
@@ -198,5 +197,30 @@ public class StringUtil {
             return s.substring(1, s.length() - 1);
         }
         return s;
+    }
+
+    /**
+     * Attempts to 'correct' a given url.  If the url starts with Http:// instead of
+     * http:// or Https://, it will return http:// and https:// respectively
+     * <p>
+     * The android VIEW intent on any such url can cause a crash since it won't be able to
+     * find a matching activity since their mapping is case sensitive.
+     *
+     * @param url
+     * @return
+     */
+    public static String correctUrl(final String url) {
+        try {
+            String s = url.substring(0, 8).toLowerCase();
+            if (s.startsWith("http://")) {
+                return "http://" + url.substring(7);
+            } else if (s.startsWith("https://")) {
+                return "http://" + url.substring(8);
+            } else {
+                return url;
+            }
+        } catch (Exception e) {
+            return url;
+        }
     }
 }

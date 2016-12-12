@@ -13,6 +13,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v13.view.inputmethod.EditorInfoCompat;
+import android.support.v13.view.inputmethod.InputConnectionCompat;
+import android.support.v13.view.inputmethod.InputContentInfoCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -32,8 +35,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -98,6 +104,7 @@ import com.instachat.android.util.ThreadWrapper;
 import com.instachat.android.view.ThemedAlertDialog;
 import com.tooltip.Tooltip;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -206,7 +213,10 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         */
 
         mUsernameTyping = ((TextView) findViewById(R.id.usernameTyping));
-        mMessageEditText = (EditText) findViewById(R.id.messageEditText);
+        LinearLayout messageEditTextParent = (LinearLayout) findViewById(R.id.messageEditTextParent);
+        mMessageEditText = createEditTextWithContentMimeTypes(
+                new String[]{"image/png", "image/gif", "image/jpeg", "image/webp"});
+        messageEditTextParent.addView(mMessageEditText);
         FontUtil.setTextViewFont(mMessageEditText);
         mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter((int) mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_LENGTH))});
         mMessageEditText.addTextChangedListener(new TextWatcher() {
@@ -1186,7 +1196,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                     mProgressBar.setVisibility(View.GONE);
                 }
             }
-        }, mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS));
+        }, 0);//mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS)
     }
 
     Integer myUserid() {
@@ -1700,4 +1710,76 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         });
     }
 
+    private EditText createEditTextWithContentMimeTypes(String[] contentMimeTypes) {
+        final CharSequence hintText;
+        final String[] mimeTypes;  // our own copy of contentMimeTypes.
+        if (contentMimeTypes == null || contentMimeTypes.length == 0) {
+            hintText = "MIME: []";
+            mimeTypes = new String[0];
+        } else {
+            hintText = "MIME: " + Arrays.toString(contentMimeTypes);
+            mimeTypes = Arrays.copyOf(contentMimeTypes, contentMimeTypes.length);
+        }
+        EditText editText = new EditText(this) {
+            @Override
+            public InputConnection onCreateInputConnection(EditorInfo editorInfo) {
+                final InputConnection ic = super.onCreateInputConnection(editorInfo);
+                EditorInfoCompat.setContentMimeTypes(editorInfo, mimeTypes);
+                final InputConnectionCompat.OnCommitContentListener callback =
+                        new InputConnectionCompat.OnCommitContentListener() {
+                            @Override
+                            public boolean onCommitContent(InputContentInfoCompat inputContentInfo,
+                                                           int flags, Bundle opts) {
+                                return GroupChatActivity.this.onCommitContent(
+                                        inputContentInfo, flags, opts, mimeTypes);
+                            }
+                        };
+                return InputConnectionCompat.createWrapper(ic, editorInfo, callback);
+            }
+        };
+        editText.setHint(R.string.message_hint);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        editText.setLayoutParams(params);
+        return editText;
+    }
+
+    private boolean onCommitContent(InputContentInfoCompat inputContentInfo, int flags,
+                                    Bundle opts, String[] contentMimeTypes) {
+
+        boolean supported = false;
+        for (final String mimeType : contentMimeTypes) {
+            if (inputContentInfo.getDescription().hasMimeType(mimeType)) {
+                supported = true;
+                break;
+            }
+        }
+        if (!supported) {
+            return false;
+        }
+
+        return onCommitContentInternal(inputContentInfo, flags);
+    }
+
+    private boolean onCommitContentInternal(InputContentInfoCompat inputContentInfo, int flags) {
+        if ((flags & InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION) != 0) {
+            try {
+                inputContentInfo.requestPermission();
+            } catch (Exception e) {
+                Log.e(TAG, "InputContentInfoCompat#requestPermission() failed.", e);
+                return false;
+            }
+        }
+        Uri linkUri = inputContentInfo.getLinkUri();
+        //todo: do something with linkUri to the remote asset
+        MLog.d(TAG, "linkUri: " + linkUri.toString() + ": " + inputContentInfo.getDescription().toString(), " : ", inputContentInfo);
+        if (inputContentInfo != null && inputContentInfo.getDescription() != null) {
+            if (inputContentInfo.getDescription().toString().contains("image/gif")) {
+                final FriendlyMessage friendlyMessage = new FriendlyMessage("", myUsername(), myUserid(), myDpid(),
+                        linkUri.toString(), false, false, null, System.currentTimeMillis());
+                friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
+                mMessagesAdapter.sendFriendlyMessage(friendlyMessage);
+            }
+        }
+        return true;
+    }
 }
