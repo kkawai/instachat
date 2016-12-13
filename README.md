@@ -1,2 +1,2 @@
 # instachat: I forked a sample android chat app from google I/O where I added a bunch of things such as private chat, gifs, periscope-likes, custom authentication, richer notifications, file uploads, web clippings.  Something where I could evaluate the different aspects and limitations of Firebase.
-# https://play.google.com/store/apps/details?id=com.instachat.android  According to Google Play, the app has over 5-million downloads, which I did not necessarily expect to happen.
+# https://play.google.com/store/apps/details?id=com.instachat.android  According to Google Play, the app has over 5million downloads, which I did not necessarily expect to happen :)
