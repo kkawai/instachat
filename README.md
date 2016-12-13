@@ -1,1 +1,1 @@
-# instachat I forked a sample android chat app from google into something bigger where I could do some cool stuff, such as periscope comment, post gif images.  So, it's like 20 times bigger now.
+# instachat: I forked a sample android chat app from google I/O where I added a bunch of things such as private chat, gifs, periscope-likes, authentication, richer notifications.  Something where I could really evaluate the different aspects of Firebase.
