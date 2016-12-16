@@ -197,4 +197,5 @@
     <string name="get_started">Get Started!</string>
 
     <string name="could_not_open_url">Sorry!  Could not open.  Try copying comment and open in browser</string>
+    <string name="camera_permission_rationale">Need camera and record-audio permission for real-time video chatting</string>
 </resources>

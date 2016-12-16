@@ -93,7 +93,8 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
 
         if (TextUtils.isEmpty(mFriendlyMessage.getImageUrl())) {
             FontUtil.setTextViewFont(mAutoResizeTextView);
-            mAutoResizeTextView.setText(StringUtil.stripNewLines(mFriendlyMessage.getText()));
+            if (mFriendlyMessage.getText() != null)
+                mAutoResizeTextView.setText(StringUtil.stripNewLines(mFriendlyMessage.getText()));
             mAutoResizeTextView.setMaxLines(Integer.MAX_VALUE);
             //float t = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()), getResources().getDisplayMetrics());
             //textView.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()), getResources().getDisplayMetrics()));

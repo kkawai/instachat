@@ -9,7 +9,7 @@ import android.support.v7.app.AppCompatActivity;
  * Created by kevin on 8/9/2016.
  */
 public class BaseActivity extends AppCompatActivity implements ActivityState {
-    private boolean mIsDestroyed;
+    private boolean mIsDestroyed; //for <= sdk 16
 
     @Override
     public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {

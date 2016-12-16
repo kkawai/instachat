@@ -1,5 +1,6 @@
 package com.instachat.android;
 
+import android.Manifest;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -278,6 +279,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         notificationManager.cancel(MyFirebaseMessagingService.NOTIFICATION_ID_PENDING_REQUESTS);
         notificationManager.cancel(MyFirebaseMessagingService.NOTIFICATION_ID_FRIEND_JUMPED_IN);
         checkForNoData();
+        //requestVideoRelatedPermissions();
+        //showJoinSecretRoom();
     }
 
     private DatabaseReference mGroupSummaryRef;
@@ -827,6 +830,13 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 MLog.d(TAG, "Failed to send invitation.");
             }
         }
+        if (requestCode == RC_CAMERA_AND_AUDIO_PERMISSION) {
+            if (resultCode == RESULT_OK) {
+                if (EasyPermissions.hasPermissions(this, Manifest.permission.CAMERA)) {
+                    //todo
+                }
+            }
+        }
 
     }
 
@@ -1105,6 +1115,13 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
         mPhotoUploadHelper.onPermissionsGranted(requestCode, perms);
+        for (final String p : perms) {
+            if (p.equals(Manifest.permission.RECORD_AUDIO)) {
+
+            } else if (p.equals(Manifest.permission.CAMERA)) {
+
+            }
+        }
     }
 
     @Override
@@ -1770,8 +1787,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             }
         }
         Uri linkUri = inputContentInfo.getLinkUri();
-        //todo: do something with linkUri to the remote asset
-        MLog.d(TAG, "linkUri: " + linkUri.toString() + ": " + inputContentInfo.getDescription().toString(), " : ", inputContentInfo);
+        //MLog.d(TAG, "linkUri: " + linkUri.toString() + ": " + inputContentInfo.getDescription().toString(), " : ", inputContentInfo);
         if (inputContentInfo != null && inputContentInfo.getDescription() != null) {
             if (inputContentInfo.getDescription().toString().contains("image/gif")) {
                 final FriendlyMessage friendlyMessage = new FriendlyMessage("", myUsername(), myUserid(), myDpid(),
@@ -1781,5 +1797,26 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             }
         }
         return true;
+    }
+
+    public static final int RC_CAMERA_AND_AUDIO_PERMISSION = 5;
+
+    private void requestVideoRelatedPermissions() {
+        String camera = Manifest.permission.CAMERA;
+        String audio = Manifest.permission.RECORD_AUDIO;
+        if (!EasyPermissions.hasPermissions(this, camera, audio)) {
+            EasyPermissions.requestPermissions(this, getString(R.string.rationale_storage), RC_CAMERA_AND_AUDIO_PERMISSION, camera, audio);
+        }
+    }
+
+    private void showJoinSecretRoom() {
+/*
+        TSnackbar snackbar = TSnackbar.make(findViewById(R.id.snackbarAnchor2), "TAP HERE to join a new SECRET ROOM", TSnackbar.LENGTH_INDEFINITE);
+        snackbar.setActionTextColor(Color.WHITE);
+        View snackbarView = snackbar.getView();
+        snackbarView.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        TextView textView = (TextView) snackbarView.findViewById(com.androidadvance.topsnackbar.R.id.snackbar_text);
+        textView.setTextColor(Color.WHITE);
+        snackbar.show();*/
     }
 }
