@@ -714,13 +714,22 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
     @Override
     protected void onAddItem(FriendlyMessage newFriendlyMessage) {
-        if (getItemCount() > 0) {
+        if (mItemWasRemoved && getItemCount() > 0) {
+            mItemWasRemoved = false;
             FriendlyMessage lastFriendlyMessage = getItem(getItemCount() - 1);
             if (newFriendlyMessage.getTime() > lastFriendlyMessage.getTime() || isSmallDifferenceInTime(newFriendlyMessage.getTime(),lastFriendlyMessage.getTime()))
                 super.onAddItem(newFriendlyMessage);
         } else {
             super.onAddItem(newFriendlyMessage);
         }
+    }
+
+    private boolean mItemWasRemoved;
+
+    @Override
+    protected void onRemoveItem(int index) {
+        mItemWasRemoved = true;
+        super.onRemoveItem(index);
     }
 
     public static final long ONE_HOUR = 60*1000*60L;

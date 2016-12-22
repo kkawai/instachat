@@ -120,8 +120,7 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
                 synchronized (BaseMessagesAdapter.this) {
                     int index = mSnapshots.indexOf(t);
                     if (index != -1) {
-                        mSnapshots.remove(index);
-                        notifyItemRemoved(index);
+                        onRemoveItem(index);
                     }
                 }
             }
@@ -141,6 +140,11 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
     protected void onAddItem(T item) {
         mSnapshots.add(item);
         notifyItemInserted(mSnapshots.size() - 1);
+    }
+
+    protected void onRemoveItem(int index) {
+        mSnapshots.remove(index);
+        notifyItemRemoved(index);
     }
 
     protected final void replaceItem(int index, T item) {
