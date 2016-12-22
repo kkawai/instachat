@@ -18,8 +18,6 @@ import java.util.Map;
 
 public class User {
 
-    private static final long serialVersionUID = 3121394108242466120L;
-
     private int id;
     private String instagramId;
     private String username;
