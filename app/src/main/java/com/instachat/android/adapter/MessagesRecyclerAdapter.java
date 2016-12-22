@@ -553,6 +553,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                         }
                     }
                 });
+
             }
 
             @Override
@@ -711,4 +712,19 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         }
     }
 
+    @Override
+    protected void onAddItem(FriendlyMessage newFriendlyMessage) {
+        if (getItemCount() > 0) {
+            FriendlyMessage lastFriendlyMessage = getItem(getItemCount() - 1);
+            if (newFriendlyMessage.getTime() > lastFriendlyMessage.getTime() || isSmallDifferenceInTime(newFriendlyMessage.getTime(),lastFriendlyMessage.getTime()))
+                super.onAddItem(newFriendlyMessage);
+        } else {
+            super.onAddItem(newFriendlyMessage);
+        }
+    }
+
+    public static final long ONE_HOUR = 60*1000*60L;
+    private boolean isSmallDifferenceInTime(long t1, long t2) {
+        return Math.abs(t1 - t2) < ONE_HOUR;
+    }
 }

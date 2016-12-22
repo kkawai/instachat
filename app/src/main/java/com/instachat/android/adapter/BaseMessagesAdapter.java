@@ -9,12 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
@@ -100,8 +98,7 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
                 synchronized (BaseMessagesAdapter.this) {
                     T t = parseSnapshot(dataSnapshot);
                     if (isNewItemAllowed(t)) {
-                        mSnapshots.add(t);
-                        notifyItemInserted(mSnapshots.size() - 1);
+                        onAddItem(t);
                     }
                 }
             }
@@ -139,6 +136,11 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
 
             }
         });
+    }
+
+    protected void onAddItem(T item) {
+        mSnapshots.add(item);
+        notifyItemInserted(mSnapshots.size() - 1);
     }
 
     protected final void replaceItem(int index, T item) {
