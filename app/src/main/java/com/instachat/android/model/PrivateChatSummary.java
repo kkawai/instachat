@@ -11,6 +11,10 @@ import java.util.Map;
 public class PrivateChatSummary implements Comparable {
 
     private static final String TAG = "PrivateChatSummary";
+    public static final int USER_ONLINE = 0;
+    public static final int USER_OFFLINE = 1;
+    public static final int USER_AWAY = 2;
+    public static final long TWELVE_HOURS = 1000 * 60 * 60 * 12L;
 
     /**
      * The 'id' of the PrivateChatSummary is the same as the id
@@ -27,7 +31,7 @@ public class PrivateChatSummary implements Comparable {
     private long lastMessageSentTimestamp;
     private String lastMessage;
     private int unreadMessageCount = -1;
-    private int onlineStatus = -1;
+    private int onlineStatus = USER_OFFLINE;
     private long lastOnline;
     private boolean accepted;
 

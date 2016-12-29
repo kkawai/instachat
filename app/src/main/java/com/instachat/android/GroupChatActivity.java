@@ -946,8 +946,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         mLeftDrawerHelper.setup(navigationView);
         mLeftDrawerHelper.setUserLikedUserListener(mUserLikedUserListener);
 
-        mChatsRecyclerViewAdapter = new ChatSummariesRecyclerAdapter(this, this);
-        mChatsRecyclerViewAdapter.setIsPrivateChat(isPrivateChat());
+        mChatsRecyclerViewAdapter = new ChatSummariesRecyclerAdapter(this, this, isPrivateChat());
         RecyclerView recyclerView = (RecyclerView) drawerView.findViewById(R.id.drawerRecyclerView);
         recyclerView.setLayoutManager(new StickyLayoutManager(this, mChatsRecyclerViewAdapter));
         recyclerView.setAdapter(mChatsRecyclerViewAdapter);

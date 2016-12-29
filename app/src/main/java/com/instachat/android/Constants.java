@@ -45,7 +45,7 @@ public final class Constants {
    /*
     * CHANGE THESE WHEN MAKING PRODUCTION BUILDS
     */
-   public static final boolean IS_LOGGING_ENABLED = false;
+   public static final boolean IS_LOGGING_ENABLED = true;
    public static final boolean IS_FOR_AMAZON_ONLY = false;//CHANGE PER AMAZON BUILD!!!
    public static final boolean IS_AMAZON_ADS_ENABLED = false;//CHANGE PER AMAZON BUILD!!!
    public static final boolean IS_AMAZON_DEBUG_AD = false; //CHANGE PER AMAZON BUILD!!!
@@ -287,11 +287,6 @@ public final class Constants {
     * message.
     */
    public static final boolean IS_SUPPORT_MESSAGE_APPENDING = true;
-
-   public static final int USER_ONLINE = 0;
-   public static final int USER_OFFLINE = 1;
-   public static final int USER_AWAY = 2;
-   public static final long TWELVE_HOURS = 1000 * 60 * 60 * 12L;
 
    public static String KEY_TEXT_REPLY = "key_text_reply";
    public static String FIELD_LAST_MESSAGE_SENT_TIMESTAMP = "lastMessageSentTimestamp";

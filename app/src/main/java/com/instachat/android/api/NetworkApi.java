@@ -16,17 +16,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.Constants;
 import com.instachat.android.MyApp;
 import com.instachat.android.R;
+import com.instachat.android.model.PrivateChatSummary;
 import com.instachat.android.model.User;
 import com.instachat.android.util.Base64;
 import com.instachat.android.util.DeviceUtil;
 import com.instachat.android.util.HttpMessage;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
+import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.ThreadWrapper;
 
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * Created by kevin on 7/22/2016.
@@ -180,6 +184,42 @@ public final class NetworkApi {
 
     public static int gcmcount(final int userid) throws Exception {
         return new HttpMessage(Constants.API_BASE_URL + "/gcmcount?iid=" + userid).getInt();
+    }
+
+    public static void getOnlineStatus(Map<String, PrivateChatSummary> users) throws Exception {
+        if (users.size() == 0) {
+            return;
+        }
+
+        final StringBuilder sb = new StringBuilder(users.size() * 13);
+
+        for (String key : users.keySet()) {
+            sb.append(key).append(' ');
+        }
+
+        MLog.i(TAG, "Getting users who actually installed by looking at gcm records");
+        final JSONObject response = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/whoinstalled").post("list", sb.toString()));
+        if (response.getString(KEY_RESPONSE_STATUS).equals(RESPONSE_OK)) {
+            final String installed = response.optString("descr");
+            if (StringUtil.isNotEmpty(installed)) {
+                final StringTokenizer st = new StringTokenizer(installed);
+                while (st.hasMoreTokens()) {
+                    final String installedId = st.nextToken().trim();
+                    PrivateChatSummary privateChatSummary = users.get(installedId);
+                    if (privateChatSummary == null)
+                        continue;
+                    if (System.currentTimeMillis() - privateChatSummary.getLastOnline() > PrivateChatSummary.TWELVE_HOURS) {
+                        privateChatSummary.setOnlineStatus(PrivateChatSummary.USER_AWAY);
+                        MLog.i(TAG, "getOnlineStatus() ", privateChatSummary.getName(), " is away");
+                    } else {
+                        privateChatSummary.setOnlineStatus(PrivateChatSummary.USER_ONLINE);
+                        MLog.i(TAG, "getOnlineStatus() ", privateChatSummary.getName(), " is online(recent)");
+                    }
+                }
+            }
+        } else {
+            MLog.e(TAG, "Error from server: ", response);
+        }
     }
 
     public static void gcmreg(final Context context, final String regid) throws Exception {
