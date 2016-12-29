@@ -87,6 +87,9 @@ public class UserPresenceManager {
 
     private void process() {
 
+        if (mActivityState == null || mActivityState.isActivityDestroyed())
+            return;
+
         Map<String, PrivateChatSummary> mCopy = new HashMap<>(200);
         synchronized (UserPresenceManager.this) {
             mCopy.putAll(mWorkMap);
