@@ -154,6 +154,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.addAction(replyAction)
                 .setPriority(Notification.PRIORITY_HIGH) //todo: control with settings
+                .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle())
                 .setContentTitle(friendlyMessage.getName())
                 .setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp)
                 .setLargeIcon(bitmap == null ? BitmapFactory.decodeResource(getResources(), R.drawable.ic_anon_person_36dp) : bitmap)
@@ -278,6 +279,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // Use NotificationCompat.Builder to set up our notification.
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setPriority(Notification.PRIORITY_DEFAULT) //todo: control with settings
+                .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle())
                 .setContentTitle(username)
                 .setContentText(getString(R.string.friend_just_jumped_in))
                 .setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp)
@@ -306,6 +308,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // Use NotificationCompat.Builder to set up our notification.
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setPriority(Notification.PRIORITY_LOW) //todo: control with settings
+                .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle())
                 .setContentTitle(getString(R.string.pending_requests_title))
                 .setContentText(getString(R.string.pending_requests_text))
                 .setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp)
