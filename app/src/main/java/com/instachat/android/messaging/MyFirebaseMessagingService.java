@@ -57,18 +57,22 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         MLog.d(TAG, "FCM Notification Message: " + remoteMessage.getNotification());
         MLog.d(TAG, "FCM Data Message: " + remoteMessage.getData());
         /*
-         * {msg={"text":"ok talk to me","name":"kkawai","time":1474173076069,"userid":3733523,"dpid":"ea34ff82-066a-413f-9efe-a816d59863a7.jpg"}}
+         * {msg={"text":"ok talk to me","name":"kkawai","time":1474173076069,"userid":3733523,
+         * "dpid":"ea34ff82-066a-413f-9efe-a816d59863a7.jpg"}}
          */
         try {
             JSONObject object = new JSONObject(remoteMessage.getData());
             if (object.has(Constants.KEY_GCM_MESSAGE)) {
                 JSONObject msg = new JSONObject(object.getString(Constants.KEY_GCM_MESSAGE));
-                if (msg.has(Constants.KEY_GCM_MSG_TYPE) && msg.getString(Constants.KEY_GCM_MSG_TYPE).equals(Constants.GcmMessageType.notify_friend_in.name())) {
+                if (msg.has(Constants.KEY_GCM_MSG_TYPE) && msg.getString(Constants.KEY_GCM_MSG_TYPE).equals(Constants
+                        .GcmMessageType.notify_friend_in.name())) {
                     notifyFriendJumpedIn(msg.getString(Constants.KEY_USERNAME));
-                } else if (msg.has(Constants.KEY_GCM_MSG_TYPE) && msg.getString(Constants.KEY_GCM_MSG_TYPE).equals(Constants.GcmMessageType.msg.name())) {
+                } else if (msg.has(Constants.KEY_GCM_MSG_TYPE) && msg.getString(Constants.KEY_GCM_MSG_TYPE).equals
+                        (Constants.GcmMessageType.msg.name())) {
                     final FriendlyMessage friendlyMessage = FriendlyMessage.fromJSONObject(msg);
 
-                    if (PrivateChatActivity.isActive() && PrivateChatActivity.getActiveUserid() == friendlyMessage.getUserid()) {
+                    if (PrivateChatActivity.isActive() && PrivateChatActivity.getActiveUserid() == friendlyMessage
+                            .getUserid()) {
                     /* Already actively chatting with this person in the PrivateChatActivity
                      * so no need to put up a notification in the system tray.
                      * For debugging purposes, however, if it's myself, then it's ok.
@@ -77,13 +81,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                             return;
                     }
 
-                    final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF() + friendlyMessage.getUserid());
+                    final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF
+                            () + friendlyMessage.getUserid());
                     ref.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             MLog.d(TAG, "onDataChange() snapshot: " + dataSnapshot, " ref: ", ref);
                             if (dataSnapshot.getValue() == null) {
-                                MLog.d(TAG, "user ", friendlyMessage.getName(), " is not blocked.  consume message now. ");
+                                MLog.d(TAG, "user ", friendlyMessage.getName(), " is not blocked.  consume message " +
+                                        "now. ");
                                 consumeFriendlyMessage(friendlyMessage);
                             } else {
                                 MLog.d(TAG, "user ", friendlyMessage.getName(), " is blocked.  do not consume. ");
@@ -137,7 +143,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         .build();
 
         // This intent is fired when notification is clicked
-        Intent intent = DirectReplyActivity.newIntent(this, friendlyMessage.getUserid(), friendlyMessage.getName(), friendlyMessage.getDpid());
+        Intent intent = DirectReplyActivity.newIntent(this, friendlyMessage.getUserid(), friendlyMessage.getName(),
+                friendlyMessage.getDpid());
         PendingIntent pendingIntent = PendingIntent.getActivity(this, friendlyMessage.getUserid(), intent, 0);
 
         Uri customSound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
@@ -150,14 +157,27 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         .addRemoteInput(remoteInput)
                         .build();
 
+        String contentText = "";
+        if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME && TextUtils.isEmpty
+                (friendlyMessage.getText()))
+            contentText = getString(R.string.one_time_photo_notification_title);
+        else if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME && !TextUtils.isEmpty
+                (friendlyMessage.getText()))
+            contentText = getString(R.string.one_time_message_notification_title);
+        else if (TextUtils.isEmpty(friendlyMessage.getText()))
+            contentText = getString(R.string.photo);
+        else
+            contentText = friendlyMessage.getText() + "";
+
         // Use NotificationCompat.Builder to set up our notification.
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.addAction(replyAction)
                 .setPriority(Notification.PRIORITY_HIGH) //todo: control with settings
-                .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle())
+                .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle().bigText(contentText))
                 .setContentTitle(friendlyMessage.getName())
                 .setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp)
-                .setLargeIcon(bitmap == null ? BitmapFactory.decodeResource(getResources(), R.drawable.ic_anon_person_36dp) : bitmap)
+                .setLargeIcon(bitmap == null ? BitmapFactory.decodeResource(getResources(), R.drawable
+                        .ic_anon_person_36dp) : bitmap)
                 .setContentIntent(pendingIntent)
                 .setSound(customSound)
                 .setSubText(getString(R.string.sent_via, getString(R.string.app_name)));
@@ -175,16 +195,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         //builder.setContentTitle(friendlyMessage.getName());
 
         // Content text, which appears in smaller text below the title
-        String contentText = "";
-        if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME && TextUtils.isEmpty(friendlyMessage.getText()))
-            contentText = getString(R.string.one_time_photo_notification_title);
-        else if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME && !TextUtils.isEmpty(friendlyMessage.getText()))
-            contentText = getString(R.string.one_time_message_notification_title);
-        else if (TextUtils.isEmpty(friendlyMessage.getText()))
-            contentText = getString(R.string.photo);
-        else
-            contentText = friendlyMessage.getText() + "";
-        builder.setContentText(contentText);
+
+        //builder.setContentText(contentText);
         // The subtext, which appears under the text on newer devices.
         // This will show-up in the devices with Android 4.2 and above only
         //builder.setSubText(getString(R.string.sent_via, c.getString(R.string.app_name)));
@@ -198,13 +210,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void incrementPrivateUnreadMessages(final FriendlyMessage friendlyMessage) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants
+                .MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
         Map<String, Object> map = new HashMap<>(1);
         map.put("id", friendlyMessage.getId());
-        ref.child(friendlyMessage.getUserid() + "").child(Constants.CHILD_UNREAD_MESSAGES).child(friendlyMessage.getId()).updateChildren(map);
+        ref.child(friendlyMessage.getUserid() + "").child(Constants.CHILD_UNREAD_MESSAGES).child(friendlyMessage
+                .getId()).updateChildren(map);
     }
 
-    private void checkIfIAcceptedThisPersonYet(final FriendlyMessage friendlyMessage, final Notification notification, final String notificationText) {
+    private void checkIfIAcceptedThisPersonYet(final FriendlyMessage friendlyMessage, final Notification
+            notification, final String notificationText) {
 
         final int myUserid = Preferences.getInstance().getUserId();
         final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -218,7 +233,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         /**
          * check if I accepted this person
          */
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF()).child(friendlyMessage.getUserid() + "").child(Constants.CHILD_ACCEPTED);
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants
+                .MY_PRIVATE_CHATS_SUMMARY_PARENT_REF()).child(friendlyMessage.getUserid() + "").child(Constants
+                .CHILD_ACCEPTED);
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -239,7 +256,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     privateChatSummary.setLastMessageSentTimestamp(System.currentTimeMillis());
                     privateChatSummary.setAccepted(false);
                     //Create PrivateChatSummary under private_requests
-                    FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(friendlyMessage.getUserid(), myUserid))
+                    FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF
+                            (friendlyMessage.getUserid(), myUserid))
                             .setValue(privateChatSummary)
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
@@ -274,7 +292,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 + "://" + getPackageName() + "/raw/arpeggio");
         // This intent is fired when notification is clicked
         Intent intent = new Intent(this, LauncherActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID_FRIEND_JUMPED_IN, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID_FRIEND_JUMPED_IN, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Use NotificationCompat.Builder to set up our notification.
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
@@ -303,7 +322,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // This intent is fired when notification is clicked
         Intent intent = new Intent(this, LauncherActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID_FRIEND_JUMPED_IN, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID_FRIEND_JUMPED_IN, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Use NotificationCompat.Builder to set up our notification.
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);

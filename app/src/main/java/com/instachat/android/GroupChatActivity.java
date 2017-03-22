@@ -115,7 +115,11 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 //import com.google.android.gms.ads.AdView;
 
-public class GroupChatActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener, FriendlyMessageContainer, EasyPermissions.PermissionCallbacks, UploadListener, UserClickedListener, ChatsItemClickedListener, FriendlyMessageListener {
+public class GroupChatActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener,
+        FriendlyMessageContainer, EasyPermissions.PermissionCallbacks, UploadListener, UserClickedListener,
+        ChatsItemClickedListener, FriendlyMessageListener {
+
+    public static final int RC_CAMERA_AND_AUDIO_PERMISSION = 5;
 
     private static final String TAG = "GroupChatActivity";
 
@@ -159,13 +163,16 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (savedInstanceState != null) { // Android support FragmentManager v4 erroneously remembers every Fragment, even when "retain instance" is
-            // false; remove the saved Fragments so we don't get into a dueling layout issue between the new Fragments we're trying to make and the
+        if (savedInstanceState != null) { // Android support FragmentManager v4 erroneously remembers every Fragment,
+            // even when "retain instance" is
+            // false; remove the saved Fragments so we don't get into a dueling layout issue between the new
+            // Fragments we're trying to make and the
             // old ones being restored.
             savedInstanceState.remove("android:support:fragments");
         }
         super.onCreate(savedInstanceState);
-        if (!Preferences.getInstance().isLoggedIn() || Preferences.getInstance().getUser() == null || Preferences.getInstance().getUsername() == null) {
+        if (!Preferences.getInstance().isLoggedIn() || Preferences.getInstance().getUser() == null || Preferences
+                .getInstance().getUsername() == null) {
             // Not signed in, launch the Sign In activity
             startActivity(new Intent(this, SignInActivity.class));
             finish();
@@ -219,7 +226,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 new String[]{"image/png", "image/gif", "image/jpeg", "image/webp"});
         messageEditTextParent.addView(mMessageEditText);
         FontUtil.setTextViewFont(mMessageEditText);
-        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter((int) mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_LENGTH))});
+        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter((int) mFirebaseRemoteConfig
+                .getLong(Constants.KEY_MAX_MESSAGE_LENGTH))});
         mMessageEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int before, int count) {
@@ -229,7 +237,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
 
                 int length = mMessageEditText.getText().toString().trim().length();
-                //MLog.i(TAG, "input onTextChanged() text [start]: " + start + " [before]: " + before + " [count]: " + count, " last delta: ", lastDelta, " length: ", length);
+                //MLog.i(TAG, "input onTextChanged() text [start]: " + start + " [before]: " + before + " [count]: "
+                // + count, " last delta: ", lastDelta, " length: ", length);
 
                 if (length > 0) {
                     setEnableSendButton(true);
@@ -267,7 +276,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         });
         if (getIntent() != null && getIntent().hasExtra(Constants.KEY_SHARE_PHOTO_URI)) {
             mPhotoUploadHelper.setStorageRefString(getDatabaseRoot());
-            mPhotoUploadHelper.consumeExternallySharedPhoto((Uri) getIntent().getParcelableExtra(Constants.KEY_SHARE_PHOTO_URI));
+            mPhotoUploadHelper.consumeExternallySharedPhoto((Uri) getIntent().getParcelableExtra(Constants
+                    .KEY_SHARE_PHOTO_URI));
             getIntent().removeExtra(Constants.KEY_SHARE_PHOTO_URI);
         }
         if (getIntent() != null && getIntent().hasExtra(Constants.KEY_SHARE_MESSAGE)) {
@@ -305,7 +315,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 mMeTypingMap.put(Constants.CHILD_TYPING, true);
                 mMeTypingMap.put(Constants.CHILD_USERNAME, myUsername());
             }
-            FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, myUserid())).setValue(mMeTypingMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, myUserid()))
+                    .setValue(mMeTypingMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     //immediately flip the value back to false in order
@@ -323,11 +334,13 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     private void listenForTyping() {
 
-        mMeTypingRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, myUserid())).
+        mMeTypingRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId,
+                myUserid())).
                 child(Constants.CHILD_TYPING);
         mMeTypingRef.setValue(false);
 
-        mTypingInRoomReference = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_PARENT_REF(mGroupId));
+        mTypingInRoomReference = FirebaseDatabase.getInstance().getReference(Constants
+                .GROUP_CHAT_USERS_TYPING_PARENT_REF(mGroupId));
         mTypingInRoomEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -527,7 +540,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         mPhotoUploadHelper = new PhotoUploadHelper(this, this);
         mPhotoUploadHelper.setPhotoUploadListener(this);
         if (savedInstanceState != null && savedInstanceState.containsKey(Constants.KEY_PHOTO_TYPE)) {
-            PhotoUploadHelper.PhotoType photoType = PhotoUploadHelper.PhotoType.valueOf(savedInstanceState.getString(Constants.KEY_PHOTO_TYPE));
+            PhotoUploadHelper.PhotoType photoType = PhotoUploadHelper.PhotoType.valueOf(savedInstanceState.getString
+                    (Constants.KEY_PHOTO_TYPE));
             mPhotoUploadHelper.setPhotoType(photoType);
             MLog.d(TAG, "initPhotoHelper: retrieved from saved instance state: " + photoType);
         }
@@ -622,7 +636,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         mAttachButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                new MessageOptionsDialogHelper().showSendOptions(GroupChatActivity.this, mAttachButton, null, new MessageOptionsDialogHelper.SendOptionsListener() {
+                new MessageOptionsDialogHelper().showSendOptions(GroupChatActivity.this, mAttachButton, null, new
+                        MessageOptionsDialogHelper.SendOptionsListener() {
                     @Override
                     public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
                         mAttachPhotoMessageType = FriendlyMessage.MESSAGE_TYPE_NORMAL;
@@ -655,12 +670,14 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         }
         if (isNeedsDp())
             return false;
-        final FriendlyMessage friendlyMessage = new FriendlyMessage(text, myUsername(), myUserid(), myDpid(), null, false, false, null, System.currentTimeMillis());
+        final FriendlyMessage friendlyMessage = new FriendlyMessage(text, myUsername(), myUserid(), myDpid(), null,
+                false, false, null, System.currentTimeMillis());
         if (!showOptions) {
             sendText(friendlyMessage);
             return true;
         }
-        new MessageOptionsDialogHelper().showSendOptions(GroupChatActivity.this, mSendButton, friendlyMessage, new MessageOptionsDialogHelper.SendOptionsListener() {
+        new MessageOptionsDialogHelper().showSendOptions(GroupChatActivity.this, mSendButton, friendlyMessage, new
+                MessageOptionsDialogHelper.SendOptionsListener() {
             @Override
             public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
                 friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
@@ -707,7 +724,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         if (isActivityDestroyed())
             return;
         mMessageEditText.setText(friendlyMessage.getText());
-        new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE).setContentText(getString(R.string.could_not_send_message)).show();
+        new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE).setContentText(getString(R.string
+                .could_not_send_message)).show();
         FirebaseAnalytics.getInstance(this).logEvent(Events.MESSAGE_FAILED, null);
     }
 
@@ -733,7 +751,9 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                     closeLeftDrawer();
                 }
                 Fragment fragment = new BlocksFragment();
-                getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, BlocksFragment.TAG).addToBackStack(null).commit();
+                getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim
+                        .slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment,
+                        BlocksFragment.TAG).addToBackStack(null).commit();
                 return true;
             case R.id.menu_who_is_online:
                 if (isLeftDrawerOpen()) {
@@ -775,7 +795,9 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     }
 
     protected void sendInvitation() {
-        Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title)).setMessage(getString(R.string.invitation_message)).setCallToActionText(getString(R.string.invitation_cta)).build();
+        Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title)).setMessage
+                (getString(R.string.invitation_message)).setCallToActionText(getString(R.string.invitation_cta))
+                .build();
         startActivityForResult(intent, REQUEST_INVITE);
     }
 
@@ -966,7 +988,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         View drawerRecyclerView = getLayoutInflater().inflate(R.layout.right_drawer_layout, navigationView, false);
         final View headerView = getLayoutInflater().inflate(R.layout.right_nav_header, navigationView, false);
 
-        mRightRef = FirebaseDatabase.getInstance().getReference(Constants.PUBLIC_CHATS_SUMMARY_PARENT_REF).child(mGroupId + "");
+        mRightRef = FirebaseDatabase.getInstance().getReference(Constants.PUBLIC_CHATS_SUMMARY_PARENT_REF).child
+                (mGroupId + "");
         mRightListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -976,7 +999,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                     /*
                      * group was deleted
                      */
-                    startGroupChatActivity(GroupChatActivity.this, Constants.DEFAULT_PUBLIC_GROUP_ID, "Main", null, null);
+                    startGroupChatActivity(GroupChatActivity.this, Constants.DEFAULT_PUBLIC_GROUP_ID, "Main", null,
+                            null);
                     return;
                 }
                 ((TextView) headerView.findViewById(R.id.groupname)).setText(groupChatSummary.getName());
@@ -1067,7 +1091,9 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         args.putInt(Constants.KEY_STARTING_POS, startingPos);
         fragment.setArguments(args);
         ((FullScreenTextFragment) fragment).setFriendlyMessageContainer(this);
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, FullScreenTextFragment.TAG).addToBackStack(null).commit();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim
+                .slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, FullScreenTextFragment.TAG)
+                .addToBackStack(null).commit();
     }
 
     private void notifyPagerAdapterDataSetChanged() {
@@ -1107,20 +1133,14 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             MLog.i(TAG, "onRequestPermissionsResult() requestCode: " + requestCode, " ", "permission ", permissions[i]);
         }
         for (int i = 0; grantResults != null && i < grantResults.length; i++) {
-            MLog.i(TAG, "onRequestPermissionsResult() requestCode: " + requestCode, " ", "grant result ", grantResults[i]);
+            MLog.i(TAG, "onRequestPermissionsResult() requestCode: " + requestCode, " ", "grant result ",
+                    grantResults[i]);
         }
     }
 
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
         mPhotoUploadHelper.onPermissionsGranted(requestCode, perms);
-        for (final String p : perms) {
-            if (p.equals(Manifest.permission.RECORD_AUDIO)) {
-
-            } else if (p.equals(Manifest.permission.CAMERA)) {
-
-            }
-        }
     }
 
     @Override
@@ -1158,7 +1178,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     }
 
     private void initFirebaseAdapter() {
-        mMessagesAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class, R.layout.item_message, MessageViewHolder.class, FirebaseDatabase.getInstance().
+        mMessagesAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class, R.layout.item_message,
+                MessageViewHolder.class, FirebaseDatabase.getInstance().
                 getReference(mDatabaseRoot).
                 limitToLast((int) mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)));
         mMessagesAdapter.setIsPrivateChat(isPrivateChat());
@@ -1189,7 +1210,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 int lastVisiblePosition = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
                 // If the recycler view is initially being loaded or the user is at the bottom of the list, scroll
                 // to the bottom of the list to show the newly added message.
-                if (lastVisiblePosition == -1 || positionStart >= (friendlyMessageCount - 1) && lastVisiblePosition == (positionStart - 1)) {
+                if (lastVisiblePosition == -1 || positionStart >= (friendlyMessageCount - 1) && lastVisiblePosition
+                        == (positionStart - 1)) {
                     mMessageRecyclerView.scrollToPosition(positionStart);
                 }
                 notifyPagerAdapterDataSetChanged();
@@ -1330,9 +1352,11 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
         if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.chatRoomPhoto) {
 
-            final FriendlyMessage friendlyMessage = new FriendlyMessage("", myUsername(), myUserid(), myDpid(), photoUrl, isPossiblyAdultImage, isPossiblyViolentImage, null, System.currentTimeMillis());
+            final FriendlyMessage friendlyMessage = new FriendlyMessage("", myUsername(), myUserid(), myDpid(),
+                    photoUrl, isPossiblyAdultImage, isPossiblyViolentImage, null, System.currentTimeMillis());
             friendlyMessage.setMessageType(mAttachPhotoMessageType);
-            MLog.d(TAG, "uploadFromUri:onSuccess photoUrl: " + photoUrl, " debug possibleAdult: ", friendlyMessage.isPossibleAdultImage(), " parameter: ", isPossiblyAdultImage);
+            MLog.d(TAG, "uploadFromUri:onSuccess photoUrl: " + photoUrl, " debug possibleAdult: ", friendlyMessage
+                    .isPossibleAdultImage(), " parameter: ", isPossiblyAdultImage);
             try {
                 mMessagesAdapter.sendFriendlyMessage(friendlyMessage);
             } catch (final Exception e) {
@@ -1363,7 +1387,10 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
         if (!TextUtils.isEmpty(myDpid()))
             return false;
-        new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE).setTitleText(this.getString(R.string.display_photo_title)).setContentText(this.getString(R.string.display_photo)).setCancelText(this.getString(android.R.string.cancel)).setConfirmText(this.getString(android.R.string.ok)).showCancelButton(true).setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+        new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE).setTitleText(this.getString(R.string
+                .display_photo_title)).setContentText(this.getString(R.string.display_photo)).setCancelText(this
+                .getString(android.R.string.cancel)).setConfirmText(this.getString(android.R.string.ok))
+                .showCancelButton(true).setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
             @Override
             public void onClick(SweetAlertDialog sweetAlertDialog) {
                 sweetAlertDialog.cancel();
@@ -1388,14 +1415,16 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         if (isActivityDestroyed())
             return;
         hideProgressDialog();
-        new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE).setContentText(getString(R.string.error_send_photo)).show();
+        new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE).setContentText(getString(R.string.error_send_photo))
+                .show();
     }
 
     @Override
     public void onUserClicked(int userid, String username, String dpid, View transitionImageView) {
         closeBothDrawers();
         ScreenUtil.hideVirtualKeyboard(mMessageEditText);
-        PrivateChatActivity.startPrivateChatActivity(this, userid, username, dpid, false, transitionImageView, null, null);
+        PrivateChatActivity.startPrivateChatActivity(this, userid, username, dpid, false, transitionImageView, null,
+                null);
     }
 
     protected void onRemoteUserTyping(int userid, String username, String dpid) {
@@ -1419,7 +1448,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     void showTypingDots() {
         showDotsParent(true);
         mDotsHandler.removeCallbacks(mDotsHideRunner);
-        mDotsHandler.postDelayed(mDotsHideRunner, mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_TYPING_DOTS_DISPLAY_TIME));
+        mDotsHandler.postDelayed(mDotsHideRunner, mFirebaseRemoteConfig.getLong(Constants
+                .KEY_MAX_TYPING_DOTS_DISPLAY_TIME));
     }
 
     @Override
@@ -1440,7 +1470,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     @Override
     public void onPrivateChatClicked(PrivateChatSummary privateChatSummary) {
         closeBothDrawers();
-        PrivateChatActivity.startPrivateChatActivity(this, Integer.parseInt(privateChatSummary.getId()), privateChatSummary.getName(), privateChatSummary.getDpid(), false, null, mSharePhotoUri, mShareText);
+        PrivateChatActivity.startPrivateChatActivity(this, Integer.parseInt(privateChatSummary.getId()),
+                privateChatSummary.getName(), privateChatSummary.getDpid(), false, null, mSharePhotoUri, mShareText);
         mSharePhotoUri = null;
         mShareText = null;
     }
@@ -1459,7 +1490,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             AnimationUtil.fadeInAnimation(mDotsLayoutParent);
     }
 
-    public static void startGroupChatActivity(Context context, long groupId, String groupName, Uri sharePhotoUri, String shareMessage) {
+    public static void startGroupChatActivity(Context context, long groupId, String groupName, Uri sharePhotoUri,
+                                              String shareMessage) {
         Intent intent = newIntent(context, groupId, groupName);
         if (sharePhotoUri != null)
             intent.putExtra(Constants.KEY_SHARE_PHOTO_URI, sharePhotoUri);
@@ -1511,7 +1543,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
                             MLog.d(TAG, "addUserPresenceToGroup() mGroupId: ", mGroupId, " username: ", myUsername());
                             User me = Preferences.getInstance().getUser();
-                            final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(mGroupId)).
+                            final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants
+                                    .GROUP_CHAT_USERS_REF(mGroupId)).
                                     child(myUserid() + "");
                             ref.updateChildren(me.toMap(true)).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
@@ -1522,7 +1555,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                             });
                             me.setCurrentGroupId(groupChatSummary.getId());
                             me.setCurrentGroupName(groupChatSummary.getName());
-                            FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(myUserid())).updateChildren(me.toMap(true));
+                            FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(myUserid()))
+                                    .updateChildren(me.toMap(true));
 
                         }
                     }, 2000);
@@ -1539,10 +1573,14 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     protected void removeUserPresenceFromGroup() {
         removeGroupInfoListener();
         MLog.d(TAG, "removeUserPresenceFromGroup() mGroupId: ", mGroupId, " username: ", myUsername());
-        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(mGroupId)).child(myUserid() + "").removeValue();
-        FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(myUserid())).child(Constants.FIELD_CURRENT_GROUP_ID).removeValue();
-        FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(myUserid())).child(Constants.FIELD_CURRENT_GROUP_NAME).removeValue();
-        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, myUserid())).removeValue();
+        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(mGroupId)).child(myUserid() + "")
+                .removeValue();
+        FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(myUserid())).child(Constants
+                .FIELD_CURRENT_GROUP_ID).removeValue();
+        FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(myUserid())).child(Constants
+                .FIELD_CURRENT_GROUP_NAME).removeValue();
+        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, myUserid()))
+                .removeValue();
     }
 
     private void toggleRightDrawer() {
@@ -1579,18 +1617,24 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
 
         // Define Firebase Remote Config Settings.
-        FirebaseRemoteConfigSettings firebaseRemoteConfigSettings = new FirebaseRemoteConfigSettings.Builder().setDeveloperModeEnabled(false).build();
+        FirebaseRemoteConfigSettings firebaseRemoteConfigSettings = new FirebaseRemoteConfigSettings.Builder()
+                .setDeveloperModeEnabled(false).build();
 
         // Define default config values. Defaults are used when fetched config values are not
         // available. Eg: if an error occurred fetching values from the server.
         Map<String, Object> defaultConfigMap = new HashMap<>();
         defaultConfigMap.put(Constants.KEY_MAX_MESSAGE_HISTORY, Constants.DEFAULT_MAX_MESSAGE_HISTORY);
-        defaultConfigMap.put(Constants.KEY_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS, Constants.DEFAULT_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS);
-        defaultConfigMap.put(Constants.KEY_MAX_TYPING_DOTS_DISPLAY_TIME, Constants.DEFAULT_MAX_TYPING_DOTS_DISPLAY_TIME);
-        defaultConfigMap.put(Constants.KEY_COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY, Constants.DEFAULT_COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY);
-        defaultConfigMap.put(Constants.KEY_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME, Constants.DEFAULT_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME);
+        defaultConfigMap.put(Constants.KEY_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS, Constants
+                .DEFAULT_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS);
+        defaultConfigMap.put(Constants.KEY_MAX_TYPING_DOTS_DISPLAY_TIME, Constants
+                .DEFAULT_MAX_TYPING_DOTS_DISPLAY_TIME);
+        defaultConfigMap.put(Constants.KEY_COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY, Constants
+                .DEFAULT_COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY);
+        defaultConfigMap.put(Constants.KEY_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME, Constants
+                .DEFAULT_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME);
         defaultConfigMap.put(Constants.KEY_MAX_MESSAGE_LENGTH, Constants.DEFAULT_MAX_MESSAGE_LENGTH);
-        defaultConfigMap.put(Constants.KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM, Constants.DEFAULT_MAX_PERISCOPABLE_LIKES_PER_ITEM);
+        defaultConfigMap.put(Constants.KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM, Constants
+                .DEFAULT_MAX_PERISCOPABLE_LIKES_PER_ITEM);
         defaultConfigMap.put(Constants.KEY_ALLOW_DELETE_OTHER_MESSAGES, Constants.DEFAULT_ALLOW_DELETE_OTHER_MESSAGES);
         defaultConfigMap.put(Constants.KEY_DO_SHORTEN_IMAGE_URLS, Constants.DEFAULT_DO_SHORTEN_IMAGE_URLS);
         defaultConfigMap.put(Constants.KEY_DO_SHOW_SIGNOUT_BUTTON, Constants.DEFAULT_DO_SHOW_SIGNOUT_BUTTON);
@@ -1608,7 +1652,9 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             bundle.putInt(Constants.KEY_USERID, myUserid());
             bundle.putString(Constants.KEY_USERNAME, myUsername());
             fragment.setArguments(bundle);
-            getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, UserLikedUserFragment.TAG).addToBackStack(null).commit();
+            getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R
+                    .anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, UserLikedUserFragment
+                    .TAG).addToBackStack(null).commit();
         }
     };
 
@@ -1622,7 +1668,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             return;
         }
         mShownSendOptionsProtips = true;
-        final Tooltip tooltip = new Tooltip.Builder(anchor, R.style.drawer_tooltip_non_cancellable).setText(getString(R.string.send_option_protips)).show();
+        final Tooltip tooltip = new Tooltip.Builder(anchor, R.style.drawer_tooltip_non_cancellable).setText(getString
+                (R.string.send_option_protips)).show();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -1638,7 +1685,9 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private void onPendingRequestsClicked() {
         closeLeftDrawer();
         Fragment fragment = new RequestsFragment();
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, RequestsFragment.TAG).addToBackStack(null).commit();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim
+                .slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, RequestsFragment.TAG)
+                .addToBackStack(null).commit();
     }
 
     @Override
@@ -1689,9 +1738,11 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                         final String text = textView.getText().toString();
                         if (!TextUtils.isEmpty(text)) {
                             Preferences.getInstance().setShownSendFirstMessageDialog(true);
-                            final FriendlyMessage friendlyMessage = new FriendlyMessage(text, myUsername(), myUserid(), myDpid(), null, false, false, null, System.currentTimeMillis());
+                            final FriendlyMessage friendlyMessage = new FriendlyMessage(text, myUsername(), myUserid
+                                    (), myDpid(), null, false, false, null, System.currentTimeMillis());
                             sendText(friendlyMessage);
-                            FirebaseAnalytics.getInstance(GroupChatActivity.this).logEvent(Events.WELCOME_MESSAGE_SENT, null);
+                            FirebaseAnalytics.getInstance(GroupChatActivity.this).logEvent(Events
+                                    .WELCOME_MESSAGE_SENT, null);
                         }
                     }
                 }).setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -1716,7 +1767,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                     if (isActivityDestroyed())
                         return;
                     if (mMessagesAdapter == null || mMessagesAdapter.getItemCount() == 0) {
-                        FirebaseAnalytics.getInstance(GroupChatActivity.this).logEvent(Events.NO_DATA_AFTER_8_SEC, null);
+                        FirebaseAnalytics.getInstance(GroupChatActivity.this).logEvent(Events.NO_DATA_AFTER_8_SEC,
+                                null);
                     } else {
                         FirebaseAnalytics.getInstance(GroupChatActivity.this).logEvent(Events.GOT_DATA, null);
                     }
@@ -1754,7 +1806,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             }
         };
         editText.setHint(R.string.message_hint);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
         editText.setLayoutParams(params);
         return editText;
     }
@@ -1786,7 +1839,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             }
         }
         Uri linkUri = inputContentInfo.getLinkUri();
-        //MLog.d(TAG, "linkUri: " + linkUri.toString() + ": " + inputContentInfo.getDescription().toString(), " : ", inputContentInfo);
+        //MLog.d(TAG, "linkUri: " + linkUri.toString() + ": " + inputContentInfo.getDescription().toString(), " : ",
+        // inputContentInfo);
         if (inputContentInfo != null && inputContentInfo.getDescription() != null) {
             if (inputContentInfo.getDescription().toString().contains("image/gif")) {
                 final FriendlyMessage friendlyMessage = new FriendlyMessage("", myUsername(), myUserid(), myDpid(),
@@ -1798,19 +1852,10 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         return true;
     }
 
-    public static final int RC_CAMERA_AND_AUDIO_PERMISSION = 5;
-
-    private void requestVideoRelatedPermissions() {
-        String camera = Manifest.permission.CAMERA;
-        String audio = Manifest.permission.RECORD_AUDIO;
-        if (!EasyPermissions.hasPermissions(this, camera, audio)) {
-            EasyPermissions.requestPermissions(this, getString(R.string.rationale_storage), RC_CAMERA_AND_AUDIO_PERMISSION, camera, audio);
-        }
-    }
-
     private void showJoinSecretRoom() {
 /*
-        TSnackbar snackbar = TSnackbar.make(findViewById(R.id.snackbarAnchor2), "TAP HERE to join a new SECRET ROOM", TSnackbar.LENGTH_INDEFINITE);
+        TSnackbar snackbar = TSnackbar.make(findViewById(R.id.snackbarAnchor2), "TAP HERE to join a new SECRET ROOM",
+         TSnackbar.LENGTH_INDEFINITE);
         snackbar.setActionTextColor(Color.WHITE);
         View snackbarView = snackbar.getView();
         snackbarView.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
