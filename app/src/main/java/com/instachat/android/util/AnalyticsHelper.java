@@ -8,6 +8,11 @@ import com.instachat.android.ErrorHandler;
 import com.instachat.android.Events;
 
 import java.util.Map;
+import java.util.concurrent.Callable;
+
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class AnalyticsHelper {
 
@@ -17,7 +22,7 @@ public class AnalyticsHelper {
 
     public static synchronized void onStartSession(final Context context) {
 
-        ThreadWrapper.executeInWorkerThread(new Runnable() {
+        SimpleRxWrapper.executeInWorkerThread(new Runnable() {
 
             @Override
             public void run() {
@@ -34,11 +39,26 @@ public class AnalyticsHelper {
 
         });
 
+        Observable<Void> observable = Observable.fromCallable(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                return null;
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+
+        DefaultSubscriber<Void> defaultSubscriber = new DefaultSubscriber<Void>(TAG) {
+            @Override
+            public void handleOnNext(Void nothing) {
+            }
+        };
+        observable.subscribe(defaultSubscriber);
+
+
     }
 
     public static synchronized void onEndSession(final Context context) {
 
-        ThreadWrapper.executeInWorkerThread(new Runnable() {
+        SimpleRxWrapper.executeInWorkerThread(new Runnable() {
 
             @Override
             public void run() {
@@ -63,7 +83,7 @@ public class AnalyticsHelper {
 
     public static void logEvent(final String name) {
 
-        ThreadWrapper.executeInWorkerThread(new Runnable() {
+        SimpleRxWrapper.executeInWorkerThread(new Runnable() {
 
             @Override
             public void run() {
@@ -76,7 +96,7 @@ public class AnalyticsHelper {
 
     public static void logEvent(final String name, final boolean isTimed) {
 
-        ThreadWrapper.executeInWorkerThread(new Runnable() {
+        SimpleRxWrapper.executeInWorkerThread(new Runnable() {
 
             @Override
             public void run() {
@@ -89,7 +109,7 @@ public class AnalyticsHelper {
 
     public static void logEvent(final String name, final Map<String, String> params) {
 
-        ThreadWrapper.executeInWorkerThread(new Runnable() {
+        SimpleRxWrapper.executeInWorkerThread(new Runnable() {
 
             @Override
             public void run() {
@@ -102,7 +122,7 @@ public class AnalyticsHelper {
 
     public static void endTimedEvent(final String name) {
 
-        ThreadWrapper.executeInWorkerThread(new Runnable() {
+        SimpleRxWrapper.executeInWorkerThread(new Runnable() {
 
             @Override
             public void run() {
@@ -115,7 +135,7 @@ public class AnalyticsHelper {
 
     public static void logError(final String errorId, final String msg, final String errorClass) {
 
-        ThreadWrapper.executeInWorkerThread(new Runnable() {
+        SimpleRxWrapper.executeInWorkerThread(new Runnable() {
 
             @Override
             public void run() {
@@ -127,7 +147,7 @@ public class AnalyticsHelper {
 
     public static void destroyErrorHandler() {
 
-        ThreadWrapper.executeInWorkerThread(new Runnable() {
+        SimpleRxWrapper.executeInWorkerThread(new Runnable() {
 
             @Override
             public void run() {

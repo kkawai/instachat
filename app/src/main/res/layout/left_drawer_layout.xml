@@ -37,5 +37,5 @@
         android:textSize="16dp"
         android:textStyle="bold|italic"
         android:visibility="gone"
-        app:font="Lato-HeavyItalic.ttf"/>
+        app:font2="Lato-HeavyItalic.ttf"/>
 </LinearLayout>

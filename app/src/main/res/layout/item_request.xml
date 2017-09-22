@@ -45,7 +45,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/chat_sender_username"
                         android:textSize="@dimen/message_sender_name_size"
-                        app:font="Lato-Bold.ttf"/>
+                        app:font2="Lato-Bold.ttf"/>
 
                     <com.instachat.android.view.CustomFontTextView
                         android:id="@+id/messageTimeTextView"
@@ -54,7 +54,7 @@
                         android:layout_marginLeft="5dp"
                         android:textColor="@color/chat_time_message_sent"
                         android:textSize="@dimen/message_sent_time_ago_size"
-                        app:font="Lato-Regular.ttf"/>
+                        app:font2="Lato-Regular.ttf"/>
 
                 </LinearLayout>
 
@@ -66,7 +66,7 @@
                     android:lineSpacingExtra="2dp"
                     android:textColor="@color/chat_message_color"
                     android:textSize="@dimen/message_text_size"
-                    app:font="Lato-Regular.ttf"/>
+                    app:font2="Lato-Regular.ttf"/>
 
             </LinearLayout>
 

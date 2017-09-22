@@ -31,7 +31,7 @@ import com.instachat.android.api.UploadListener;
 import com.instachat.android.util.ImageUtils;
 import com.instachat.android.util.LocalFileUtils;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.ThreadWrapper;
+import com.instachat.android.util.SimpleRxWrapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,7 +68,7 @@ public class PhotoUploadHelper {
         mActivityState = activityState;
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mTempPhotoUploadDir = new File(Environment.getExternalStorageDirectory() + "/photos");
-        ThreadWrapper.executeInWorkerThread(new Runnable() {
+        SimpleRxWrapper.executeInWorkerThread(new Runnable() {
             @Override
             public void run() {
                 LocalFileUtils.deleteDirectoryAndContents(mTempPhotoUploadDir, true);
@@ -230,7 +230,7 @@ public class PhotoUploadHelper {
     }
 
     private void reducePhotoSize(final Uri uri) {
-        ThreadWrapper.executeInWorkerThread(new Runnable() {
+        SimpleRxWrapper.executeInWorkerThread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -370,7 +370,7 @@ public class PhotoUploadHelper {
             return;
         }
 
-        ThreadWrapper.executeInWorkerThread(new Runnable() {
+        SimpleRxWrapper.executeInWorkerThread(new Runnable() {
             @Override
             public void run() {
                 Urlshortener.Builder builder = new Urlshortener.Builder(AndroidHttp.newCompatibleTransport(),
@@ -383,7 +383,7 @@ public class PhotoUploadHelper {
                     url = urlshortener.url().insert(url).setKey(Constants.GOOGLE_API_KEY).execute();
                 } catch (Exception e) {
                     MLog.e(TAG, "shorten url error: ", e);
-                    ThreadWrapper.executeInUiThread(new Runnable() {
+                    SimpleRxWrapper.executeInUiThread(new Runnable() {
                         @Override
                         public void run() {
                             mListener.onPhotoUploadSuccess(photoUrl, isPossibleAdult, isPossibleViolence);
@@ -393,7 +393,7 @@ public class PhotoUploadHelper {
                 }
                 final String newUrl = url != null && url.getId() != null ? url.getId() : photoUrl;
                 MLog.d(TAG, "shorten url success: " + newUrl);
-                ThreadWrapper.executeInUiThread(new Runnable() {
+                SimpleRxWrapper.executeInUiThread(new Runnable() {
                     @Override
                     public void run() {
                         mListener.onPhotoUploadSuccess(newUrl, isPossibleAdult, isPossibleViolence);

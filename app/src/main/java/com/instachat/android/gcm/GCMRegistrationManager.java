@@ -10,7 +10,7 @@ import com.google.android.gms.iid.InstanceID;
 import com.instachat.android.Constants;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.ThreadWrapper;
+import com.instachat.android.util.SimpleRxWrapper;
 
 /**
  * The important assumption is that GCM is already supported on this device
@@ -50,7 +50,7 @@ public final class GCMRegistrationManager {
      */
     private void registerInBackground() {
 
-        ThreadWrapper.executeInWorkerThread(new Runnable() {
+        SimpleRxWrapper.executeInWorkerThread(new Runnable() {
 
             @Override
             public void run() {

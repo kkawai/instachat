@@ -45,7 +45,7 @@ public final class Constants {
    /*
     * CHANGE THESE WHEN MAKING PRODUCTION BUILDS
     */
-   public static final boolean IS_LOGGING_ENABLED = false;
+   public static final boolean IS_LOGGING_ENABLED = true;
    public static final boolean IS_FOR_AMAZON_ONLY = false;//CHANGE PER AMAZON BUILD!!!
    public static final boolean IS_AMAZON_ADS_ENABLED = false;//CHANGE PER AMAZON BUILD!!!
    public static final boolean IS_AMAZON_DEBUG_AD = false; //CHANGE PER AMAZON BUILD!!!
@@ -64,7 +64,7 @@ public final class Constants {
    public static final String GC_SETTINGS = "group_chat_settings";
 
    public static final String XMPP_SERVER = "xmpp.instachat.us";
-   public static final String API_BASE_URL = "https://api.instachat.us/ih";
+   public static final String API_BASE_URL = "https://api.instachat.us";
    public static final String PUBLIC_WEBSITE = "http://instachat.us";
    public static final int XMPP_PORT = 50138; //5222;
    public static final int GLOBAL_GRID_COLUMNS = 3;
@@ -269,7 +269,6 @@ public final class Constants {
       msg, notify_friend_in
    }
 
-   public static final String ACTION_USER_TYPING = "action_user_typing";
    public static final String KEY_GCM_MESSAGE = "msg"; //DO NOT CHANGE, SERVER DEPENDENT
    public static final String KEY_TO_USERID = "toid";//DO NOT CHANGE, SERVER DEPENDENT
    public static final String CHILD_UNREAD_MESSAGES = "unread_messages";
@@ -295,4 +294,6 @@ public final class Constants {
 
    public static final String GOOGLE_API_KEY = "AIzaSyAHnphNjr0gqXkxps262WCzNmyG_P6OE24";
 
+   public static final String CHANNEL_ID_NEW_MSGS = "com.instachat.android.directs";
+   public static final String CHANNEL_ID_ACTIVITY = "com.instachat.android.activity";
 }

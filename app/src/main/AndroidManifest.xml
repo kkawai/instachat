@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.instachat.android"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.instachat.android">
 
 
     <!-- permissions for video chat -->
@@ -125,7 +125,7 @@
             android:screenOrientation="portrait"/>
 
         <service
-            android:name=".messaging.MyFirebaseMessagingService"
+            android:name=".messaging.InstachatMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
@@ -139,18 +139,6 @@
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </service>
-
-        <receiver
-            android:name=".gcm.GCMBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND">
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-                <category android:name="com.instachat.android"/>
-            </intent-filter>
-        </receiver>
-
-        <service android:name=".gcm.GCMIntentService"/>
-
 
         <service
             android:name=".download.MyDownloadService"

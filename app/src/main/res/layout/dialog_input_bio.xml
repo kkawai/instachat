@@ -18,7 +18,7 @@
             android:text="@string/bio"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:font="Lato-Bold.ttf"/>
+            app:font2="Lato-Bold.ttf"/>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/input_boi_layout"

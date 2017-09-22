@@ -1,7 +1,5 @@
 package com.instachat.android;
 
-import android.app.Application;
-import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 
 import com.android.volley.RequestQueue;
@@ -15,7 +13,6 @@ import com.instachat.android.adapter.MessagesRecyclerAdapterHelper;
 import com.instachat.android.util.BitmapLruCache;
 import com.instachat.android.util.HttpMessage;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.ThreadWrapper;
 
 /**
  * Created by kevin on 7/23/2016.
@@ -28,8 +25,6 @@ public class MyApp extends MultiDexApplication {
     public static boolean isAdmSupported;
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
-    public static double lat;
-    public static double lon;
 
     private MessagesRecyclerAdapterHelper mMessagesRecyclerAdapterHelper = new MessagesRecyclerAdapterHelper();
 
@@ -40,7 +35,6 @@ public class MyApp extends MultiDexApplication {
         FuelInjector.initializeModule(new FuelModule(this) {
         });
         sInstance = this;
-        ThreadWrapper.init();
         HttpMessage.initializeSSL();
         initAdm();
         initGcm();

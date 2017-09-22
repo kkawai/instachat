@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 
+import com.github.silvestrpredko.dotprogressbar.DotProgressBar;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.instachat.android.Constants;
 import com.instachat.android.Events;
@@ -15,8 +16,11 @@ import org.json.JSONObject;
 /**
  * https://developer.android.com/google/gcm/client.html#sample-registerIfNecessary
  *
+ * No longer used in favor of InstachatMessagingService.
+ *
  * @author kkawai
  */
+@Deprecated
 public final class GCMIntentService extends IntentService {
 
     private static final String TAG = GCMIntentService.class.getSimpleName();
@@ -28,7 +32,7 @@ public final class GCMIntentService extends IntentService {
     private void onMessage(final Context context, final Intent data) throws Exception {
 
         final JSONObject msg = new JSONObject(data.getStringExtra(Constants.KEY_GCM_MESSAGE));
-        MLog.i(TAG, "onMessage: ", msg.toString());
+        MLog.i(TAG, "NOT FCM onMessage: ", msg.toString());
         //final org.jivesoftware.smack.packet.Message message = MessageUtils.toXMPPMessage(msg);
         //XMPPService.consumeMessage(context, message);
         //TODO
@@ -49,6 +53,6 @@ public final class GCMIntentService extends IntentService {
         }
 
         // Release the wake lock provided by the WakefulBroadcastReceiver.
-        GCMBroadcastReceiver.completeWakefulIntent(intent);
+        //GCMBroadcastReceiver.completeWakefulIntent(intent);
     }
 }

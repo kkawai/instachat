@@ -198,4 +198,9 @@
 
     <string name="could_not_open_url">Sorry!  Could not open.  Try copying comment and open in browser</string>
     <string name="camera_permission_rationale">Need camera and record-audio permission for real-time video chatting</string>
+
+    <!-- On or after 9/18/2017 -->
+    <string name="channel_new_messages">New messages</string>
+    <string name="channel_activity">Activity</string>
+    <string name="said">%s said:</string>
 </resources>

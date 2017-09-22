@@ -19,7 +19,7 @@
         android:paddingLeft="13dp"
         android:text="# Channels"
         android:textSize="18sp"
-        app:font="Lato-Heavy.ttf"
+        app:font2="Lato-Heavy.ttf"
         />
 
     <!--

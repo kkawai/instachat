@@ -92,7 +92,7 @@
             android:textSize="13sp"
             android:textStyle="bold"
             android:visibility="invisible"
-            app:font="Lato-Bold.ttf"/>
+            app:font2="Lato-Bold.ttf"/>
     </LinearLayout>
 
     <EditText

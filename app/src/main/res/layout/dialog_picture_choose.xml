@@ -20,7 +20,7 @@
             android:text="@string/title_update_my_pic"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:font="@{`Lato-Regular`}"
+            app:font2="Lato-Regular.ttf"
             />
 
         <TextView
@@ -37,7 +37,7 @@
             android:textColor="@color/jonPink"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:font="@{`Lato-Regular`}"
+            app:font2="Lato-Regular.ttf"
             />
 
         <TextView

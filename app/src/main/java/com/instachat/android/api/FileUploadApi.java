@@ -9,7 +9,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.instachat.android.Constants;
 import com.instachat.android.util.HttpMessage;
-import com.instachat.android.util.ThreadWrapper;
+import com.instachat.android.util.SimpleRxWrapper;
 
 import org.json.JSONObject;
 
@@ -64,7 +64,7 @@ public final class FileUploadApi {
             }
         };
 
-        ThreadWrapper.executeInUiThread(new Runnable() {
+        SimpleRxWrapper.executeInUiThread(new Runnable() {
             @Override
             public void run() {
                 listener.onPhotoUploadStarted();
@@ -81,7 +81,7 @@ public final class FileUploadApi {
 
                 @Override
                 public void progressChanged(final ProgressEvent progressEvent) {
-                    ThreadWrapper.executeInUiThread(new Runnable() {
+                    SimpleRxWrapper.executeInUiThread(new Runnable() {
                         @Override
                         public void run() {
                             counter.set(counter.intValue() + (int) progressEvent.getBytesTransferred());
@@ -91,7 +91,7 @@ public final class FileUploadApi {
                 }
             });
             s3Client.putObject(request);
-            ThreadWrapper.executeInUiThread(new Runnable() {
+            SimpleRxWrapper.executeInUiThread(new Runnable() {
                 @Override
                 public void run() {
                     listener.onPhotoUploadSuccess(null, false, false);
@@ -159,10 +159,10 @@ public final class FileUploadApi {
                     fis.close();
                 }
 
-                final JSONObject response = new JSONObject(post(Constants.API_BASE_URL + "/sfile", request, "filepart", filepart));
+                final JSONObject response = new JSONObject(post(Constants.API_BASE_URL + "/ih/sfile", request, "filepart", filepart));
 
                 final int finalTotal = total;
-                ThreadWrapper.executeInUiThread(new Runnable() {
+                SimpleRxWrapper.executeInUiThread(new Runnable() {
                     @Override
                     public void run() {
                         listener.onPhotoUploadProgress((int) file.length() / 1024, finalTotal / 1024);
@@ -173,7 +173,7 @@ public final class FileUploadApi {
 
                 if (isReadAllBytes) {
                     key = response.getJSONObject("data").getString("key");
-                    ThreadWrapper.executeInUiThread(new Runnable() {
+                    SimpleRxWrapper.executeInUiThread(new Runnable() {
                         @Override
                         public void run() {
                             listener.onPhotoUploadSuccess(null, false, false);

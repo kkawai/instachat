@@ -38,8 +38,12 @@ public class CustomFontTextView extends TextView {
 
     private void init(AttributeSet attrs) {
         if (attrs != null) {
-            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.CustomFontTextView);
-            String fontName = a.getString(R.styleable.CustomFontTextView_font);
+            TypedArray typedArray = getContext().getTheme().obtainStyledAttributes(
+                    attrs,
+                    R.styleable.CustomFontTextView,
+                    0, 0);
+
+            String fontName = typedArray.getString(R.styleable.CustomFontTextView_font2);
 
             try {
                 if (fontName != null) {
@@ -50,7 +54,7 @@ public class CustomFontTextView extends TextView {
                 e.printStackTrace();
             }
 
-            a.recycle();
+            typedArray.recycle();
         }
     }
 }

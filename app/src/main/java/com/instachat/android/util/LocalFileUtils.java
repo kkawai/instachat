@@ -316,7 +316,7 @@ public final class LocalFileUtils {
         targetPath.delete();
         try {
             if (deleteFromS3) {
-                new HttpMessage(Constants.API_BASE_URL + "/ds3").post("k", key);
+                new HttpMessage(Constants.API_BASE_URL + "/ih/ds3").post("k", key);
             }
         } catch (final Exception e) {
             MLog.e(TAG, "deletePermanentFile failed..", e);

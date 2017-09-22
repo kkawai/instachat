@@ -78,7 +78,6 @@ public class PrivateChatActivity extends GroupChatActivity {
     private ImageView mProfilePic;
     private AppBarLayout mAppBarLayout;
     private GestureDetectorCompat mGestureDetector;
-    private static boolean sIsActive;
     private static int sUserid;
     private static String sUsername, sProfilePicUrl;
     private View mLikesParent;
@@ -119,7 +118,8 @@ public class PrivateChatActivity extends GroupChatActivity {
         if (Build.VERSION.SDK_INT >= 21) {
             mProfilePic.setTransitionName("profilePic" + sUserid);
         }
-        MLog.d(TAG, "before grab from server, intent data: sUserid: ", sUserid, " sUsernane: ", sUsername, " sProfilePicUrl: ", sProfilePicUrl);
+        MLog.d(TAG, "before grab from server, intent data: sUserid: ", sUserid, " sUsernane: ", sUsername, " " +
+                "sProfilePicUrl: ", sProfilePicUrl);
         loadBasicData(getIntent());
         NetworkApi.getUserById(this, sUserid, new Response.Listener<JSONObject>() {
             @Override
@@ -128,13 +128,15 @@ public class PrivateChatActivity extends GroupChatActivity {
                     final User toUser = User.fromResponse(response);
                     sUsername = toUser.getUsername();
                     sProfilePicUrl = toUser.getProfilePicUrl();
-                    MLog.d(TAG, "after grab from server: toUser: ", toUser.getId(), " ", toUser.getUsername(), " ", toUser.getProfilePicUrl());
+                    MLog.d(TAG, "after grab from server: toUser: ", toUser.getId(), " ", toUser.getUsername(), " ",
+                            toUser.getProfilePicUrl());
                     populateUserProfile(toUser);
                     setCustomTitles(toUser.getUsername(), 0);
                     listenForPartnerTyping();
                     checkIfPartnerIsBlocked();
 
-                    mUserInfoValueEventListener = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(sUserid)).addValueEventListener(new ValueEventListener() {
+                    mUserInfoValueEventListener = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF
+                            (sUserid)).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if (isActivityDestroyed())
@@ -169,7 +171,8 @@ public class PrivateChatActivity extends GroupChatActivity {
                                     if (!onlyUpdateLastActiveTime) {
                                         populateUserProfile(toUser);
                                     }
-                                    MLog.d(TAG, "user info changed onlyUpdateLastActiveTime: ", onlyUpdateLastActiveTime);
+                                    MLog.d(TAG, "user info changed onlyUpdateLastActiveTime: ",
+                                            onlyUpdateLastActiveTime);
 
                                 }
                             } catch (Exception e) {
@@ -218,7 +221,8 @@ public class PrivateChatActivity extends GroupChatActivity {
                 customTitlePairInToolbar.setAlpha(1 - alpha);
                 mMessageRecyclerViewParent.setAlpha(1 - (alpha / 2f));
 
-                MLog.d(TAG, "mAppBarLayout.height: " + appBarLayout.getHeight(), " verticalOffset ", verticalOffset, " toolbarHeight ", getToolbarHeight(), " alpha ", alpha);
+                MLog.d(TAG, "mAppBarLayout.height: " + appBarLayout.getHeight(), " verticalOffset ", verticalOffset,
+                        " toolbarHeight ", getToolbarHeight(), " alpha ", alpha);
                 if (verticalOffset == 0) {
                     mIsAppBarExpanded = true;
                 } else if (Math.abs(verticalOffset) + getToolbarHeight() == appBarLayout.getHeight()) {
@@ -250,7 +254,8 @@ public class PrivateChatActivity extends GroupChatActivity {
         if (Preferences.getInstance().hasShownToolbarProfileTooltip())
             return;
         Preferences.getInstance().setShownToolbarProfileTooltip(true);
-        final Tooltip tooltip = new Tooltip.Builder(anchor, R.style.drawer_tooltip_non_cancellable).setText(getString(R.string.toolbar_user_profile_tooltip)).show();
+        final Tooltip tooltip = new Tooltip.Builder(anchor, R.style.drawer_tooltip_non_cancellable).setText(getString
+                (R.string.toolbar_user_profile_tooltip)).show();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -265,7 +270,8 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     private void showErrorToast(String extra) {
         try {
-            Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, extra), Toast.LENGTH_SHORT).show();
+            Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, extra), Toast
+                    .LENGTH_SHORT).show();
         } catch (Exception e) {
             MLog.e(TAG, "", e);
         }
@@ -282,7 +288,8 @@ public class PrivateChatActivity extends GroupChatActivity {
     private boolean mIsAppBarExpanded = true; //initially it's expanded
 
     private void initializePrivateChatSummary() {
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF()).child(sUserid + "");
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants
+                .MY_PRIVATE_CHATS_SUMMARY_PARENT_REF()).child(sUserid + "");
         PrivateChatSummary summary = new PrivateChatSummary();
         summary.setName(sUsername);
         summary.setDpid(sProfilePicUrl);
@@ -294,13 +301,11 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     @Override
     public void onResume() {
-        sIsActive = true;
         super.onResume();
     }
 
     @Override
     public void onPause() {
-        sIsActive = false;
         super.onPause();
     }
 
@@ -308,7 +313,8 @@ public class PrivateChatActivity extends GroupChatActivity {
     public void onDestroy() {
         if (mUserInfoValueEventListener != null) {
             try {
-                FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(sUserid)).removeEventListener(mUserInfoValueEventListener);
+                FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(sUserid)).removeEventListener
+                        (mUserInfoValueEventListener);
             } catch (Exception e) {
                 MLog.e(TAG, "", e);
             }
@@ -319,6 +325,11 @@ public class PrivateChatActivity extends GroupChatActivity {
         if (mTotalLikesRef != null)
             mTotalLikesRef.removeEventListener(mTotalLikesEventListener);
         super.onDestroy();
+
+        sUserid = 0;
+        sUsername = null;
+        sProfilePicUrl = null;
+
     }
 
     @Override
@@ -355,14 +366,17 @@ public class PrivateChatActivity extends GroupChatActivity {
             if (System.currentTimeMillis() - mLastTypingTime < 3000) {
                 return;
             }
-            FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHAT_TYPING_REF(sUserid)).child("" + myUserid()).child(Constants.CHILD_TYPING).setValue(true);
+            FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHAT_TYPING_REF(sUserid)).child("" +
+                    myUserid()).child(Constants.CHILD_TYPING).setValue(true);
             mLastTypingTime = System.currentTimeMillis();
         } catch (Exception e) {
             MLog.e(TAG, "onMeTyping() failed", e);
         }
     }
 
-    public static void startPrivateChatActivity(Activity activity, int userid, String username, String profilePicUrl, final boolean autoAddUser, final View transitionImageView, Uri sharePhotoUri, String shareMessage) {
+    public static void startPrivateChatActivity(Activity activity, int userid, String username, String profilePicUrl,
+                                                final boolean autoAddUser, final View transitionImageView, Uri
+                                                        sharePhotoUri, String shareMessage) {
         Intent intent = new Intent(activity, PrivateChatActivity.class);
         intent.putExtra(Constants.KEY_USERID, userid);
         intent.putExtra(Constants.KEY_USERNAME, username);
@@ -376,15 +390,12 @@ public class PrivateChatActivity extends GroupChatActivity {
             intent.putExtra(Constants.KEY_SHARE_MESSAGE, shareMessage);
 
         if (transitionImageView != null) {
-            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, transitionImageView, "profilePic" + userid);
+            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity,
+                    transitionImageView, "profilePic" + userid);
             activity.startActivity(intent, options.toBundle());
         } else {
             activity.startActivity(intent);
         }
-    }
-
-    public static boolean isActive() {
-        return sIsActive;
     }
 
     public static int getActiveUserid() {
@@ -393,7 +404,7 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     @Override
     protected void onRemoteUserTyping(int userid, String username, String dpid) {
-        if (isActivityDestroyed() || !sIsActive || this.sUserid != userid) {
+        if (isActivityDestroyed() || this.sUserid != userid) {
             return;
         }
         showTypingDots();
@@ -411,13 +422,15 @@ public class PrivateChatActivity extends GroupChatActivity {
             privateChatSummary.setDpid(sProfilePicUrl);
             privateChatSummary.setAccepted(true);
             privateChatSummary.setLastMessageSentTimestamp(System.currentTimeMillis());
-            final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF()).child(sUserid + "");
+            final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants
+                    .MY_PRIVATE_CHATS_SUMMARY_PARENT_REF()).child(sUserid + "");
             ref.updateChildren(privateChatSummary.toMap());
 
             /**
              * remove the person from your pending requests
              */
-            FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(sUserid, Preferences.getInstance().getUserId())).removeValue();
+            FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(sUserid,
+                    Preferences.getInstance().getUserId())).removeValue();
         }
 
     }
@@ -436,11 +449,13 @@ public class PrivateChatActivity extends GroupChatActivity {
             collapseAppbarAfterDelay();
         } else {
             try {
-                Glide.with(PrivateChatActivity.this).load(toUser.getProfilePicUrl()).error(R.drawable.ic_anon_person_36dp)
+                Glide.with(PrivateChatActivity.this).load(toUser.getProfilePicUrl()).error(R.drawable
+                        .ic_anon_person_36dp)
                         //.crossFade()
                         .listener(new RequestListener<String, GlideDrawable>() {
                             @Override
-                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            public boolean onException(Exception e, String model, Target<GlideDrawable> target,
+                                                       boolean isFirstResource) {
                                 if (isActivityDestroyed())
                                     return false;
                                 collapseAppbarAfterDelay();
@@ -448,15 +463,19 @@ public class PrivateChatActivity extends GroupChatActivity {
                             }
 
                             @Override
-                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            public boolean onResourceReady(GlideDrawable resource, String model,
+                                                           Target<GlideDrawable> target, boolean isFromMemoryCache,
+                                                           boolean isFirstResource) {
                                 if (isActivityDestroyed())
                                     return false;
                                 collapseAppbarAfterDelay();
                                 return false;
                             }
                         }).into(mProfilePic);
-                Glide.with(PrivateChatActivity.this).load(toUser.getProfilePicUrl()).error(R.drawable.ic_anon_person_36dp).crossFade().into(miniPic);
-                Glide.with(PrivateChatActivity.this).load(toUser.getProfilePicUrl()).error(R.drawable.ic_anon_person_36dp).crossFade().into(toolbarProfileImageView);
+                Glide.with(PrivateChatActivity.this).load(toUser.getProfilePicUrl()).error(R.drawable
+                        .ic_anon_person_36dp).crossFade().into(miniPic);
+                Glide.with(PrivateChatActivity.this).load(toUser.getProfilePicUrl()).error(R.drawable
+                        .ic_anon_person_36dp).crossFade().into(toolbarProfileImageView);
 
             } catch (Exception e) {
                 MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
@@ -505,7 +524,8 @@ public class PrivateChatActivity extends GroupChatActivity {
 
     private void clearPrivateUnreadMessages(int toUserid) {
         try {
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants
+                    .MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
             ref.child(toUserid + "").child(Constants.CHILD_UNREAD_MESSAGES).removeValue();
         } catch (Exception e) {
             MLog.e(TAG, "", e);
@@ -543,7 +563,8 @@ public class PrivateChatActivity extends GroupChatActivity {
                     toggleAppbar();
                 return true;
             case R.id.menu_block_user:
-                new BlockUserDialogHelper().showBlockUserQuestionDialog(this, sUserid, sUsername, sProfilePicUrl, getBlockedUserListener());
+                new BlockUserDialogHelper().showBlockUserQuestionDialog(this, sUserid, sUsername, sProfilePicUrl,
+                        getBlockedUserListener());
                 return true;
             case R.id.menu_report_user:
                 new ReportUserDialogHelper().showReportUserQuestionDialog(this, sUserid, sUsername, sProfilePicUrl);
@@ -708,7 +729,8 @@ public class PrivateChatActivity extends GroupChatActivity {
     }
 
     private void checkIfPartnerIsBlocked() {
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF()).child(sUserid + "");
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF()).child
+                (sUserid + "");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -717,7 +739,8 @@ public class PrivateChatActivity extends GroupChatActivity {
                 if (dataSnapshot.getValue() == null) {
                     //
                 } else {
-                    Toast.makeText(PrivateChatActivity.this, getString(R.string.cannot_chat_you_blocked_them, sUsername), Toast.LENGTH_LONG).show();
+                    Toast.makeText(PrivateChatActivity.this, getString(R.string.cannot_chat_you_blocked_them,
+                            sUsername), Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -787,7 +810,9 @@ public class PrivateChatActivity extends GroupChatActivity {
                 bundle.putInt(Constants.KEY_USERID, sUserid);
                 bundle.putString(Constants.KEY_USERNAME, sUsername);
                 fragment.setArguments(bundle);
-                getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, UserLikedUserFragment.TAG).addToBackStack(null).commit();
+                getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim
+                        .slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment,
+                        UserLikedUserFragment.TAG).addToBackStack(null).commit();
 
             }
         });

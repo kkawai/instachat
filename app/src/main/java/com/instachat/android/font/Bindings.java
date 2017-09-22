@@ -1,8 +1,5 @@
 package com.instachat.android.font;
 
-import android.databinding.BindingAdapter;
-import android.widget.TextView;
-
 /**
  * Created by kevin on 8/6/2016.
  */
@@ -13,8 +10,10 @@ import android.widget.TextView;
  */
 public class Bindings {
 
+    /*
     @BindingAdapter({"bind:font"})
     public static void setFont(TextView textView, String fontName) {
         textView.setTypeface(FontCache.getInstance().get(fontName));
     }
+    */
 }

@@ -47,7 +47,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/chat_sender_username"
                         android:textSize="@dimen/message_sender_name_size"
-                        app:font="Lato-Bold.ttf"/>
+                        app:font2="Lato-Bold.ttf"/>
 
                     <com.instachat.android.view.CustomFontTextView
                         android:id="@+id/messageTimeTextView"
@@ -57,7 +57,7 @@
                         android:layout_weight="0"
                         android:textColor="@color/chat_time_message_sent"
                         android:textSize="@dimen/message_sent_time_ago_size"
-                        app:font="Lato-Regular.ttf"/>
+                        app:font2="Lato-Regular.ttf"/>
 
                     <ImageView
                         android:id="@+id/messageReadConfirmationView"
@@ -107,7 +107,7 @@
                                     android:maxLines="2"
                                     android:textColor="@color/chat_web_clipping_article_title"
                                     android:textSize="@dimen/web_clipping_article_title_size"
-                                    app:font="Lato-Bold.ttf"/>
+                                    app:font2="Lato-Bold.ttf"/>
 
                                 <com.instachat.android.view.CustomFontTextView
                                     android:id="@+id/description"
@@ -116,7 +116,7 @@
                                     android:ellipsize="end"
                                     android:maxLines="3"
                                     android:textSize="@dimen/web_clipping_short_description_size"
-                                    app:font="Lato-Regular.ttf"/>
+                                    app:font2="Lato-Regular.ttf"/>
 
                                 <com.instachat.android.view.CustomFontTextView
                                     android:id="@+id/url"
@@ -126,7 +126,7 @@
                                     android:maxLines="1"
                                     android:textColor="@color/chat_web_cliping_url"
                                     android:textSize="@dimen/web_clipping_short_url_size"
-                                    app:font="Lato-Regular.ttf"/>
+                                    app:font2="Lato-Regular.ttf"/>
 
                             </LinearLayout>
 
@@ -196,7 +196,7 @@
                     android:textColor="@color/chat_likes_count"
                     android:textSize="@dimen/message_likes_counter_size"
                     android:textStyle="bold"
-                    app:font="Lato-Bold.ttf"/>
+                    app:font2="Lato-Bold.ttf"/>
             </FrameLayout>
         </FrameLayout>
 

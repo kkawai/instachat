@@ -44,7 +44,7 @@
                         android:text=""
                         android:textSize="21sp"
                         android:textStyle="bold"
-                        app:font="Lato-Bold.ttf"
+                        app:font2="Lato-Bold.ttf"
                         />
 
                     <com.instachat.android.view.CustomFontTextView
@@ -57,7 +57,7 @@
                         android:text=""
                         android:textSize="14sp"
                         android:textStyle="bold"
-                        app:font="Lato-SemiboldItalic.ttf"
+                        app:font2="Lato-SemiboldItalic.ttf"
                         />
                 </LinearLayout>
 
@@ -106,7 +106,7 @@
                         android:textSize="13sp"
                         android:textStyle="bold"
                         android:visibility="visible"
-                        app:font="Lato-Bold.ttf"/>
+                        app:font2="Lato-Bold.ttf"/>
                 </LinearLayout>
 `
                 <com.instachat.android.view.CustomFontTextView
@@ -124,7 +124,7 @@
                     android:textAlignment="center"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                     android:textSize="15sp"
-                    app:font="Lato-Regular.ttf"
+                    app:font2="Lato-Regular.ttf"
                     />
 
                 <LinearLayout
@@ -148,7 +148,7 @@
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:visibility="gone"
-                        app:font="Lato-Bold.ttf"/>
+                        app:font2="Lato-Bold.ttf"/>
 
                 </LinearLayout>
 
@@ -189,7 +189,7 @@
                         android:text=""
                         android:textSize="21sp"
                         android:textStyle="bold"
-                        app:font="Lato-Bold.ttf"
+                        app:font2="Lato-Bold.ttf"
                         />
 
                     <com.instachat.android.view.CustomFontTextView
@@ -201,7 +201,7 @@
                         android:text=""
                         android:textSize="14sp"
                         android:textStyle="bold"
-                        app:font="Lato-SemiboldItalic.ttf"
+                        app:font2="Lato-SemiboldItalic.ttf"
                         />
                 </LinearLayout>
 

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+@Deprecated
 public class UserManager {
 
     private static final String TAG = UserManager.class.getSimpleName();
@@ -85,7 +86,7 @@ public class UserManager {
     }
 
     public void deleteUser(final User user) {
-        deleteUser(user.getInstagramId());
+        //deleteUser(user.getInstagramId());
     }
 
     public void deleteUser(final String iid) {

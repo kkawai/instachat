@@ -16,7 +16,7 @@ import com.instachat.android.util.AnalyticsHelper;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.StringUtil;
-import com.instachat.android.util.ThreadWrapper;
+import com.instachat.android.util.SimpleRxWrapper;
 
 /**
  * Invoke registerIfNecessary() method AFTER user authenticates with IG
@@ -122,7 +122,7 @@ public final class GCMHelper {
 
     public static void unregister(final String userid) {
 
-        ThreadWrapper.executeInWorkerThread(
+        SimpleRxWrapper.executeInWorkerThread(
                 new Runnable() {
                     @Override
                     public void run() {

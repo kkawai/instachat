@@ -3,13 +3,17 @@ package com.instachat.android.view;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.view.View;
 import android.widget.TextView;
 
 import com.instachat.android.R;
-import com.instachat.android.util.ThreadWrapper;
+import com.instachat.android.util.DefaultSubscriber;
+
+import java.util.concurrent.TimeUnit;
+
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 final class IhIndeterminateProgressDialog extends Dialog {
 
@@ -24,21 +28,6 @@ final class IhIndeterminateProgressDialog extends Dialog {
     public void setMessage(final String message) {
         this.message = message;
     }
-
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            try {
-                if (isShowing()) {
-                    try {
-                        dismiss();
-                    } catch (final Throwable t) {
-                    }
-                }
-            } catch (final Exception e) {
-            }
-        }
-    };
 
     @Override
     public void show() {
@@ -88,22 +77,24 @@ final class IhIndeterminateProgressDialog extends Dialog {
         if (!useTimer) {
             return;
         }
-        ThreadWrapper.executeInWorkerThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(6000);
-                    handler.sendEmptyMessage(0);
-                } catch (Exception e) {
-                }
-            }
-        });
+        Observable
+                .timer(6, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DefaultSubscriber<Long>("progress dialog timer") {
+                    @Override
+                    public void handleOnCompleted() {
+                        dismiss();
+                    }
+                });
     }
 
     @Override
     public void dismiss() {
         try {
-            super.dismiss();
+            if (isShowing()) {
+                super.dismiss();
+            }
         } catch (final Throwable t) {
         }
     }

@@ -9,9 +9,13 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 /**
  * Receives message from GCM service.
  * Launches GCMIntentService to consume the message.
+ * <p>
+ * This class is no longer used.  InstachatMessagingService is the
+ * way to go for messaging, extends FirebaseMessagingService.
  *
  * @author kkawai
  */
+@Deprecated
 public final class GCMBroadcastReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(final Context context, final Intent intent) {

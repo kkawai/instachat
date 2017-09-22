@@ -22,6 +22,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -77,7 +78,10 @@ import com.instachat.android.adapter.MessageTextClickedListener;
 import com.instachat.android.adapter.MessageViewHolder;
 import com.instachat.android.adapter.MessagesRecyclerAdapter;
 import com.instachat.android.adapter.UserClickedListener;
+import com.instachat.android.api.APIClient;
+import com.instachat.android.api.APIInterface;
 import com.instachat.android.api.NetworkApi;
+import com.instachat.android.api.RemoteSettingsResult;
 import com.instachat.android.api.UploadListener;
 import com.instachat.android.blocks.BlockedUserListener;
 import com.instachat.android.blocks.BlocksFragment;
@@ -89,7 +93,8 @@ import com.instachat.android.likes.UserLikedUserFragment;
 import com.instachat.android.likes.UserLikedUserListener;
 import com.instachat.android.login.LogoutDialogHelper;
 import com.instachat.android.login.SignInActivity;
-import com.instachat.android.messaging.MyFirebaseMessagingService;
+import com.instachat.android.messaging.InstachatMessagingService;
+import com.instachat.android.messaging.NotificationHelper;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.model.GroupChatSummary;
 import com.instachat.android.model.PrivateChatSummary;
@@ -100,8 +105,8 @@ import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ScreenUtil;
+import com.instachat.android.util.SimpleRxWrapper;
 import com.instachat.android.util.StringUtil;
-import com.instachat.android.util.ThreadWrapper;
 import com.instachat.android.view.ThemedAlertDialog;
 import com.tooltip.Tooltip;
 
@@ -112,6 +117,8 @@ import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import pub.devrel.easypermissions.EasyPermissions;
+import retrofit2.Call;
+import retrofit2.Callback;
 
 //import com.google.android.gms.ads.AdView;
 
@@ -179,6 +186,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             return;
         }
 
+        doExperiments();
+
         initDatabaseRef();
         DataBindingUtil.setContentView(this, getLayout());
         initPhotoHelper(savedInstanceState);
@@ -204,6 +213,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             //MLog.e(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) failed: " + e);
         }
 
+        NotificationHelper.createNotificationChannels(this);
         initRemoteConfig();
         fetchConfig();
         initFirebaseAdapter();
@@ -286,8 +296,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         }
         listenForTyping();
         final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.cancel(MyFirebaseMessagingService.NOTIFICATION_ID_PENDING_REQUESTS);
-        notificationManager.cancel(MyFirebaseMessagingService.NOTIFICATION_ID_FRIEND_JUMPED_IN);
+        notificationManager.cancel(InstachatMessagingService.NOTIFICATION_ID_PENDING_REQUESTS);
+        notificationManager.cancel(InstachatMessagingService.NOTIFICATION_ID_FRIEND_JUMPED_IN);
         checkForNoData();
         //requestVideoRelatedPermissions();
         //showJoinSecretRoom();
@@ -638,18 +648,18 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             public boolean onLongClick(View view) {
                 new MessageOptionsDialogHelper().showSendOptions(GroupChatActivity.this, mAttachButton, null, new
                         MessageOptionsDialogHelper.SendOptionsListener() {
-                    @Override
-                    public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
-                        mAttachPhotoMessageType = FriendlyMessage.MESSAGE_TYPE_NORMAL;
-                        showFileOptions();
-                    }
+                            @Override
+                            public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
+                                mAttachPhotoMessageType = FriendlyMessage.MESSAGE_TYPE_NORMAL;
+                                showFileOptions();
+                            }
 
-                    @Override
-                    public void onSendOneTimeRequested(FriendlyMessage friendlyMessage) {
-                        mAttachPhotoMessageType = FriendlyMessage.MESSAGE_TYPE_ONE_TIME;
-                        showFileOptions();
-                    }
-                });
+                            @Override
+                            public void onSendOneTimeRequested(FriendlyMessage friendlyMessage) {
+                                mAttachPhotoMessageType = FriendlyMessage.MESSAGE_TYPE_ONE_TIME;
+                                showFileOptions();
+                            }
+                        });
                 return true;
             }
         });
@@ -678,18 +688,18 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         }
         new MessageOptionsDialogHelper().showSendOptions(GroupChatActivity.this, mSendButton, friendlyMessage, new
                 MessageOptionsDialogHelper.SendOptionsListener() {
-            @Override
-            public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
-                friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
-                sendText(friendlyMessage);
-            }
+                    @Override
+                    public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
+                        friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
+                        sendText(friendlyMessage);
+                    }
 
-            @Override
-            public void onSendOneTimeRequested(FriendlyMessage friendlyMessage) {
-                friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
-                sendText(friendlyMessage);
-            }
-        });
+                    @Override
+                    public void onSendOneTimeRequested(FriendlyMessage friendlyMessage) {
+                        friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
+                        sendText(friendlyMessage);
+                    }
+                });
         return true;
     }
 
@@ -1759,7 +1769,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         /**
          * if after 12 seconds and there is no chat data from firebase, log it
          */
-        ThreadWrapper.executeInWorkerThread(new Runnable() {
+        SimpleRxWrapper.executeInWorkerThread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -1788,7 +1798,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             hintText = "MIME: " + Arrays.toString(contentMimeTypes);
             mimeTypes = Arrays.copyOf(contentMimeTypes, contentMimeTypes.length);
         }
-        EditText editText = new EditText(this) {
+        AppCompatEditText editText = new AppCompatEditText(this) {
             @Override
             public InputConnection onCreateInputConnection(EditorInfo editorInfo) {
                 final InputConnection ic = super.onCreateInputConnection(editorInfo);
@@ -1862,5 +1872,27 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         TextView textView = (TextView) snackbarView.findViewById(com.androidadvance.topsnackbar.R.id.snackbar_text);
         textView.setTextColor(Color.WHITE);
         snackbar.show();*/
+    }
+
+    private void doExperiments() {
+
+        //User user = Preferences.getInstance().getUser();
+        Call settings = APIClient.getClient().create(APIInterface.class).getSettings();
+        settings.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, retrofit2.Response response) {
+
+                RemoteSettingsResult remoteSettingsResult = (RemoteSettingsResult) response.body();
+                MLog.i(TAG, "myexperiment response: " + remoteSettingsResult.status
+                        + " data.a: " + remoteSettingsResult.data.a
+                        + " data.s: " + remoteSettingsResult.data.s);
+            }
+
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                MLog.i(TAG, "myexperiment retrofit failed: ", t);
+            }
+        });
+
     }
 }

@@ -9,8 +9,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.RemoteInput;
-import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
 
 import com.bumptech.glide.Glide;
@@ -31,19 +31,24 @@ import com.instachat.android.R;
 import com.instachat.android.login.LauncherActivity;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.model.PrivateChatSummary;
+import com.instachat.android.util.DefaultSubscriber;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
-import com.instachat.android.util.ThreadWrapper;
 import com.instachat.android.view.CircleTransform;
 
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
-public class MyFirebaseMessagingService extends FirebaseMessagingService {
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
-    private static final String TAG = "MyFMService";
+public class InstachatMessagingService extends FirebaseMessagingService {
+
+    private static final String TAG = "FCMService";
 
     //all pending request notifications will have the same id
     //2 will not conflict with any user id
@@ -71,14 +76,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         (Constants.GcmMessageType.msg.name())) {
                     final FriendlyMessage friendlyMessage = FriendlyMessage.fromJSONObject(msg);
 
-                    if (PrivateChatActivity.isActive() && PrivateChatActivity.getActiveUserid() == friendlyMessage
-                            .getUserid()) {
+                    if (PrivateChatActivity.getActiveUserid() == friendlyMessage.getUserid()) {
                     /* Already actively chatting with this person in the PrivateChatActivity
                      * so no need to put up a notification in the system tray.
                      * For debugging purposes, however, if it's myself, then it's ok.
                      */
-                        if (PrivateChatActivity.getActiveUserid() != Preferences.getInstance().getUserId())
+                        if (PrivateChatActivity.getActiveUserid() != Preferences.getInstance().getUserId()) {
+                            MLog.d(TAG, "already actively chatting, do NOT notify");
                             return;
+                        }
                     }
 
                     final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF
@@ -114,24 +120,31 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private void consumeFriendlyMessage(final FriendlyMessage friendlyMessage) {
         incrementPrivateUnreadMessages(friendlyMessage);
-        ThreadWrapper.executeInWorkerThread(new Runnable() {
+        Observable<Bitmap> observable = Observable.fromCallable(new Callable<Bitmap>() {
             @Override
-            public void run() {
-                try {
-                    Bitmap bitmap = Glide.
-                            with(MyFirebaseMessagingService.this).
-                            load(friendlyMessage.getDpid()).
-                            asBitmap().
-                            transform(new CircleTransform(MyFirebaseMessagingService.this)).
-                            into(thumbSize(), thumbSize()). // Width and height
-                            get();
-                    showNotification(friendlyMessage, bitmap);
-                } catch (Exception e) {
-                    MLog.e(TAG, "", e); //todo better error handling/message
-                    showNotification(friendlyMessage, null);
-                }
+            public Bitmap call() throws Exception {
+                return Glide.
+                        with(InstachatMessagingService.this).
+                        load(friendlyMessage.getDpid()).
+                        asBitmap().
+                        transform(new CircleTransform(InstachatMessagingService.this)).
+                        into(thumbSize(), thumbSize()). // Width and height
+                        get();
             }
-        });
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+
+        DefaultSubscriber<Bitmap> defaultSubscriber = new DefaultSubscriber<Bitmap>(TAG) {
+            @Override
+            public void handleOnNext(Bitmap bitmap) {
+                showNotification(friendlyMessage, bitmap);
+            }
+
+            @Override
+            public void handleOnError(Throwable error) {
+                showNotification(friendlyMessage, null);
+            }
+        };
+        observable.subscribe(defaultSubscriber);
     }
 
     private void showNotification(FriendlyMessage friendlyMessage, Bitmap bitmap) {
@@ -169,18 +182,20 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         else
             contentText = friendlyMessage.getText() + "";
 
+        MLog.d(TAG, "contentText: " + contentText);
+
         // Use NotificationCompat.Builder to set up our notification.
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, Constants.CHANNEL_ID_NEW_MSGS);
         builder.addAction(replyAction)
-                .setPriority(Notification.PRIORITY_HIGH) //todo: control with settings
-                .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle().bigText(contentText))
-                .setContentTitle(friendlyMessage.getName())
+                .setContentTitle(getString(R.string.said, friendlyMessage.getName()))
                 .setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp)
                 .setLargeIcon(bitmap == null ? BitmapFactory.decodeResource(getResources(), R.drawable
                         .ic_anon_person_36dp) : bitmap)
                 .setContentIntent(pendingIntent)
                 .setSound(customSound)
-                .setSubText(getString(R.string.sent_via, getString(R.string.app_name)));
+                .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle().bigText(contentText))
+                .setContentText(contentText)
+                .setSubText(friendlyMessage.getName());
 
 
         //icon appears in device notification bar and right hand corner of notification
@@ -245,6 +260,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
                     //Display the notification in the notification bar
                     notificationManager.notify(friendlyMessage.getUserid(), notification);
+                    MLog.d(TAG, "this should have notified and I'm in a UI thread too user id? " +
+                            friendlyMessage.getUserid());
                 } else {
                     //I have not accepted this person
                     PrivateChatSummary privateChatSummary = new PrivateChatSummary();
@@ -296,8 +313,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Use NotificationCompat.Builder to set up our notification.
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setPriority(Notification.PRIORITY_DEFAULT) //todo: control with settings
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, Constants.CHANNEL_ID_ACTIVITY);
+        builder
                 .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle())
                 .setContentTitle(username)
                 .setContentText(getString(R.string.friend_just_jumped_in))
@@ -326,9 +343,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Use NotificationCompat.Builder to set up our notification.
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setPriority(Notification.PRIORITY_LOW) //todo: control with settings
-                .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle())
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, Constants.CHANNEL_ID_ACTIVITY);
+        builder.setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle())
                 .setContentTitle(getString(R.string.pending_requests_title))
                 .setContentText(getString(R.string.pending_requests_text))
                 .setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp)

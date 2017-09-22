@@ -11,8 +11,6 @@ import com.instachat.android.R;
 import com.instachat.android.model.FriendlyMessage;
 import com.instachat.android.util.MLog;
 
-import org.jetbrains.annotations.NotNull;
-
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
@@ -23,7 +21,7 @@ public class MessagesDialogHelper {
     private static final String TAG = "MessagesDialogHelper";
 
     public void showDeleteMessageDialog(@NonNull final Context context,
-                                        @NotNull final FriendlyMessage friendlyMessage,
+                                        @NonNull final FriendlyMessage friendlyMessage,
                                         @NonNull final StorageReference storageRef,
                                         @NonNull final String dbRef) {
         new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)

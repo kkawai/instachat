@@ -7,8 +7,8 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.2'
-        classpath 'com.google.gms:google-services:3.0.0'
+        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.google.gms:google-services:3.1.0'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -21,9 +21,27 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
         maven { url 'https://github.com/leonardocardoso/mvn-repo/raw/master/maven-deploy' }
+        //google support libraries
+        maven { url "https://maven.google.com" }
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+ext {
+    compileSdkVersion = 26
+    minSdkVersion = 16
+    buildToolsVersion = '25.0.2'
+    supportLibraryVersion = '26.1.0'
+    googlePlayServicesVersion = '11.2.2'
+    firebaseVersion = '11.2.2'
+    dexMakerVersion = '1.2'
+    daggerVersion = '2.11'
+    espressoVersion = '2.2.2'
+    leakCanaryVersion = '1.5.1'
+    timberVersion = '4.5.1'
+    robolectricVersion = '3.3.2'
+    powerMockVersion = '1.6.6'
 }
