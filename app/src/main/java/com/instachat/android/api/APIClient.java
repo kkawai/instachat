@@ -29,71 +29,73 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public final class APIClient {
 
-    private static final String TAG = "APIClient";
-    private static Retrofit retrofit = null;
+   private static final String TAG = "APIClient";
+   private static Retrofit retrofit = null;
 
-    public synchronized static Retrofit getClient() {
-        if (retrofit != null) {
-            return retrofit;
-        }
-        OkHttpClient client = createClient(MyApp.getInstance());
-        retrofit = new Retrofit.Builder()
-                .baseUrl(Constants.API_BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create()).client(client).build();
-        return retrofit;
-    }
+   public synchronized static Retrofit getClient() {
+      if (retrofit != null) {
+         return retrofit;
+      }
+      OkHttpClient client = createClient(MyApp.getInstance());
+      retrofit = new Retrofit.Builder()
+            .baseUrl(Constants.API_BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create()).client(client).build();
+      return retrofit;
+   }
 
-    private static HostnameVerifier hostnameVerifier = new HostnameVerifier() {
-        @Override
-        public boolean verify(String hostname, SSLSession sslSession) {
-            MLog.i(TAG, "verify: " + hostname);
-            return hostname.equals(Constants.API_BASE_URL.substring("https://".length()));
-        }
-    };
+   private static HostnameVerifier hostnameVerifier = new HostnameVerifier() {
+      @Override
+      public boolean verify(String hostname, SSLSession sslSession) {
+         MLog.i(TAG, "verify: " + hostname);
+         return hostname.equals(Constants.API_BASE_URL.substring("https://".length()));
+      }
+   };
 
-    private static OkHttpClient createClient(Context context) {
+   private static OkHttpClient createClient(Context context) {
 
-        OkHttpClient client = null;
+      OkHttpClient client = null;
 
-        CertificateFactory cf;
-        InputStream cert;
-        Certificate ca;
-        SSLContext sslContext;
-        try {
-            cf = CertificateFactory.getInstance("X.509");
-            cert = context.getResources().openRawResource(R.raw.mykeystore); // Place your 'my_cert.crt' file in
-            // `res/raw`
+      CertificateFactory cf;
+      InputStream cert;
+      Certificate ca;
+      SSLContext sslContext;
+      try {
+         cf = CertificateFactory.getInstance("X.509");
+         cert = context.getResources().openRawResource(R.raw.mykeystore); // Place your 'my_cert.crt' file in
+         // `res/raw`
 
-            ca = cf.generateCertificate(cert);
-            cert.close();
+         ca = cf.generateCertificate(cert);
+         cert.close();
 
-            String keyStoreType = KeyStore.getDefaultType();
-            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-            keyStore.load(null, null);
-            keyStore.setCertificateEntry("ca", ca);
+         String keyStoreType = KeyStore.getDefaultType();
+         KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+         keyStore.load(null, null);
+         keyStore.setCertificateEntry("ca", ca);
 
-            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-            tmf.init(keyStore);
+         String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+         TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+         tmf.init(keyStore);
 
-            sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, tmf.getTrustManagers(), null);
+         sslContext = SSLContext.getInstance("TLS");
+         sslContext.init(null, tmf.getTrustManagers(), null);
 
-            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+         interceptor.setLevel(Constants.IS_LOGGING_ENABLED
+               ? HttpLoggingInterceptor.Level.BODY
+               : HttpLoggingInterceptor.Level.NONE);
 
-            client = new OkHttpClient.Builder()
-                    .sslSocketFactory(sslContext.getSocketFactory())
-                    .addInterceptor(interceptor)
-                    .hostnameVerifier(hostnameVerifier)
-                    .build();
+         client = new OkHttpClient.Builder()
+               .sslSocketFactory(sslContext.getSocketFactory())
+               .addInterceptor(interceptor)
+               .hostnameVerifier(hostnameVerifier)
+               .build();
 
-        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException |
-                KeyManagementException e) {
-            e.printStackTrace();
-        }
+      } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException |
+            KeyManagementException e) {
+         e.printStackTrace();
+      }
 
-        return client;
-    }
+      return client;
+   }
 
 }
