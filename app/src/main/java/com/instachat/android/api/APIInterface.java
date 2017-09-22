@@ -1,7 +1,5 @@
 package com.instachat.android.api;
 
-import com.instachat.android.model.User;
-
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -21,13 +19,13 @@ public interface APIInterface {
                                @Field("bio") String bio);
 
     @GET("/ih/getubyem")
-    Call<User> getUserByEmail(@Query("em") String email);
+    Call<UserResult> getUserByEmail(@Query("em") String email);
 
     @GET("/ih/getubid")
-    Call<User> getUserById(@Query("i") int userid);
+    Call<UserResult> getUserById(@Query("i") int userid);
 
     @GET("/ih/getu")
-    Call<User> getUserByEmailAndPassword(@Query("em") String email, @Query("pd") String password);
+    Call<UserResult> getUserByEmailAndPassword(@Query("em") String email, @Query("pd") String password);
 
     @GET("/ih/exists")
     Call<BasicExistenceResult> emailExists(@Query("em") String email);
