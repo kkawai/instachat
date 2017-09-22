@@ -2,7 +2,6 @@ package com.instachat.android.api;
 
 import com.instachat.android.model.User;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
