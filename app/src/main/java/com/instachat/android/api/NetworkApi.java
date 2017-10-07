@@ -23,8 +23,8 @@ import com.instachat.android.util.DeviceUtil;
 import com.instachat.android.util.HttpMessage;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
-import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.SimpleRxWrapper;
+import com.instachat.android.util.StringUtil;
 
 import org.json.JSONObject;
 
@@ -32,9 +32,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-/**
- * Created by kevin on 7/22/2016.
- */
 public final class NetworkApi {
 
     private static Pair<String, String> sPair = null;
@@ -48,7 +45,8 @@ public final class NetworkApi {
     public static final String KEY_RESPONSE_STATUS = "status";
     public static final String KEY_EXISTS = "exists";
 
-    private static final DefaultRetryPolicy DEFAULT_RETRY_POLICY = new DefaultRetryPolicy(REQUEST_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+    private static final DefaultRetryPolicy DEFAULT_RETRY_POLICY = new DefaultRetryPolicy(REQUEST_TIMEOUT_MS,
+            DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 
     public static Pair pair() {
         if (sPair == null) {
@@ -59,7 +57,8 @@ public final class NetworkApi {
 
     public static JSONObject getRemoteSettings() {
         try {
-            final JSONObject r = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/ih/settings").getString()).getJSONObject(NetworkApi.RESPONSE_DATA);
+            final JSONObject r = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/ih/settings").getString())
+                    .getJSONObject(NetworkApi.RESPONSE_DATA);
             sPair = new Pair<>(r.getString("a"), r.getString("s"));
             return r;
         } catch (final Exception e) {
@@ -68,7 +67,8 @@ public final class NetworkApi {
         }
     }
 
-    public static void getUserByEmail(final Object cancelTag, final String email, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+    public static void getUserByEmail(final Object cancelTag, final String email, final Response.Listener<JSONObject>
+            listener, final Response.ErrorListener errorListener) {
 
         final String url = Constants.API_BASE_URL + "/ih/getubyem?em=" + Base64.encodeWebSafe(email.getBytes(), false);
         final Request request = new ApiGetRequest(url, listener, errorListener);
@@ -76,7 +76,8 @@ public final class NetworkApi {
         MyApp.getInstance().getRequestQueue().add(request);
     }
 
-    public static void getUserById(final Object cancelTag, final int userid, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+    public static void getUserById(final Object cancelTag, final int userid, final Response.Listener<JSONObject>
+            listener, final Response.ErrorListener errorListener) {
 
         final String url = Constants.API_BASE_URL + "/ih/getubid?i=" + userid;
         final Request request = new ApiGetRequest(url, listener, errorListener);
@@ -84,9 +85,12 @@ public final class NetworkApi {
         MyApp.getInstance().getRequestQueue().add(request);
     }
 
-    public static void getUserByEmailOrUsernamePassword(final Object cancelTag, final String email, final String pw, String ltuEmail, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+    public static void getUserByEmailOrUsernamePassword(final Object cancelTag, final String email, final String pw,
+                                                        String ltuEmail, final Response.Listener<JSONObject>
+                                                                listener, final Response.ErrorListener errorListener) {
 
-        String url = Constants.API_BASE_URL + "/ih/getu?em=" + email + "&pd=" + Base64.encodeWebSafe(pw.getBytes(), false);
+        String url = Constants.API_BASE_URL + "/ih/getu?em=" + email + "&pd=" + Base64.encodeWebSafe(pw.getBytes(),
+                false);
         if (ltuEmail != null)
             url = url + "&nem=" + ltuEmail;
         final Request request = new ApiGetRequest(url, listener, errorListener);
@@ -94,7 +98,8 @@ public final class NetworkApi {
         MyApp.getInstance().getRequestQueue().add(request);
     }
 
-    public static void isExistsEmail(final Object cancelTag, final String email, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+    public static void isExistsEmail(final Object cancelTag, final String email, final Response.Listener<JSONObject>
+            listener, final Response.ErrorListener errorListener) {
 
         final String url = Constants.API_BASE_URL + "/ih/exists?em=" + email;
         final Request request = new ApiGetRequest(url, listener, errorListener);
@@ -102,7 +107,8 @@ public final class NetworkApi {
         MyApp.getInstance().getRequestQueue().add(request);
     }
 
-    public static void isExistsUsername(final Object cancelTag, final String username, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+    public static void isExistsUsername(final Object cancelTag, final String username, final Response
+            .Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
 
         final String url = Constants.API_BASE_URL + "/ih/exists?un=" + username;
         final Request request = new ApiGetRequest(url, listener, errorListener);
@@ -110,7 +116,8 @@ public final class NetworkApi {
         MyApp.getInstance().getRequestQueue().add(request);
     }
 
-    public static void saveUser(final Object tag, final User user, final Response.Listener<String> responder, Response.ErrorListener errorListener) {
+    public static void saveUser(final Object tag, final User user, final Response.Listener<String> responder,
+                                Response.ErrorListener errorListener) {
 
         String appName = MyApp.getInstance().getString(R.string.app_name);
         if (TextUtils.isEmpty(user.getBio())) {
@@ -119,19 +126,23 @@ public final class NetworkApi {
 
         final HashMap<String, String> params = new HashMap<>(1);
         params.put("user", user.toJSON().toString());
-        final ApiPostRequest request = new ApiPostRequest(params, Constants.API_BASE_URL + "/ih/saveuser2", responder, errorListener);
+        final ApiPostRequest request = new ApiPostRequest(params, Constants.API_BASE_URL + "/ih/saveuser2",
+                responder, errorListener);
         MLog.d(TAG, "saving user.  json: ", params.get("user"));
         request.setTag(tag);
         MyApp.getInstance().getRequestQueue().add(request);
 
         if (user.getId() != 0)
-            FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(user.getId())).updateChildren(user.toMap(true));
+            FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(user.getId())).updateChildren(user
+                    .toMap(true));
     }
 
-    public static void forgotPassword(final Object tag, final String usernameOrEmail, final Response.Listener<String> responder, Response.ErrorListener errorListener) {
+    public static void forgotPassword(final Object tag, final String usernameOrEmail, final Response.Listener<String>
+            responder, Response.ErrorListener errorListener) {
         final HashMap<String, String> params = new HashMap<>(1);
         params.put("emun", usernameOrEmail);
-        final ApiPostRequest request = new ApiPostRequest(params, Constants.API_BASE_URL + "/ih/fgp", responder, errorListener);
+        final ApiPostRequest request = new ApiPostRequest(params, Constants.API_BASE_URL + "/ih/fgp", responder,
+                errorListener);
         request.setTag(tag);
         MyApp.getInstance().getRequestQueue().add(request);
     }
@@ -142,7 +153,8 @@ public final class NetworkApi {
             @Override
             public void run() {
                 try {
-                    Urlshortener.Builder builder = new Urlshortener.Builder(AndroidHttp.newCompatibleTransport(), AndroidJsonFactory.getDefaultInstance(), null);
+                    Urlshortener.Builder builder = new Urlshortener.Builder(AndroidHttp.newCompatibleTransport(),
+                            AndroidJsonFactory.getDefaultInstance(), null);
                     Urlshortener urlshortener = builder.build();
 
                     com.google.api.services.urlshortener.model.Url url = new Url();
@@ -191,7 +203,8 @@ public final class NetworkApi {
         }
 
         MLog.i(TAG, "Getting users who actually installed by looking at gcm records");
-        final JSONObject response = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/ih/whoinstalled").post("list", sb.toString()));
+        final JSONObject response = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/ih/whoinstalled").post
+                ("list", sb.toString()));
         if (response.getString(KEY_RESPONSE_STATUS).equals(RESPONSE_OK)) {
             final String installed = response.optString("descr");
             if (StringUtil.isNotEmpty(installed)) {
@@ -201,7 +214,8 @@ public final class NetworkApi {
                     PrivateChatSummary privateChatSummary = users.get(installedId);
                     if (privateChatSummary == null)
                         continue;
-                    if (System.currentTimeMillis() - privateChatSummary.getLastOnline() > PrivateChatSummary.TWELVE_HOURS) {
+                    if (System.currentTimeMillis() - privateChatSummary.getLastOnline() > PrivateChatSummary
+                            .TWELVE_HOURS) {
                         privateChatSummary.setOnlineStatus(PrivateChatSummary.USER_AWAY);
                         MLog.i(TAG, "getOnlineStatus() ", privateChatSummary.getName(), " is away");
                     } else {
@@ -237,7 +251,8 @@ public final class NetworkApi {
         params.put("iid", userid);
         params.put("deviceid", androidId);
         params.put("regid", regid);
-        final JSONObject response = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/ih/gcmunreg").post(params));
+        final JSONObject response = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/ih/gcmunreg").post
+                (params));
         if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
             MLog.i(TAG, "unregistered successfully at server ");
         } else {
@@ -255,11 +270,13 @@ public final class NetworkApi {
                     final HashMap<String, String> params = new HashMap<>();
                     params.put(Constants.KEY_TO_USERID, toid + ""); //DON'T CHANGE KEY, SERVER DEPENDENT
                     params.put(Constants.KEY_GCM_MESSAGE, msg.toString()); //DON'T CHANGE KEY, SERVER
-                    final JSONObject response = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/ih/gcmsend").post(params));
+                    final JSONObject response = new JSONObject(new HttpMessage(Constants.API_BASE_URL +
+                            "/ih/gcmsend").post(params));
                     if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                         MLog.i(TAG, "sent gcm message to server: " + response.optString("descr"));
                     } else {
-                        MLog.e(TAG, "gcmsend() failed. Error from server: ", response, " toid: ", toid, " msg: ", msg.toString());
+                        MLog.e(TAG, "gcmsend() failed. Error from server: ", response, " toid: ", toid, " msg: ", msg
+                                .toString());
                     }
                 } catch (Exception e) {
                     MLog.e(TAG, "NetworkApi.gcmsend() failed", e);

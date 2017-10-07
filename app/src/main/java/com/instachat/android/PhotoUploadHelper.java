@@ -250,7 +250,7 @@ public class PhotoUploadHelper {
                     try {
                         new CloudVisionApi(mCloudVisionApiListener).checkForAdultOrViolence(bitmap);
                     } catch (final Exception e) {
-                        MLog.e(TAG, "cloud vision api failed ", e);
+                        MLog.e(TAG, "cloud vision getApi failed ", e);
                     }
                 } catch (final Exception e) {
                     MLog.e(TAG, "reducePhotoSize() failed", e);

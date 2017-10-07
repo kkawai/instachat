@@ -66,7 +66,7 @@ import java.util.Map;
  * 2) Realtime database reference
  * 3) Every message you post gets sent to the person you are talking to
  * so if they are not in the chat room they will receive an notification
- * 4) we need to fetch the user that we are talking to from network api
+ * 4) we need to fetch the user that we are talking to from network getApi
  */
 public class PrivateChatActivity extends GroupChatActivity {
 

@@ -21,6 +21,7 @@ import java.util.Date;
  *         You have two options, either you can: 1) extend this ToString in your
  *         object and it will just inherit toString()
  */
+@Deprecated
 public abstract class DomainObject implements Serializable {
 
     /**
@@ -226,7 +227,8 @@ public abstract class DomainObject implements Serializable {
                                 .toString());
                         f.setAccessible(true);
 
-                        if (exceptionField != null && sb.toString().equals(exceptionField) || (sb.toString().equals("serialVersionUID"))) {
+                        if (exceptionField != null && sb.toString().equals(exceptionField) || (sb.toString().equals
+                                ("serialVersionUID"))) {
                             continue;
                         }
 

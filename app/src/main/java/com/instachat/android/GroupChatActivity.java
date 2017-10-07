@@ -50,7 +50,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.ath.fuel.FuelInjector;
 import com.brandongogetap.stickyheaders.StickyLayoutManager;
-import com.cocosw.bottomsheet.BottomSheet;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -79,7 +78,6 @@ import com.instachat.android.adapter.MessageViewHolder;
 import com.instachat.android.adapter.MessagesRecyclerAdapter;
 import com.instachat.android.adapter.UserClickedListener;
 import com.instachat.android.api.APIClient;
-import com.instachat.android.api.APIInterface;
 import com.instachat.android.api.NetworkApi;
 import com.instachat.android.api.RemoteSettingsResult;
 import com.instachat.android.api.UploadListener;
@@ -124,7 +122,7 @@ import retrofit2.Callback;
 
 public class GroupChatActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener,
         FriendlyMessageContainer, EasyPermissions.PermissionCallbacks, UploadListener, UserClickedListener,
-        ChatsItemClickedListener, FriendlyMessageListener {
+        ChatsItemClickedListener, FriendlyMessageListener, AttachPhotoOptionsDialogHelper.PhotoOptionsListener {
 
     public static final int RC_CAMERA_AND_AUDIO_PERMISSION = 5;
 
@@ -1273,53 +1271,26 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 public void run() {
                     if (isActivityDestroyed())
                         return;
-                    showBottomDialog();
+                    showPhotoOptionsDialog();
                 }
             }, 175);
         } else {
-            showBottomDialog();
+            showPhotoOptionsDialog();
         }
     }
 
-    private void showBottomDialog() {
+    private void showPhotoOptionsDialog() {
+        new AttachPhotoOptionsDialogHelper(this, this).showBottomDialog();
+    }
 
-        /*final BottomSheetMenuDialog dialog = new BottomSheetBuilder(this, R.style.AppTheme_BottomSheetDialog)
-                .setMode(BottomSheetBuilder.MODE_LIST)
-                .setMenu(R.menu.file_upload_options)
-                .setItemClickListener(new BottomSheetItemClickListener() {
-                    @Override
-                    public void onBottomSheetItemClick(final MenuItem item) {
-                        mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.chatRoomPhoto);
-                        mPhotoUploadHelper.setStorageRefString(mDatabaseRoot);
-                        if (item.getItemId() == R.id.menu_take_photo) {
-                            mPhotoUploadHelper.launchCamera(false);
-                        } else if (item.getItemId() == R.id.menu_choose_photo) {
-                            mPhotoUploadHelper.launchCamera(true);
-                        }
-                    }
-                })
-                .createDialog();
+    @Override
+    public void onTakePhoto() {
+        mPhotoUploadHelper.launchCamera(false);
+    }
 
-        dialog.show();*/
-        new BottomSheet.Builder(this).sheet(R.menu.file_upload_options).listener(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case R.id.menu_choose_photo:
-                        mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.chatRoomPhoto);
-                        mPhotoUploadHelper.setStorageRefString(mDatabaseRoot);
-                        mPhotoUploadHelper.launchCamera(true);
-                        break;
-                    case R.id.menu_take_photo:
-                        mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.chatRoomPhoto);
-                        mPhotoUploadHelper.setStorageRefString(mDatabaseRoot);
-                        mPhotoUploadHelper.launchCamera(false);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }).show();
+    @Override
+    public void onChoosePhoto() {
+        mPhotoUploadHelper.launchCamera(true);
     }
 
     @Override
@@ -1877,7 +1848,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private void doExperiments() {
 
         //User user = Preferences.getInstance().getUser();
-        Call settings = APIClient.getClient().create(APIInterface.class).getSettings();
+        Call settings = APIClient.getApi().getSettings();
         settings.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, retrofit2.Response response) {

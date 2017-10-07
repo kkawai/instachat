@@ -296,4 +296,7 @@ public final class Constants {
 
    public static final String CHANNEL_ID_NEW_MSGS = "com.instachat.android.directs";
    public static final String CHANNEL_ID_ACTIVITY = "com.instachat.android.activity";
+
+   public static final String SMAATO_PUBLISHER_ID = "1100036676";
+   public static final String SMAATO_BANNER_ADSPACE_ID = "130326310";
 }

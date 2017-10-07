@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import java.sql.Timestamp;
 import java.util.Date;
 
+@Deprecated
 public class Invite extends DomainObject {
 
     private static final long serialVersionUID = 2546919512298413613L;
