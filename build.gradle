@@ -3,11 +3,12 @@
 buildscript {
     repositories {
         // TODO(arthurthompson): mavenLocal() being used for preview but will be removed for release.
+        google()
         mavenLocal()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.0.0-beta6'
         classpath 'com.google.gms:google-services:3.1.0'
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -44,4 +45,5 @@ ext {
     timberVersion = '4.5.1'
     robolectricVersion = '3.3.2'
     powerMockVersion = '1.6.6'
+    daggerVersion = '2.11'
 }
