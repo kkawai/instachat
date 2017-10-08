@@ -135,7 +135,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
             }
         };
 
-        publicGroupChatsSummaryReference = FirebaseDatabase.getInstance().getReference(Constants.PUBLIC_CHATS_SUMMARY_PARENT_REF);
+        publicGroupChatsSummaryReference = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_ROOMS);
         publicGroupChatsSummaryListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {

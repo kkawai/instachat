@@ -712,8 +712,20 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         }
     }
 
+    private String lastMessage;
+
+    /**
+     * For debugging those hard bugs
+     *
+     * @return
+     */
+    public String peekLastMessage() {
+        return lastMessage;
+    }
+
     @Override
     protected void onAddItem(FriendlyMessage newFriendlyMessage) {
+        lastMessage = newFriendlyMessage.getText();
         if (mItemWasRemoved && getItemCount() > 0) {
             mItemWasRemoved = false;
             FriendlyMessage lastFriendlyMessage = getItem(getItemCount() - 1);
@@ -722,6 +734,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         } else {
             super.onAddItem(newFriendlyMessage);
         }
+
     }
 
     private boolean mItemWasRemoved;

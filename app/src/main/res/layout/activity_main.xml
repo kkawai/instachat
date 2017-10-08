@@ -49,21 +49,8 @@
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-            </android.support.design.widget.CoordinatorLayout>
-
-            <LinearLayout
-                android:id="@+id/linearLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:orientation="vertical"
-                android:paddingBottom="5dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp">
-
                 <LinearLayout
+                    android:layout_gravity="bottom"
                     android:id="@+id/dotsLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -96,23 +83,24 @@
 
                 </LinearLayout>
 
+            </android.support.design.widget.CoordinatorLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:orientation="vertical"
+                android:paddingBottom="5dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
-
-                    <!--
-                    <android.support.design.widget.FloatingActionButton
-                        android:enabled="false"
-                        android:id="@+id/attachButton"
-                        android:layout_width="@dimen/send_button_size"
-                        android:layout_height="@dimen/send_button_size"
-                        android:src="@drawable/ic_photo_camera_black_24dp"
-                        android:layout_gravity="bottom"
-                        android:background="@null"
-                        app:rippleColor="@color/colorPrimaryDark"
-                        app:useCompatPadding="true"
-                        />-->
 
                     <com.github.clans.fab.FloatingActionButton
                         android:id="@+id/attachButton"

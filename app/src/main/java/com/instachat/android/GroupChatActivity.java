@@ -712,6 +712,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         try {
             if (isActivityDestroyed())
                 return;
+            MLog.d(TAG,"C kevin scroll: "+(mMessagesAdapter.getItemCount() - 1) + " text: "+mMessagesAdapter.peekLastMessage());
             mMessageRecyclerView.scrollToPosition(mMessagesAdapter.getItemCount() - 1);
             updateLastActiveTimestamp();
         } catch (final Exception e) {
@@ -996,7 +997,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         View drawerRecyclerView = getLayoutInflater().inflate(R.layout.right_drawer_layout, navigationView, false);
         final View headerView = getLayoutInflater().inflate(R.layout.right_nav_header, navigationView, false);
 
-        mRightRef = FirebaseDatabase.getInstance().getReference(Constants.PUBLIC_CHATS_SUMMARY_PARENT_REF).child
+        mRightRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_ROOMS).child
                 (mGroupId + "");
         mRightListener = new ValueEventListener() {
             @Override
@@ -1129,7 +1130,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     @Override
     public void setCurrentFriendlyMessage(int position) {
-        mMessageRecyclerView.scrollToPosition(position + 1);
+        MLog.d(TAG,"A kevin scroll: "+(position + 1) + " text: "+mMessagesAdapter.peekLastMessage());
+        mMessageRecyclerView.scrollToPosition(mMessagesAdapter.getItemCount()-1);
     }
 
     @Override
@@ -1215,12 +1217,25 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
                 super.onItemRangeInserted(positionStart, itemCount);
                 int friendlyMessageCount = mMessagesAdapter.getItemCount();
-                int lastVisiblePosition = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
+                int lastVisiblePosition = mLinearLayoutManager.findLastVisibleItemPosition();
                 // If the recycler view is initially being loaded or the user is at the bottom of the list, scroll
                 // to the bottom of the list to show the newly added message.
-                if (lastVisiblePosition == -1 || positionStart >= (friendlyMessageCount - 1) && lastVisiblePosition
-                        == (positionStart - 1)) {
-                    mMessageRecyclerView.scrollToPosition(positionStart);
+
+/*
+                lastVisiblePosition: 64
+                positionStart: 64
+                friendlyMessageCount: 65
+
+                lastVisiblePosition: 63 text:
+                positionStart: 64
+                friendlyMessageCount: 65
+                 */
+
+                MLog.d(TAG,"scroll debug: lastVisiblePosition: "+lastVisiblePosition + " text: "+mMessagesAdapter.peekLastMessage()
+                +" positionStart: "+positionStart + " friendlyMessageCount: "+friendlyMessageCount);
+                if (lastVisiblePosition == -1 || ((lastVisiblePosition+4) >=  positionStart)) {
+                    MLog.d(TAG,"B kevin scroll: "+(positionStart) + " text: "+mMessagesAdapter.peekLastMessage());
+                    mMessageRecyclerView.scrollToPosition(mMessagesAdapter.getItemCount()-1);
                 }
                 notifyPagerAdapterDataSetChanged();
             }
@@ -1501,7 +1516,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
     protected void addUserPresenceToGroup() {
 
-        mGroupSummaryRef = FirebaseDatabase.getInstance().getReference(Constants.PUBLIC_CHATS_SUMMARY_PARENT_REF).
+        mGroupSummaryRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_ROOMS).
                 child(mGroupId + "");
         mGroupSummaryListener = mGroupSummaryRef.addValueEventListener(new ValueEventListener() {
             @Override

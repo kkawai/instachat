@@ -203,7 +203,7 @@ public final class Constants {
       return "/reports/" + userid;
    }
 
-   public static String PUBLIC_CHATS_SUMMARY_PARENT_REF = "/public_group_summaries/";
+   public static String GROUP_CHAT_ROOMS = "/public_group_summaries/";
 
    /**
     * use-case: list of users that liked the given message
