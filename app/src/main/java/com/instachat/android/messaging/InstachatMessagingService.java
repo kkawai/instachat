@@ -25,13 +25,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.instachat.android.Constants;
-import com.instachat.android.Events;
-import com.instachat.android.PrivateChatActivity;
+import com.instachat.android.app.analytics.Events;
+import com.instachat.android.app.activity.PrivateChatActivity;
 import com.instachat.android.R;
-import com.instachat.android.login.LauncherActivity;
-import com.instachat.android.model.FriendlyMessage;
-import com.instachat.android.model.PrivateChatSummary;
-import com.instachat.android.util.DefaultSubscriber;
+import com.instachat.android.app.login.LauncherActivity;
+import com.instachat.android.data.model.FriendlyMessage;
+import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.view.CircleTransform;
@@ -42,9 +41,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class InstachatMessagingService extends FirebaseMessagingService {
 
@@ -133,18 +133,18 @@ public class InstachatMessagingService extends FirebaseMessagingService {
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
-        DefaultSubscriber<Bitmap> defaultSubscriber = new DefaultSubscriber<Bitmap>(TAG) {
+        observable.subscribe(new Consumer<Bitmap>() {
             @Override
-            public void handleOnNext(Bitmap bitmap) {
+            public void accept(Bitmap bitmap) throws Exception {
                 showNotification(friendlyMessage, bitmap);
             }
-
+        }, new Consumer<Throwable>() {
             @Override
-            public void handleOnError(Throwable error) {
+            public void accept(Throwable throwable) throws Exception {
                 showNotification(friendlyMessage, null);
             }
-        };
-        observable.subscribe(defaultSubscriber);
+        });
+
     }
 
     private void showNotification(FriendlyMessage friendlyMessage, Bitmap bitmap) {

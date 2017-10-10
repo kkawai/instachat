@@ -16,10 +16,11 @@ Document differences between activity_main.xml here:
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        tools:context="com.instachat.android.GroupChatActivity">
+        tools:context="com.instachat.android.app.activity.GroupChatActivity">
 
         <!-- android:paddingBottom="@dimen/activity_vertical_margin" -->
         <RelativeLayout
+            android:id="@+id/relativeLayout"
             xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
@@ -153,14 +154,14 @@ Document differences between activity_main.xml here:
                         fab:fab_colorRipple="@color/colorPrimaryDark"/>
 
                     <LinearLayout
-                        android:orientation="horizontal"
                         android:id="@+id/messageEditTextParent"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
-                        android:layout_weight="1"/>
+                        android:layout_weight="1"
+                        android:orientation="horizontal"/>
 
                     <!-- at.markushi.ui.CircleButton
                     <at.markushi.ui.CircleButton

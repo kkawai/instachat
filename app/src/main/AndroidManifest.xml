@@ -67,7 +67,7 @@
             android:value="AIzaSyAHnphNjr0gqXkxps262WCzNmyG_P6OE24"/>
 
         <activity
-            android:name=".GroupChatActivity"
+            android:name=".app.activity.GroupChatActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
@@ -88,7 +88,7 @@
         </activity>
 
         <activity
-            android:name=".PrivateChatActivity"
+            android:name=".app.activity.PrivateChatActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Launcher">
         </activity>
@@ -98,7 +98,7 @@
         </activity>
 
         <activity
-            android:name=".login.LauncherActivity"
+            android:name=".app.login.LauncherActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Launcher">
             <intent-filter>
@@ -109,19 +109,19 @@
         </activity>
 
         <activity
-            android:name=".login.SignInActivity"
+            android:name=".app.login.SignInActivity"
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".login.SignUpActivity"
+            android:name=".app.login.SignUpActivity"
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".login.ClaimRoomActivity"
+            android:name=".app.login.ClaimRoomActivity"
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".login.ForgotPasswordActivity"
+            android:name=".app.login.ForgotPasswordActivity"
             android:screenOrientation="portrait"/>
 
         <service
@@ -133,16 +133,12 @@
         </service>
 
         <service
-            android:name=".MyFirebaseInstanceIdService"
+            android:name=".app.MyFirebaseInstanceIdService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </service>
-
-        <service
-            android:name=".download.MyDownloadService"
-            android:exported="false"/>
 
         <!--
         Android N SDK has new restrictions around sharing file:// URIs

@@ -7,7 +7,7 @@ import android.preference.PreferenceManager;
 
 import com.instachat.android.Constants;
 import com.instachat.android.MyApp;
-import com.instachat.android.model.User;
+import com.instachat.android.data.model.User;
 
 import org.json.JSONException;
 import org.json.JSONObject;

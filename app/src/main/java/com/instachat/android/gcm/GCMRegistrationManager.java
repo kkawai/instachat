@@ -8,7 +8,7 @@ import android.preference.PreferenceManager;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.instachat.android.Constants;
-import com.instachat.android.api.NetworkApi;
+import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.SimpleRxWrapper;
 

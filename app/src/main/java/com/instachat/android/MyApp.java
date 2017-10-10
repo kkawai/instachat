@@ -9,14 +9,11 @@ import com.ath.fuel.FuelInjector;
 import com.ath.fuel.FuelModule;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.instachat.android.adapter.MessagesRecyclerAdapterHelper;
+import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
 import com.instachat.android.util.BitmapLruCache;
 import com.instachat.android.util.HttpMessage;
 import com.instachat.android.util.MLog;
 
-/**
- * Created by kevin on 7/23/2016.
- */
 public class MyApp extends MultiDexApplication {
 
     private static final String TAG = "MyApp";

@@ -7,7 +7,7 @@ import com.amazon.device.messaging.ADMMessageHandlerBase;
 import com.amazon.device.messaging.ADMMessageReceiver;
 import com.instachat.android.Constants;
 import com.instachat.android.MyApp;
-import com.instachat.android.api.NetworkApi;
+import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 

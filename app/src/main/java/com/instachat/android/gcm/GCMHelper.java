@@ -8,15 +8,15 @@ import com.amazon.device.messaging.development.ADMManifest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.iid.InstanceID;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.instachat.android.Constants;
-import com.instachat.android.Events;
 import com.instachat.android.MyApp;
-import com.instachat.android.api.NetworkApi;
-import com.instachat.android.util.AnalyticsHelper;
+import com.instachat.android.app.analytics.Events;
+import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
-import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.SimpleRxWrapper;
+import com.instachat.android.util.StringUtil;
 
 /**
  * Invoke registerIfNecessary() method AFTER user authenticates with IG
@@ -112,7 +112,7 @@ public final class GCMHelper {
                 GoogleApiAvailability.getInstance().getErrorDialog(activity, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
             } else {
                 MLog.i(TAG, "This device does not have google play services support, so cannot do gcm.  Too bad.");
-                AnalyticsHelper.logEvent(Events.NO_GOOGLE_PLAY_SERVICES);
+                FirebaseAnalytics.getInstance(activity).logEvent(Events.NO_GOOGLE_PLAY_SERVICES,null);
             }
             return false;
         }

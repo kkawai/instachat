@@ -14,6 +14,7 @@ buildscript {
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
+
 }
 
 allprojects {
@@ -39,11 +40,17 @@ ext {
     googlePlayServicesVersion = '11.2.2'
     firebaseVersion = '11.2.2'
     dexMakerVersion = '1.2'
-    daggerVersion = '2.11'
+    dagger2Version = '2.11'
+    retrofitVersion = '2.2.0'
+    rxjavaVersion = '2.1.3'
+    rxandroidVersion = '2.0.1'
+    okhttpVersion = '3.7.0'
+    glideVersion = '3.7.0'
+    butterknifeVersion = '8.4.0'
+    gsonVersion = '2.8.0'
     espressoVersion = '2.2.2'
     leakCanaryVersion = '1.5.1'
     timberVersion = '4.5.1'
     robolectricVersion = '3.3.2'
     powerMockVersion = '1.6.6'
-    daggerVersion = '2.11'
 }

@@ -2,9 +2,6 @@ package com.instachat.android;
 
 import com.instachat.android.util.Preferences;
 
-/**
- * @author kkawai
- */
 public final class Constants {
 
    private Constants() {
@@ -297,6 +294,6 @@ public final class Constants {
    public static final String CHANNEL_ID_NEW_MSGS = "com.instachat.android.directs";
    public static final String CHANNEL_ID_ACTIVITY = "com.instachat.android.activity";
 
-   public static final String SMAATO_PUBLISHER_ID = "1100036676";
-   public static final String SMAATO_BANNER_ADSPACE_ID = "130326310";
+   public static final Long SMAATO_PUBLISHER_ID = 1100036676L;
+   public static final Long SMAATO_BANNER_ADSPACE_ID = 130326310L;
 }

@@ -12,7 +12,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
-import com.instachat.android.api.ApiGetBytesRequest;
+import com.instachat.android.data.api.ApiGetBytesRequest;
 
 import java.util.HashMap;
 import java.util.LinkedList;

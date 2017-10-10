@@ -50,4 +50,6 @@
     <integer name="max_password_length">20</integer>
     <integer name="max_email_length">128</integer>
 
+    <!-- 320 x 50 banner ad -->
+    <dimen name="standard_banner_ad_height">50dp</dimen>
 </resources>
