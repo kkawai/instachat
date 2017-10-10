@@ -10,21 +10,22 @@ public class SimpleRxWrapper {
 
     public static void executeInWorkerThread(final Runnable task) {
 
-        Observable.fromCallable(new Callable<Void>() {
+        Observable.fromCallable(new Callable<Integer>() {
             @Override
-            public Void call() throws Exception {
+            public Integer call() throws Exception {
                 task.run();
-                return null;
+                return 0;
             }
         }).subscribeOn(Schedulers.io()).subscribe();
+
     }
 
     public static void executeInUiThread(final Runnable task) {
-        Observable.fromCallable(new Callable<Void>() {
+        Observable.fromCallable(new Callable<Integer>() {
             @Override
-            public Void call() throws Exception {
+            public Integer call() throws Exception {
                 task.run();
-                return null;
+                return 0;
             }
         }).subscribeOn(AndroidSchedulers.mainThread()).subscribe();
     }

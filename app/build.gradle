@@ -47,6 +47,10 @@ android {
         // but continue the build even when errors are found:
         abortOnError false
     }
+
+    packagingOptions {
+        exclude 'META-INF/rxjava.properties'
+    }
 }
 
 dependencies {
@@ -60,8 +64,8 @@ dependencies {
     compile "com.android.support:recyclerview-v7:$rootProject.ext.supportLibraryVersion"
     compile "com.android.support:design:$rootProject.ext.supportLibraryVersion"
 
-    compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile 'de.hdodenhof:circleimageview:2.1.0'
+    compile "com.github.bumptech.glide:glide:$rootProject.ext.glideVersion"
+    compile "de.hdodenhof:circleimageview:$rootProject.ext.circleImageViewVersion"
 
     // Google
     compile "com.google.android.gms:play-services-auth:$rootProject.ext.googlePlayServicesVersion"

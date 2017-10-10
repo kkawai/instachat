@@ -41,7 +41,7 @@ ext {
     firebaseVersion = '11.2.2'
     dexMakerVersion = '1.2'
     dagger2Version = '2.11'
-    retrofitVersion = '2.2.0'
+    retrofitVersion = '2.3.0'
     rxjavaVersion = '2.1.3'
     rxandroidVersion = '2.0.1'
     okhttpVersion = '3.7.0'
@@ -53,4 +53,5 @@ ext {
     timberVersion = '4.5.1'
     robolectricVersion = '3.3.2'
     powerMockVersion = '1.6.6'
+    circleImageViewVersion = '2.1.0'
 }

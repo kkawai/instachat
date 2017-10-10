@@ -18,7 +18,7 @@ public class AdHelper {
         bannerView = new BannerView(activity.getApplication());
         relativeLayout = activity.findViewById(R.id.relativeLayout);
         relativeLayout.addView(bannerView, new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dpToPx(50) ));
-        bannerView.addAdListener((AdListenerInterface)this);
+        bannerView.addAdListener((AdListenerInterface)activity);
         bannerView.getAdSettings().setAdDimension(AdDimension.DEFAULT);
     }
 

@@ -160,3 +160,6 @@
 -dontwarn com.instachat.android.app.activity.PrivateChatActivity
 
 -dontwarn
+
+-dontwarn okio.**
+-dontwarn javax.annotation.**
