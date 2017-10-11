@@ -3,6 +3,7 @@ package com.instachat.android.app.activity;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -51,6 +52,7 @@ import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.data.model.User;
+import com.instachat.android.databinding.ActivityPrivateChatBinding;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ScreenUtil;
@@ -85,10 +87,22 @@ public class PrivateChatActivity extends GroupChatActivity {
     private static String sUsername, sProfilePicUrl;
     private View mLikesParent;
     private TextView mLikesCount;
+    private ActivityPrivateChatBinding binding;
 
     @Override
     protected int getLayout() {
         return R.layout.activity_private_chat;
+    }
+
+    @Override
+    protected void doDataBinding() {
+        binding = DataBindingUtil.setContentView(this, getLayout());
+        binding.setVisibleAd(true);
+    }
+
+    @Override
+    protected void setVisibleAd(boolean visibleAd) {
+        binding.setVisibleAd(visibleAd);
     }
 
     @Override
@@ -99,6 +113,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         onNewIntent(getIntent());
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
         mConfig = FirebaseRemoteConfig.getInstance();
+        hideSmallProgressCircle(); //don't show small progress at all for private chat
     }
 
     @Override

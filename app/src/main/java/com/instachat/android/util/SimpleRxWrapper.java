@@ -10,22 +10,22 @@ public class SimpleRxWrapper {
 
     public static void executeInWorkerThread(final Runnable task) {
 
-        Observable.fromCallable(new Callable<Integer>() {
+        Observable.fromCallable(new Callable<Boolean>() {
             @Override
-            public Integer call() throws Exception {
+            public Boolean call() throws Exception {
                 task.run();
-                return 0;
+                return true;
             }
         }).subscribeOn(Schedulers.io()).subscribe();
 
     }
 
     public static void executeInUiThread(final Runnable task) {
-        Observable.fromCallable(new Callable<Integer>() {
+        Observable.fromCallable(new Callable<Boolean>() {
             @Override
-            public Integer call() throws Exception {
+            public Boolean call() throws Exception {
                 task.run();
-                return 0;
+                return true;
             }
         }).subscribeOn(AndroidSchedulers.mainThread()).subscribe();
     }

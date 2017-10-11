@@ -4,6 +4,16 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:fab="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="visibleAd"
+            type="boolean"/>
+
+    </data>
+
 
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"
@@ -46,7 +56,6 @@
                     android:id="@+id/messageRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingTop="@dimen/standard_banner_ad_height"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
@@ -98,6 +107,14 @@
                 android:paddingBottom="5dp"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/ad_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:visibility="@{visibleAd ? View.VISIBLE : View.GONE}"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"

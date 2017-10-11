@@ -11,6 +11,16 @@ Document differences between activity_main.xml here:
         xmlns:fab="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="visibleAd"
+            type="boolean"/>
+
+    </data>
+
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
@@ -77,6 +87,13 @@ Document differences between activity_main.xml here:
                 android:paddingBottom="5dp"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/ad_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"/>
 
                 <LinearLayout
                     android:id="@+id/dotsLayout"

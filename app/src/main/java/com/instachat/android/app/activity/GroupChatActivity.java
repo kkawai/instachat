@@ -42,7 +42,6 @@ import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,10 +66,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.app.BaseActivity;
+import com.instachat.android.app.MessageOptionsDialogHelper;
 import com.instachat.android.app.adapter.AdapterPopulateHolderListener;
 import com.instachat.android.app.adapter.ChatSummariesRecyclerAdapter;
 import com.instachat.android.app.adapter.ChatsItemClickedListener;
@@ -81,28 +80,26 @@ import com.instachat.android.app.adapter.MessageViewHolder;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapter;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.app.analytics.Events;
-import com.instachat.android.data.api.APIClient;
-import com.instachat.android.data.api.NetworkApi;
-import com.instachat.android.data.api.RemoteSettingsResult;
-import com.instachat.android.data.api.UploadListener;
 import com.instachat.android.app.blocks.BlockedUserListener;
 import com.instachat.android.app.blocks.BlocksFragment;
-import com.instachat.android.font.FontUtil;
 import com.instachat.android.app.fullscreen.FriendlyMessageContainer;
 import com.instachat.android.app.fullscreen.FullScreenTextFragment;
-import com.instachat.android.gcm.GCMHelper;
 import com.instachat.android.app.likes.UserLikedUserFragment;
 import com.instachat.android.app.likes.UserLikedUserListener;
 import com.instachat.android.app.login.LogoutDialogHelper;
 import com.instachat.android.app.login.SignInActivity;
-import com.instachat.android.messaging.InstachatMessagingService;
-import com.instachat.android.messaging.NotificationHelper;
+import com.instachat.android.app.requests.RequestsFragment;
+import com.instachat.android.data.api.NetworkApi;
+import com.instachat.android.data.api.UploadListener;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.data.model.User;
-import com.instachat.android.app.MessageOptionsDialogHelper;
-import com.instachat.android.app.requests.RequestsFragment;
+import com.instachat.android.databinding.ActivityMainBinding;
+import com.instachat.android.font.FontUtil;
+import com.instachat.android.gcm.GCMHelper;
+import com.instachat.android.messaging.InstachatMessagingService;
+import com.instachat.android.messaging.NotificationHelper;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
@@ -121,11 +118,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 import pub.devrel.easypermissions.EasyPermissions;
-import retrofit2.Call;
-import retrofit2.Callback;
 
 //import com.google.android.gms.ads.AdView;
 
@@ -145,7 +145,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
     private MessagesRecyclerAdapter<FriendlyMessage, MessageViewHolder> mMessagesAdapter;
-    private ProgressBar mProgressBar;
     private FirebaseAuth mFirebaseAuth;
     //private FirebaseUser mFirebaseUser;
     private EditText mMessageEditText;
@@ -171,9 +170,20 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     private String mShareText;
     private long mGroupId = 0L;
     private boolean mIsPendingRequestsAvailable;
+    private ActivityMainBinding binding;
+    private AdHelper adHelper;
 
     protected int getLayout() {
         return R.layout.activity_main;
+    }
+
+    protected void doDataBinding() {
+        binding = DataBindingUtil.setContentView(this, getLayout());
+        setVisibleAd(true);
+    }
+
+    protected void setVisibleAd(boolean visibleAd) {
+        binding.setVisibleAd(visibleAd);
     }
 
     @Override
@@ -194,10 +204,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             return;
         }
 
-        doExperiments();
-
         initDatabaseRef();
-        DataBindingUtil.setContentView(this, getLayout());
+        doDataBinding();
         initPhotoHelper(savedInstanceState);
         setupDrawers();
         setupToolbar();
@@ -209,7 +217,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
 
         GCMHelper.onCreate(this);
 
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mMessageRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setStackFromEnd(true);
@@ -231,13 +238,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
         mMessageRecyclerView.setAdapter(mMessagesAdapter);
 
-        // Initialize and request AdMob ad.
-        /*
-        mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
-        */
-        new AdHelper(this).loadAd();
+        adHelper = new AdHelper(this,R.id.ad_container);
+        adHelper.loadAd();
 
         mUsernameTyping = ((TextView) findViewById(R.id.usernameTyping));
         LinearLayout messageEditTextParent = (LinearLayout) findViewById(R.id.messageEditTextParent);
@@ -308,8 +310,8 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         notificationManager.cancel(InstachatMessagingService.NOTIFICATION_ID_PENDING_REQUESTS);
         notificationManager.cancel(InstachatMessagingService.NOTIFICATION_ID_FRIEND_JUMPED_IN);
         checkForNoData();
-        //requestVideoRelatedPermissions();
-        //showJoinSecretRoom();
+        hideSmallProgressAfter();
+
     }
 
     private DatabaseReference mGroupSummaryRef;
@@ -595,33 +597,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
             mProgressDialog.dismiss();
         }
     }
-
-    /*private void initDownloadReceiver() {
-        mDownloadReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.d(TAG, "downloadReceiver:onReceive:" + intent);
-                hideProgressDialog();
-
-                if (MyDownloadService.ACTION_COMPLETED.equals(intent.getAction())) {
-                    String path = intent.getStringExtra(MyDownloadService.EXTRA_DOWNLOAD_PATH);
-                    long numBytes = intent.getLongExtra(MyDownloadService.EXTRA_BYTES_DOWNLOADED, 0);
-
-                    // Alert success
-                    showMessageDialog(getString(R.string.success), String.format(Locale.getDefault(),
-                            "%d bytes downloaded from %s", numBytes, path));
-                }
-
-                if (MyDownloadService.ACTION_ERROR.equals(intent.getAction())) {
-                    String path = intent.getStringExtra(MyDownloadService.EXTRA_DOWNLOAD_PATH);
-
-                    // Alert failure
-                    showMessageDialog("Error", String.format(Locale.getDefault(),
-                            "Failed to download from %s", path));
-                }
-            }
-        };
-    }*/
 
     private int mAttachPhotoMessageType;
 
@@ -1209,8 +1184,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         mMessagesAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {
             @Override
             public void onViewHolderPopulated() {
-                if (mProgressBar.isShown())
-                    mProgressBar.setVisibility(ProgressBar.GONE);
+                //todo
             }
         });
         mMessagesAdapter.setMessageTextClickedListener(new MessageTextClickedListener() {
@@ -1229,19 +1203,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 super.onItemRangeInserted(positionStart, itemCount);
                 int friendlyMessageCount = mMessagesAdapter.getItemCount();
                 int lastVisiblePosition = mLinearLayoutManager.findLastVisibleItemPosition();
-                // If the recycler view is initially being loaded or the user is at the bottom of the list, scroll
-                // to the bottom of the list to show the newly added message.
-
-/*
-                lastVisiblePosition: 64
-                positionStart: 64
-                friendlyMessageCount: 65
-
-                lastVisiblePosition: 63 text:
-                positionStart: 64
-                friendlyMessageCount: 65
-                 */
-
                 MLog.d(TAG,"scroll debug: lastVisiblePosition: "+lastVisiblePosition + " text: "+mMessagesAdapter.peekLastMessage()
                 +" positionStart: "+positionStart + " friendlyMessageCount: "+friendlyMessageCount);
                 if (lastVisiblePosition == -1 || ((lastVisiblePosition+4) >=  positionStart)) {
@@ -1257,18 +1218,6 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
                 notifyPagerAdapterDataSetChanged();
             }
         });
-        //don't show initial indeterminate progress more than 5 seconds
-        //no matter how long it takes to pull messages from firebase
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isActivityDestroyed())
-                    return;
-                if (mProgressBar.getVisibility() == View.VISIBLE) {
-                    mProgressBar.setVisibility(View.GONE);
-                }
-            }
-        }, 0);//mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS)
     }
 
     Integer myUserid() {
@@ -1620,35 +1569,7 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
     }
 
     private void initRemoteConfig() {
-        // Initialize Firebase Remote Config.
-        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-
-        // Define Firebase Remote Config Settings.
-        FirebaseRemoteConfigSettings firebaseRemoteConfigSettings = new FirebaseRemoteConfigSettings.Builder()
-                .setDeveloperModeEnabled(false).build();
-
-        // Define default config values. Defaults are used when fetched config values are not
-        // available. Eg: if an error occurred fetching values from the server.
-        Map<String, Object> defaultConfigMap = new HashMap<>();
-        defaultConfigMap.put(Constants.KEY_MAX_MESSAGE_HISTORY, Constants.DEFAULT_MAX_MESSAGE_HISTORY);
-        defaultConfigMap.put(Constants.KEY_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS, Constants
-                .DEFAULT_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS);
-        defaultConfigMap.put(Constants.KEY_MAX_TYPING_DOTS_DISPLAY_TIME, Constants
-                .DEFAULT_MAX_TYPING_DOTS_DISPLAY_TIME);
-        defaultConfigMap.put(Constants.KEY_COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY, Constants
-                .DEFAULT_COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY);
-        defaultConfigMap.put(Constants.KEY_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME, Constants
-                .DEFAULT_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME);
-        defaultConfigMap.put(Constants.KEY_MAX_MESSAGE_LENGTH, Constants.DEFAULT_MAX_MESSAGE_LENGTH);
-        defaultConfigMap.put(Constants.KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM, Constants
-                .DEFAULT_MAX_PERISCOPABLE_LIKES_PER_ITEM);
-        defaultConfigMap.put(Constants.KEY_ALLOW_DELETE_OTHER_MESSAGES, Constants.DEFAULT_ALLOW_DELETE_OTHER_MESSAGES);
-        defaultConfigMap.put(Constants.KEY_DO_SHORTEN_IMAGE_URLS, Constants.DEFAULT_DO_SHORTEN_IMAGE_URLS);
-        defaultConfigMap.put(Constants.KEY_DO_SHOW_SIGNOUT_BUTTON, Constants.DEFAULT_DO_SHOW_SIGNOUT_BUTTON);
-
-        // Apply config settings and default values.
-        mFirebaseRemoteConfig.setConfigSettings(firebaseRemoteConfigSettings);
-        mFirebaseRemoteConfig.setDefaults(defaultConfigMap);
+        mFirebaseRemoteConfig = new RemoteConfigHelper().initializeRemoteConfig();
     }
 
     private UserLikedUserListener mUserLikedUserListener = new UserLikedUserListener() {
@@ -1871,32 +1792,35 @@ public class GroupChatActivity extends BaseActivity implements GoogleApiClient.O
         snackbar.show();*/
     }
 
-    private void doExperiments() {
-
-        //User user = Preferences.getInstance().getUser();
-        Call settings = APIClient.getApi().getSettings();
-        settings.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, retrofit2.Response response) {
-
-                RemoteSettingsResult remoteSettingsResult = (RemoteSettingsResult) response.body();
-                MLog.i(TAG, "myexperiment response: " + remoteSettingsResult.status
-                        + " data.a: " + remoteSettingsResult.data.a
-                        + " data.s: " + remoteSettingsResult.data.s);
-            }
-
-            @Override
-            public void onFailure(Call call, Throwable t) {
-                MLog.i(TAG, "myexperiment retrofit failed: ", t);
-            }
-        });
-
-    }
-
     @Override
     public void onReceiveAd(AdDownloaderInterface adDownloaderInterface, ReceivedBannerInterface receivedBanner) throws AdReceiveFailed {
         if(receivedBanner.getErrorCode() != ErrorCode.NO_ERROR){
-            Toast.makeText(getBaseContext(), receivedBanner.getErrorMessage(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(), receivedBanner.getErrorMessage(), Toast.LENGTH_SHORT).show();
+            setVisibleAd(false);
+            adHelper.loadAd();
+        } else {
+            setVisibleAd(true);
         }
+    }
+
+    private void hideSmallProgressAfter() {
+        addDisposable(Observable.interval(0, 1000, TimeUnit.MILLISECONDS)
+                .take(5)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doFinally(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        hideSmallProgressCircle();
+                    }
+                })
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long value) throws Exception {
+                        if (mMessagesAdapter.getItemCount() > 0) {
+                            hideSmallProgressCircle();
+                        }
+                    }
+                }));
+
     }
 }
