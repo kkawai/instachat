@@ -1,4 +1,4 @@
-package com.instachat.android.app.activity;
+package com.instachat.android.app.activity.pm;
 
 import android.app.Activity;
 import android.app.NotificationManager;
@@ -43,6 +43,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
+import com.instachat.android.app.activity.group.GroupChatActivity;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.app.blocks.BlockUserDialogHelper;
@@ -351,7 +352,7 @@ public class PrivateChatActivity extends GroupChatActivity {
     }
 
     @Override
-    void initDatabaseRef() {
+    protected void initDatabaseRef() {
         setDatabaseRoot(Constants.PRIVATE_CHAT_REF(getIntent().getIntExtra(Constants.KEY_USERID, 0)));
     }
 

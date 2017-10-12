@@ -152,12 +152,12 @@
 
 -keep class android.support.** { *; }
 
--keep class com.instachat.android.app.activity.GroupChatActivity
+-keep class com.instachat.android.app.activity.group.GroupChatActivity
 -keepclassmembers class com.initech.PrivateChatActivity {
     <methods>;
 }
--dontwarn com.instachat.android.app.activity.GroupChatActivity
--dontwarn com.instachat.android.app.activity.PrivateChatActivity
+-dontwarn com.instachat.android.app.activity.group.GroupChatActivity
+-dontwarn com.instachat.android.app.activity.pm.PrivateChatActivity
 
 -dontwarn
 

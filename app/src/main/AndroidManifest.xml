@@ -55,7 +55,7 @@
 
 
     <application
-        android:name=".MyApp"
+        android:name=".TheApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -67,7 +67,7 @@
             android:value="AIzaSyAHnphNjr0gqXkxps262WCzNmyG_P6OE24"/>
 
         <activity
-            android:name=".app.activity.GroupChatActivity"
+            android:name=".app.activity.group.GroupChatActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
@@ -88,7 +88,7 @@
         </activity>
 
         <activity
-            android:name=".app.activity.PrivateChatActivity"
+            android:name=".app.activity.pm.PrivateChatActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Launcher">
         </activity>

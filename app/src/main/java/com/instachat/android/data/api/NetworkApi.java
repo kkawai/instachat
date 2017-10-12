@@ -14,7 +14,7 @@ import com.google.api.services.urlshortener.Urlshortener;
 import com.google.api.services.urlshortener.model.Url;
 import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.Constants;
-import com.instachat.android.MyApp;
+import com.instachat.android.TheApp;
 import com.instachat.android.R;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.data.model.User;
@@ -73,7 +73,7 @@ public final class NetworkApi {
         final String url = Constants.API_BASE_URL + "/ih/getubyem?em=" + Base64.encodeWebSafe(email.getBytes(), false);
         final Request request = new ApiGetRequest(url, listener, errorListener);
         request.setShouldCache(false).setRetryPolicy(DEFAULT_RETRY_POLICY).setTag(cancelTag);
-        MyApp.getInstance().getRequestQueue().add(request);
+        TheApp.getInstance().getRequestQueue().add(request);
     }
 
     public static void getUserById(final Object cancelTag, final int userid, final Response.Listener<JSONObject>
@@ -82,7 +82,7 @@ public final class NetworkApi {
         final String url = Constants.API_BASE_URL + "/ih/getubid?i=" + userid;
         final Request request = new ApiGetRequest(url, listener, errorListener);
         request.setShouldCache(false).setRetryPolicy(DEFAULT_RETRY_POLICY).setTag(cancelTag);
-        MyApp.getInstance().getRequestQueue().add(request);
+        TheApp.getInstance().getRequestQueue().add(request);
     }
 
     public static void getUserByEmailOrUsernamePassword(final Object cancelTag, final String email, final String pw,
@@ -95,7 +95,7 @@ public final class NetworkApi {
             url = url + "&nem=" + ltuEmail;
         final Request request = new ApiGetRequest(url, listener, errorListener);
         request.setShouldCache(false).setRetryPolicy(DEFAULT_RETRY_POLICY).setTag(cancelTag);
-        MyApp.getInstance().getRequestQueue().add(request);
+        TheApp.getInstance().getRequestQueue().add(request);
     }
 
     public static void isExistsEmail(final Object cancelTag, final String email, final Response.Listener<JSONObject>
@@ -104,7 +104,7 @@ public final class NetworkApi {
         final String url = Constants.API_BASE_URL + "/ih/exists?em=" + email;
         final Request request = new ApiGetRequest(url, listener, errorListener);
         request.setShouldCache(false).setRetryPolicy(DEFAULT_RETRY_POLICY).setTag(cancelTag);
-        MyApp.getInstance().getRequestQueue().add(request);
+        TheApp.getInstance().getRequestQueue().add(request);
     }
 
     public static void isExistsUsername(final Object cancelTag, final String username, final Response
@@ -113,15 +113,15 @@ public final class NetworkApi {
         final String url = Constants.API_BASE_URL + "/ih/exists?un=" + username;
         final Request request = new ApiGetRequest(url, listener, errorListener);
         request.setShouldCache(false).setRetryPolicy(DEFAULT_RETRY_POLICY).setTag(cancelTag);
-        MyApp.getInstance().getRequestQueue().add(request);
+        TheApp.getInstance().getRequestQueue().add(request);
     }
 
     public static void saveUser(final Object tag, final User user, final Response.Listener<String> responder,
                                 Response.ErrorListener errorListener) {
 
-        String appName = MyApp.getInstance().getString(R.string.app_name);
+        String appName = TheApp.getInstance().getString(R.string.app_name);
         if (TextUtils.isEmpty(user.getBio())) {
-            user.setBio(MyApp.getInstance().getString(R.string.default_bio, appName));
+            user.setBio(TheApp.getInstance().getString(R.string.default_bio, appName));
         }
 
         final HashMap<String, String> params = new HashMap<>(1);
@@ -130,7 +130,7 @@ public final class NetworkApi {
                 responder, errorListener);
         MLog.d(TAG, "saving user.  json: ", params.get("user"));
         request.setTag(tag);
-        MyApp.getInstance().getRequestQueue().add(request);
+        TheApp.getInstance().getRequestQueue().add(request);
 
         if (user.getId() != 0)
             FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(user.getId())).updateChildren(user
@@ -144,7 +144,7 @@ public final class NetworkApi {
         final ApiPostRequest request = new ApiPostRequest(params, Constants.API_BASE_URL + "/ih/fgp", responder,
                 errorListener);
         request.setTag(tag);
-        MyApp.getInstance().getRequestQueue().add(request);
+        TheApp.getInstance().getRequestQueue().add(request);
     }
 
     public static void saveThirdPartyPhoto(final String thirdPartyProfilePicUrl) {

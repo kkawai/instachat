@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.provider.BaseColumns;
 import android.util.Log;
 
-import com.instachat.android.MyApp;
+import com.instachat.android.TheApp;
 import com.instachat.android.data.model.Rss;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.StringUtil;
@@ -36,7 +36,7 @@ public final class RssDb {
 
     public synchronized static RssDb getInstance() {
         if (instance == null)
-            instance = new RssDb(MyApp.getInstance());
+            instance = new RssDb(TheApp.getInstance());
         return instance;
     }
 

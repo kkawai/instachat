@@ -4,7 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.instachat.android.Constants;
-import com.instachat.android.MyApp;
+import com.instachat.android.TheApp;
 import com.instachat.android.view.IhProgressiveProgressDialog;
 
 import java.io.BufferedInputStream;
@@ -241,9 +241,9 @@ public final class LocalFileUtils {
         final boolean isPhoto = key.startsWith("t_") || key.startsWith("p_");
         File permPath = null;
         if (isPhoto) {
-            permPath = new File(CacheUtils.getPermanentPhotoDir(MyApp.getInstance()).getPath());
+            permPath = new File(CacheUtils.getPermanentPhotoDir(TheApp.getInstance()).getPath());
         } else {
-            permPath = new File(CacheUtils.getPermanentExternalDir(MyApp.getInstance()).getPath() + "/v");
+            permPath = new File(CacheUtils.getPermanentExternalDir(TheApp.getInstance()).getPath() + "/v");
         }
 
         permPath.mkdirs();
@@ -264,9 +264,9 @@ public final class LocalFileUtils {
         final boolean isPhoto = key.startsWith("t_") || key.startsWith("p_");
         File permPath = null;
         if (isPhoto) {
-            permPath = new File(CacheUtils.getPermanentPhotoDir(MyApp.getInstance()).getPath());
+            permPath = new File(CacheUtils.getPermanentPhotoDir(TheApp.getInstance()).getPath());
         } else {
-            permPath = new File(CacheUtils.getPermanentExternalDir(MyApp.getInstance()).getPath() + "/v");
+            permPath = new File(CacheUtils.getPermanentExternalDir(TheApp.getInstance()).getPath() + "/v");
         }
 
         permPath.mkdirs();
@@ -286,9 +286,9 @@ public final class LocalFileUtils {
         final boolean isPhoto = key.startsWith("t_") || key.startsWith("p_");
         File permPath = null;
         if (isPhoto) {
-            permPath = new File(CacheUtils.getPermanentPhotoDir(MyApp.getInstance()).getPath());
+            permPath = new File(CacheUtils.getPermanentPhotoDir(TheApp.getInstance()).getPath());
         } else {
-            permPath = new File(CacheUtils.getPermanentExternalDir(MyApp.getInstance()).getPath() + "/v");
+            permPath = new File(CacheUtils.getPermanentExternalDir(TheApp.getInstance()).getPath() + "/v");
         }
         permPath.mkdirs();
         final File targetPath = new File(permPath.getPath() + "/" + key);
@@ -307,9 +307,9 @@ public final class LocalFileUtils {
 
         File permPath = null;
         if (isPhoto) {
-            permPath = new File(CacheUtils.getPermanentPhotoDir(MyApp.getInstance()).getPath());
+            permPath = new File(CacheUtils.getPermanentPhotoDir(TheApp.getInstance()).getPath());
         } else {
-            permPath = new File(CacheUtils.getPermanentExternalDir(MyApp.getInstance()).getPath() + "/v");
+            permPath = new File(CacheUtils.getPermanentExternalDir(TheApp.getInstance()).getPath() + "/v");
         }
         permPath.mkdirs();
         final File targetPath = new File(permPath.getPath() + "/" + key);
@@ -324,8 +324,8 @@ public final class LocalFileUtils {
     }
 
     public static void migrateOldPhotosToNewPhotos() {
-        final File oldPhotoDir = new File(CacheUtils.getPermanentExternalDir(MyApp.getInstance()).getPath() + "/v");
-        final File newPhotoDir = new File(CacheUtils.getPermanentPhotoDir(MyApp.getInstance()).getPath());
+        final File oldPhotoDir = new File(CacheUtils.getPermanentExternalDir(TheApp.getInstance()).getPath() + "/v");
+        final File newPhotoDir = new File(CacheUtils.getPermanentPhotoDir(TheApp.getInstance()).getPath());
 
         final String list[] = oldPhotoDir.list(new FilenameFilter() {
 

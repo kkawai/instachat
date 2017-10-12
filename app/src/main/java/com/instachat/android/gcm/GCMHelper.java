@@ -10,7 +10,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.iid.InstanceID;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.instachat.android.Constants;
-import com.instachat.android.MyApp;
+import com.instachat.android.TheApp;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.util.MLog;
@@ -39,7 +39,7 @@ public final class GCMHelper {
 
         MLog.i(TAG, "registerIfNecessary()");
 
-        if (MyApp.isAdmSupported && Constants.IS_FOR_AMAZON_ONLY) {
+        if (TheApp.isAdmSupported && Constants.IS_FOR_AMAZON_ONLY) {
 
             try {
                 MLog.i(TAG, "about to verify if adm is really supported");
@@ -58,13 +58,13 @@ public final class GCMHelper {
 
             } catch (final Throwable t) {
                 MLog.e(TAG, "Device does not support ADM", t);
-                MyApp.isAdmSupported = false;
+                TheApp.isAdmSupported = false;
             }
             return;
         }
 
-        if (MyApp.isGcmSupported && !Constants.IS_FOR_AMAZON_ONLY) {
-            MLog.i(TAG, "debugx about to registerIfNecessary gcm.  isGcmSupported:" + MyApp.isGcmSupported);
+        if (TheApp.isGcmSupported && !Constants.IS_FOR_AMAZON_ONLY) {
+            MLog.i(TAG, "debugx about to registerIfNecessary gcm.  isGcmSupported:" + TheApp.isGcmSupported);
             new GCMRegistrationManager(context).registerGCM();
         }
 
@@ -85,7 +85,7 @@ public final class GCMHelper {
             return;
         }
 
-        registerIfNecessary(MyApp.getInstance());
+        registerIfNecessary(TheApp.getInstance());
     }
 
     public static void onResume(final Activity activity) {
@@ -106,7 +106,7 @@ public final class GCMHelper {
             return false;
         }
 
-        final int resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MyApp.getInstance());
+        final int resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(TheApp.getInstance());
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GoogleApiAvailability.getInstance().isUserResolvableError(resultCode)) {
                 GoogleApiAvailability.getInstance().getErrorDialog(activity, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
@@ -116,7 +116,7 @@ public final class GCMHelper {
             }
             return false;
         }
-        MyApp.isGcmSupported = true;
+        TheApp.isGcmSupported = true;
         return true;
     }
 
@@ -127,11 +127,11 @@ public final class GCMHelper {
                     @Override
                     public void run() {
 
-                        if (MyApp.isAdmSupported) {
+                        if (TheApp.isAdmSupported) {
 
                             try {
                                 MLog.i(TAG, "adm starting unregister");
-                                new ADM(MyApp.getInstance()).startUnregister();
+                                new ADM(TheApp.getInstance()).startUnregister();
                                 MLog.i(TAG, "adm unregistered");
                             } catch (final Throwable t) {
                                 MLog.i(TAG, "adm failed to unregister", t);
@@ -139,21 +139,21 @@ public final class GCMHelper {
 
                         }
 
-                        if (MyApp.isGcmSupported) {
+                        if (TheApp.isGcmSupported) {
 
-                            final String regId = GCMRegistrationManager.getRegistrationId(MyApp.getInstance());
+                            final String regId = GCMRegistrationManager.getRegistrationId(TheApp.getInstance());
                             MLog.i(TAG, "gcm starting unregister for regId: " + regId);
                             if (StringUtil.isNotEmpty(regId)) {
                                 try {
-                                    GCMRegistrationManager.removeRegistrationId(MyApp.getInstance());
-                                    NetworkApi.gcmunreg(MyApp.getInstance(), userid, regId);
+                                    GCMRegistrationManager.removeRegistrationId(TheApp.getInstance());
+                                    NetworkApi.gcmunreg(TheApp.getInstance(), userid, regId);
                                     MLog.i(TAG, "gcm unregistered");
                                 } catch (final Exception e) {
                                     MLog.e(TAG, "gcm failed to unregister", e);
                                 }
                             }
                             try {
-                                InstanceID.getInstance(MyApp.getInstance()).deleteInstanceID();
+                                InstanceID.getInstance(TheApp.getInstance()).deleteInstanceID();
                             } catch (Exception e) {
                                 MLog.e(TAG, "gcm failed to unregister. failed to delete instance id", e);
                             }

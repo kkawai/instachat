@@ -18,8 +18,8 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.instachat.android.app.analytics.Events;
-import com.instachat.android.app.activity.GroupChatActivity;
-import com.instachat.android.MyApp;
+import com.instachat.android.app.activity.group.GroupChatActivity;
+import com.instachat.android.TheApp;
 import com.instachat.android.R;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.font.FontUtil;
@@ -241,7 +241,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     protected void onDestroy() {
-        MyApp.getInstance().getRequestQueue().cancelAll(this);
+        TheApp.getInstance().getRequestQueue().cancelAll(this);
         super.onDestroy();
     }
 }

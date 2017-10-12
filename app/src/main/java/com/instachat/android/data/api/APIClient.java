@@ -3,7 +3,7 @@ package com.instachat.android.data.api;
 import android.content.Context;
 
 import com.instachat.android.Constants;
-import com.instachat.android.MyApp;
+import com.instachat.android.TheApp;
 import com.instachat.android.R;
 import com.instachat.android.util.MLog;
 
@@ -44,7 +44,7 @@ public final class APIClient {
       if (retrofit != null) {
          return retrofit;
       }
-      OkHttpClient client = createClient(MyApp.getInstance());
+      OkHttpClient client = createClient(TheApp.getInstance());
       retrofit = new Retrofit.Builder()
             .baseUrl(Constants.API_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create()).client(client).build();

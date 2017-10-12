@@ -6,7 +6,7 @@ import android.os.Bundle;
 import com.amazon.device.messaging.ADMMessageHandlerBase;
 import com.amazon.device.messaging.ADMMessageReceiver;
 import com.instachat.android.Constants;
-import com.instachat.android.MyApp;
+import com.instachat.android.TheApp;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
@@ -49,7 +49,7 @@ public class ADMReceiver extends ADMMessageHandlerBase {
 					 * server that this is for ADM, not GCM 
 					 */
                     NetworkApi
-                            .gcmreg(MyApp.getInstance(), " " + registrationId);
+                            .gcmreg(TheApp.getInstance(), " " + registrationId);
                     MLog.i(TAG, "onRegistered: " + registrationId);
                 } catch (final Exception e) {
                     MLog.e(TAG, "adm error", e);
@@ -74,7 +74,7 @@ public class ADMReceiver extends ADMMessageHandlerBase {
 					 * VERY Important: the prepended ' ' character signifies to
 					 * server that this is for ADM, not GCM 
 					 */
-                    NetworkApi.gcmunreg(MyApp.getInstance(), Preferences.getInstance().getUserId() + "", " " + registrationId);
+                    NetworkApi.gcmunreg(TheApp.getInstance(), Preferences.getInstance().getUserId() + "", " " + registrationId);
                     MLog.i(TAG, "onUnregistered: " + registrationId);
                 } catch (final Exception e) {
                     MLog.e(TAG, "adm error", e);

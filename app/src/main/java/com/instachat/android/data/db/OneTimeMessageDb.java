@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.util.Log;
 
-import com.instachat.android.MyApp;
+import com.instachat.android.TheApp;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 
@@ -31,7 +31,7 @@ public final class OneTimeMessageDb {
 
     public synchronized static OneTimeMessageDb getInstance() {
         if (instance == null)
-            instance = new OneTimeMessageDb(MyApp.getInstance());
+            instance = new OneTimeMessageDb(TheApp.getInstance());
         return instance;
     }
 

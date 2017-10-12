@@ -5,7 +5,7 @@ import android.util.AttributeSet;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
-import com.instachat.android.MyApp;
+import com.instachat.android.TheApp;
 
 /**
  * @author kkawai
@@ -45,6 +45,6 @@ public class MyNetworkImageView extends NetworkImageView {
     }
 
     public final void setImageUrl(final String url) {
-        setImageUrl(url, MyApp.getInstance().getImageLoader());
+        setImageUrl(url, TheApp.getInstance().getImageLoader());
     }
 }

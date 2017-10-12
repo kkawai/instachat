@@ -68,7 +68,7 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
     private Class<T> mModelClass;
     private int mModelLayout;
     private Class<VH> mViewHolderClass;
-    private List<T> mSnapshots;
+    private ArrayList<T> mSnapshots;
     private ChildEventListener mChildEventListener;
     private Query mQuery;
 
@@ -148,8 +148,7 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
     }
 
     protected final void replaceItem(int index, T item) {
-        mSnapshots.remove(index);
-        mSnapshots.add(index, item);
+        mSnapshots.set(index, item);
     }
 
     /**

@@ -15,7 +15,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.app.BaseFragment;
 import com.instachat.android.Constants;
 import com.instachat.android.app.analytics.Events;
-import com.instachat.android.app.activity.PrivateChatActivity;
+import com.instachat.android.app.activity.pm.PrivateChatActivity;
 import com.instachat.android.R;
 import com.instachat.android.app.adapter.MessageViewHolder;
 import com.instachat.android.app.adapter.UserClickedListener;

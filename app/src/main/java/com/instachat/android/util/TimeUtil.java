@@ -1,6 +1,6 @@
 package com.instachat.android.util;
 
-import com.instachat.android.MyApp;
+import com.instachat.android.TheApp;
 import com.instachat.android.R;
 
 import java.text.ParseException;
@@ -59,42 +59,42 @@ public final class TimeUtil {
         int day = hour * 24;
 
         if (duration < (minute * 2)) {
-            return MyApp.getInstance().getString(R.string.just_now);
+            return TheApp.getInstance().getString(R.string.just_now);
             //return "less than 1 minute ago";
         }
 
         if (duration < hour) {
             int n = (int) Math.floor(duration / minute);
-            return MyApp.getInstance().getString(R.string.some_minutes_ago, "" + n);
+            return TheApp.getInstance().getString(R.string.some_minutes_ago, "" + n);
             //return n + " minutes ago";
         }
 
         if (duration < (hour * 2)) {
-            return MyApp.getInstance().getString(R.string.one_hour_ago);
+            return TheApp.getInstance().getString(R.string.one_hour_ago);
             //return "1 hour ago";
         }
 
         if (duration < day) {
             int n = (int) Math.floor(duration / hour);
             //return n + " hours ago";
-            return MyApp.getInstance().getString(R.string.some_hours_ago, "" + n);
+            return TheApp.getInstance().getString(R.string.some_hours_ago, "" + n);
         }
         if (duration > day && duration < (day * 2)) {
             //return "1 day ago";
-            return MyApp.getInstance().getString(R.string.one_day_ago);
+            return TheApp.getInstance().getString(R.string.one_day_ago);
         }
 
         int n = (int) Math.floor(duration / day);
         if (n < 365) {
             if (n > 30)
                 //return (n / 30) + " month(s) ago";
-                return MyApp.getInstance().getString(R.string.some_minutes_ago, "" + n);
+                return TheApp.getInstance().getString(R.string.some_minutes_ago, "" + n);
             else
                 //return n + " days ago";
-                return MyApp.getInstance().getString(R.string.some_days_ago, "" + n);
+                return TheApp.getInstance().getString(R.string.some_days_ago, "" + n);
         } else {
             //return ">1y";
-            return MyApp.getInstance().getString(R.string.more_than_one_year_ago);
+            return TheApp.getInstance().getString(R.string.more_than_one_year_ago);
         }
     }
 

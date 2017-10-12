@@ -6,7 +6,7 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
 import com.instachat.android.Constants;
-import com.instachat.android.MyApp;
+import com.instachat.android.TheApp;
 import com.instachat.android.data.model.User;
 
 import org.json.JSONException;
@@ -67,7 +67,7 @@ public final class Preferences {
 
     public static Preferences getInstance() {
         if (instance == null)
-            instance = new Preferences(MyApp.getInstance());
+            instance = new Preferences(TheApp.getInstance());
         return instance;
     }
 

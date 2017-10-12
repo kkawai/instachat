@@ -14,9 +14,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.instachat.android.TheApp;
 import com.instachat.android.app.activity.ActivityState;
 import com.instachat.android.Constants;
-import com.instachat.android.MyApp;
 import com.instachat.android.R;
 import com.instachat.android.app.activity.UsersInGroupListener;
 import com.instachat.android.data.model.GroupChatHeader;
@@ -72,8 +72,8 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
 
     public void populateData() {
 
-        data.add(new GroupChatHeader(MyApp.getInstance().getString(R.string.group_chat_header)));
-        data.add(new PrivateChatHeader(MyApp.getInstance().getString(R.string.private_chat_header)));
+        data.add(new GroupChatHeader(TheApp.getInstance().getString(R.string.group_chat_header)));
+        data.add(new PrivateChatHeader(TheApp.getInstance().getString(R.string.private_chat_header)));
         privateChatsSummaryReference = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
         privateChatsSummaryListener = new ChildEventListener() {
             @Override

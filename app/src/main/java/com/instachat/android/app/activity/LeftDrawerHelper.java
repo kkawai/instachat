@@ -30,7 +30,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.instachat.android.Constants;
-import com.instachat.android.MyApp;
+import com.instachat.android.TheApp;
 import com.instachat.android.R;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.data.api.NetworkApi;
@@ -382,7 +382,7 @@ public class LeftDrawerHelper {
                   MLog.e(TAG, "", e);
                   showErrorToast("leftd 1");
                }
-               FirebaseAnalytics.getInstance(MyApp.getInstance()).logEvent(Events.SAVED_PROFILE, null);
+               FirebaseAnalytics.getInstance(TheApp.getInstance()).logEvent(Events.SAVED_PROFILE, null);
             }
          }, new Response.ErrorListener() {
             @Override
@@ -392,7 +392,7 @@ public class LeftDrawerHelper {
                Bundle payload = new Bundle();
                payload.putString("why", error.toString());
                payload.putString("username", Preferences.getInstance().getUsername() + "");
-               FirebaseAnalytics.getInstance(MyApp.getInstance()).logEvent(Events.SAVED_PROFILE_FAILED, payload);
+               FirebaseAnalytics.getInstance(TheApp.getInstance()).logEvent(Events.SAVED_PROFILE_FAILED, payload);
             }
          });
 
@@ -427,7 +427,7 @@ public class LeftDrawerHelper {
                            }
                            Bundle payload = new Bundle();
                            payload.putString("username", Preferences.getInstance().getUsername() + "");
-                           FirebaseAnalytics.getInstance(MyApp.getInstance()).logEvent(Events.SAVED_PROFILE, payload);
+                           FirebaseAnalytics.getInstance(TheApp.getInstance()).logEvent(Events.SAVED_PROFILE, payload);
                         }
                      }, new Response.ErrorListener() {
                         @Override
@@ -437,7 +437,7 @@ public class LeftDrawerHelper {
                            Bundle payload = new Bundle();
                            payload.putString("why", error.toString());
                            payload.putString("username", Preferences.getInstance().getUsername() + "");
-                           FirebaseAnalytics.getInstance(MyApp.getInstance()).logEvent(Events.SAVED_PROFILE_FAILED, payload);
+                           FirebaseAnalytics.getInstance(TheApp.getInstance()).logEvent(Events.SAVED_PROFILE_FAILED, payload);
                         }
                      });
 

@@ -19,13 +19,13 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.instachat.android.app.BaseActivity;
-import com.instachat.android.MyApp;
+import com.instachat.android.TheApp;
 import com.instachat.android.R;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.util.ActivityUtil;
@@ -37,7 +37,7 @@ import org.json.JSONObject;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class ForgotPasswordActivity extends BaseActivity implements View.OnClickListener {
+public class ForgotPasswordActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "ForgotPasswordActivity";
     private TextInputLayout emailLayout;
@@ -81,7 +81,7 @@ public class ForgotPasswordActivity extends BaseActivity implements View.OnClick
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                if (isActivityDestroyed())
+                                if (isFinishing())
                                     return;
                                 finish();
                             }
@@ -117,12 +117,12 @@ public class ForgotPasswordActivity extends BaseActivity implements View.OnClick
 
     @Override
     protected void onDestroy() {
-        MyApp.getInstance().getRequestQueue().cancelAll(this);
+        TheApp.getInstance().getRequestQueue().cancelAll(this);
         super.onDestroy();
     }
 
     private void showErrorToast(final int stringResId) {
-        if (isActivityDestroyed())
+        if (isFinishing())
             return;
         new SweetAlertDialog(ForgotPasswordActivity.this, SweetAlertDialog.ERROR_TYPE)
                 .setContentText(getString(stringResId))

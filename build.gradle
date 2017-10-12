@@ -54,4 +54,5 @@ ext {
     robolectricVersion = '3.3.2'
     powerMockVersion = '1.6.6'
     circleImageViewVersion = '2.1.0'
+    lifecycle = '1.0.0-beta1'
 }

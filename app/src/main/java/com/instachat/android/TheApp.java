@@ -1,12 +1,11 @@
 package com.instachat.android;
 
+import android.app.Activity;
 import android.support.multidex.MultiDexApplication;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
-import com.ath.fuel.FuelInjector;
-import com.ath.fuel.FuelModule;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
@@ -14,10 +13,18 @@ import com.instachat.android.util.BitmapLruCache;
 import com.instachat.android.util.HttpMessage;
 import com.instachat.android.util.MLog;
 
-public class MyApp extends MultiDexApplication {
+import javax.inject.Inject;
 
-    private static final String TAG = "MyApp";
-    private static MyApp sInstance;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.HasActivityInjector;
+
+public class TheApp extends MultiDexApplication implements HasActivityInjector {
+
+    @Inject
+    DispatchingAndroidInjector<Activity> activityDispatchingAndroidInjector;
+
+    private static final String TAG = "TheApp";
+    private static TheApp sInstance;
     public static boolean isGcmSupported;
     public static boolean isAdmSupported;
     private RequestQueue mRequestQueue;
@@ -28,9 +35,10 @@ public class MyApp extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        FuelInjector.setDebug(false);
-        FuelInjector.initializeModule(new FuelModule(this) {
-        });
+        DaggerAppComponent.builder()
+                .application(this)
+                .build()
+                .inject(this);
         sInstance = this;
         HttpMessage.initializeSSL();
         initAdm();
@@ -39,7 +47,7 @@ public class MyApp extends MultiDexApplication {
         mMessagesRecyclerAdapterHelper = new MessagesRecyclerAdapterHelper();
     }
 
-    public static MyApp getInstance() {
+    public static TheApp getInstance() {
         return sInstance;
     }
 
@@ -84,5 +92,10 @@ public class MyApp extends MultiDexApplication {
 
     public MessagesRecyclerAdapterHelper getMap() {
         return mMessagesRecyclerAdapterHelper;
+    }
+
+    @Override
+    public DispatchingAndroidInjector<Activity> activityInjector() {
+        return activityDispatchingAndroidInjector;
     }
 }

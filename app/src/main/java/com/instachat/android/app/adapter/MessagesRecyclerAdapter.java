@@ -33,9 +33,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.instachat.android.TheApp;
 import com.instachat.android.app.activity.ActivityState;
 import com.instachat.android.Constants;
-import com.instachat.android.MyApp;
 import com.instachat.android.R;
 import com.instachat.android.app.blocks.BlockUserDialogHelper;
 import com.instachat.android.app.blocks.BlockedUser;
@@ -320,8 +320,8 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
         if (friendlyMessage.getLikes() > 0) {
             viewHolder.periscopeParent.setVisibility(View.VISIBLE);
-            final int consumedLikes = MyApp.getInstance().getMap().getConsumedLikesMap().containsKey(friendlyMessage.getId()) ?
-                    MyApp.getInstance().getMap().getConsumedLikesMap().get(friendlyMessage.getId()) : 0;
+            final int consumedLikes = TheApp.getInstance().getMap().getConsumedLikesMap().containsKey(friendlyMessage.getId()) ?
+                    TheApp.getInstance().getMap().getConsumedLikesMap().get(friendlyMessage.getId()) : 0;
             final int likesToDisplay = friendlyMessage.getLikes() - consumedLikes;
             final int count = likesToDisplay > mMaxPeriscopesPerItem ? mMaxPeriscopesPerItem : likesToDisplay;
             if (count > 0) { //only show likes periscope for likes that have not been consumed yet
@@ -338,7 +338,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                                 MLog.e(TAG, " failed to periscope ", e.getMessage());
                             }
                         }
-                        MyApp.getInstance().getMap().getConsumedLikesMap().put(friendlyMessage.getId(), friendlyMessage.getLikes());
+                        TheApp.getInstance().getMap().getConsumedLikesMap().put(friendlyMessage.getId(), friendlyMessage.getLikes());
                     }
                 }, 500);
             } else {

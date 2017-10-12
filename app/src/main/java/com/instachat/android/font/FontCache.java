@@ -8,7 +8,7 @@ import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.util.Log;
 
-import com.instachat.android.MyApp;
+import com.instachat.android.TheApp;
 import com.instachat.android.util.MLog;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class FontCache {
     }
 
     private FontCache() {
-        AssetManager am = MyApp.getInstance().getAssets();
+        AssetManager am = TheApp.getInstance().getAssets();
         String fileList[];
         try {
             fileList = am.list(FONT_DIR);
@@ -69,7 +69,7 @@ public class FontCache {
         if (cache.containsKey(fontName)) {
             return cache.get(fontName);
         } else {
-            Typeface typeface = Typeface.createFromAsset(MyApp.getInstance().getAssets(), FONT_DIR + "/" + fontFilename);
+            Typeface typeface = Typeface.createFromAsset(TheApp.getInstance().getAssets(), FONT_DIR + "/" + fontFilename);
             cache.put(fontFilename, typeface);
             return typeface;
         }

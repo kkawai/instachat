@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
@@ -43,10 +44,9 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
-import com.instachat.android.app.BaseActivity;
+import com.instachat.android.TheApp;
 import com.instachat.android.app.analytics.Events;
-import com.instachat.android.app.activity.GroupChatActivity;
-import com.instachat.android.MyApp;
+import com.instachat.android.app.activity.group.GroupChatActivity;
 import com.instachat.android.R;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.font.FontUtil;
@@ -60,7 +60,7 @@ import com.instachat.android.view.ThemedAlertDialog;
 
 import org.json.JSONObject;
 
-public class SignInActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, View.OnFocusChangeListener {
+public class SignInActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, View.OnFocusChangeListener {
 
    private static final String TAG = "SignInActivity";
    private static final int RC_SIGN_IN = 9001;
@@ -365,7 +365,7 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
                   NetworkApi.isExistsEmail(tag, ltuEmail, new Response.Listener<JSONObject>() {
                      @Override
                      public void onResponse(JSONObject response) {
-                        if (isActivityDestroyed())
+                        if (isFinishing())
                            return;
                         try {
                            if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK) && response.getJSONObject(NetworkApi.RESPONSE_DATA).getBoolean(NetworkApi.KEY_EXISTS)) {
@@ -391,7 +391,7 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
             }).setOnCancelListener(new DialogInterface.OnCancelListener() {
          @Override
          public void onCancel(DialogInterface dialogInterface) {
-            MyApp.getInstance().getRequestQueue().cancelAll(tag);
+            TheApp.getInstance().getRequestQueue().cancelAll(tag);
          }
       }).show();
       return dialog;

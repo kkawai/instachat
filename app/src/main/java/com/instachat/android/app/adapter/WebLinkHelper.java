@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.instachat.android.MyApp;
+import com.instachat.android.TheApp;
 import com.instachat.android.data.db.RssDb;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.Rss;
@@ -74,7 +74,7 @@ public class WebLinkHelper {
             viewHolder.webLinkTitle.setText(rss.getTitle() + "");
             viewHolder.webLinkUrl.setText(rss.getBasicLink() + "");
             if (rss.getImageUrl() != null && rss.getImageUrl().toLowerCase().startsWith("http")) {
-                Glide.with(MyApp.getInstance()).load(rss.getImageUrl()).into(viewHolder.webLinkImageView);
+                Glide.with(TheApp.getInstance()).load(rss.getImageUrl()).into(viewHolder.webLinkImageView);
             }
             MLog.d(TAG, "found link in rss db. basic link: " + rss.getBasicLink() + " main rss link: " + rss.getLink());
         } else {

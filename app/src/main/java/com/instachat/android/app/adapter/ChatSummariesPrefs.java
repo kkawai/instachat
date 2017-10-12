@@ -3,7 +3,7 @@ package com.instachat.android.app.adapter;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.instachat.android.MyApp;
+import com.instachat.android.TheApp;
 
 /**
  * Created by kevin on 11/22/2016.
@@ -20,7 +20,7 @@ public final class ChatSummariesPrefs {
 
     public static boolean isNotifiedRecently(String userid) {
         if (chatSummariesPrefs == null) {
-            chatSummariesPrefs = MyApp.getInstance().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+            chatSummariesPrefs = TheApp.getInstance().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         }
         long last = chatSummariesPrefs.getLong(userid, 0);
         return System.currentTimeMillis() - last < THIRTY_MINUTES;
@@ -28,7 +28,7 @@ public final class ChatSummariesPrefs {
 
     public static void updateLastNotifiedTime(String userid) {
         if (chatSummariesPrefs == null) {
-            chatSummariesPrefs = MyApp.getInstance().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+            chatSummariesPrefs = TheApp.getInstance().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         }
         chatSummariesPrefs.edit().putLong(userid, System.currentTimeMillis()).apply();
     }

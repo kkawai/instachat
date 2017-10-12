@@ -26,7 +26,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.instachat.android.Constants;
 import com.instachat.android.app.analytics.Events;
-import com.instachat.android.app.activity.PrivateChatActivity;
+import com.instachat.android.app.activity.pm.PrivateChatActivity;
 import com.instachat.android.R;
 import com.instachat.android.app.login.LauncherActivity;
 import com.instachat.android.data.model.FriendlyMessage;
@@ -115,7 +115,7 @@ public class InstachatMessagingService extends FirebaseMessagingService {
             MLog.e(TAG, "", e); //todo better error handling/message
         }
 
-        //Glide.with(MyApp.getInstance()).loa
+        //Glide.with(TheApp.getInstance()).loa
     }
 
     private void consumeFriendlyMessage(final FriendlyMessage friendlyMessage) {

@@ -27,7 +27,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.instachat.android.Constants;
-import com.instachat.android.MyApp;
+import com.instachat.android.TheApp;
 import com.instachat.android.R;
 import com.instachat.android.data.api.CloudVisionApi;
 import com.instachat.android.data.api.UploadListener;
@@ -161,11 +161,11 @@ public class PhotoUploadHelper {
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         mTargetFileUri = FileProvider.getUriForFile(mActivity, mActivity.getPackageName() + ".fileprovider",
                 mTargetFile);
-        List<ResolveInfo> resInfoList = MyApp.getInstance().getPackageManager().queryIntentActivities(cameraIntent,
+        List<ResolveInfo> resInfoList = TheApp.getInstance().getPackageManager().queryIntentActivities(cameraIntent,
                 PackageManager.MATCH_DEFAULT_ONLY);
         for (ResolveInfo resolveInfo : resInfoList) {
             String packageName = resolveInfo.activityInfo.packageName;
-            MyApp.getInstance().grantUriPermission(packageName, mTargetFileUri, Intent
+            TheApp.getInstance().grantUriPermission(packageName, mTargetFileUri, Intent
                     .FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
             MLog.d(TAG, "granted app ", packageName, " permission to internal file uri: ", mTargetFileUri);
         }

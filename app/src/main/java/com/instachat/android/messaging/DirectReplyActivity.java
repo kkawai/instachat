@@ -16,7 +16,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.instachat.android.Constants;
-import com.instachat.android.app.activity.PrivateChatActivity;
+import com.instachat.android.app.activity.pm.PrivateChatActivity;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.User;

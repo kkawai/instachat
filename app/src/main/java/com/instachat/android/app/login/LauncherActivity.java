@@ -2,10 +2,10 @@ package com.instachat.android.app.login;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import com.instachat.android.app.BaseActivity;
-import com.instachat.android.app.activity.GroupChatActivity;
+import com.instachat.android.app.activity.group.GroupChatActivity;
 import com.instachat.android.R;
 import com.instachat.android.util.ActivityUtil;
 import com.instachat.android.util.Preferences;
@@ -13,7 +13,7 @@ import com.instachat.android.util.Preferences;
 /**
  * Created by kevin on 8/9/2016.
  */
-public final class LauncherActivity extends BaseActivity {
+public final class LauncherActivity extends AppCompatActivity {
 
    @Override
    public void onCreate(Bundle savedInstanceState) {
@@ -38,7 +38,7 @@ public final class LauncherActivity extends BaseActivity {
       findViewById(R.id.sign_up_button).setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
-            startActivity(new Intent(LauncherActivity.this, ClaimRoomActivity.class));
+            startActivity(new Intent(LauncherActivity.this, SignUpActivity.class));
             finish();
          }
       });

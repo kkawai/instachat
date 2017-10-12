@@ -12,6 +12,10 @@
             name="visibleAd"
             type="boolean"/>
 
+        <variable
+            name="viewModel"
+            type="com.instachat.android.app.activity.group.GroupChatViewModel" />
+
     </data>
 
 
@@ -20,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        tools:context="com.instachat.android.app.activity.GroupChatActivity">
+        tools:context="com.instachat.android.app.activity.group.GroupChatActivity">
 
         <!-- android:paddingBottom="@dimen/activity_vertical_margin" -->
         <RelativeLayout
