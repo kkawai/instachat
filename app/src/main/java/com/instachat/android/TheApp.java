@@ -9,6 +9,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
+import com.instachat.android.di.component.DaggerAppComponent;
 import com.instachat.android.util.BitmapLruCache;
 import com.instachat.android.util.HttpMessage;
 import com.instachat.android.util.MLog;

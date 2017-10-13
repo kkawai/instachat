@@ -47,7 +47,6 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.ath.fuel.FuelInjector;
 import com.brandongogetap.stickyheaders.StickyLayoutManager;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.common.ConnectionResult;
@@ -86,7 +85,6 @@ import com.instachat.android.app.adapter.ChatsItemClickedListener;
 import com.instachat.android.app.adapter.FriendlyMessageListener;
 import com.instachat.android.app.adapter.GroupChatUsersRecyclerAdapter;
 import com.instachat.android.app.adapter.MessageTextClickedListener;
-import com.instachat.android.app.adapter.MessageViewHolder;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapter;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.app.analytics.Events;
@@ -133,7 +131,6 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
-import dagger.android.DispatchingAndroidInjector;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Action;
@@ -160,11 +157,10 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     LinearLayoutManager mLinearLayoutManager;
 
     @Inject
-    MessagesRecyclerAdapter<FriendlyMessage, MessageViewHolder> mMessagesAdapter;
+    MessagesRecyclerAdapter mMessagesAdapter;
 
     private Toolbar mToolbar;
     private View mSendButton, mAttachButton;
-    private RecyclerView mMessageRecyclerView;
     private FirebaseAuth mFirebaseAuth;
     //private FirebaseUser mFirebaseUser;
     private EditText mMessageEditText;
@@ -241,7 +237,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
         GCMHelper.onCreate(this);
 
-        mMessageRecyclerView = findViewById(R.id.messageRecyclerView);
         mLinearLayoutManager.setStackFromEnd(true);
 
         try {
@@ -256,10 +251,15 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         fetchConfig();
         initFirebaseAdapter();
 
-        FuelInjector.ignite(this, this);
+        /*
+        mMessagesAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class,
+                R.layout.item_message,
+                MessageViewHolder.class,
+                FirebaseDatabase.getInstance().getReference(mDatabaseRoot).
+                        limitToLast((int) mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)));  */
 
-        mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mMessageRecyclerView.setAdapter(mMessagesAdapter);
+        binding.messageRecyclerView.setLayoutManager(mLinearLayoutManager);
+        binding.messageRecyclerView.setAdapter(mMessagesAdapter);
 
         adHelper.loadAd();
 
@@ -721,7 +721,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             if (isActivityDestroyed())
                 return;
             MLog.d(TAG,"C kevin scroll: "+(mMessagesAdapter.getItemCount() - 1) + " text: "+mMessagesAdapter.peekLastMessage());
-            mMessageRecyclerView.scrollToPosition(mMessagesAdapter.getItemCount() - 1);
+            binding.messageRecyclerView.scrollToPosition(mMessagesAdapter.getItemCount() - 1);
             updateLastActiveTimestamp();
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
@@ -1123,7 +1123,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     @Override
     public FriendlyMessage getFriendlyMessage(int position) {
-        return mMessagesAdapter.getItem(position);
+        return (FriendlyMessage)mMessagesAdapter.getItem(position);
     }
 
     @Override
@@ -1139,7 +1139,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     @Override
     public void setCurrentFriendlyMessage(int position) {
         MLog.d(TAG,"A kevin scroll: "+(position + 1) + " text: "+mMessagesAdapter.peekLastMessage());
-        mMessageRecyclerView.scrollToPosition(mMessagesAdapter.getItemCount()-1);
+        binding.messageRecyclerView.scrollToPosition(mMessagesAdapter.getItemCount()-1);
     }
 
     @Override
@@ -1225,7 +1225,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 +" positionStart: "+positionStart + " friendlyMessageCount: "+friendlyMessageCount);
                 if (lastVisiblePosition == -1 || ((lastVisiblePosition+4) >=  positionStart)) {
                     MLog.d(TAG,"B kevin scroll: "+(positionStart) + " text: "+mMessagesAdapter.peekLastMessage());
-                    mMessageRecyclerView.scrollToPosition(mMessagesAdapter.getItemCount()-1);
+                    binding.messageRecyclerView.scrollToPosition(mMessagesAdapter.getItemCount()-1);
                 }
                 notifyPagerAdapterDataSetChanged();
             }

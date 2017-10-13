@@ -9,10 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ath.fuel.FuelInjector;
+import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.data.model.FriendlyMessage;
-import com.instachat.android.Constants;
 import com.instachat.android.util.MLog;
 
 /**
@@ -36,7 +35,6 @@ public class FullScreenTextFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         final ViewPager viewPager = (ViewPager) getView().findViewById(R.id.view_pager);
-        FuelInjector.ignite(getActivity(), this);
         mPagerAdapter = new FragmentStatePagerAdapter(getChildFragmentManager()) {
             @Override
             public Fragment getItem(final int position) {

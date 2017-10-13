@@ -18,7 +18,6 @@ import android.webkit.URLUtil;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.ath.fuel.FuelInjector;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -33,18 +32,18 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.instachat.android.TheApp;
-import com.instachat.android.app.activity.ActivityState;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
+import com.instachat.android.TheApp;
+import com.instachat.android.app.MessageOptionsDialogHelper;
+import com.instachat.android.app.activity.ActivityState;
 import com.instachat.android.app.blocks.BlockUserDialogHelper;
 import com.instachat.android.app.blocks.BlockedUser;
 import com.instachat.android.app.blocks.BlockedUserListener;
 import com.instachat.android.app.blocks.ReportUserDialogHelper;
-import com.instachat.android.data.db.OneTimeMessageDb;
 import com.instachat.android.app.likes.LikesHelper;
+import com.instachat.android.data.db.OneTimeMessageDb;
 import com.instachat.android.data.model.FriendlyMessage;
-import com.instachat.android.app.MessageOptionsDialogHelper;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
@@ -112,7 +111,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     public void setActivity(@NonNull Activity activity,
                             @NonNull ActivityState activityState,
                             @NonNull FrameLayout entireScreenLayout) {
-        FuelInjector.ignite(activity, this);
         mActivity = new WeakReference<>(activity);
         mActivityState = activityState;
         mEntireScreenFrameLayout = entireScreenLayout;

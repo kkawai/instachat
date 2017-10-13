@@ -8,6 +8,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.app.activity.AdHelper;
+import com.instachat.android.app.activity.RemoteConfigHelper;
 import com.instachat.android.app.adapter.MessageViewHolder;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapter;
 import com.instachat.android.data.DataManager;
@@ -23,7 +24,7 @@ public class GroupChatActivityModule {
 
     @Provides
     GroupChatViewModel provideGroupChatViewModel(DataManager dataManager,
-                                       SchedulerProvider schedulerProvider) {
+                                                 SchedulerProvider schedulerProvider) {
         return new GroupChatViewModel(dataManager, schedulerProvider);
     }
 
@@ -33,12 +34,14 @@ public class GroupChatActivityModule {
     }
 
     @Provides
-    MessagesRecyclerAdapter provideMessagesRecyclerAdapter(GroupChatActivity activity, FirebaseRemoteConfig firebaseRemoteConfig) {
-        return new MessagesRecyclerAdapter<>(FriendlyMessage.class,
+    MessagesRecyclerAdapter provideMessagesRecyclerAdapter(GroupChatActivity activity, FirebaseRemoteConfig remoteConfig) {
+        MessagesRecyclerAdapter adapter = new MessagesRecyclerAdapter<FriendlyMessage,MessageViewHolder>(FriendlyMessage.class,
                 R.layout.item_message,
                 MessageViewHolder.class,
                 FirebaseDatabase.getInstance().getReference(activity.getDatabaseRoot()).
-                        limitToLast((int) firebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)));
+                        limitToLast((int) remoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)));
+        return adapter;
+
     }
 
     @Provides

@@ -101,7 +101,6 @@ dependencies {
     compile 'com.android.volley:volley:1.0.0'
 
     compile 'com.github.AndroidDeveloperLB:AutoFitTextView:3'
-    compile 'com.ath.fuel:Fuel:1.0.1'
     compile 'pub.devrel:easypermissions:0.1.9'
     compile 'com.github.clans:fab:1.6.4'
     compile 'com.github.bhargavms:DotLoader:1.0.0'
