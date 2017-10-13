@@ -32,12 +32,15 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 
+import com.android.volley.RequestQueue;
 import com.instachat.android.R;
 import com.instachat.android.TheApp;
 import com.instachat.android.app.activity.ActivityState;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
 import io.reactivex.disposables.Disposable;
@@ -154,9 +157,12 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
         super.onCreate(savedInstanceState, persistentState);
     }
 
+    @Inject
+    RequestQueue requestQueue;
+
     @Override
     protected void onDestroy() {
-        TheApp.getInstance().getRequestQueue().cancelAll(this);
+        requestQueue.cancelAll(this);
         mIsDestroyed = true;
         for (Disposable disposable : disposableList) {
             disposable.dispose();

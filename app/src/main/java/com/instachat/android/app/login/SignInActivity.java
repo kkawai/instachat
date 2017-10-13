@@ -30,6 +30,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.android.gms.auth.api.Auth;
@@ -44,13 +45,12 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
-import com.instachat.android.TheApp;
-import com.instachat.android.app.analytics.Events;
-import com.instachat.android.app.activity.group.GroupChatActivity;
 import com.instachat.android.R;
+import com.instachat.android.app.activity.group.GroupChatActivity;
+import com.instachat.android.app.analytics.Events;
 import com.instachat.android.data.api.NetworkApi;
-import com.instachat.android.font.FontUtil;
 import com.instachat.android.data.model.User;
+import com.instachat.android.font.FontUtil;
 import com.instachat.android.util.ActivityUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
@@ -59,6 +59,10 @@ import com.instachat.android.util.StringUtil;
 import com.instachat.android.view.ThemedAlertDialog;
 
 import org.json.JSONObject;
+
+import javax.inject.Inject;
+
+import dagger.android.AndroidInjection;
 
 public class SignInActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, View.OnFocusChangeListener {
 
@@ -72,9 +76,16 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
    private FirebaseAuth mFirebaseAuth;
    private ProgressDialog mProgressDialog;
 
+   @Inject
+   NetworkApi networkApi;
+
+   @Inject
+   RequestQueue requestQueue;
+
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
+      AndroidInjection.inject(this);
       ActivityUtil.hideStatusBar(getWindow());
       DataBindingUtil.setContentView(this, R.layout.activity_sign_in);
       passwordLayout = (TextInputLayout) findViewById(R.id.input_password_layout);
@@ -128,7 +139,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
 
    private void signInWithEmailOrUsernamePassword(final String emailOrUsername, final String password, final String ltuEmail) {
       showProgressDialog();
-      NetworkApi.getUserByEmailOrUsernamePassword(this, emailOrUsername, password, ltuEmail, new Response.Listener<JSONObject>() {
+      networkApi.getUserByEmailOrUsernamePassword(this, emailOrUsername, password, ltuEmail, new Response.Listener<JSONObject>() {
          @Override
          public void onResponse(final JSONObject response) {
             try {
@@ -193,7 +204,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
       User user = Preferences.getInstance().getUser();
       if (StringUtil.isEmpty(user.getProfilePicUrl())) {
          if (!TextUtils.isEmpty(thirdPartyProfilePicUrl)) {
-            NetworkApi.saveThirdPartyPhoto(thirdPartyProfilePicUrl);
+            networkApi.saveThirdPartyPhoto(thirdPartyProfilePicUrl);
          }
       }
       startActivity(new Intent(SignInActivity.this, GroupChatActivity.class));
@@ -275,7 +286,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
          thirdPartyProfilePicUrl = acct.getPhotoUrl().toString();
       }
       showProgressDialog();
-      NetworkApi.getUserByEmail(this, acct.getEmail(), new Response.Listener<JSONObject>() {
+      networkApi.getUserByEmail(this, acct.getEmail(), new Response.Listener<JSONObject>() {
          @Override
          public void onResponse(final JSONObject response) {
             try {
@@ -362,7 +373,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                      return;
                   }
                   showProgressDialog();
-                  NetworkApi.isExistsEmail(tag, ltuEmail, new Response.Listener<JSONObject>() {
+                  networkApi.isExistsEmail(tag, ltuEmail, new Response.Listener<JSONObject>() {
                      @Override
                      public void onResponse(JSONObject response) {
                         if (isFinishing())
@@ -391,7 +402,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
             }).setOnCancelListener(new DialogInterface.OnCancelListener() {
          @Override
          public void onCancel(DialogInterface dialogInterface) {
-            TheApp.getInstance().getRequestQueue().cancelAll(tag);
+            requestQueue.cancelAll(tag);
          }
       }).show();
       return dialog;

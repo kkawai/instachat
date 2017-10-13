@@ -3,7 +3,10 @@ package com.instachat.android.di.component;
 
 import android.app.Application;
 
+import com.android.volley.Network;
+import com.android.volley.RequestQueue;
 import com.instachat.android.TheApp;
+import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.di.builder.ActivityBuilder;
 import com.instachat.android.di.module.AppModule;
 
@@ -13,7 +16,6 @@ import dagger.BindsInstance;
 import dagger.Component;
 import dagger.android.AndroidInjectionModule;
 
-//todo: add more modules as activities are added
 @Singleton
 @Component(modules = {AndroidInjectionModule.class, AppModule.class, ActivityBuilder.class})
 public interface AppComponent {
@@ -29,5 +31,4 @@ public interface AppComponent {
     }
 
     void inject(TheApp app);
-
 }

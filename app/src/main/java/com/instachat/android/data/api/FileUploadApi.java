@@ -19,7 +19,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.inject.Inject;
+
 public final class FileUploadApi {
+
+    @Inject
+    NetworkApi networkApi;
 
     private static final String TAG = FileUploadApi.class.getSimpleName();
     private static final int CHUNK_SIZE = 8024;
@@ -72,7 +77,7 @@ public final class FileUploadApi {
         });
 
         try {
-            final Pair<String, String> pair = NetworkApi.pair();
+            final Pair<String, String> pair = networkApi.pair();
             //MLog.i(TAG, "amz s: "+ InstagramApp.sAmzSecKey + " a: " + InstagramApp.sAmzAccKey);
             final AmazonS3Client s3Client = new AmazonS3Client(new BasicAWSCredentials(pair.first, pair.second));
             final PutObjectRequest request = new PutObjectRequest(targetBucket, filename, file);

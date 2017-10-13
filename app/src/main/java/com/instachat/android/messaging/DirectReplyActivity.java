@@ -25,6 +25,8 @@ import com.instachat.android.util.Preferences;
 
 import org.json.JSONObject;
 
+import javax.inject.Inject;
+
 /**
  * Created by kevin on 10/18/2016.
  */
@@ -32,6 +34,9 @@ import org.json.JSONObject;
 public class DirectReplyActivity extends AppCompatActivity {
 
     public static final String TAG = "DirectReplyActivity";
+
+    @Inject
+    NetworkApi networkApi;
 
     public static Intent newIntent(Context context, int userid, String username, String dpid) {
         Intent intent = new Intent(context, DirectReplyActivity.class);
@@ -92,7 +97,7 @@ public class DirectReplyActivity extends AppCompatActivity {
                                     if (task.isSuccessful()) {
                                         try {
                                             JSONObject o = friendlyMessage.toLightweightJSONObject();
-                                            NetworkApi.gcmsend(userid, Constants.GcmMessageType.msg, o);
+                                            networkApi.gcmsend(userid, Constants.GcmMessageType.msg, o);
                                         } catch (Exception e) {
                                             MLog.e(TAG, "gcmsend() failed", e);
                                         }

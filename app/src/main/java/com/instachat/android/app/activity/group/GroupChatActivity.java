@@ -154,10 +154,18 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     ViewModelProvider.Factory viewModelFactory;
 
     @Inject
-    LinearLayoutManager mLinearLayoutManager;
+    LinearLayoutManager linearLayoutManager;
 
     @Inject
-    MessagesRecyclerAdapter mMessagesAdapter;
+    MessagesRecyclerAdapter messagesAdapter;
+
+    @Inject
+    NetworkApi networkApi;
+
+    @Inject
+    GCMHelper gcmHelper;
+
+    private RecyclerView messageRecyclerView;
 
     private Toolbar mToolbar;
     private View mSendButton, mAttachButton;
@@ -235,9 +243,9 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
 
-        GCMHelper.onCreate(this);
+        gcmHelper.onCreate(this);
 
-        mLinearLayoutManager.setStackFromEnd(true);
+        linearLayoutManager.setStackFromEnd(true);
 
         try {
             FirebaseDatabase.getInstance().setPersistenceEnabled(true);
@@ -252,14 +260,15 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         initFirebaseAdapter();
 
         /*
-        mMessagesAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class,
+        messagesAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class,
                 R.layout.item_message,
                 MessageViewHolder.class,
                 FirebaseDatabase.getInstance().getReference(mDatabaseRoot).
                         limitToLast((int) mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)));  */
 
-        binding.messageRecyclerView.setLayoutManager(mLinearLayoutManager);
-        binding.messageRecyclerView.setAdapter(mMessagesAdapter);
+        messageRecyclerView = findViewById(R.id.messageRecyclerView);
+        messageRecyclerView.setLayoutManager(linearLayoutManager);
+        messageRecyclerView.setAdapter(messagesAdapter);
 
         adHelper.loadAd();
 
@@ -449,7 +458,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
         mSendButton.setEnabled(mMessageEditText.getText().toString().trim().length() > 0);
         if (Preferences.getInstance().isLoggedIn()) {
-            GCMHelper.onResume(this);
+            gcmHelper.onResume(this);
             showFirstMessageDialog(GroupChatActivity.this);
             if (mExternalSendIntentConsumer != null)
                 mExternalSendIntentConsumer.consumeIntent(getIntent());
@@ -490,8 +499,8 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             mRightRef.removeEventListener(mRightListener);
         if (mPhotoUploadHelper != null)
             mPhotoUploadHelper.cleanup();
-        if (mMessagesAdapter != null)
-            mMessagesAdapter.cleanup();
+        if (messagesAdapter != null)
+            messagesAdapter.cleanup();
         if (mLeftDrawerHelper != null)
             mLeftDrawerHelper.cleanup();
         //if (mAdView != null)
@@ -673,7 +682,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     private void sendText(FriendlyMessage friendlyMessage) {
         try {
-            mMessagesAdapter.sendFriendlyMessage(friendlyMessage);
+            messagesAdapter.sendFriendlyMessage(friendlyMessage);
             mMessageEditText.setText("");//fast double taps on send can cause 2x sends!
         } catch (Exception e) {
             MLog.e(TAG, "", e);
@@ -720,8 +729,8 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         try {
             if (isActivityDestroyed())
                 return;
-            MLog.d(TAG,"C kevin scroll: "+(mMessagesAdapter.getItemCount() - 1) + " text: "+mMessagesAdapter.peekLastMessage());
-            binding.messageRecyclerView.scrollToPosition(mMessagesAdapter.getItemCount() - 1);
+            MLog.d(TAG,"C kevin scroll: "+(messagesAdapter.getItemCount() - 1) + " text: "+ messagesAdapter.peekLastMessage());
+            messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
             updateLastActiveTimestamp();
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
@@ -1123,7 +1132,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     @Override
     public FriendlyMessage getFriendlyMessage(int position) {
-        return (FriendlyMessage)mMessagesAdapter.getItem(position);
+        return (FriendlyMessage) messagesAdapter.getItem(position);
     }
 
     @Override
@@ -1133,13 +1142,13 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     @Override
     public int getFriendlyMessageCount() {
-        return mMessagesAdapter.getItemCount();
+        return messagesAdapter.getItemCount();
     }
 
     @Override
     public void setCurrentFriendlyMessage(int position) {
-        MLog.d(TAG,"A kevin scroll: "+(position + 1) + " text: "+mMessagesAdapter.peekLastMessage());
-        binding.messageRecyclerView.scrollToPosition(mMessagesAdapter.getItemCount()-1);
+        MLog.d(TAG,"A kevin scroll: "+(position + 1) + " text: "+ messagesAdapter.peekLastMessage());
+        messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount()-1);
     }
 
     @Override
@@ -1196,36 +1205,36 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     }
 
     private void initFirebaseAdapter() {
-        mMessagesAdapter.setIsPrivateChat(isPrivateChat());
-        mMessagesAdapter.setDatabaseRoot(mDatabaseRoot);
-        mMessagesAdapter.setActivity(this, this, (FrameLayout) findViewById(R.id.fragment_content));
-        mMessagesAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {
+        messagesAdapter.setIsPrivateChat(isPrivateChat());
+        messagesAdapter.setDatabaseRoot(mDatabaseRoot);
+        messagesAdapter.setActivity(this, this, (FrameLayout) findViewById(R.id.fragment_content));
+        messagesAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {
             @Override
             public void onViewHolderPopulated() {
                 //todo
             }
         });
-        mMessagesAdapter.setMessageTextClickedListener(new MessageTextClickedListener() {
+        messagesAdapter.setMessageTextClickedListener(new MessageTextClickedListener() {
             @Override
             public void onMessageClicked(final int position) {
                 openFullScreenTextView(position);
             }
         });
-        mMessagesAdapter.setBlockedUserListener(mBlockedUserListener);
-        mMessagesAdapter.setFriendlyMessageListener(this);
-        mMessagesAdapter.setUserThumbClickedListener(this);
-        mMessagesAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+        messagesAdapter.setBlockedUserListener(mBlockedUserListener);
+        messagesAdapter.setFriendlyMessageListener(this);
+        messagesAdapter.setUserThumbClickedListener(this);
+        messagesAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
 
                 super.onItemRangeInserted(positionStart, itemCount);
-                int friendlyMessageCount = mMessagesAdapter.getItemCount();
-                int lastVisiblePosition = mLinearLayoutManager.findLastVisibleItemPosition();
-                MLog.d(TAG,"scroll debug: lastVisiblePosition: "+lastVisiblePosition + " text: "+mMessagesAdapter.peekLastMessage()
+                int friendlyMessageCount = messagesAdapter.getItemCount();
+                int lastVisiblePosition = linearLayoutManager.findLastVisibleItemPosition();
+                MLog.d(TAG,"scroll debug: lastVisiblePosition: "+lastVisiblePosition + " text: "+ messagesAdapter.peekLastMessage()
                 +" positionStart: "+positionStart + " friendlyMessageCount: "+friendlyMessageCount);
                 if (lastVisiblePosition == -1 || ((lastVisiblePosition+4) >=  positionStart)) {
-                    MLog.d(TAG,"B kevin scroll: "+(positionStart) + " text: "+mMessagesAdapter.peekLastMessage());
-                    binding.messageRecyclerView.scrollToPosition(mMessagesAdapter.getItemCount()-1);
+                    MLog.d(TAG,"B kevin scroll: "+(positionStart) + " text: "+ messagesAdapter.peekLastMessage());
+                    messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount()-1);
                 }
                 notifyPagerAdapterDataSetChanged();
             }
@@ -1332,7 +1341,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             MLog.d(TAG, "uploadFromUri:onSuccess photoUrl: " + photoUrl, " debug possibleAdult: ", friendlyMessage
                     .isPossibleAdultImage(), " parameter: ", isPossiblyAdultImage);
             try {
-                mMessagesAdapter.sendFriendlyMessage(friendlyMessage);
+                messagesAdapter.sendFriendlyMessage(friendlyMessage);
             } catch (final Exception e) {
                 MLog.e(TAG, "", e);
             }
@@ -1342,7 +1351,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             final User user = Preferences.getInstance().getUser();
             user.setProfilePicUrl(photoUrl);
             Preferences.getInstance().saveUser(user);
-            NetworkApi.saveUser(null, user, new Response.Listener<String>() {
+            networkApi.saveUser(null, user, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     MLog.d(TAG, "saveUser() success via uploadFromUri(): " + response);
@@ -1574,7 +1583,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             public void onConfirmLogout() {
                 mFirebaseAuth.signOut();
                 removeUserPresenceFromGroup();
-                GCMHelper.unregister(Preferences.getInstance().getUserId() + "");
+                gcmHelper.unregister(Preferences.getInstance().getUserId() + "");
                 Preferences.getInstance().saveUser(null);
                 startActivity(new Intent(GroupChatActivity.this, SignInActivity.class));
                 finish();
@@ -1647,7 +1656,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             if (menu.findItem(R.id.menu_pending_requests) == null)
                 menu.add(0, R.id.menu_pending_requests, 0, getString(R.string.menu_option_pending_requests));
         }
-        if (mMessagesAdapter != null && mMessagesAdapter.getNumBlockedUsers() > 0) {
+        if (messagesAdapter != null && messagesAdapter.getNumBlockedUsers() > 0) {
             if (menu.findItem(R.id.menu_manage_blocks) == null) {
                 menu.add(0, R.id.menu_manage_blocks, 1, getString(R.string.manage_blocks));
             }
@@ -1711,7 +1720,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 .doFinally(new Action() {
                     @Override
                     public void run() throws Exception {
-                        if (mMessagesAdapter == null || mMessagesAdapter.getItemCount() == 0) {
+                        if (messagesAdapter == null || messagesAdapter.getItemCount() == 0) {
                             FirebaseAnalytics.getInstance(GroupChatActivity.this).logEvent(Events.NO_DATA_AFTER_8_SEC,
                                     null);
                         } else {
@@ -1790,7 +1799,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 final FriendlyMessage friendlyMessage = new FriendlyMessage("", myUsername(), myUserid(), myDpid(),
                         linkUri.toString(), false, false, null, System.currentTimeMillis());
                 friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
-                mMessagesAdapter.sendFriendlyMessage(friendlyMessage);
+                messagesAdapter.sendFriendlyMessage(friendlyMessage);
             }
         }
         return true;
@@ -1832,7 +1841,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 .subscribe(new Consumer<Long>() {
                     @Override
                     public void accept(Long value) throws Exception {
-                        if (mMessagesAdapter.getItemCount() > 0) {
+                        if (messagesAdapter.getItemCount() > 0) {
                             hideSmallProgressCircle();
                         }
                     }

@@ -23,9 +23,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.instachat.android.TheApp;
 import com.instachat.android.R;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.util.ActivityUtil;
@@ -35,11 +35,20 @@ import com.instachat.android.util.StringUtil;
 
 import org.json.JSONObject;
 
+import javax.inject.Inject;
+
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class ForgotPasswordActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "ForgotPasswordActivity";
+
+    @Inject
+    NetworkApi networkApi;
+
+    @Inject
+    RequestQueue requestQueue;
+
     private TextInputLayout emailLayout;
 
     @Override
@@ -68,7 +77,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
                     .show();
             return;
         }
-        NetworkApi.forgotPassword(this, emailOrUsername, new Response.Listener<String>() {
+        networkApi.forgotPassword(this, emailOrUsername, new Response.Listener<String>() {
             @Override
             public void onResponse(final String response) {
                 try {
@@ -117,7 +126,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
 
     @Override
     protected void onDestroy() {
-        TheApp.getInstance().getRequestQueue().cancelAll(this);
+        requestQueue.cancelAll(this);
         super.onDestroy();
     }
 

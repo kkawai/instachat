@@ -5,12 +5,9 @@ import android.support.multidex.MultiDexApplication;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
 import com.instachat.android.di.component.DaggerAppComponent;
-import com.instachat.android.util.BitmapLruCache;
 import com.instachat.android.util.HttpMessage;
 import com.instachat.android.util.MLog;
 
@@ -31,8 +28,6 @@ public class TheApp extends MultiDexApplication implements HasActivityInjector {
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
 
-    private MessagesRecyclerAdapterHelper mMessagesRecyclerAdapterHelper = new MessagesRecyclerAdapterHelper();
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -44,8 +39,6 @@ public class TheApp extends MultiDexApplication implements HasActivityInjector {
         HttpMessage.initializeSSL();
         initAdm();
         initGcm();
-        initVolley();
-        mMessagesRecyclerAdapterHelper = new MessagesRecyclerAdapterHelper();
     }
 
     public static TheApp getInstance() {
@@ -69,30 +62,6 @@ public class TheApp extends MultiDexApplication implements HasActivityInjector {
         } catch (final Throwable t) {
             MLog.e(TAG, "Device does not support GCM", t);
         }
-    }
-
-    public RequestQueue getRequestQueue() {
-        return mRequestQueue;
-    }
-
-    public ImageLoader getImageLoader() {
-        return mImageLoader;
-    }
-
-    private void initVolley() {
-        /*
-         *  init requestQueue
-		 */
-        mRequestQueue = Volley.newRequestQueue(getApplicationContext());
-        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-        final int maxCacheSize = maxMemory / 8;
-        this.mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache(
-                maxCacheSize));
-
-    }
-
-    public MessagesRecyclerAdapterHelper getMap() {
-        return mMessagesRecyclerAdapterHelper;
     }
 
     @Override

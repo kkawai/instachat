@@ -30,14 +30,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.instachat.android.Constants;
-import com.instachat.android.TheApp;
 import com.instachat.android.R;
+import com.instachat.android.TheApp;
 import com.instachat.android.app.analytics.Events;
-import com.instachat.android.data.api.NetworkApi;
-import com.instachat.android.font.FontUtil;
 import com.instachat.android.app.likes.UserLikedUserListener;
+import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.data.model.User;
+import com.instachat.android.font.FontUtil;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
@@ -49,6 +49,8 @@ import org.json.JSONObject;
 
 import java.util.Hashtable;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -79,6 +81,9 @@ public class LeftDrawerHelper {
    private ChildEventListener mPrivateChatRequestsListener;
    private DatabaseReference mPrivateChatRequestsRef;
    private Map<String, Boolean> mOutstandingRequestsMap = new Hashtable<>();
+
+   @Inject
+   NetworkApi networkApi;
 
    public LeftDrawerHelper(@NonNull Activity activity, @NonNull ActivityState activityState, @NonNull DrawerLayout drawerLayout, @NonNull LeftDrawerEventListener listener) {
       mActivity = activity;
@@ -276,7 +281,7 @@ public class LeftDrawerHelper {
    }
 
    private void checkForRemoteUpdatesToMyDP() {
-      NetworkApi.getUserById(null, Preferences.getInstance().getUserId(), new Response.Listener<JSONObject>() {
+      networkApi.getUserById(null, Preferences.getInstance().getUserId(), new Response.Listener<JSONObject>() {
          @Override
          public void onResponse(final JSONObject response) {
             try {
@@ -366,7 +371,7 @@ public class LeftDrawerHelper {
    private void saveUser(final User user, final String newUsername, final String newBio, final boolean needToSaveBio, final boolean needToSaveUsername) {
       if (needToSaveBio && !needToSaveUsername) {
          user.setBio(newBio);
-         NetworkApi.saveUser(mActivity, user, new Response.Listener<String>() {
+         networkApi.saveUser(mActivity, user, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                MLog.d(TAG, "response: ", response);
@@ -399,7 +404,7 @@ public class LeftDrawerHelper {
       } else if (needToSaveUsername) {
          if (needToSaveBio)
             user.setBio(newBio);
-         NetworkApi.isExistsUsername(mActivity, newUsername, new Response.Listener<JSONObject>() {
+         networkApi.isExistsUsername(mActivity, newUsername, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
@@ -408,7 +413,7 @@ public class LeftDrawerHelper {
                try {
                   if (!response.getJSONObject(NetworkApi.RESPONSE_DATA).getBoolean(NetworkApi.KEY_EXISTS)) {
                      user.setUsername(newUsername);
-                     NetworkApi.saveUser(mActivity, user, new Response.Listener<String>() {
+                     networkApi.saveUser(mActivity, user, new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
                            MLog.d(TAG, "response: ", response);

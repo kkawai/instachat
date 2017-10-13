@@ -7,6 +7,8 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.instachat.android.TheApp;
 
+import javax.inject.Inject;
+
 /**
  * @author kkawai
  */
@@ -15,6 +17,9 @@ public class MyNetworkImageView extends NetworkImageView {
     private static final String TAG = MyNetworkImageView.class.getSimpleName();
 
     private String mImageUrl;
+
+    @Inject
+    ImageLoader imageLoader;
 
     public MyNetworkImageView(final Context context) {
         super(context);
@@ -45,6 +50,6 @@ public class MyNetworkImageView extends NetworkImageView {
     }
 
     public final void setImageUrl(final String url) {
-        setImageUrl(url, TheApp.getInstance().getImageLoader());
+        setImageUrl(url, imageLoader);
     }
 }

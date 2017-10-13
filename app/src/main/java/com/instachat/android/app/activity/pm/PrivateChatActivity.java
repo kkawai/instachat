@@ -65,6 +65,8 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
+import javax.inject.Inject;
+
 /**
  * Created by kevin on 9/16/2016.
  * The difference between Private and Group Chat:
@@ -89,6 +91,9 @@ public class PrivateChatActivity extends GroupChatActivity {
     private View mLikesParent;
     private TextView mLikesCount;
     private ActivityPrivateChatBinding binding;
+
+    @Inject
+    NetworkApi networkApi;
 
     @Override
     protected int getLayout() {
@@ -140,7 +145,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         MLog.d(TAG, "before grab from server, intent data: sUserid: ", sUserid, " sUsernane: ", sUsername, " " +
                 "sProfilePicUrl: ", sProfilePicUrl);
         loadBasicData(getIntent());
-        NetworkApi.getUserById(this, sUserid, new Response.Listener<JSONObject>() {
+        networkApi.getUserById(this, sUserid, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -361,7 +366,7 @@ public class PrivateChatActivity extends GroupChatActivity {
         super.onFriendlyMessageSuccess(friendlyMessage);
 
         try {
-            NetworkApi.gcmsend(sUserid, Constants.GcmMessageType.msg, friendlyMessage.toLightweightJSONObject());
+            networkApi.gcmsend(sUserid, Constants.GcmMessageType.msg, friendlyMessage.toLightweightJSONObject());
         } catch (JSONException e) {
             MLog.e(TAG, "", e);
         }

@@ -16,6 +16,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 /**
  * Created by kevin on 12/13/2016.
  * <p>
@@ -34,6 +36,9 @@ public class UserPresenceManager {
     private boolean isTimerRunning;
     private boolean isNotifyOthers;
     private ActivityState mActivityState;
+
+    @Inject
+    NetworkApi networkApi;
 
     public UserPresenceManager(ActivityState activityState, boolean isNotifyOthers) {
         this.isNotifyOthers = isNotifyOthers;
@@ -97,7 +102,7 @@ public class UserPresenceManager {
 
         //get online status for the queue
         try {
-            NetworkApi.getOnlineStatus(mCopy);
+            networkApi.getOnlineStatus(mCopy);
         } catch (Exception e) {
             MLog.e(TAG, "", e);
         }
@@ -131,7 +136,7 @@ public class UserPresenceManager {
                                 try {
                                     JSONObject msg = new JSONObject();
                                     msg.put(Constants.KEY_USERNAME, Preferences.getInstance().getUsername());
-                                    NetworkApi.gcmsend(Integer.parseInt(privateChatSummary.getId()), Constants.GcmMessageType.notify_friend_in, msg);
+                                    networkApi.gcmsend(Integer.parseInt(privateChatSummary.getId()), Constants.GcmMessageType.notify_friend_in, msg);
                                     ChatSummariesPrefs.updateLastNotifiedTime(privateChatSummary.getId());
                                 } catch (Exception e) {
                                     MLog.e(TAG, "", e);

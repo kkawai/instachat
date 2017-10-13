@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -32,6 +33,8 @@ import com.instachat.android.util.StringUtil;
 
 import org.json.JSONObject;
 
+import javax.inject.Inject;
+
 /**
  * Created by kevin on 7/18/2016.
  */
@@ -43,6 +46,12 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     private String email, username, password;
     private FirebaseAuth mFirebaseAuth;
     private String thirdPartyProfilePicUrl;
+
+    @Inject
+    NetworkApi networkApi;
+
+    @Inject
+    RequestQueue requestQueue;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -116,7 +125,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void remotelyValidateEmail() {
-        NetworkApi.isExistsEmail(this, email,
+        networkApi.isExistsEmail(this, email,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(final JSONObject response) {
@@ -144,7 +153,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void remotelyValidateUsername() {
-        NetworkApi.isExistsUsername(this, username,
+        networkApi.isExistsUsername(this, username,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(final JSONObject response) {
@@ -190,7 +199,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         user.setUsername(username);
         if (thirdPartyProfilePicUrl != null)
             user.setProfilePicUrl(thirdPartyProfilePicUrl);
-        NetworkApi.saveUser(this, user, new Response.Listener<String>() {
+        networkApi.saveUser(this, user, new Response.Listener<String>() {
             @Override
             public void onResponse(final String string) {
                 try {
@@ -230,7 +239,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     showErrorToast("Firebase Account Create Error");
                 } else {
                     if (!TextUtils.isEmpty(thirdPartyProfilePicUrl))
-                        NetworkApi.saveThirdPartyPhoto(thirdPartyProfilePicUrl);
+                        networkApi.saveThirdPartyPhoto(thirdPartyProfilePicUrl);
                     startActivity(new Intent(SignUpActivity.this, GroupChatActivity.class));
                     FirebaseAnalytics.getInstance(SignUpActivity.this).logEvent(Events.SIGNUP_SUCCESS, null);
                     finish();
@@ -241,7 +250,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     protected void onDestroy() {
-        TheApp.getInstance().getRequestQueue().cancelAll(this);
+        requestQueue.cancelAll(this);
         super.onDestroy();
     }
 }

@@ -18,6 +18,8 @@ import com.instachat.android.util.Preferences;
 import com.instachat.android.util.SimpleRxWrapper;
 import com.instachat.android.util.StringUtil;
 
+import javax.inject.Inject;
+
 /**
  * Invoke registerIfNecessary() method AFTER user authenticates with IG
  * and we have stored the USER
@@ -27,12 +29,18 @@ import com.instachat.android.util.StringUtil;
  * @author kkawai
  */
 
-public final class GCMHelper {
+public class GCMHelper {
 
     private static final String TAG = GCMHelper.class.getSimpleName();
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
-    private GCMHelper() {
+    @Inject
+    NetworkApi networkApi;
+
+    @Inject
+    Context context;
+
+    public GCMHelper() {
     }
 
     private static void registerIfNecessary(final Context context) {
@@ -70,7 +78,7 @@ public final class GCMHelper {
 
     }
 
-    public static void onCreate(final Activity activity) {
+    public void onCreate(final Activity activity) {
 
         if (!Preferences.getInstance().isLoggedIn()) {
             MLog.i(TAG, "not signed in; skip cloud messaging registration");
@@ -88,7 +96,7 @@ public final class GCMHelper {
         registerIfNecessary(TheApp.getInstance());
     }
 
-    public static void onResume(final Activity activity) {
+    public void onResume(final Activity activity) {
 
         if (!Constants.IS_FOR_AMAZON_ONLY) {
             checkPlayServices(activity);
@@ -100,7 +108,7 @@ public final class GCMHelper {
      * doesn't, display a dialog that allows users to download the APK from the
      * Google Play Store or enable it in the device's system settings.
      */
-    private static boolean checkPlayServices(final Activity activity) {
+    private boolean checkPlayServices(final Activity activity) {
 
         if (Constants.IS_FOR_AMAZON_ONLY) {
             return false;
@@ -120,7 +128,7 @@ public final class GCMHelper {
         return true;
     }
 
-    public static void unregister(final String userid) {
+    public void unregister(final String userid) {
 
         SimpleRxWrapper.executeInWorkerThread(
                 new Runnable() {
@@ -141,12 +149,12 @@ public final class GCMHelper {
 
                         if (TheApp.isGcmSupported) {
 
-                            final String regId = GCMRegistrationManager.getRegistrationId(TheApp.getInstance());
+                            final String regId = GCMRegistrationManager.getRegistrationId(context);
                             MLog.i(TAG, "gcm starting unregister for regId: " + regId);
                             if (StringUtil.isNotEmpty(regId)) {
                                 try {
-                                    GCMRegistrationManager.removeRegistrationId(TheApp.getInstance());
-                                    NetworkApi.gcmunreg(TheApp.getInstance(), userid, regId);
+                                    GCMRegistrationManager.removeRegistrationId(context);
+                                    networkApi.gcmunreg(context, userid, regId);
                                     MLog.i(TAG, "gcm unregistered");
                                 } catch (final Exception e) {
                                     MLog.e(TAG, "gcm failed to unregister", e);

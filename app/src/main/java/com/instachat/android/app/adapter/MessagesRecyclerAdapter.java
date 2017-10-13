@@ -57,6 +57,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.inject.Inject;
+
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
@@ -91,6 +93,9 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private int mMaxPeriscopesPerItem;
     private boolean mIsPrivateChat;
     private int mMyUserid;
+
+    @Inject
+    MessagesRecyclerAdapterHelper map;
 
     public MessagesRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref) {
         super(modelClass, modelLayout, viewHolderClass, ref);
@@ -318,8 +323,8 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
         if (friendlyMessage.getLikes() > 0) {
             viewHolder.periscopeParent.setVisibility(View.VISIBLE);
-            final int consumedLikes = TheApp.getInstance().getMap().getConsumedLikesMap().containsKey(friendlyMessage.getId()) ?
-                    TheApp.getInstance().getMap().getConsumedLikesMap().get(friendlyMessage.getId()) : 0;
+            final int consumedLikes = map.getConsumedLikesMap().containsKey(friendlyMessage.getId()) ?
+                    map.getConsumedLikesMap().get(friendlyMessage.getId()) : 0;
             final int likesToDisplay = friendlyMessage.getLikes() - consumedLikes;
             final int count = likesToDisplay > mMaxPeriscopesPerItem ? mMaxPeriscopesPerItem : likesToDisplay;
             if (count > 0) { //only show likes periscope for likes that have not been consumed yet
@@ -336,7 +341,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                                 MLog.e(TAG, " failed to periscope ", e.getMessage());
                             }
                         }
-                        TheApp.getInstance().getMap().getConsumedLikesMap().put(friendlyMessage.getId(), friendlyMessage.getLikes());
+                        map.getConsumedLikesMap().put(friendlyMessage.getId(), friendlyMessage.getLikes());
                     }
                 }, 500);
             } else {

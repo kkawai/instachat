@@ -12,6 +12,8 @@ import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.SimpleRxWrapper;
 
+import javax.inject.Inject;
+
 /**
  * The important assumption is that GCM is already supported on this device
  * AND that Google Play Services is installed on the device.
@@ -27,6 +29,9 @@ public final class GCMRegistrationManager {
     private GoogleCloudMessaging mGcm;
     private String mRegId;
     private Context mContext;
+
+    @Inject
+    NetworkApi networkApi;
 
     public GCMRegistrationManager(final Context context) {
         mContext = context;
@@ -69,7 +74,7 @@ public final class GCMRegistrationManager {
                     // The request to your server should be authenticated if
                     // your app
                     // is using accounts.
-                    NetworkApi.gcmreg(mContext, mRegId);
+                    networkApi.gcmreg(mContext, mRegId);
 
                     // For this demo: we don't need to send it because the
                     // device

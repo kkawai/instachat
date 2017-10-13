@@ -13,9 +13,14 @@ import com.instachat.android.util.Preferences;
 
 import org.json.JSONObject;
 
+import javax.inject.Inject;
+
 public class ADMReceiver extends ADMMessageHandlerBase {
 
     private static final String TAG = ADMReceiver.class.getSimpleName();
+
+    @Inject
+    NetworkApi networkApi;
 
     public ADMReceiver() {
         /** {@inheritDoc} */
@@ -48,7 +53,7 @@ public class ADMReceiver extends ADMMessageHandlerBase {
                      * VERY Important: the prepended ' ' character signifies to
 					 * server that this is for ADM, not GCM 
 					 */
-                    NetworkApi
+                    networkApi
                             .gcmreg(TheApp.getInstance(), " " + registrationId);
                     MLog.i(TAG, "onRegistered: " + registrationId);
                 } catch (final Exception e) {
@@ -74,7 +79,7 @@ public class ADMReceiver extends ADMMessageHandlerBase {
 					 * VERY Important: the prepended ' ' character signifies to
 					 * server that this is for ADM, not GCM 
 					 */
-                    NetworkApi.gcmunreg(TheApp.getInstance(), Preferences.getInstance().getUserId() + "", " " + registrationId);
+                    networkApi.gcmunreg(TheApp.getInstance(), Preferences.getInstance().getUserId() + "", " " + registrationId);
                     MLog.i(TAG, "onUnregistered: " + registrationId);
                 } catch (final Exception e) {
                     MLog.e(TAG, "adm error", e);
