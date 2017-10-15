@@ -1,4 +1,4 @@
-package com.instachat.android.app.login;
+package com.instachat.android.app.login.signup;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -20,7 +20,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.activity.group.GroupChatActivity;
-import com.instachat.android.TheApp;
 import com.instachat.android.R;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.font.FontUtil;

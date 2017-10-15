@@ -85,6 +85,7 @@ import com.instachat.android.app.adapter.ChatsItemClickedListener;
 import com.instachat.android.app.adapter.FriendlyMessageListener;
 import com.instachat.android.app.adapter.GroupChatUsersRecyclerAdapter;
 import com.instachat.android.app.adapter.MessageTextClickedListener;
+import com.instachat.android.app.adapter.MessageViewHolder;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapter;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.app.analytics.Events;
@@ -94,7 +95,6 @@ import com.instachat.android.app.fullscreen.FriendlyMessageContainer;
 import com.instachat.android.app.fullscreen.FullScreenTextFragment;
 import com.instachat.android.app.likes.UserLikedUserFragment;
 import com.instachat.android.app.likes.UserLikedUserListener;
-import com.instachat.android.app.login.LogoutDialogHelper;
 import com.instachat.android.app.login.SignInActivity;
 import com.instachat.android.app.requests.RequestsFragment;
 import com.instachat.android.app.ui.base.BaseActivity;
@@ -156,7 +156,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     @Inject
     LinearLayoutManager linearLayoutManager;
 
-    @Inject
     MessagesRecyclerAdapter messagesAdapter;
 
     @Inject
@@ -165,11 +164,17 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     @Inject
     GCMHelper gcmHelper;
 
+    @Inject
+    LogoutDialogHelper logoutDialogHelper;
+
+    @Inject
+    FirebaseAuth firebaseAuth;
+
     private RecyclerView messageRecyclerView;
 
     private Toolbar mToolbar;
     private View mSendButton, mAttachButton;
-    private FirebaseAuth mFirebaseAuth;
+
     //private FirebaseUser mFirebaseUser;
     private EditText mMessageEditText;
     private TextView mUsernameTyping;
@@ -196,7 +201,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     private ActivityMainBinding binding;
     private GroupChatViewModel groupChatViewModel;
 
-    @Inject
     AdHelper adHelper;
 
     protected int getLayout() {
@@ -240,9 +244,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         setupToolbar();
         mDotsLayoutParent = findViewById(R.id.dotsLayout);
 
-        // Initialize Firebase Auth
-        mFirebaseAuth = FirebaseAuth.getInstance();
-
         gcmHelper.onCreate(this);
 
         linearLayoutManager.setStackFromEnd(true);
@@ -258,18 +259,11 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         initRemoteConfig();
         fetchConfig();
         initFirebaseAdapter();
-
-        /*
-        messagesAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class,
-                R.layout.item_message,
-                MessageViewHolder.class,
-                FirebaseDatabase.getInstance().getReference(mDatabaseRoot).
-                        limitToLast((int) mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)));  */
-
         messageRecyclerView = findViewById(R.id.messageRecyclerView);
         messageRecyclerView.setLayoutManager(linearLayoutManager);
         messageRecyclerView.setAdapter(messagesAdapter);
 
+        adHelper = new AdHelper(this);
         adHelper.loadAd();
 
         mUsernameTyping = ((TextView) findViewById(R.id.usernameTyping));
@@ -487,13 +481,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        // Unregister download receiver
-        //LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadReceiver);
-    }
-
-    @Override
     public void onDestroy() {
         if (mRightRef != null)
             mRightRef.removeEventListener(mRightListener);
@@ -536,11 +523,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     protected final void setDatabaseRoot(final String root) {
         mDatabaseRoot = root;
-        //        try {
-        //            FirebaseDatabase.getInstance().getReference(mDatabaseRoot).keepSynced(true);
-        //        } catch (Exception e) {
-        //            MLog.e(TAG, "", e);
-        //        }
     }
 
     private void setEnableSendButton(final boolean isEnable) {
@@ -598,20 +580,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             MLog.d(TAG, "initPhotoHelper: retrieved from saved instance state: " + photoType);
         }
     }
-
-    /*private void beginDownload() {
-        // Get path
-        String path = "photos/" + mFileUri.getLastPathSegment();
-
-        // Kick off download service
-        Intent intent = new Intent(this, MyDownloadService.class);
-        intent.setAction(MyDownloadService.ACTION_DOWNLOAD);
-        intent.putExtra(MyDownloadService.EXTRA_DOWNLOAD_PATH, path);
-        startService(intent);
-
-        // Show loading spinner
-        showProgressDialog();
-    }*/
 
     private void showProgressDialog() {
         if (mProgressDialog == null) {
@@ -990,7 +958,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         View drawerView = getLayoutInflater().inflate(R.layout.left_drawer_layout, navigationView, false);
         navigationView.addView(drawerView);
         navigationView.addHeaderView(headerView);
-        mLeftDrawerHelper = new LeftDrawerHelper(this, this, mDrawerLayout, mLeftDrawerEventListener);
+        mLeftDrawerHelper = new LeftDrawerHelper(networkApi, this, this, mDrawerLayout, mLeftDrawerEventListener);
         mLeftDrawerHelper.setup(navigationView);
         mLeftDrawerHelper.setUserLikedUserListener(mUserLikedUserListener);
 
@@ -1205,6 +1173,11 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     }
 
     private void initFirebaseAdapter() {
+        messagesAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class,
+                R.layout.item_message,
+                MessageViewHolder.class,
+                FirebaseDatabase.getInstance().getReference(mDatabaseRoot).
+                        limitToLast((int) mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)));
         messagesAdapter.setIsPrivateChat(isPrivateChat());
         messagesAdapter.setDatabaseRoot(mDatabaseRoot);
         messagesAdapter.setActivity(this, this, (FrameLayout) findViewById(R.id.fragment_content));
@@ -1578,10 +1551,10 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     private void signout() {
 
-        new LogoutDialogHelper().showLogoutDialog(this, new LogoutDialogHelper.LogoutListener() {
+        logoutDialogHelper.showLogoutDialog(this, new LogoutDialogHelper.LogoutListener() {
             @Override
             public void onConfirmLogout() {
-                mFirebaseAuth.signOut();
+                firebaseAuth.signOut();
                 removeUserPresenceFromGroup();
                 gcmHelper.unregister(Preferences.getInstance().getUserId() + "");
                 Preferences.getInstance().saveUser(null);

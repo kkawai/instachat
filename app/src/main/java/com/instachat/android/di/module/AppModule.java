@@ -6,10 +6,12 @@ import android.content.Context;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.gson.Gson;
 import com.instachat.android.app.activity.RemoteConfigHelper;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
+import com.instachat.android.app.activity.group.LogoutDialogHelper;
 import com.instachat.android.data.AppDataManager;
 import com.instachat.android.data.DataManager;
 import com.instachat.android.data.api.NetworkApi;
@@ -59,14 +61,20 @@ public class AppModule {
 
     @Provides
     @Singleton
+    FirebaseAuth provideFirebaseAuth() {
+        return FirebaseAuth.getInstance();
+    }
+
+    @Provides
+    @Singleton
     MessagesRecyclerAdapterHelper provideMessagesRecyclerAdapterHelper() {
         return new MessagesRecyclerAdapterHelper();
     }
 
     @Provides
     @Singleton
-    RequestQueue providesVolleyRequestQueue(Application application) {
-        return Volley.newRequestQueue(application);
+    RequestQueue providesVolleyRequestQueue(Context context) {
+        return Volley.newRequestQueue(context);
     }
 
     @Provides
@@ -79,13 +87,18 @@ public class AppModule {
 
     @Provides
     @Singleton
-    NetworkApi provideNetworkApi() {
-        return new NetworkApi();
+    NetworkApi provideNetworkApi(RequestQueue requestQueue) {
+        return new NetworkApi(requestQueue);
     }
 
     @Provides
     GCMHelper provideGCMHelper() {
         return new GCMHelper();
+    }
+
+    @Provides
+    LogoutDialogHelper provideLogoutDialogHelper() {
+        return new LogoutDialogHelper();
     }
 
 //    @Provides

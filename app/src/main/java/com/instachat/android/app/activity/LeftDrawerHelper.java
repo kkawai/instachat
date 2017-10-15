@@ -81,15 +81,14 @@ public class LeftDrawerHelper {
    private ChildEventListener mPrivateChatRequestsListener;
    private DatabaseReference mPrivateChatRequestsRef;
    private Map<String, Boolean> mOutstandingRequestsMap = new Hashtable<>();
+   private final NetworkApi networkApi;
 
-   @Inject
-   NetworkApi networkApi;
-
-   public LeftDrawerHelper(@NonNull Activity activity, @NonNull ActivityState activityState, @NonNull DrawerLayout drawerLayout, @NonNull LeftDrawerEventListener listener) {
+   public LeftDrawerHelper(@NonNull NetworkApi networkApi, @NonNull Activity activity, @NonNull ActivityState activityState, @NonNull DrawerLayout drawerLayout, @NonNull LeftDrawerEventListener listener) {
       mActivity = activity;
       mActivityState = activityState;
       mDrawerLayout = drawerLayout;
       mLeftDrawerEventListener = listener;
+      this.networkApi = networkApi;
    }
 
    public void updateProfilePic(final String profilePicUrl) {

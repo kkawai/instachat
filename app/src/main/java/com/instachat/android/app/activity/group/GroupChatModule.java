@@ -20,7 +20,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class GroupChatActivityModule {
+public class GroupChatModule {
 
     @Provides
     GroupChatViewModel provideGroupChatViewModel(DataManager dataManager,
@@ -34,24 +34,7 @@ public class GroupChatActivityModule {
     }
 
     @Provides
-    MessagesRecyclerAdapter provideMessagesRecyclerAdapter(GroupChatActivity activity, FirebaseRemoteConfig remoteConfig) {
-        MessagesRecyclerAdapter adapter = new MessagesRecyclerAdapter<FriendlyMessage,MessageViewHolder>(FriendlyMessage.class,
-                R.layout.item_message,
-                MessageViewHolder.class,
-                FirebaseDatabase.getInstance().getReference(activity.getDatabaseRoot()).
-                        limitToLast((int) remoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)));
-        return adapter;
-
-    }
-
-    @Provides
     LinearLayoutManager provideGridLayoutManager(GroupChatActivity activity) {
         return new LinearLayoutManager(activity);
     }
-
-    @Provides
-    AdHelper provideAdHelper(GroupChatActivity activity) {
-        return new AdHelper(activity);
-    }
-
 }

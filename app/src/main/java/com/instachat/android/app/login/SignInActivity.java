@@ -1,30 +1,15 @@
-/**
- * Copyright Google Inc. All Rights Reserved.
- * <p/>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p/>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.instachat.android.app.login;
 
 import android.app.ProgressDialog;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
@@ -45,11 +30,16 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.instachat.android.BR;
 import com.instachat.android.R;
 import com.instachat.android.app.activity.group.GroupChatActivity;
 import com.instachat.android.app.analytics.Events;
+import com.instachat.android.app.login.recovery.ForgotPasswordActivity;
+import com.instachat.android.app.login.signup.SignUpActivity;
+import com.instachat.android.app.ui.base.BaseActivity;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.model.User;
+import com.instachat.android.databinding.ActivitySignInBinding;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.util.ActivityUtil;
 import com.instachat.android.util.MLog;
@@ -62,9 +52,7 @@ import org.json.JSONObject;
 
 import javax.inject.Inject;
 
-import dagger.android.AndroidInjection;
-
-public class SignInActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, View.OnFocusChangeListener {
+public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInViewModel> implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, View.OnFocusChangeListener, SignInNavigator {
 
    private static final String TAG = "SignInActivity";
    private static final int RC_SIGN_IN = 9001;
@@ -72,9 +60,12 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
    private TextInputLayout passwordLayout, emailLayout;
    private String email, password;
    private String thirdPartyProfilePicUrl;
-   private GoogleApiClient mGoogleApiClient;
-   private FirebaseAuth mFirebaseAuth;
-   private ProgressDialog mProgressDialog;
+   private GoogleApiClient googleApiClient;
+   private ProgressDialog progressDialog;
+   private SignInViewModel signInViewModel;
+
+   @Inject
+   ViewModelProvider.Factory viewModelFactory;
 
    @Inject
    NetworkApi networkApi;
@@ -82,12 +73,14 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
    @Inject
    RequestQueue requestQueue;
 
+   @Inject
+   FirebaseAuth firebaseAuth;
+
    @Override
    protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
-      AndroidInjection.inject(this);
+      signInViewModel.setNavigator(this);
       ActivityUtil.hideStatusBar(getWindow());
-      DataBindingUtil.setContentView(this, R.layout.activity_sign_in);
       passwordLayout = (TextInputLayout) findViewById(R.id.input_password_layout);
       emailLayout = (TextInputLayout) findViewById(R.id.input_email_layout);
       findViewById(R.id.sign_in_with_email_button).setOnClickListener(this);
@@ -99,10 +92,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
       findViewById(R.id.sign_in_with_google_textview).setOnClickListener(this);
 
       GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
-      mGoogleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */).addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
-
-      // Initialize FirebaseAuth
-      mFirebaseAuth = FirebaseAuth.getInstance();
+      googleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */).addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
 
       String lastSignIn = Preferences.getInstance().getLastSignIn();
       MLog.i(TAG, "lastSignIn ", lastSignIn);
@@ -181,16 +171,16 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
 
    private void signIntoFirebase(final String email, final String password) {
 
-      mFirebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+      firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
          @Override
          public void onComplete(@NonNull Task<AuthResult> task) {
-            MLog.d(TAG, "mFirebaseAuth.signInWithEmailAndPassword(): " + task.isSuccessful(), " ", email, " ", password);
+            MLog.d(TAG, "firebaseAuth.signInWithEmailAndPassword(): " + task.isSuccessful(), " ", email, " ", password);
             if (!task.isSuccessful()) {
                if (task.getException() instanceof FirebaseAuthInvalidUserException) {
                   createFirebaseAccount(email, password);
                   return;
                }
-               MLog.w(TAG, "mFirebaseAuth.signInWithEmailAndPassword(): ", task.getException());
+               MLog.w(TAG, "firebaseAuth.signInWithEmailAndPassword(): ", task.getException());
                showErrorToast("Sign In Error");
             } else {
                finallyGoChat();
@@ -214,12 +204,12 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
 
    private void createFirebaseAccount(final String email, final String password) {
 
-      mFirebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+      firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
          @Override
          public void onComplete(@NonNull Task<AuthResult> task) {
-            MLog.d(TAG, "mFirebaseAuth.createFirebaseAccount(): " + task.isSuccessful(), " ", email, " ", password);
+            MLog.d(TAG, "firebaseAuth.createFirebaseAccount(): " + task.isSuccessful(), " ", email, " ", password);
             if (!task.isSuccessful()) {
-               MLog.w(TAG, "mFirebaseAuth.createUserWithEmailAndPassword(): ", task.getException());
+               MLog.w(TAG, "firebaseAuth.createUserWithEmailAndPassword(): ", task.getException());
                showErrorToast("Sign In Error");
             } else {
                finallyGoChat();
@@ -246,7 +236,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
    }
 
    private void signInWithGoogle() {
-      startActivityForResult(Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient), RC_SIGN_IN);
+      startActivityForResult(Auth.GoogleSignInApi.getSignInIntent(googleApiClient), RC_SIGN_IN);
    }
 
    private void signUp() {
@@ -409,20 +399,34 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
    }
 
    private void showProgressDialog() {
-      if (mProgressDialog != null && mProgressDialog.isShowing()) {
+      if (progressDialog != null && progressDialog.isShowing()) {
          return;
       }
-      mProgressDialog = new ProgressDialog(this);
-      mProgressDialog.setIndeterminate(true);
-      mProgressDialog.setCancelable(false);
-      mProgressDialog.setTitle(R.string.loading);
-      mProgressDialog.show();
+      progressDialog = new ProgressDialog(this);
+      progressDialog.setIndeterminate(true);
+      progressDialog.setCancelable(false);
+      progressDialog.setTitle(R.string.loading);
+      progressDialog.show();
    }
 
    private void hideProgressDialog() {
-      if (mProgressDialog != null && mProgressDialog.isShowing()) {
-         mProgressDialog.dismiss();
+      if (progressDialog != null && progressDialog.isShowing()) {
+         progressDialog.dismiss();
       }
    }
 
+   @Override
+   public SignInViewModel getViewModel() {
+      return (signInViewModel = ViewModelProviders.of(this, viewModelFactory).get(SignInViewModel.class));
+   }
+
+   @Override
+   public int getBindingVariable() {
+      return BR.viewModel;
+   }
+
+   @Override
+   public int getLayoutId() {
+      return R.layout.activity_sign_in;
+   }
 }

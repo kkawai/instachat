@@ -48,13 +48,14 @@ public class NetworkApi {
     public static final String KEY_RESPONSE_STATUS = "status";
     public static final String KEY_EXISTS = "exists";
 
+    final RequestQueue requestQueue;
+
     private static final DefaultRetryPolicy DEFAULT_RETRY_POLICY = new DefaultRetryPolicy(REQUEST_TIMEOUT_MS,
             DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-    
+
     @Inject
-    RequestQueue requestQueue;
-    
-    public NetworkApi() {
+    public NetworkApi(RequestQueue requestQueue) {
+        this.requestQueue = requestQueue;
     }
 
     public Pair pair() {

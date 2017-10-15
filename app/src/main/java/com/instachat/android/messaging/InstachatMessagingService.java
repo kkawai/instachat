@@ -28,7 +28,7 @@ import com.instachat.android.Constants;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.activity.pm.PrivateChatActivity;
 import com.instachat.android.R;
-import com.instachat.android.app.login.LauncherActivity;
+import com.instachat.android.app.activity.LauncherActivity;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.util.MLog;

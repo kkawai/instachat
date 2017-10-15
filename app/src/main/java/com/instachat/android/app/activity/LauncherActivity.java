@@ -1,4 +1,4 @@
-package com.instachat.android.app.login;
+package com.instachat.android.app.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,6 +7,8 @@ import android.view.View;
 
 import com.instachat.android.app.activity.group.GroupChatActivity;
 import com.instachat.android.R;
+import com.instachat.android.app.login.SignInActivity;
+import com.instachat.android.app.login.signup.SignUpActivity;
 import com.instachat.android.util.ActivityUtil;
 import com.instachat.android.util.Preferences;
 

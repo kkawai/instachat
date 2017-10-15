@@ -1,4 +1,4 @@
-package com.instachat.android.app.login;
+package com.instachat.android.app.activity.group;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
@@ -12,6 +12,9 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
  */
 
 public class LogoutDialogHelper {
+
+    public LogoutDialogHelper() {
+    }
 
     public interface LogoutListener {
         void onConfirmLogout();
