@@ -8,6 +8,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.app.activity.AdHelper;
+import com.instachat.android.app.activity.PresenceHelper;
 import com.instachat.android.app.activity.RemoteConfigHelper;
 import com.instachat.android.app.adapter.MessageViewHolder;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapter;
@@ -15,6 +16,8 @@ import com.instachat.android.data.DataManager;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.di.ViewModelProviderFactory;
 import com.instachat.android.util.rx.SchedulerProvider;
+
+import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
@@ -36,5 +39,10 @@ public class GroupChatModule {
     @Provides
     LinearLayoutManager provideGridLayoutManager(GroupChatActivity activity) {
         return new LinearLayoutManager(activity);
+    }
+
+    @Provides
+    PresenceHelper providePresenceHelper() {
+        return new PresenceHelper();
     }
 }

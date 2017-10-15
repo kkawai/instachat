@@ -14,7 +14,7 @@ public class SimpleRxWrapper {
             @Override
             public Boolean call() throws Exception {
                 task.run();
-                return true;
+                return false;
             }
         }).subscribeOn(Schedulers.io()).subscribe();
 
@@ -25,7 +25,7 @@ public class SimpleRxWrapper {
             @Override
             public Boolean call() throws Exception {
                 task.run();
-                return true;
+                return false;
             }
         }).subscribeOn(AndroidSchedulers.mainThread()).subscribe();
     }

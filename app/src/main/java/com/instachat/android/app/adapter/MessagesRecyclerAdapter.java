@@ -93,16 +93,15 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private int mMaxPeriscopesPerItem;
     private boolean mIsPrivateChat;
     private int mMyUserid;
+    private final MessagesRecyclerAdapterHelper map;
 
-    @Inject
-    MessagesRecyclerAdapterHelper map;
-
-    public MessagesRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref) {
+    public MessagesRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref, MessagesRecyclerAdapterHelper map) {
         super(modelClass, modelLayout, viewHolderClass, ref);
         mMessagesRef = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mMaxPeriscopesPerItem = (int) FirebaseRemoteConfig.getInstance().getLong(Constants.KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM);
         mMyUserid = Preferences.getInstance().getUserId();
+        this.map = map;
     }
 
     public void setIsPrivateChat(boolean isPrivateChat) {

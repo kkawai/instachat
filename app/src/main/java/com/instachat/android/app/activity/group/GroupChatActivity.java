@@ -87,6 +87,7 @@ import com.instachat.android.app.adapter.GroupChatUsersRecyclerAdapter;
 import com.instachat.android.app.adapter.MessageTextClickedListener;
 import com.instachat.android.app.adapter.MessageViewHolder;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapter;
+import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.blocks.BlockedUserListener;
@@ -114,6 +115,7 @@ import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
+import com.instachat.android.util.rx.SchedulerProvider;
 import com.instachat.android.view.ThemedAlertDialog;
 import com.smaato.soma.AdDownloaderInterface;
 import com.smaato.soma.AdListenerInterface;
@@ -126,12 +128,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
@@ -149,6 +153,18 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     private static final String TAG = "GroupChatActivity";
 
     private static final int REQUEST_INVITE = 1;
+
+    @Inject
+    SchedulerProvider schedulerProvider;
+    
+    @Inject
+    FirebaseRemoteConfig firebaseRemoteConfig;
+
+    @Inject
+    MessagesRecyclerAdapterHelper map;
+
+    @Inject
+    PresenceHelper presenceHelper;
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
@@ -175,18 +191,13 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     private Toolbar mToolbar;
     private View mSendButton, mAttachButton;
 
-    //private FirebaseUser mFirebaseUser;
     private EditText mMessageEditText;
     private TextView mUsernameTyping;
-    //private AdView mAdView;
-    private FirebaseRemoteConfig mFirebaseRemoteConfig;
-    //private GoogleApiClient mGoogleApiClient;
     private DrawerLayout mDrawerLayout;
     private DatabaseReference mMeTypingRef;
 
     private ProgressDialog mProgressDialog;
 
-    // [START declare_ref]
     private PhotoUploadHelper mPhotoUploadHelper;
     private LeftDrawerHelper mLeftDrawerHelper;
     private String mDatabaseRoot;
@@ -200,8 +211,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     private boolean mIsPendingRequestsAvailable;
     private ActivityMainBinding binding;
     private GroupChatViewModel groupChatViewModel;
-
-    AdHelper adHelper;
+    private AdHelper adHelper;
 
     protected int getLayout() {
         return R.layout.activity_main;
@@ -256,7 +266,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         }
 
         NotificationHelper.createNotificationChannels(this);
-        initRemoteConfig();
         fetchConfig();
         initFirebaseAdapter();
         messageRecyclerView = findViewById(R.id.messageRecyclerView);
@@ -272,7 +281,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 new String[]{"image/png", "image/gif", "image/jpeg", "image/webp"});
         messageEditTextParent.addView(mMessageEditText);
         FontUtil.setTextViewFont(mMessageEditText);
-        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter((int) mFirebaseRemoteConfig
+        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter((int) firebaseRemoteConfig
                 .getLong(Constants.KEY_MAX_MESSAGE_LENGTH))});
         mMessageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -542,29 +551,12 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
             @Override
             public void onAnimationEnd(Animation animation) {
-
-                showAnimation.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
                 mSendButton.startAnimation(showAnimation);
                 //mSendButton.setEnabled(isEnable);
             }
 
             @Override
             public void onAnimationRepeat(Animation animation) {
-
             }
         });
         mSendButton.startAnimation(hideAnimation);
@@ -686,10 +678,8 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         return true;
     }
 
-    private PresenceHelper mPresenceHelper = new PresenceHelper();
-
     protected final void updateLastActiveTimestamp() {
-        mPresenceHelper.updateLastActiveTimestamp();
+        presenceHelper.updateLastActiveTimestamp();
     }
 
     @Override
@@ -800,14 +790,14 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         long cacheExpiration = 3600; // 1 hour in seconds
         // If developer mode is enabled reduce cacheExpiration to 0 so that each fetch goes to the
         // server. This should not be used in release builds.
-        if (mFirebaseRemoteConfig.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
+        if (firebaseRemoteConfig.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
             cacheExpiration = 0;
         }
-        mFirebaseRemoteConfig.fetch(cacheExpiration).addOnSuccessListener(new OnSuccessListener<Void>() {
+        firebaseRemoteConfig.fetch(cacheExpiration).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 // Make the fetched config available via FirebaseRemoteConfig get<type> calls.
-                mFirebaseRemoteConfig.activateFetched();
+                firebaseRemoteConfig.activateFetched();
                 applyRetrievedLengthLimit();
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -857,14 +847,13 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     }
 
     private void showPhotoReduceError() {
-        runOnUiThread(new Runnable() {
+        addDisposable(Observable.fromCallable(new Callable<Boolean>() {
             @Override
-            public void run() {
-                if (isActivityDestroyed())
-                    return;
+            public Boolean call() throws Exception {
                 Toast.makeText(GroupChatActivity.this, "Could not read photo", Toast.LENGTH_SHORT).show();
+                return false;
             }
-        });
+        }).subscribeOn(schedulerProvider.ui()).subscribe());
     }
 
     /**
@@ -872,7 +861,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
      * cached values.
      */
     private void applyRetrievedLengthLimit() {
-        Long friendly_msg_length = mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_LENGTH);
+        Long friendly_msg_length = firebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_LENGTH);
         mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(friendly_msg_length.intValue())});
         MLog.d(TAG, "FML is: " + friendly_msg_length);
     }
@@ -1177,7 +1166,8 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 R.layout.item_message,
                 MessageViewHolder.class,
                 FirebaseDatabase.getInstance().getReference(mDatabaseRoot).
-                        limitToLast((int) mFirebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)));
+                        limitToLast((int) firebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)),
+                map);
         messagesAdapter.setIsPrivateChat(isPrivateChat());
         messagesAdapter.setDatabaseRoot(mDatabaseRoot);
         messagesAdapter.setActivity(this, this, (FrameLayout) findViewById(R.id.fragment_content));
@@ -1404,7 +1394,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     protected void showTypingDots() {
         showDotsParent(true);
         mDotsHandler.removeCallbacks(mDotsHideRunner);
-        mDotsHandler.postDelayed(mDotsHideRunner, mFirebaseRemoteConfig.getLong(Constants
+        mDotsHandler.postDelayed(mDotsHideRunner, firebaseRemoteConfig.getLong(Constants
                 .KEY_MAX_TYPING_DOTS_DISPLAY_TIME));
     }
 
@@ -1566,10 +1556,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     protected BlockedUserListener getBlockedUserListener() {
         return mBlockedUserListener;
-    }
-
-    private void initRemoteConfig() {
-        mFirebaseRemoteConfig = new RemoteConfigHelper().initializeRemoteConfig();
     }
 
     private UserLikedUserListener mUserLikedUserListener = new UserLikedUserListener() {

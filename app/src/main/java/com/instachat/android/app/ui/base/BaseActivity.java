@@ -34,8 +34,8 @@ import android.widget.ProgressBar;
 
 import com.android.volley.RequestQueue;
 import com.instachat.android.R;
-import com.instachat.android.TheApp;
 import com.instachat.android.app.activity.ActivityState;
+import com.instachat.android.util.MLog;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -155,6 +155,7 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
     public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
         mIsDestroyed = false;
         super.onCreate(savedInstanceState, persistentState);
+        MLog.d("kevintest", "BaseActivity.onCreate() injected requestQueue: "+requestQueue);
     }
 
     @Inject
