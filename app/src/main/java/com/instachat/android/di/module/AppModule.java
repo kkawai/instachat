@@ -2,6 +2,7 @@ package com.instachat.android.di.module;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
@@ -16,6 +17,7 @@ import com.instachat.android.data.AppDataManager;
 import com.instachat.android.data.DataManager;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.gcm.GCMHelper;
+import com.instachat.android.gcm.GCMRegistrationManager;
 import com.instachat.android.util.BitmapLruCache;
 import com.instachat.android.util.rx.AppSchedulerProvider;
 import com.instachat.android.util.rx.SchedulerProvider;
@@ -92,8 +94,14 @@ public class AppModule {
     }
 
     @Provides
-    GCMHelper provideGCMHelper() {
-        return new GCMHelper();
+    @Singleton
+    GCMRegistrationManager provideGCMRegistrationManager(Context context, NetworkApi networkApi) {
+        return new GCMRegistrationManager(context, networkApi);
+    }
+
+    @Provides
+    GCMHelper provideGCMHelper(Context context, NetworkApi networkApi, GCMRegistrationManager gcmRegistrationManager) {
+        return new GCMHelper(context, networkApi, gcmRegistrationManager);
     }
 
     @Provides

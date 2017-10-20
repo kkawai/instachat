@@ -47,6 +47,9 @@ import io.reactivex.disposables.Disposable;
 
 public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseViewModel> extends AppCompatActivity implements BaseFragment.Callback, ActivityState {
 
+    @Inject
+    RequestQueue requestQueue;
+
     // TODO
     // this can probably depend on isLoading variable of BaseViewModel,
     // since its going to be common for all the activities
@@ -150,16 +153,6 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
 
     private boolean mIsDestroyed; //for <= sdk 16
     private List<Disposable> disposableList = new LinkedList<>();
-
-    @Override
-    public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-        mIsDestroyed = false;
-        super.onCreate(savedInstanceState, persistentState);
-        MLog.d("kevintest", "BaseActivity.onCreate() injected requestQueue: "+requestQueue);
-    }
-
-    @Inject
-    RequestQueue requestQueue;
 
     @Override
     protected void onDestroy() {

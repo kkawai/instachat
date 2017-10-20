@@ -2,6 +2,7 @@ package com.instachat.android.gcm;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.amazon.device.messaging.ADM;
 import com.amazon.device.messaging.development.ADMManifest;
@@ -34,16 +35,20 @@ public class GCMHelper {
     private static final String TAG = GCMHelper.class.getSimpleName();
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
-    @Inject
-    NetworkApi networkApi;
+    private final NetworkApi networkApi;
+    private final GCMRegistrationManager gcmRegistrationManager;
+    private final Context context;
 
     @Inject
-    Context context;
-
-    public GCMHelper() {
+    public GCMHelper(@NonNull Context context,
+                     @NonNull NetworkApi networkApi,
+                     @NonNull GCMRegistrationManager gcmRegistrationManager) {
+        this.context = context;
+        this.networkApi = networkApi;
+        this.gcmRegistrationManager = gcmRegistrationManager;
     }
 
-    private static void registerIfNecessary(final Context context) {
+    private void registerIfNecessary(final Context context) {
 
         MLog.i(TAG, "registerIfNecessary()");
 
@@ -73,7 +78,7 @@ public class GCMHelper {
 
         if (TheApp.isGcmSupported && !Constants.IS_FOR_AMAZON_ONLY) {
             MLog.i(TAG, "debugx about to registerIfNecessary gcm.  isGcmSupported:" + TheApp.isGcmSupported);
-            new GCMRegistrationManager(context).registerGCM();
+            gcmRegistrationManager.registerGCM();
         }
 
     }

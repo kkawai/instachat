@@ -34,6 +34,8 @@ import org.json.JSONObject;
 
 import javax.inject.Inject;
 
+import dagger.android.AndroidInjection;
+
 /**
  * Created by kevin on 7/18/2016.
  */
@@ -54,6 +56,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         ActivityUtil.hideStatusBar(getWindow());
         DataBindingUtil.setContentView(this, R.layout.activity_sign_up);

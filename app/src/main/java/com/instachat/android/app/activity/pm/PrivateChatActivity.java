@@ -2,6 +2,8 @@ package com.instachat.android.app.activity.pm;
 
 import android.app.Activity;
 import android.app.NotificationManager;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
@@ -13,6 +15,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.GestureDetector;
@@ -34,6 +37,7 @@ import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -41,23 +45,33 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.instachat.android.BR;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
+import com.instachat.android.app.activity.PresenceHelper;
 import com.instachat.android.app.activity.group.GroupChatActivity;
+import com.instachat.android.app.activity.group.GroupChatViewModel;
+import com.instachat.android.app.activity.group.LogoutDialogHelper;
+import com.instachat.android.app.adapter.MessagesRecyclerAdapter;
+import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
 import com.instachat.android.app.analytics.Events;
-import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.app.blocks.BlockUserDialogHelper;
 import com.instachat.android.app.blocks.ReportUserDialogHelper;
 import com.instachat.android.app.likes.UserLikedUserFragment;
+import com.instachat.android.app.ui.base.BaseActivity;
+import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.data.model.User;
+import com.instachat.android.databinding.ActivityMainBinding;
 import com.instachat.android.databinding.ActivityPrivateChatBinding;
+import com.instachat.android.gcm.GCMHelper;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.TimeUtil;
+import com.instachat.android.util.rx.SchedulerProvider;
 import com.tooltip.Tooltip;
 
 import org.json.JSONException;
@@ -67,16 +81,18 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import dagger.Provides;
+
 /**
  * Created by kevin on 9/16/2016.
  * The difference between Private and Group Chat:
- * 1) Title - Name of person you are talking to you
- * 2) Realtime database reference
- * 3) Every message you post gets sent to the person you are talking to
- * so if they are not in the chat room they will receive an notification
- * 4) we need to fetch the user that we are talking to from network getApi
+ * Title in toolbar
+ * Private has user photo
+ * Different database references
+ * Private messages result in partner devices receiving notifications
+ * Private needs to fetch partner user from network api
  */
-public class PrivateChatActivity extends GroupChatActivity {
+public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding, PrivateChatViewModel> {
 
     private static final String TAG = "PrivateChatActivity";
     private long mLastTypingTime;
@@ -91,9 +107,40 @@ public class PrivateChatActivity extends GroupChatActivity {
     private View mLikesParent;
     private TextView mLikesCount;
     private ActivityPrivateChatBinding binding;
+    private PrivateChatViewModel privateChatViewModel;
 
     @Inject
-    NetworkApi networkApi;
+    SchedulerProvider schedulerProvider;
+
+    @Inject
+    FirebaseRemoteConfig firebaseRemoteConfig;
+
+    @Inject
+    MessagesRecyclerAdapterHelper map;
+
+    @Inject
+    PresenceHelper presenceHelper;
+
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
+
+    @Inject
+    LinearLayoutManager linearLayoutManager;
+
+    MessagesRecyclerAdapter messagesAdapter;
+
+    @Inject
+    protected NetworkApi networkApi;
+
+    @Inject
+    GCMHelper gcmHelper;
+
+    @Inject
+    LogoutDialogHelper logoutDialogHelper;
+
+    @Inject
+    FirebaseAuth firebaseAuth;
+
 
     @Override
     protected int getLayout() {
@@ -321,16 +368,6 @@ public class PrivateChatActivity extends GroupChatActivity {
         Map<String, Object> map = summary.toMap();
         map.put(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP, ServerValue.TIMESTAMP);
         ref.updateChildren(map);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
     }
 
     @Override
@@ -840,6 +877,21 @@ public class PrivateChatActivity extends GroupChatActivity {
 
             }
         });
+    }
+
+    @Override
+    public PrivateChatViewModel getViewModel() {
+        return (privateChatViewModel = ViewModelProviders.of(this, viewModelFactory).get(PrivateChatViewModel.class));
+    }
+
+    @Override
+    public int getBindingVariable() {
+        return BR.viewModel;
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_private_chat;
     }
 
 }

@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.databinding.ViewDataBinding;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -99,6 +100,7 @@ import com.instachat.android.app.likes.UserLikedUserListener;
 import com.instachat.android.app.login.SignInActivity;
 import com.instachat.android.app.requests.RequestsFragment;
 import com.instachat.android.app.ui.base.BaseActivity;
+import com.instachat.android.app.ui.base.BaseViewModel;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.api.UploadListener;
 import com.instachat.android.data.model.FriendlyMessage;
@@ -135,7 +137,6 @@ import javax.inject.Inject;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
@@ -175,7 +176,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     MessagesRecyclerAdapter messagesAdapter;
 
     @Inject
-    NetworkApi networkApi;
+    protected NetworkApi networkApi;
 
     @Inject
     GCMHelper gcmHelper;
@@ -218,7 +219,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     }
 
     protected void doDataBinding() {
-        binding = getViewDataBinding();
+        binding = (ActivityMainBinding)getViewDataBinding();
         //binding = DataBindingUtil.setContentView(this, getLayout());
         setVisibleAd(true);
     }
@@ -750,10 +751,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             case R.id.menu_invite:
                 sendInvitation();
                 return true;
-            case R.id.crash_menu:
-                FirebaseCrash.logcat(Log.ERROR, TAG, "crash caused");
-                causeCrash();
-                return true;
             case R.id.menu_sign_out:
                 signout();
                 return true;
@@ -762,9 +759,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 return true;
             case R.id.full_screen_texts_menu:
                 openFullScreenTextView(-1);
-                return true;
-            case R.id.download:
-                //beginDownload();
                 return true;
             case R.id.menu_pending_requests:
                 onPendingRequestsClicked();
@@ -1764,18 +1758,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         return true;
     }
 
-    private void showJoinSecretRoom() {
-/*
-        TSnackbar snackbar = TSnackbar.make(findViewById(R.id.snackbarAnchor2), "TAP HERE to join a new SECRET ROOM",
-         TSnackbar.LENGTH_INDEFINITE);
-        snackbar.setActionTextColor(Color.WHITE);
-        View snackbarView = snackbar.getView();
-        snackbarView.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
-        TextView textView = (TextView) snackbarView.findViewById(com.androidadvance.topsnackbar.R.id.snackbar_text);
-        textView.setTextColor(Color.WHITE);
-        snackbar.show();*/
-    }
-
     @Override
     public void onReceiveAd(AdDownloaderInterface adDownloaderInterface, ReceivedBannerInterface receivedBanner) throws AdReceiveFailed {
         if(receivedBanner.getErrorCode() != ErrorCode.NO_ERROR){
@@ -1822,9 +1804,4 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     public int getLayoutId() {
         return R.layout.activity_main;
     }
-
-    /*@Override
-    public AndroidInjector<Fragment> supportFragmentInjector() {
-        return fragmentDispatchingAndroidInjector;
-    }*/
 }

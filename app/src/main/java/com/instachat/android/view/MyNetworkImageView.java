@@ -10,7 +10,7 @@ import com.instachat.android.TheApp;
 import javax.inject.Inject;
 
 /**
- * @author kkawai
+ * @author kkawai`
  */
 public class MyNetworkImageView extends NetworkImageView {
 

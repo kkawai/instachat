@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
@@ -26,23 +27,23 @@ public final class GCMRegistrationManager {
 
     private static final String PROPERTY_APP_VERSION = "appVersion";
     public static final String PROPERTY_REG_ID = "registration_id";
-    private GoogleCloudMessaging mGcm;
-    private String mRegId;
-    private Context mContext;
+    private GoogleCloudMessaging gcm;
+    private String regId;
+    private final Context context;
+    private final NetworkApi networkApi;
 
     @Inject
-    NetworkApi networkApi;
-
-    public GCMRegistrationManager(final Context context) {
-        mContext = context;
+    public GCMRegistrationManager(@NonNull Context context, @NonNull NetworkApi networkApi) {
+        this.context = context;
+        this.networkApi = networkApi;
     }
 
     public void registerGCM() {
 
-        mGcm = GoogleCloudMessaging.getInstance(mContext);
-        mRegId = getRegistrationId(mContext);
+        gcm = GoogleCloudMessaging.getInstance(context);
+        regId = getRegistrationId(context);
 
-        if (mRegId.isEmpty()) {
+        if (regId.isEmpty()) {
             registerInBackground();
         }
     }
@@ -60,12 +61,12 @@ public final class GCMRegistrationManager {
             @Override
             public void run() {
                 try {
-                    if (mGcm == null) {
-                        mGcm = GoogleCloudMessaging.getInstance(mContext);
+                    if (gcm == null) {
+                        gcm = GoogleCloudMessaging.getInstance(context);
                     }
-                    mRegId = InstanceID.getInstance(mContext).getToken(Constants.GCM_SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE);
+                    regId = InstanceID.getInstance(context).getToken(Constants.GCM_SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE);
 
-                    MLog.i(TAG, "debugx Device registered, registration ID=" + mRegId);
+                    MLog.i(TAG, "debugx Device registered, registration ID=" + regId);
 
                     // You should send the registration ID to your server over
                     // HTTP,
@@ -74,7 +75,7 @@ public final class GCMRegistrationManager {
                     // The request to your server should be authenticated if
                     // your app
                     // is using accounts.
-                    networkApi.gcmreg(mContext, mRegId);
+                    networkApi.gcmreg(context, regId);
 
                     // For this demo: we don't need to send it because the
                     // device
@@ -83,11 +84,11 @@ public final class GCMRegistrationManager {
                     // message using the 'from' address in the message.
 
                     // Persist the regID - no need to registerIfNecessary again.
-                    final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-                    final int appVersion = getAppVersion(mContext);
+                    final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                    final int appVersion = getAppVersion(context);
                     MLog.i(TAG, "debugx Saving regId on app version " + appVersion);
                     final SharedPreferences.Editor editor = prefs.edit();
-                    editor.putString(PROPERTY_REG_ID, mRegId);
+                    editor.putString(PROPERTY_REG_ID, regId);
                     editor.putInt(PROPERTY_APP_VERSION, appVersion);
                     editor.commit();
 

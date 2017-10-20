@@ -11,6 +11,8 @@ import com.instachat.android.data.model.User;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
 
+import javax.inject.Inject;
+
 /**
  * Created by kevin on 10/14/2016.
  */
@@ -18,6 +20,10 @@ import com.instachat.android.util.Preferences;
 public class PresenceHelper {
 
     private static final String TAG = "PresenceHelper";
+
+    @Inject
+    public PresenceHelper() {
+    }
 
     public void updateLastActiveTimestamp() {
         // since I can connect from multiple devices, we store each connection instance separately
