@@ -11,8 +11,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.gson.Gson;
 import com.instachat.android.app.activity.RemoteConfigHelper;
+import com.instachat.android.app.adapter.ChatSummariesRecyclerAdapter;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
 import com.instachat.android.app.activity.group.LogoutDialogHelper;
+import com.instachat.android.app.adapter.UserPresenceManager;
 import com.instachat.android.data.AppDataManager;
 import com.instachat.android.data.DataManager;
 import com.instachat.android.data.api.NetworkApi;
@@ -107,6 +109,16 @@ public class AppModule {
     @Provides
     LogoutDialogHelper provideLogoutDialogHelper() {
         return new LogoutDialogHelper();
+    }
+
+    @Provides
+    UserPresenceManager provideUserPresenceManager(NetworkApi networkApi) {
+        return new UserPresenceManager(networkApi);
+    }
+
+    @Provides
+    ChatSummariesRecyclerAdapter provideChatSummariesRecyclerAdapter(UserPresenceManager userPresenceManager) {
+        return new ChatSummariesRecyclerAdapter(userPresenceManager);
     }
 
 //    @Provides

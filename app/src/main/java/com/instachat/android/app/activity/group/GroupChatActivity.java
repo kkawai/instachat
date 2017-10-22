@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.databinding.ViewDataBinding;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -58,7 +57,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -77,7 +75,6 @@ import com.instachat.android.app.activity.LeftDrawerEventListener;
 import com.instachat.android.app.activity.LeftDrawerHelper;
 import com.instachat.android.app.activity.PhotoUploadHelper;
 import com.instachat.android.app.activity.PresenceHelper;
-import com.instachat.android.app.activity.RemoteConfigHelper;
 import com.instachat.android.app.activity.UsersInGroupListener;
 import com.instachat.android.app.activity.pm.PrivateChatActivity;
 import com.instachat.android.app.adapter.AdapterPopulateHolderListener;
@@ -100,7 +97,6 @@ import com.instachat.android.app.likes.UserLikedUserListener;
 import com.instachat.android.app.login.SignInActivity;
 import com.instachat.android.app.requests.RequestsFragment;
 import com.instachat.android.app.ui.base.BaseActivity;
-import com.instachat.android.app.ui.base.BaseViewModel;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.api.UploadListener;
 import com.instachat.android.data.model.FriendlyMessage;
@@ -187,6 +183,9 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     @Inject
     FirebaseAuth firebaseAuth;
 
+    @Inject
+    ChatSummariesRecyclerAdapter chatsRecyclerViewAdapter;
+
     private RecyclerView messageRecyclerView;
 
     private Toolbar mToolbar;
@@ -203,7 +202,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     private LeftDrawerHelper mLeftDrawerHelper;
     private String mDatabaseRoot;
     private View mDotsLayoutParent;
-    private ChatSummariesRecyclerAdapter mChatsRecyclerViewAdapter;
     private GroupChatUsersRecyclerAdapter mGroupChatUsersRecyclerAdapter;
     private ExternalSendIntentConsumer mExternalSendIntentConsumer;
     private Uri mSharePhotoUri;
@@ -219,8 +217,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     }
 
     protected void doDataBinding() {
-        binding = (ActivityMainBinding)getViewDataBinding();
-        //binding = DataBindingUtil.setContentView(this, getLayout());
+        binding = getViewDataBinding();
         setVisibleAd(true);
     }
 
@@ -445,7 +442,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                     getSupportActionBar().setTitle(groupName + getCount(numUsers));
             }
         };
-        mChatsRecyclerViewAdapter.setUsersInGroupListener(usersInGroupListener);
+        chatsRecyclerViewAdapter.setUsersInGroupListener(usersInGroupListener);
     }
 
     private String getCount(int count) {
@@ -502,8 +499,8 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             mLeftDrawerHelper.cleanup();
         //if (mAdView != null)
         //    mAdView.destroy();
-        if (mChatsRecyclerViewAdapter != null)
-            mChatsRecyclerViewAdapter.cleanup();
+        if (chatsRecyclerViewAdapter != null)
+            chatsRecyclerViewAdapter.cleanup();
         if (mExternalSendIntentConsumer != null)
             mExternalSendIntentConsumer.cleanup();
         if (mGroupChatUsersRecyclerAdapter != null)
@@ -565,6 +562,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     private void initPhotoHelper(Bundle savedInstanceState) {
         mPhotoUploadHelper = new PhotoUploadHelper(this, this);
+        mPhotoUploadHelper.setStorageRefString(getDatabaseRoot());
         mPhotoUploadHelper.setPhotoUploadListener(this);
         if (savedInstanceState != null && savedInstanceState.containsKey(Constants.KEY_PHOTO_TYPE)) {
             PhotoUploadHelper.PhotoType photoType = PhotoUploadHelper.PhotoType.valueOf(savedInstanceState.getString
@@ -830,13 +828,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 MLog.d(TAG, "Failed to send invitation.");
             }
         }
-        if (requestCode == RC_CAMERA_AND_AUDIO_PERMISSION) {
-            if (resultCode == RESULT_OK) {
-                if (EasyPermissions.hasPermissions(this, Manifest.permission.CAMERA)) {
-                    //todo
-                }
-            }
-        }
 
     }
 
@@ -945,11 +936,11 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         mLeftDrawerHelper.setup(navigationView);
         mLeftDrawerHelper.setUserLikedUserListener(mUserLikedUserListener);
 
-        mChatsRecyclerViewAdapter = new ChatSummariesRecyclerAdapter(this, this, isPrivateChat());
+        chatsRecyclerViewAdapter.setup(this,this,false);
         RecyclerView recyclerView = (RecyclerView) drawerView.findViewById(R.id.drawerRecyclerView);
-        recyclerView.setLayoutManager(new StickyLayoutManager(this, mChatsRecyclerViewAdapter));
-        recyclerView.setAdapter(mChatsRecyclerViewAdapter);
-        mChatsRecyclerViewAdapter.populateData();
+        recyclerView.setLayoutManager(new StickyLayoutManager(this, chatsRecyclerViewAdapter));
+        recyclerView.setAdapter(chatsRecyclerViewAdapter);
+        chatsRecyclerViewAdapter.populateData();
     }
 
     private DatabaseReference mRightRef;
@@ -1243,12 +1234,16 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     }
 
     @Override
-    public void onTakePhoto() {
+    public void onPhotoGallery() {
+        mPhotoUploadHelper.setStorageRefString(getDatabaseRoot());
+        mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.chatRoomPhoto);
         mPhotoUploadHelper.launchCamera(false);
     }
 
     @Override
-    public void onChoosePhoto() {
+    public void onPhotoTake() {
+        mPhotoUploadHelper.setStorageRefString(getDatabaseRoot());
+        mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.chatRoomPhoto);
         mPhotoUploadHelper.launchCamera(true);
     }
 
@@ -1489,8 +1484,8 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                             ref.updateChildren(me.toMap(true)).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    if (mChatsRecyclerViewAdapter != null)
-                                        mChatsRecyclerViewAdapter.removeUserFromAllGroups(myUserid(), mGroupId);
+                                    if (chatsRecyclerViewAdapter != null)
+                                        chatsRecyclerViewAdapter.removeUserFromAllGroups(myUserid(), mGroupId);
                                 }
                             });
                             me.setCurrentGroupId(groupChatSummary.getId());

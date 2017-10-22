@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.inject.Inject;
+
 /**
  * Created by kevin on 9/26/2016.
  * <p/>
@@ -56,14 +58,18 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
     private ActivityState activityState;
     private List<Map.Entry<DatabaseReference, ValueEventListener>> userInfoRefs = new Vector<>(128);
     private UsersInGroupListener mUsersInGroupListener;
-    private boolean isPrivateChat;
-    private UserPresenceManager userPresenceManager;
+    private final UserPresenceManager userPresenceManager;
 
-    public ChatSummariesRecyclerAdapter(@NonNull ChatsItemClickedListener chatsItemClickedListener, @NonNull ActivityState activityState, boolean isPrivateChat) {
+    @Inject
+    public ChatSummariesRecyclerAdapter(UserPresenceManager userPresenceManager) {
+        this.userPresenceManager = userPresenceManager;
+    }
+
+    public void setup(ChatsItemClickedListener chatsItemClickedListener, ActivityState activityState, boolean isPrivateChat) {
         this.chatsItemClickedListener = chatsItemClickedListener;
         this.activityState = activityState;
-        this.isPrivateChat = isPrivateChat;
-        this.userPresenceManager = new UserPresenceManager(this.activityState, !isPrivateChat);
+        userPresenceManager.setActivityState(activityState);
+        userPresenceManager.setNotifyOthers(!isPrivateChat);
     }
 
     public void setUsersInGroupListener(UsersInGroupListener usersInGroupListener) {

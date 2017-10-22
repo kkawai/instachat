@@ -1,11 +1,12 @@
 package com.instachat.android.view;
 
+import android.app.Application;
 import android.content.Context;
 import android.util.AttributeSet;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
-import com.instachat.android.TheApp;
+import com.instachat.android.di.component.DaggerAppComponent;
 
 import javax.inject.Inject;
 
@@ -27,16 +28,26 @@ public class MyNetworkImageView extends NetworkImageView {
 
     public MyNetworkImageView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
+        inject();
     }
 
     public MyNetworkImageView(final Context context, final AttributeSet attrs, final int defStyle) {
         super(context, attrs, defStyle);
+        inject();
     }
 
     @Override
     public void setImageUrl(final String url, final ImageLoader imageLoader) {
         super.setImageUrl(url, imageLoader);
         mImageUrl = url;
+        inject();
+    }
+
+    private void inject() {
+        DaggerAppComponent.builder()
+                .application((Application)getContext().getApplicationContext())
+                .build()
+                .inject(this);
     }
 
     /**

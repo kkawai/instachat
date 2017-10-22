@@ -37,12 +37,19 @@ public class UserPresenceManager {
     private boolean isNotifyOthers;
     private ActivityState mActivityState;
 
-    @Inject
-    NetworkApi networkApi;
+    private final NetworkApi networkApi;
 
-    public UserPresenceManager(ActivityState activityState, boolean isNotifyOthers) {
-        this.isNotifyOthers = isNotifyOthers;
-        mActivityState = activityState;
+    @Inject
+    public UserPresenceManager(NetworkApi networkApi) {
+        this.networkApi = networkApi;
+    }
+
+    public void setActivityState(ActivityState activityState) {
+        this.mActivityState = activityState;
+    }
+
+    public void setNotifyOthers(boolean doNotifyOthers) {
+        this.isNotifyOthers = doNotifyOthers;
     }
 
     public void queue(PrivateChatSummary privateChatSummary) {

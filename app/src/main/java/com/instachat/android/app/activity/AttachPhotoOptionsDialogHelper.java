@@ -11,8 +11,8 @@ import com.instachat.android.R;
 public class AttachPhotoOptionsDialogHelper {
 
     public interface PhotoOptionsListener {
-        void onTakePhoto();
-        void onChoosePhoto();
+        void onPhotoGallery();
+        void onPhotoTake();
     }
     private Context context;
     private PhotoOptionsListener listener;
@@ -31,14 +31,14 @@ public class AttachPhotoOptionsDialogHelper {
         bottomSheetView.findViewById(R.id.menu_take_photo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.onTakePhoto();
+                listener.onPhotoGallery();
                 bottomSheetDialog.dismiss();
             }
         });
         bottomSheetView.findViewById(R.id.menu_choose_photo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.onChoosePhoto();
+                listener.onPhotoTake();
                 bottomSheetDialog.dismiss();
             }
         });

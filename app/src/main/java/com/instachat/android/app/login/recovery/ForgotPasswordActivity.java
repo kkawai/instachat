@@ -1,18 +1,18 @@
 package com.instachat.android.app.login.recovery;
 
+import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.instachat.android.R;
 import com.instachat.android.data.api.NetworkApi;
+import com.instachat.android.di.component.DaggerAppComponent;
 import com.instachat.android.util.ActivityUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.Preferences;
@@ -39,6 +39,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        inject();
         ActivityUtil.hideStatusBar(getWindow());
         DataBindingUtil.setContentView(this, R.layout.activity_forgot_password);
         emailLayout = (TextInputLayout) findViewById(R.id.input_email_layout);
@@ -69,17 +70,16 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
                     final JSONObject object = new JSONObject(response);
                     final String status = object.getString(NetworkApi.KEY_RESPONSE_STATUS);
                     if (status.equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
-                        new SweetAlertDialog(ForgotPasswordActivity.this, SweetAlertDialog.SUCCESS_TYPE)
-                                .setContentText(getString(R.string.information_emailed))
-                                .show();
-                        new Handler().postDelayed(new Runnable() {
+                        SweetAlertDialog sweetAlertDialog =
+                                new SweetAlertDialog(ForgotPasswordActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+                                .setContentText(getString(R.string.information_emailed));
+                        sweetAlertDialog.show();
+                        sweetAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                             @Override
-                            public void run() {
-                                if (isFinishing())
-                                    return;
+                            public void onDismiss(DialogInterface dialogInterface) {
                                 finish();
                             }
-                        }, Toast.LENGTH_SHORT);
+                        });
                     } else {
                         showErrorToast(R.string.email_password_not_found);
                     }
@@ -121,6 +121,13 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
         new SweetAlertDialog(ForgotPasswordActivity.this, SweetAlertDialog.ERROR_TYPE)
                 .setContentText(getString(stringResId))
                 .show();
+    }
+
+    private void inject() {
+        DaggerAppComponent.builder()
+                .application(getApplication())
+                .build()
+                .inject(this);
     }
 
 }

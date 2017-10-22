@@ -23,11 +23,15 @@ import javax.inject.Inject;
 
 public final class FileUploadApi {
 
-    @Inject
-    NetworkApi networkApi;
-
     private static final String TAG = FileUploadApi.class.getSimpleName();
     private static final int CHUNK_SIZE = 8024;
+
+    private final NetworkApi networkApi;
+
+    @Inject
+    public FileUploadApi(NetworkApi networkApi) {
+        this.networkApi = networkApi;
+    }
 
     /**
      * Posts a potentially large file to an intermediary server, which then

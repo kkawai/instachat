@@ -6,9 +6,11 @@ import android.app.Application;
 import com.android.volley.Network;
 import com.android.volley.RequestQueue;
 import com.instachat.android.TheApp;
+import com.instachat.android.app.login.recovery.ForgotPasswordActivity;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.di.builder.ActivityBuilder;
 import com.instachat.android.di.module.AppModule;
+import com.instachat.android.view.MyNetworkImageView;
 
 import javax.inject.Singleton;
 
@@ -31,4 +33,6 @@ public interface AppComponent {
     }
 
     void inject(TheApp app);
+    void inject(MyNetworkImageView networkImageView);
+    void inject(ForgotPasswordActivity forgotPasswordActivity);
 }

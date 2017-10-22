@@ -3,8 +3,6 @@ package com.instachat.android;
 import android.app.Activity;
 import android.support.multidex.MultiDexApplication;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.ImageLoader;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.instachat.android.di.component.DaggerAppComponent;
@@ -25,8 +23,6 @@ public class TheApp extends MultiDexApplication implements HasActivityInjector {
     private static TheApp sInstance;
     public static boolean isGcmSupported;
     public static boolean isAdmSupported;
-    private RequestQueue mRequestQueue;
-    private ImageLoader mImageLoader;
 
     @Override
     public void onCreate() {
