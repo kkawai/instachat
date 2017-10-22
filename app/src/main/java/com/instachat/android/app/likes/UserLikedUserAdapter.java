@@ -19,7 +19,7 @@ import com.instachat.android.R;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.data.model.User;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -151,6 +151,6 @@ public final class UserLikedUserAdapter<T, VH extends RecyclerView.ViewHolder> e
       if (user.getProfilePicUrl() != null)
          map.put("profilePicUrl", user.getProfilePicUrl());
       map.put("id", user.getId());
-      FirebaseDatabase.getInstance().getReference(Constants.USER_RECEIVED_LIKES_REF(Preferences.getInstance().getUserId())).child(user.getId() + "").updateChildren(map);
+      FirebaseDatabase.getInstance().getReference(Constants.USER_RECEIVED_LIKES_REF(UserPreferences.getInstance().getUserId())).child(user.getId() + "").updateChildren(map);
    }
 }

@@ -1,6 +1,5 @@
 package com.instachat.android.app.activity.group;
 
-import android.Manifest;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.arch.lifecycle.ViewModelProvider;
@@ -13,13 +12,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
 import android.support.v13.view.inputmethod.EditorInfoCompat;
 import android.support.v13.view.inputmethod.InputConnectionCompat;
 import android.support.v13.view.inputmethod.InputContentInfoCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatEditText;
@@ -40,7 +37,6 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -110,7 +106,7 @@ import com.instachat.android.messaging.InstachatMessagingService;
 import com.instachat.android.messaging.NotificationHelper;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.rx.SchedulerProvider;
@@ -153,7 +149,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     @Inject
     SchedulerProvider schedulerProvider;
-    
+
     @Inject
     FirebaseRemoteConfig firebaseRemoteConfig;
 
@@ -172,7 +168,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     MessagesRecyclerAdapter messagesAdapter;
 
     @Inject
-    protected NetworkApi networkApi;
+    NetworkApi networkApi;
 
     @Inject
     GCMHelper gcmHelper;
@@ -186,14 +182,12 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     @Inject
     ChatSummariesRecyclerAdapter chatsRecyclerViewAdapter;
 
-    private RecyclerView messageRecyclerView;
+    @Inject
+    AdHelper adsHelper;
 
     private Toolbar mToolbar;
-    private View mSendButton, mAttachButton;
 
     private EditText mMessageEditText;
-    private TextView mUsernameTyping;
-    private DrawerLayout mDrawerLayout;
     private DatabaseReference mMeTypingRef;
 
     private ProgressDialog mProgressDialog;
@@ -201,7 +195,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     private PhotoUploadHelper mPhotoUploadHelper;
     private LeftDrawerHelper mLeftDrawerHelper;
     private String mDatabaseRoot;
-    private View mDotsLayoutParent;
     private GroupChatUsersRecyclerAdapter mGroupChatUsersRecyclerAdapter;
     private ExternalSendIntentConsumer mExternalSendIntentConsumer;
     private Uri mSharePhotoUri;
@@ -210,19 +203,10 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     private boolean mIsPendingRequestsAvailable;
     private ActivityMainBinding binding;
     private GroupChatViewModel groupChatViewModel;
-    private AdHelper adHelper;
-
-    protected int getLayout() {
-        return R.layout.activity_main;
-    }
 
     protected void doDataBinding() {
         binding = getViewDataBinding();
-        setVisibleAd(true);
-    }
-
-    protected void setVisibleAd(boolean visibleAd) {
-        binding.setVisibleAd(visibleAd);
+        binding.setVisibleAd(true);
     }
 
     @Override
@@ -235,9 +219,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             savedInstanceState.remove("android:support:fragments");
         }
         super.onCreate(savedInstanceState);
-        if (!Preferences.getInstance().isLoggedIn() || Preferences.getInstance().getUser() == null || Preferences
-                .getInstance().getUsername() == null) {
-            // Not signed in, launch the Sign In activity
+        if (!UserPreferences.getInstance().isLoggedIn()) {
             startActivity(new Intent(this, SignInActivity.class));
             finish();
             return;
@@ -250,7 +232,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         initPhotoHelper(savedInstanceState);
         setupDrawers();
         setupToolbar();
-        mDotsLayoutParent = findViewById(R.id.dotsLayout);
 
         gcmHelper.onCreate(this);
 
@@ -266,18 +247,14 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         NotificationHelper.createNotificationChannels(this);
         fetchConfig();
         initFirebaseAdapter();
-        messageRecyclerView = findViewById(R.id.messageRecyclerView);
-        messageRecyclerView.setLayoutManager(linearLayoutManager);
-        messageRecyclerView.setAdapter(messagesAdapter);
+        binding.messageRecyclerView.setLayoutManager(linearLayoutManager);
+        binding.messageRecyclerView.setAdapter(messagesAdapter);
 
-        adHelper = new AdHelper(this);
-        adHelper.loadAd();
+        adsHelper.loadAd(this);
 
-        mUsernameTyping = ((TextView) findViewById(R.id.usernameTyping));
-        LinearLayout messageEditTextParent = (LinearLayout) findViewById(R.id.messageEditTextParent);
         mMessageEditText = createEditTextWithContentMimeTypes(
                 new String[]{"image/png", "image/gif", "image/jpeg", "image/webp"});
-        messageEditTextParent.addView(mMessageEditText);
+        binding.messageEditTextParent.addView(mMessageEditText);
         FontUtil.setTextViewFont(mMessageEditText);
         mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter((int) firebaseRemoteConfig
                 .getLong(Constants.KEY_MAX_MESSAGE_LENGTH))});
@@ -296,7 +273,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 if (length > 0) {
                     setEnableSendButton(true);
                     onMeTyping();
-                    showSendOptionsTooltip(mSendButton);
+                    showSendOptionsTooltip(binding.sendButton);
                 } else {
                     setEnableSendButton(false);
                 }
@@ -317,13 +294,13 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         mExternalSendIntentConsumer.setListener(new ExternalSendIntentConsumer.ExternalSendIntentListener() {
             @Override
             public void onHandleSendImage(final Uri imageUri) {
-                mDrawerLayout.openDrawer(GravityCompat.START);
+                binding.drawerLayout.openDrawer(GravityCompat.START);
                 mSharePhotoUri = imageUri;
             }
 
             @Override
             public void onHandleSendText(final String text) {
-                mDrawerLayout.openDrawer(GravityCompat.START);
+                binding.drawerLayout.openDrawer(GravityCompat.START);
                 mShareText = text;
             }
         });
@@ -454,11 +431,8 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     @Override
     public void onResume() {
         super.onResume();
-        //if (mAdView != null)
-        //   mAdView.resume();
-
-        mSendButton.setEnabled(mMessageEditText.getText().toString().trim().length() > 0);
-        if (Preferences.getInstance().isLoggedIn()) {
+        binding.sendButton.setEnabled(mMessageEditText.getText().toString().trim().length() > 0);
+        if (UserPreferences.getInstance().isLoggedIn()) {
             gcmHelper.onResume(this);
             showFirstMessageDialog(GroupChatActivity.this);
             if (mExternalSendIntentConsumer != null)
@@ -472,8 +446,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     @Override
     public void onPause() {
-        //if (mAdView != null)
-        //    mAdView.pause();
         super.onPause();
         removeUserPresenceFromGroup();
     }
@@ -497,8 +469,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             messagesAdapter.cleanup();
         if (mLeftDrawerHelper != null)
             mLeftDrawerHelper.cleanup();
-        //if (mAdView != null)
-        //    mAdView.destroy();
         if (chatsRecyclerViewAdapter != null)
             chatsRecyclerViewAdapter.cleanup();
         if (mExternalSendIntentConsumer != null)
@@ -516,9 +486,9 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         if (getIntent() != null && getIntent().hasExtra(Constants.KEY_GROUPID)) {
             mGroupId = getIntent().getLongExtra(Constants.KEY_GROUPID, Constants.DEFAULT_PUBLIC_GROUP_ID);
             databaseRef = Constants.GROUP_CHAT_REF(mGroupId);
-            Preferences.getInstance().setLastGroupChatRoomVisited(mGroupId);
+            UserPreferences.getInstance().setLastGroupChatRoomVisited(mGroupId);
         } else {
-            mGroupId = Preferences.getInstance().getLastGroupChatRoomVisited();
+            mGroupId = UserPreferences.getInstance().getLastGroupChatRoomVisited();
             databaseRef = Constants.GROUP_CHAT_REF(mGroupId);
         }
         setDatabaseRoot(databaseRef);
@@ -534,10 +504,10 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     private void setEnableSendButton(final boolean isEnable) {
 
-        if (isEnable && mSendButton.isEnabled() || !isEnable && !mSendButton.isEnabled())
+        if (isEnable && binding.sendButton.isEnabled() || !isEnable && !binding.sendButton.isEnabled())
             return; //already set
 
-        mSendButton.setEnabled(isEnable);
+        binding.sendButton.setEnabled(isEnable);
 
         final Animation hideAnimation = AnimationUtils.loadAnimation(GroupChatActivity.this, R.anim.fab_scale_down);
         final Animation showAnimation = AnimationUtils.loadAnimation(GroupChatActivity.this, R.anim.fab_scale_up);
@@ -549,15 +519,15 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                mSendButton.startAnimation(showAnimation);
-                //mSendButton.setEnabled(isEnable);
+                binding.sendButton.startAnimation(showAnimation);
+                //binding.sendButton.setEnabled(isEnable);
             }
 
             @Override
             public void onAnimationRepeat(Animation animation) {
             }
         });
-        mSendButton.startAnimation(hideAnimation);
+        binding.sendButton.startAnimation(hideAnimation);
     }
 
     private void initPhotoHelper(Bundle savedInstanceState) {
@@ -591,16 +561,14 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     private int mAttachPhotoMessageType;
 
     private void initButtons() {
-        mSendButton = findViewById(R.id.sendButton);
-        mAttachButton = findViewById(R.id.attachButton);
-        mSendButton.setOnClickListener(new View.OnClickListener() {
+        binding.sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final String text = mMessageEditText.getText().toString();
                 validateBeforeSendText(text, false);
             }
         });
-        mSendButton.setOnLongClickListener(new View.OnLongClickListener() {
+        binding.sendButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
                 final String text = mMessageEditText.getText().toString();
@@ -608,7 +576,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 return true;
             }
         });
-        mAttachButton.setOnClickListener(new View.OnClickListener() {
+        binding.attachButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (isNeedsDp())
@@ -617,10 +585,10 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 showFileOptions();
             }
         });
-        mAttachButton.setOnLongClickListener(new View.OnLongClickListener() {
+        binding.attachButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                new MessageOptionsDialogHelper().showSendOptions(GroupChatActivity.this, mAttachButton, null, new
+                new MessageOptionsDialogHelper().showSendOptions(GroupChatActivity.this, binding.attachButton, null, new
                         MessageOptionsDialogHelper.SendOptionsListener() {
                             @Override
                             public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
@@ -660,7 +628,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             sendText(friendlyMessage);
             return true;
         }
-        new MessageOptionsDialogHelper().showSendOptions(GroupChatActivity.this, mSendButton, friendlyMessage, new
+        new MessageOptionsDialogHelper().showSendOptions(GroupChatActivity.this, binding.sendButton, friendlyMessage, new
                 MessageOptionsDialogHelper.SendOptionsListener() {
                     @Override
                     public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
@@ -686,8 +654,8 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         try {
             if (isActivityDestroyed())
                 return;
-            MLog.d(TAG,"C kevin scroll: "+(messagesAdapter.getItemCount() - 1) + " text: "+ messagesAdapter.peekLastMessage());
-            messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
+            MLog.d(TAG, "C kevin scroll: " + (messagesAdapter.getItemCount() - 1) + " text: " + messagesAdapter.peekLastMessage());
+            binding.messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
             updateLastActiveTimestamp();
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
@@ -720,7 +688,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     }
 
     protected void onHomeClicked() {
-        mDrawerLayout.openDrawer(GravityCompat.START);
+        binding.drawerLayout.openDrawer(GravityCompat.START);
     }
 
     @Override
@@ -764,10 +732,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void causeCrash() {
-        throw new NullPointerException("Fake null pointer exception");
     }
 
     protected void sendInvitation() {
@@ -857,7 +821,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     }
 
     private void setupToolbar() {
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
         ActionBar ab = getSupportActionBar();
@@ -880,12 +844,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         });
     }
 
-    protected int getToolbarHeight() {
-        return mToolbar.getHeight();
-    }
-
     private void setupDrawers() {
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         setupLeftDrawerContent();
         setupRightDrawerContent();
     }
@@ -925,18 +884,15 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     }
 
     private void setupLeftDrawerContent() {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        if (navigationView == null)
-            return;
-        View headerView = getLayoutInflater().inflate(R.layout.left_nav_header, navigationView, false);
-        View drawerView = getLayoutInflater().inflate(R.layout.left_drawer_layout, navigationView, false);
-        navigationView.addView(drawerView);
-        navigationView.addHeaderView(headerView);
-        mLeftDrawerHelper = new LeftDrawerHelper(networkApi, this, this, mDrawerLayout, mLeftDrawerEventListener);
-        mLeftDrawerHelper.setup(navigationView);
+        View headerView = getLayoutInflater().inflate(R.layout.left_nav_header, binding.navView, false);
+        View drawerView = getLayoutInflater().inflate(R.layout.left_drawer_layout, binding.navView, false);
+        binding.navView.addView(drawerView);
+        binding.navView.addHeaderView(headerView);
+        mLeftDrawerHelper = new LeftDrawerHelper(networkApi, this, this, binding.drawerLayout, mLeftDrawerEventListener);
+        mLeftDrawerHelper.setup(binding.navView);
         mLeftDrawerHelper.setUserLikedUserListener(mUserLikedUserListener);
 
-        chatsRecyclerViewAdapter.setup(this,this,false);
+        chatsRecyclerViewAdapter.setup(this, this, false);
         RecyclerView recyclerView = (RecyclerView) drawerView.findViewById(R.id.drawerRecyclerView);
         recyclerView.setLayoutManager(new StickyLayoutManager(this, chatsRecyclerViewAdapter));
         recyclerView.setAdapter(chatsRecyclerViewAdapter);
@@ -948,13 +904,9 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     protected void setupRightDrawerContent() {
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.right_nav_view);
-        if (navigationView == null) {
-            return;
-        }
         //View headerView = getLayoutInflater().inflate(R.layout.nav_header, navigationView, false);
-        View drawerRecyclerView = getLayoutInflater().inflate(R.layout.right_drawer_layout, navigationView, false);
-        final View headerView = getLayoutInflater().inflate(R.layout.right_nav_header, navigationView, false);
+        RecyclerView drawerRecyclerView = (RecyclerView)getLayoutInflater().inflate(R.layout.right_drawer_layout, binding.rightNavView, false);
+        final View headerView = getLayoutInflater().inflate(R.layout.right_nav_header, binding.rightNavView, false);
 
         mRightRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_ROOMS).child
                 (mGroupId + "");
@@ -981,45 +933,44 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         };
         mRightRef.addValueEventListener(mRightListener);
 
-        navigationView.addHeaderView(headerView);
-        navigationView.addHeaderView(drawerRecyclerView);
+        binding.rightNavView.addHeaderView(headerView);
+        binding.rightNavView.addHeaderView(drawerRecyclerView);
 
-        RecyclerView recyclerView = (RecyclerView) drawerRecyclerView.findViewById(R.id.drawerRecyclerView);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(linearLayoutManager);
+        drawerRecyclerView.setLayoutManager(linearLayoutManager);
 
         mGroupChatUsersRecyclerAdapter = new GroupChatUsersRecyclerAdapter(this, this, this, mGroupId);
-        recyclerView.setAdapter(mGroupChatUsersRecyclerAdapter);
+        drawerRecyclerView.setAdapter(mGroupChatUsersRecyclerAdapter);
         mGroupChatUsersRecyclerAdapter.populateData();
     }
 
     private boolean isLeftDrawerOpen() {
-        return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START);
+        return binding.drawerLayout != null && binding.drawerLayout.isDrawerOpen(GravityCompat.START);
     }
 
     private boolean isRightDrawerOpen() {
-        return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.END);
+        return binding.drawerLayout != null && binding.drawerLayout.isDrawerOpen(GravityCompat.END);
     }
 
     private void closeLeftDrawer() {
-        if (mDrawerLayout != null)
-            mDrawerLayout.closeDrawer(GravityCompat.START);
+        if (binding.drawerLayout != null)
+            binding.drawerLayout.closeDrawer(GravityCompat.START);
     }
 
     private void closeRightDrawer() {
-        if (mDrawerLayout != null)
-            mDrawerLayout.closeDrawer(GravityCompat.END);
+        if (binding.drawerLayout != null)
+            binding.drawerLayout.closeDrawer(GravityCompat.END);
     }
 
     private void openRightDrawer() {
-        if (mDrawerLayout != null)
-            mDrawerLayout.openDrawer(GravityCompat.END);
+        if (binding.drawerLayout != null)
+            binding.drawerLayout.openDrawer(GravityCompat.END);
     }
 
     private void openLeftDrawer() {
-        if (mDrawerLayout != null)
-            mDrawerLayout.openDrawer(GravityCompat.START);
+        if (binding.drawerLayout != null)
+            binding.drawerLayout.openDrawer(GravityCompat.START);
     }
 
     private boolean closeBothDrawers() {
@@ -1089,8 +1040,8 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     @Override
     public void setCurrentFriendlyMessage(int position) {
-        MLog.d(TAG,"A kevin scroll: "+(position + 1) + " text: "+ messagesAdapter.peekLastMessage());
-        messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount()-1);
+        MLog.d(TAG, "A kevin scroll: " + (position + 1) + " text: " + messagesAdapter.peekLastMessage());
+        binding.messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
     }
 
     @Override
@@ -1155,7 +1106,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 map);
         messagesAdapter.setIsPrivateChat(isPrivateChat());
         messagesAdapter.setDatabaseRoot(mDatabaseRoot);
-        messagesAdapter.setActivity(this, this, (FrameLayout) findViewById(R.id.fragment_content));
+        messagesAdapter.setActivity(this, this, binding.fragmentContent);
         messagesAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {
             @Override
             public void onViewHolderPopulated() {
@@ -1178,11 +1129,11 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 super.onItemRangeInserted(positionStart, itemCount);
                 int friendlyMessageCount = messagesAdapter.getItemCount();
                 int lastVisiblePosition = linearLayoutManager.findLastVisibleItemPosition();
-                MLog.d(TAG,"scroll debug: lastVisiblePosition: "+lastVisiblePosition + " text: "+ messagesAdapter.peekLastMessage()
-                +" positionStart: "+positionStart + " friendlyMessageCount: "+friendlyMessageCount);
-                if (lastVisiblePosition == -1 || ((lastVisiblePosition+4) >=  positionStart)) {
-                    MLog.d(TAG,"B kevin scroll: "+(positionStart) + " text: "+ messagesAdapter.peekLastMessage());
-                    messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount()-1);
+                MLog.d(TAG, "scroll debug: lastVisiblePosition: " + lastVisiblePosition + " text: " + messagesAdapter.peekLastMessage()
+                        + " positionStart: " + positionStart + " friendlyMessageCount: " + friendlyMessageCount);
+                if (lastVisiblePosition == -1 || ((lastVisiblePosition + 4) >= positionStart)) {
+                    MLog.d(TAG, "B kevin scroll: " + (positionStart) + " text: " + messagesAdapter.peekLastMessage());
+                    binding.messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
                 }
                 notifyPagerAdapterDataSetChanged();
             }
@@ -1196,15 +1147,15 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     }
 
     protected Integer myUserid() {
-        return Preferences.getInstance().getUserId();
+        return UserPreferences.getInstance().getUserId();
     }
 
     protected String myDpid() {
-        return Preferences.getInstance().getUser().getProfilePicUrl();
+        return UserPreferences.getInstance().getUser().getProfilePicUrl();
     }
 
     protected String myUsername() {
-        return Preferences.getInstance().getUsername() + "";
+        return UserPreferences.getInstance().getUsername() + "";
     }
 
     private void showFileOptions() {
@@ -1300,9 +1251,9 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
         } else if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.userProfilePhoto) {
 
-            final User user = Preferences.getInstance().getUser();
+            final User user = UserPreferences.getInstance().getUser();
             user.setProfilePicUrl(photoUrl);
-            Preferences.getInstance().saveUser(user);
+            UserPreferences.getInstance().saveUser(user);
             networkApi.saveUser(null, user, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
@@ -1366,7 +1317,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         if (isActivityDestroyed()) {
             return;
         }
-        mUsernameTyping.setText(username);
+        binding.usernameTyping.setText(username);
         showTypingDots();
     }
 
@@ -1412,17 +1363,17 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     }
 
     private void hideDotsParent() {
-        if (mDotsLayoutParent.getVisibility() == View.GONE)
+        if (binding.dotsLayout.getVisibility() == View.GONE)
             return;
-        mDotsLayoutParent.setVisibility(View.GONE);
+        binding.dotsLayout.setVisibility(View.GONE);
     }
 
     private void showDotsParent(boolean isAnimate) {
-        if (mDotsLayoutParent.getVisibility() == View.VISIBLE)
+        if (binding.dotsLayout.getVisibility() == View.VISIBLE)
             return;
-        mDotsLayoutParent.setVisibility(View.VISIBLE);
+        binding.dotsLayout.setVisibility(View.VISIBLE);
         if (isAnimate)
-            AnimationUtil.fadeInAnimation(mDotsLayoutParent);
+            AnimationUtil.fadeInAnimation(binding.dotsLayout);
     }
 
     public static void startGroupChatActivity(Context context, long groupId, String groupName, Uri sharePhotoUri,
@@ -1477,7 +1428,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                                 return;
 
                             MLog.d(TAG, "addUserPresenceToGroup() mGroupId: ", mGroupId, " username: ", myUsername());
-                            User me = Preferences.getInstance().getUser();
+                            User me = UserPreferences.getInstance().getUser();
                             final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants
                                     .GROUP_CHAT_USERS_REF(mGroupId)).
                                     child(myUserid() + "");
@@ -1535,16 +1486,12 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             public void onConfirmLogout() {
                 firebaseAuth.signOut();
                 removeUserPresenceFromGroup();
-                gcmHelper.unregister(Preferences.getInstance().getUserId() + "");
-                Preferences.getInstance().saveUser(null);
+                gcmHelper.unregister(UserPreferences.getInstance().getUserId() + "");
+                UserPreferences.getInstance().clearUser();
                 startActivity(new Intent(GroupChatActivity.this, SignInActivity.class));
                 finish();
             }
         });
-    }
-
-    protected BlockedUserListener getBlockedUserListener() {
-        return mBlockedUserListener;
     }
 
     private UserLikedUserListener mUserLikedUserListener = new UserLikedUserListener() {
@@ -1564,9 +1511,9 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     private boolean mShownSendOptionsProtips;
 
     private void showSendOptionsTooltip(View anchor) {
-        //        if (Preferences.getInstance().hasShownToolbarProfileTooltip())
+        //        if (UserPreferences.getInstance().hasShownToolbarProfileTooltip())
         //            return;
-        //        Preferences.getInstance().setShownToolbarProfileTooltip(true);
+        //        UserPreferences.getInstance().setShownToolbarProfileTooltip(true);
         if (mShownSendOptionsProtips) {
             return;
         }
@@ -1624,7 +1571,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     }
 
     private void showFirstMessageDialog(@NonNull final Context context) {
-        if (Preferences.getInstance().hasShownSendFirstMessageDialog()) {
+        if (UserPreferences.getInstance().hasShownSendFirstMessageDialog()) {
             return;
         }
         final View view = getLayoutInflater().inflate(R.layout.dialog_input_comment, null);
@@ -1640,7 +1587,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                     public void onClick(DialogInterface dialogInterface, int i) {
                         final String text = textView.getText().toString();
                         if (!TextUtils.isEmpty(text)) {
-                            Preferences.getInstance().setShownSendFirstMessageDialog(true);
+                            UserPreferences.getInstance().setShownSendFirstMessageDialog(true);
                             final FriendlyMessage friendlyMessage = new FriendlyMessage(text, myUsername(), myUserid
                                     (), myDpid(), null, false, false, null, System.currentTimeMillis());
                             sendText(friendlyMessage);
@@ -1651,7 +1598,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 }).setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                if (!Preferences.getInstance().hasShownSendFirstMessageDialog()) {
+                if (!UserPreferences.getInstance().hasShownSendFirstMessageDialog()) {
                     showFirstMessageDialog(GroupChatActivity.this);
                 }
             }
@@ -1755,12 +1702,11 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     @Override
     public void onReceiveAd(AdDownloaderInterface adDownloaderInterface, ReceivedBannerInterface receivedBanner) throws AdReceiveFailed {
-        if(receivedBanner.getErrorCode() != ErrorCode.NO_ERROR){
-            //Toast.makeText(getBaseContext(), receivedBanner.getErrorMessage(), Toast.LENGTH_SHORT).show();
-            setVisibleAd(false);
-            adHelper.loadAd();
+        if (receivedBanner.getErrorCode() != ErrorCode.NO_ERROR) {
+            binding.setVisibleAd(false);
+            adsHelper.loadAd(this);
         } else {
-            setVisibleAd(true);
+            binding.setVisibleAd(true);
         }
     }
 

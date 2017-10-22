@@ -1,6 +1,5 @@
 package com.instachat.android.app.activity.pm;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
@@ -121,7 +120,7 @@ import com.instachat.android.messaging.InstachatMessagingService;
 import com.instachat.android.messaging.NotificationHelper;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.TimeUtil;
@@ -200,7 +199,9 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     private String mShareText;
     private long mGroupId = 0L;
     private boolean mIsPendingRequestsAvailable;
-    private AdHelper adHelper;
+
+    @Inject
+    AdHelper adsHelper;
 
     @Inject
     SchedulerProvider schedulerProvider;
@@ -238,11 +239,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     ChatSummariesRecyclerAdapter chatsRecyclerViewAdapter;
 
     //@Override
-    protected int getLayout() {
-        return R.layout.activity_private_chat;
-    }
-
-    //@Override
     protected void doDataBinding() {
         binding = getViewDataBinding();
         binding.setVisibleAd(true);
@@ -259,7 +255,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         super.onCreate(savedInstanceState);
 
 
-        if (!Preferences.getInstance().isLoggedIn() || Preferences.getInstance().getUser() == null || Preferences
+        if (!UserPreferences.getInstance().isLoggedIn() || UserPreferences.getInstance().getUser() == null || UserPreferences
                 .getInstance().getUsername() == null) {
             // Not signed in, launch the Sign In activity
             startActivity(new Intent(this, SignInActivity.class));
@@ -294,8 +290,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         messageRecyclerView.setLayoutManager(linearLayoutManager);
         messageRecyclerView.setAdapter(messagesAdapter);
 
-        adHelper = new AdHelper(this);
-        adHelper.loadAd();
+        adsHelper.loadAd(this);
 
         LinearLayout messageEditTextParent = (LinearLayout) findViewById(R.id.messageEditTextParent);
         mMessageEditText = createEditTextWithContentMimeTypes(
@@ -524,9 +519,9 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     }
 
     private void checkIfSeenToolbarProfileTooltip(View anchor) {
-        if (Preferences.getInstance().hasShownToolbarProfileTooltip())
+        if (UserPreferences.getInstance().hasShownToolbarProfileTooltip())
             return;
-        Preferences.getInstance().setShownToolbarProfileTooltip(true);
+        UserPreferences.getInstance().setShownToolbarProfileTooltip(true);
         final Tooltip tooltip = new Tooltip.Builder(anchor, R.style.drawer_tooltip_non_cancellable).setText(getString
                 (R.string.toolbar_user_profile_tooltip)).show();
         new Handler().postDelayed(new Runnable() {
@@ -702,7 +697,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
              * remove the person from your pending requests
              */
             FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(sUserid,
-                    Preferences.getInstance().getUserId())).removeValue();
+                    UserPreferences.getInstance().getUserId())).removeValue();
         }
 
     }
@@ -894,7 +889,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
     @Override
     public void onGroupChatClicked(GroupChatSummary groupChatSummary) {
-        if (Preferences.getInstance().getLastGroupChatRoomVisited() == groupChatSummary.getId()) {
+        if (UserPreferences.getInstance().getLastGroupChatRoomVisited() == groupChatSummary.getId()) {
             finish();
         }
         closeBothDrawers();
@@ -1290,9 +1285,9 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
         } else if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.userProfilePhoto) {
 
-            final User user = Preferences.getInstance().getUser();
+            final User user = UserPreferences.getInstance().getUser();
             user.setProfilePicUrl(photoUrl);
-            Preferences.getInstance().saveUser(user);
+            UserPreferences.getInstance().saveUser(user);
             networkApi.saveUser(null, user, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
@@ -1327,15 +1322,15 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     private int mAttachPhotoMessageType;
 
     protected Integer myUserid() {
-        return Preferences.getInstance().getUserId();
+        return UserPreferences.getInstance().getUserId();
     }
 
     protected String myDpid() {
-        return Preferences.getInstance().getUser().getProfilePicUrl();
+        return UserPreferences.getInstance().getUser().getProfilePicUrl();
     }
 
     protected String myUsername() {
-        return Preferences.getInstance().getUsername() + "";
+        return UserPreferences.getInstance().getUsername() + "";
     }
 
     @Override
@@ -1386,7 +1381,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         if(receivedBanner.getErrorCode() != ErrorCode.NO_ERROR){
             //Toast.makeText(getBaseContext(), receivedBanner.getErrorMessage(), Toast.LENGTH_SHORT).show();
             setVisibleAd(false);
-            adHelper.loadAd();
+            adsHelper.loadAd(this);
         } else {
             setVisibleAd(true);
         }
@@ -1659,9 +1654,9 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     }
 
     private void showSendOptionsTooltip(View anchor) {
-        //        if (Preferences.getInstance().hasShownToolbarProfileTooltip())
+        //        if (UserPreferences.getInstance().hasShownToolbarProfileTooltip())
         //            return;
-        //        Preferences.getInstance().setShownToolbarProfileTooltip(true);
+        //        UserPreferences.getInstance().setShownToolbarProfileTooltip(true);
         if (mShownSendOptionsProtips) {
             return;
         }

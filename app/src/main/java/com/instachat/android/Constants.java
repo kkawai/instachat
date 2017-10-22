@@ -1,6 +1,6 @@
 package com.instachat.android;
 
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 
 public final class Constants {
 
@@ -159,21 +159,21 @@ public final class Constants {
    }
 
    public static String PRIVATE_CHAT_REF(int toUserid) {
-      final int myUserid = Preferences.getInstance().getUserId();
+      final int myUserid = UserPreferences.getInstance().getUserId();
       return "/directs/" + (toUserid > myUserid ? (myUserid + "_" + toUserid) : (toUserid + "_" + myUserid));
    }
 
    public static String PRIVATE_CHAT_TYPING_REF(int toUserid) {
-      final int myUserid = Preferences.getInstance().getUserId();
+      final int myUserid = UserPreferences.getInstance().getUserId();
       return "/direct_typing/" + (toUserid > myUserid ? (myUserid + "_" + toUserid) : (toUserid + "_" + myUserid));
    }
 
    public static String MY_PRIVATE_CHATS_SUMMARY_PARENT_REF() {
-      return "/users/" + Preferences.getInstance().getUserId() + "/private_summaries/";
+      return "/users/" + UserPreferences.getInstance().getUserId() + "/private_summaries/";
    }
 
    public static String MY_PRIVATE_REQUESTS_REF() {
-      return "/users/" + Preferences.getInstance().getUserId() + "/private_requests/";
+      return "/users/" + UserPreferences.getInstance().getUserId() + "/private_requests/";
    }
 
    public static String PRIVATE_REQUEST_STATUS_PARENT_REF(int fromUserid, int toUserid) {
@@ -181,7 +181,7 @@ public final class Constants {
    }
 
    public static String MY_BLOCKS_REF() {
-      return "/users/" + Preferences.getInstance().getUserId() + "/blocks/";
+      return "/users/" + UserPreferences.getInstance().getUserId() + "/blocks/";
    }
 
    public static String GROUP_CHAT_REF(long groupid) {

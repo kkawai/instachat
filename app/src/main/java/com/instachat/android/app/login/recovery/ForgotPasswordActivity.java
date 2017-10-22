@@ -15,7 +15,7 @@ import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.di.component.DaggerAppComponent;
 import com.instachat.android.util.ActivityUtil;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.StringUtil;
 
 import org.json.JSONObject;
@@ -48,7 +48,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
         // Set click listeners
         findViewById(R.id.find_account_button).setOnClickListener(this);
 
-        String lastSignIn = Preferences.getInstance().getLastSignIn();
+        String lastSignIn = UserPreferences.getInstance().getLastSignIn();
         MLog.i(TAG, "lastSignIn ", lastSignIn);
         if (lastSignIn != null) {
             emailLayout.getEditText().setText(lastSignIn);

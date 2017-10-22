@@ -10,6 +10,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.gson.Gson;
+import com.instachat.android.app.activity.AdHelper;
 import com.instachat.android.app.activity.RemoteConfigHelper;
 import com.instachat.android.app.adapter.ChatSummariesRecyclerAdapter;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
@@ -119,6 +120,11 @@ public class AppModule {
     @Provides
     ChatSummariesRecyclerAdapter provideChatSummariesRecyclerAdapter(UserPresenceManager userPresenceManager) {
         return new ChatSummariesRecyclerAdapter(userPresenceManager);
+    }
+
+    @Provides
+    AdHelper provideAdHelper() {
+        return new AdHelper();
     }
 
 //    @Provides

@@ -23,7 +23,7 @@ import com.instachat.android.util.Base64;
 import com.instachat.android.util.DeviceUtil;
 import com.instachat.android.util.HttpMessage;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.SimpleRxWrapper;
 import com.instachat.android.util.StringUtil;
 
@@ -176,12 +176,12 @@ public class NetworkApi {
                     }
                     final String newUrl = url != null && url.getId() != null ? url.getId() : thirdPartyProfilePicUrl;
 
-                    final User user = Preferences.getInstance().getUser();
+                    final User user = UserPreferences.getInstance().getUser();
                     user.setProfilePicUrl(newUrl);
                     saveUser(null, user, new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Preferences.getInstance().saveUser(user);
+                            UserPreferences.getInstance().saveUser(user);
                         }
                     }, new Response.ErrorListener() {
                         @Override
@@ -243,7 +243,7 @@ public class NetworkApi {
 
         final String androidId = DeviceUtil.getAndroidId(context);
         final HashMap<String, String> params = new HashMap<>();
-        params.put("iid", Preferences.getInstance().getUserId() + "");
+        params.put("iid", UserPreferences.getInstance().getUserId() + "");
         params.put("deviceid", androidId);
         params.put("regid", regid);
         final JSONObject response = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/ih/gcmreg").post(params));

@@ -9,7 +9,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class ReportUserDialogHelper {
                                              @NonNull final String username,
                                              final String dpid) {
 
-        if (Preferences.getInstance().getUserId() == userid) {
+        if (UserPreferences.getInstance().getUserId() == userid) {
             return;
         }
 
@@ -61,12 +61,12 @@ public class ReportUserDialogHelper {
                                     .setContentText(activity.getString(R.string.report_person_success, username))
                                     .show();
                             Map<String, Object> reporterMap = new HashMap<>(2);
-                            reporterMap.put("name", Preferences.getInstance().getUsername());
-                            String dpid = Preferences.getInstance().getUser().getProfilePicUrl();
+                            reporterMap.put("name", UserPreferences.getInstance().getUsername());
+                            String dpid = UserPreferences.getInstance().getUser().getProfilePicUrl();
                             if (!TextUtils.isEmpty(dpid))
                                 reporterMap.put("dpid", dpid);
                             FirebaseDatabase.getInstance().getReference(Constants.REPORTS_REF(userid))
-                                    .child(Preferences.getInstance().getUserId() + "")
+                                    .child(UserPreferences.getInstance().getUserId() + "")
                                     .updateChildren(reporterMap);
                         } else {
                             new SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)

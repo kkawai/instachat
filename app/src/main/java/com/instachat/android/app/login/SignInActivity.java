@@ -43,7 +43,7 @@ import com.instachat.android.databinding.ActivitySignInBinding;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.util.ActivityUtil;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
 import com.instachat.android.view.ThemedAlertDialog;
@@ -94,7 +94,7 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
       GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
       googleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */).addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
 
-      String lastSignIn = Preferences.getInstance().getLastSignIn();
+      String lastSignIn = UserPreferences.getInstance().getLastSignIn();
       MLog.i(TAG, "lastSignIn ", lastSignIn);
       if (lastSignIn != null) {
          emailLayout.getEditText().setText(lastSignIn);
@@ -148,8 +148,8 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
                      return;
                   }
                   final User user = User.fromResponse(response);
-                  Preferences.getInstance().saveUser(user);
-                  Preferences.getInstance().saveLastSignIn(emailOrUsername);
+                  UserPreferences.getInstance().saveUser(user);
+                  UserPreferences.getInstance().saveLastSignIn(emailOrUsername);
                   signIntoFirebase(user.getEmail(), password);
                } else {
                   showErrorToast(R.string.email_password_not_found);
@@ -191,7 +191,7 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
 
    private void finallyGoChat() {
       hideProgressDialog();
-      User user = Preferences.getInstance().getUser();
+      User user = UserPreferences.getInstance().getUser();
       if (StringUtil.isEmpty(user.getProfilePicUrl())) {
          if (!TextUtils.isEmpty(thirdPartyProfilePicUrl)) {
             networkApi.saveThirdPartyPhoto(thirdPartyProfilePicUrl);
@@ -282,8 +282,8 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
             try {
                if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                   final User user = User.fromResponse(response);
-                  Preferences.getInstance().saveUser(user);
-                  Preferences.getInstance().saveLastSignIn(user.getUsername());
+                  UserPreferences.getInstance().saveUser(user);
+                  UserPreferences.getInstance().saveLastSignIn(user.getUsername());
                   signIntoFirebase(user.getEmail(), user.getPassword());
                } else { //user does not exist go to sign up activity
                   hideProgressDialog();

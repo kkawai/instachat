@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 
 import com.instachat.android.Constants;
 import com.instachat.android.TheApp;
@@ -16,11 +17,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 
-public final class Preferences {
+public final class UserPreferences {
 
     private static final Random RANDOM = new Random();
 
-    private Preferences() {
+    private UserPreferences() {
     }
 
     private static final String PREFERENCE_USER_ID = "id";
@@ -38,7 +39,7 @@ public final class Preferences {
 
     private static final int MAX_SAVED_TAGS = 15;
     private static final int MAX_SAVED_USERS = 5;
-    public static final String PREFERENCES_SERVICE = "com.instachat.android.Preferences";
+    public static final String PREFERENCES_SERVICE = "com.instachat.android.UserPreferences";
     private static final String PREFERENCE_ADVANCED_CAMERA_ENABLED = "advanced_camera_enabled";
     private static final String PREFERENCE_BORDERS_ENABLED = "borders_enabled";
     private static final String PREFERENCE_DOUBLE_TAP_TO_LIKE_HINT_IMPRESSIONS = "used_double_tap_hint_impressions";
@@ -52,22 +53,22 @@ public final class Preferences {
     private static final String PREFERENCE_UNIQUE_ID = "unique_id";
     private static final String PREFERENCE_SHOW_VC_COUNT_MSG = "show_vc_count_msg";
 
-    private static final String TAG = "Preferences";
+    private static final String TAG = "UserPreferences";
     private static final long TWO_DAYS = 172800000L;
     private static final long HALF_DAY = 43200000L;
     private static String sUniqueID = null;
     // private final ObjectMapper mObjectMapper;
     private SharedPreferences mPrefs;
-    private static Preferences instance;
+    private static UserPreferences instance;
     private static User sUser;
 
-    private Preferences(Context context) {
+    private UserPreferences(Context context) {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    public static Preferences getInstance() {
+    public static UserPreferences getInstance() {
         if (instance == null)
-            instance = new Preferences(TheApp.getInstance());
+            instance = new UserPreferences(TheApp.getInstance());
         return instance;
     }
 
@@ -132,12 +133,14 @@ public final class Preferences {
         //TODO
     }
 
-    public void clearUser(Editor editor) {
-        editor.remove(PREFERENCE_USER).remove(PREFERENCE_USER_ID).remove(PREFERENCE_USER_NAME).remove
+    public void clearUser() {
+        mPrefs.edit().remove(PREFERENCE_USER).remove(PREFERENCE_USER_ID).remove(PREFERENCE_USER_NAME).remove
                 (PREFERENCE_EMAIL).remove(PREFERENCE_IS_LOGGED_IN).apply();
     }
 
     public boolean isLoggedIn() {
+        if (getUser() == null || getUsername() == null)
+            return false;
         return mPrefs.getBoolean(PREFERENCE_IS_LOGGED_IN, false);
     }
 
@@ -180,22 +183,20 @@ public final class Preferences {
         return mPrefs.getString(PREFERENCE_LAST_SIGN_IN, null);
     }
 
-    public void saveUser(final User user) {
+    public void saveUser(@NonNull User user) {
+        if (user == null)
+            throw new IllegalArgumentException("cannot pass null user to saveUser(..)");
         sUser = user;
         final Editor editor = mPrefs.edit();
-        if (user == null) {
-            clearUser(editor);
-        } else {
             editor.putBoolean(PREFERENCE_IS_LOGGED_IN, true).putString(PREFERENCE_USER, user.toJSON().toString())
                     .putInt(PREFERENCE_USER_ID, user.getId()).putString(PREFERENCE_USER_NAME, user.getUsername())
                     .putString(PREFERENCE_EMAIL, user.getEmail());
-        }
-        editor.commit();
+        editor.apply();
     }
 
     public String getAccessToken() {
         final String accessToken = mPrefs.getString(INSTAGRAM_ACCESS_TOKEN, null);
-        MLog.i(Preferences.class.getSimpleName(), "Prefences.getAccessToken()=" + accessToken);
+        MLog.i(UserPreferences.class.getSimpleName(), "Prefences.getAccessToken()=" + accessToken);
         return this.mPrefs.getString(INSTAGRAM_ACCESS_TOKEN, null);
     }
 
@@ -203,11 +204,11 @@ public final class Preferences {
         final Editor editor = this.mPrefs.edit();
         if (accessToken == null) {
             editor.remove(INSTAGRAM_ACCESS_TOKEN);
-            MLog.i(Preferences.class.getSimpleName(), "Prefences.saveAccessToken() removed access token because it's " +
+            MLog.i(UserPreferences.class.getSimpleName(), "Prefences.saveAccessToken() removed access token because it's " +
                     "null..");
         } else {
             editor.putString(INSTAGRAM_ACCESS_TOKEN, accessToken);
-            MLog.i(Preferences.class.getSimpleName(), "Prefences.saveAccessToken() saved.." + accessToken);
+            MLog.i(UserPreferences.class.getSimpleName(), "Prefences.saveAccessToken() saved.." + accessToken);
         }
         editor.commit();
     }

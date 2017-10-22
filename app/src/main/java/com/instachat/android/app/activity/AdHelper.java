@@ -10,25 +10,34 @@ import com.smaato.soma.AdDimension;
 import com.smaato.soma.AdListenerInterface;
 import com.smaato.soma.BannerView;
 
+import javax.inject.Inject;
+
 public class AdHelper {
 
     private BannerView bannerView;
     private RelativeLayout relativeLayout;
-    public AdHelper(Activity activity) {
-        bannerView = new BannerView(activity.getApplication());
-        relativeLayout = activity.findViewById(R.id.ad_container);
-        relativeLayout.addView(bannerView, new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dpToPx(50) ));
-        bannerView.addAdListener((AdListenerInterface)activity);
-        bannerView.getAdSettings().setAdDimension(AdDimension.DEFAULT);
+
+    @Inject
+    public AdHelper() {
     }
 
-    public void loadAd() {
+    public void loadAd(Activity activity) {
 
-        bannerView.getAdSettings().setPublisherId(Constants.SMAATO_PUBLISHER_ID);
-        bannerView.getAdSettings().setAdspaceId(Constants.SMAATO_BANNER_ADSPACE_ID);
-        bannerView.setAutoReloadEnabled(true);
-        bannerView.setAutoReloadFrequency(60);
-        bannerView.setLocationUpdateEnabled(false);
+        if (bannerView == null) {
+            bannerView = new BannerView(activity.getApplication());
+            relativeLayout = activity.findViewById(R.id.ad_container);
+            if (relativeLayout == null) {
+                throw new IllegalStateException("activity layout does not contain RelativeLayout with R.id.ad_container");
+            }
+            relativeLayout.addView(bannerView, new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dpToPx(50) ));
+            bannerView.addAdListener((AdListenerInterface)activity);
+            bannerView.getAdSettings().setAdDimension(AdDimension.DEFAULT);
+            bannerView.getAdSettings().setPublisherId(Constants.SMAATO_PUBLISHER_ID);
+            bannerView.getAdSettings().setAdspaceId(Constants.SMAATO_BANNER_ADSPACE_ID);
+            bannerView.setAutoReloadEnabled(true);
+            bannerView.setAutoReloadFrequency(60);
+            bannerView.setLocationUpdateEnabled(false);
+        }
         bannerView.asyncLoadNewBanner();
     }
 

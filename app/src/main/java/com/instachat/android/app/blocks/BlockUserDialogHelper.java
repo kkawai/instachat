@@ -10,7 +10,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +29,7 @@ public class BlockUserDialogHelper {
                                             final String dpid,
                                             @NonNull final BlockedUserListener listener) {
 
-        if (Preferences.getInstance().getUserId() == userid) {
+        if (UserPreferences.getInstance().getUserId() == userid) {
             return;
         }
 

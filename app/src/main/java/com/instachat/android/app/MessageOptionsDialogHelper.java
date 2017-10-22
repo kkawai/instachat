@@ -11,7 +11,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.data.model.FriendlyMessage;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -89,11 +89,11 @@ public class MessageOptionsDialogHelper {
             popupMenu.getMenu().findItem(R.id.menu_delete_message).setTitle(R.string.delete_photo);
         }
         if (!FirebaseRemoteConfig.getInstance().getBoolean(Constants.KEY_ALLOW_DELETE_OTHER_MESSAGES)) {
-            if (Preferences.getInstance().getUserId() != friendlyMessage.getUserid()) {
+            if (UserPreferences.getInstance().getUserId() != friendlyMessage.getUserid()) {
                 popupMenu.getMenu().removeItem(R.id.menu_delete_message);
             }
         }
-        if (Preferences.getInstance().getUserId() == friendlyMessage.getUserid()) {
+        if (UserPreferences.getInstance().getUserId() == friendlyMessage.getUserid()) {
             popupMenu.getMenu().removeItem(R.id.menu_report_user);
             popupMenu.getMenu().removeItem(R.id.menu_block_user);
         } else {

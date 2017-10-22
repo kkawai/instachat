@@ -15,7 +15,7 @@ import com.instachat.android.TheApp;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.SimpleRxWrapper;
 import com.instachat.android.util.StringUtil;
 
@@ -85,7 +85,7 @@ public class GCMHelper {
 
     public void onCreate(final Activity activity) {
 
-        if (!Preferences.getInstance().isLoggedIn()) {
+        if (!UserPreferences.getInstance().isLoggedIn()) {
             MLog.i(TAG, "not signed in; skip cloud messaging registration");
             return;
         }

@@ -11,7 +11,7 @@ import android.util.Log;
 
 import com.instachat.android.TheApp;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 
 /**
  * @author kkawai
@@ -55,7 +55,7 @@ public final class OneTimeMessageDb {
     }
 
     private static final String getDbName() {
-        return Preferences.getInstance().getUserId() + ".db";
+        return UserPreferences.getInstance().getUserId() + ".db";
     }
 
     private class DbOpenHelper extends SQLiteOpenHelper {

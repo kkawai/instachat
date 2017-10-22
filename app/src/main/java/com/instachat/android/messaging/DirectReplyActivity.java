@@ -21,7 +21,7 @@ import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.User;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 
 import org.json.JSONObject;
 
@@ -79,7 +79,7 @@ public class DirectReplyActivity extends AppCompatActivity {
             PrivateChatActivity.startPrivateChatActivity(this, userid, username, profilePicUrl, false, null, null, null);
             finish();
         } else {
-            User me = Preferences.getInstance().getUser();
+            User me = UserPreferences.getInstance().getUser();
             final FriendlyMessage friendlyMessage = new FriendlyMessage(myDirectReply, me.getUsername(), me.getId(),
                     me.getProfilePicUrl(), null, false, false, null, System.currentTimeMillis());
 

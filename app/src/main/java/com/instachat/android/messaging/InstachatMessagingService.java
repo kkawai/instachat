@@ -32,7 +32,7 @@ import com.instachat.android.app.activity.LauncherActivity;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 import com.instachat.android.view.CircleTransform;
 
 import org.json.JSONObject;
@@ -81,7 +81,7 @@ public class InstachatMessagingService extends FirebaseMessagingService {
                      * so no need to put up a notification in the system tray.
                      * For debugging purposes, however, if it's myself, then it's ok.
                      */
-                        if (PrivateChatActivity.getActiveUserid() != Preferences.getInstance().getUserId()) {
+                        if (PrivateChatActivity.getActiveUserid() != UserPreferences.getInstance().getUserId()) {
                             MLog.d(TAG, "already actively chatting, do NOT notify");
                             return;
                         }
@@ -236,7 +236,7 @@ public class InstachatMessagingService extends FirebaseMessagingService {
     private void checkIfIAcceptedThisPersonYet(final FriendlyMessage friendlyMessage, final Notification
             notification, final String notificationText) {
 
-        final int myUserid = Preferences.getInstance().getUserId();
+        final int myUserid = UserPreferences.getInstance().getUserId();
         final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (friendlyMessage.getUserid() == myUserid) {
             /**
@@ -299,7 +299,7 @@ public class InstachatMessagingService extends FirebaseMessagingService {
          * fix bug from older version
          */
         try {
-            if (username.equals(Preferences.getInstance().getUsername())) {
+            if (username.equals(UserPreferences.getInstance().getUsername())) {
                 return;
             }
         } catch (Exception e) {

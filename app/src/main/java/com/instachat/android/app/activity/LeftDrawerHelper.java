@@ -40,7 +40,7 @@ import com.instachat.android.data.model.User;
 import com.instachat.android.font.FontUtil;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
 import com.tooltip.Tooltip;
@@ -49,8 +49,6 @@ import org.json.JSONObject;
 
 import java.util.Hashtable;
 import java.util.Map;
-
-import javax.inject.Inject;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -196,15 +194,15 @@ public class LeftDrawerHelper {
 
             MLog.d(TAG, "onDrawerOpened() LEFT drawer");
             ScreenUtil.hideKeyboard(mActivity);
-            if (TextUtils.isEmpty(Preferences.getInstance().getUser().getProfilePicUrl())) {
+            if (TextUtils.isEmpty(UserPreferences.getInstance().getUser().getProfilePicUrl())) {
                mProfilePicTooltip = new Tooltip.Builder(mProfilePic, R.style.drawer_tooltip).setText(mActivity.getString(R.string.display_photo_tooltip)).show();
             }
             showViews(true);
             mSaveButton.setVisibility(View.GONE);
 
-            if (!Preferences.getInstance().hasShownUsernameTooltip()) {
+            if (!UserPreferences.getInstance().hasShownUsernameTooltip()) {
                showTooltips();
-               Preferences.getInstance().setShownUsernameTooltip(true);
+               UserPreferences.getInstance().setShownUsernameTooltip(true);
             }
          }
 
@@ -225,10 +223,10 @@ public class LeftDrawerHelper {
             showViews(false);
             hideTooltips();
 
-            final String existingUsername = Preferences.getInstance().getUser().getUsername();
+            final String existingUsername = UserPreferences.getInstance().getUser().getUsername();
             final String newUsername = mUsernameEditText.getText().toString();
 
-            final String existingBio = Preferences.getInstance().getUser().getBio();
+            final String existingBio = UserPreferences.getInstance().getUser().getBio();
             final String newBio = mBioEditText.getText().toString();
 
             /**
@@ -249,7 +247,7 @@ public class LeftDrawerHelper {
                }
             }
 
-            saveUser(Preferences.getInstance().getUser(), newUsername, newBio, bioChanged, usernameChanged);
+            saveUser(UserPreferences.getInstance().getUser(), newUsername, newBio, bioChanged, usernameChanged);
          }
 
          @Override
@@ -258,11 +256,11 @@ public class LeftDrawerHelper {
          }
       });
 
-      mUsernameEditText.setText(Preferences.getInstance().getUser().getUsername());
-      if (TextUtils.isEmpty(Preferences.getInstance().getUser().getBio())) {
+      mUsernameEditText.setText(UserPreferences.getInstance().getUser().getUsername());
+      if (TextUtils.isEmpty(UserPreferences.getInstance().getUser().getBio())) {
          mBioEditText.setHint(R.string.hint_write_something_about_yourself);
       } else {
-         String bioStr = Preferences.getInstance().getUser().getBio() + "";
+         String bioStr = UserPreferences.getInstance().getUser().getBio() + "";
          bioStr = bioStr.equals("null") ? "" : bioStr;
          mBioEditText.setText(bioStr);
       }
@@ -274,13 +272,13 @@ public class LeftDrawerHelper {
             return true;
          }
       });
-      setupProfilePic(Preferences.getInstance().getUser().getProfilePicUrl());
-      listenForUpdatedLikeCount(Preferences.getInstance().getUser().getId());
+      setupProfilePic(UserPreferences.getInstance().getUser().getProfilePicUrl());
+      listenForUpdatedLikeCount(UserPreferences.getInstance().getUser().getId());
       listenForPrivateChatRequests();
    }
 
    private void checkForRemoteUpdatesToMyDP() {
-      networkApi.getUserById(null, Preferences.getInstance().getUserId(), new Response.Listener<JSONObject>() {
+      networkApi.getUserById(null, UserPreferences.getInstance().getUserId(), new Response.Listener<JSONObject>() {
          @Override
          public void onResponse(final JSONObject response) {
             try {
@@ -290,11 +288,11 @@ public class LeftDrawerHelper {
                if (status.equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                   final User remote = User.fromResponse(response);
                   if (!TextUtils.isEmpty(remote.getProfilePicUrl())) {
-                     User local = Preferences.getInstance().getUser();
+                     User local = UserPreferences.getInstance().getUser();
                      if (TextUtils.isEmpty(local.getProfilePicUrl()) || !remote.getProfilePicUrl().equals(local.getProfilePicUrl())) {
-                        User user = Preferences.getInstance().getUser();
+                        User user = UserPreferences.getInstance().getUser();
                         user.setProfilePicUrl(remote.getProfilePicUrl());
-                        Preferences.getInstance().saveUser(user);
+                        UserPreferences.getInstance().saveUser(user);
 
                         MLog.i(TAG, "checkForRemoteUpdatesToMyDP() my pic changed remotely. attempt to update");
                         try {
@@ -379,7 +377,7 @@ public class LeftDrawerHelper {
                try {
                   JSONObject object = new JSONObject(response);
                   if (object.getString(NetworkApi.KEY_RESPONSE_STATUS).equals(NetworkApi.RESPONSE_OK)) {
-                     Preferences.getInstance().saveUser(user);
+                     UserPreferences.getInstance().saveUser(user);
                      showProfileUpdatedDialog();
                   }
                } catch (Exception e) {
@@ -395,7 +393,7 @@ public class LeftDrawerHelper {
                showErrorToast("leftd 2");
                Bundle payload = new Bundle();
                payload.putString("why", error.toString());
-               payload.putString("username", Preferences.getInstance().getUsername() + "");
+               payload.putString("username", UserPreferences.getInstance().getUsername() + "");
                FirebaseAnalytics.getInstance(TheApp.getInstance()).logEvent(Events.SAVED_PROFILE_FAILED, payload);
             }
          });
@@ -422,36 +420,36 @@ public class LeftDrawerHelper {
                               JSONObject object = new JSONObject(response);
                               if (object.getString(NetworkApi.KEY_RESPONSE_STATUS).equals(NetworkApi.RESPONSE_OK)) {
                                  user.setUsername(newUsername);
-                                 Preferences.getInstance().saveUser(user);
-                                 Preferences.getInstance().saveLastSignIn(newUsername);
+                                 UserPreferences.getInstance().saveUser(user);
+                                 UserPreferences.getInstance().saveLastSignIn(newUsername);
                                  showProfileUpdatedDialog();
                               }
                            } catch (Exception e) {
-                              mUsernameEditText.setText(Preferences.getInstance().getUsername());
+                              mUsernameEditText.setText(UserPreferences.getInstance().getUsername());
                            }
                            Bundle payload = new Bundle();
-                           payload.putString("username", Preferences.getInstance().getUsername() + "");
+                           payload.putString("username", UserPreferences.getInstance().getUsername() + "");
                            FirebaseAnalytics.getInstance(TheApp.getInstance()).logEvent(Events.SAVED_PROFILE, payload);
                         }
                      }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
                            MLog.d(TAG, "error response: ", error);
-                           mUsernameEditText.setText(Preferences.getInstance().getUsername());
+                           mUsernameEditText.setText(UserPreferences.getInstance().getUsername());
                            Bundle payload = new Bundle();
                            payload.putString("why", error.toString());
-                           payload.putString("username", Preferences.getInstance().getUsername() + "");
+                           payload.putString("username", UserPreferences.getInstance().getUsername() + "");
                            FirebaseAnalytics.getInstance(TheApp.getInstance()).logEvent(Events.SAVED_PROFILE_FAILED, payload);
                         }
                      });
 
                   } else {
                      new SweetAlertDialog(mActivity, SweetAlertDialog.ERROR_TYPE).setContentText(mActivity.getString(R.string.username_exists, newUsername)).show();
-                     mUsernameEditText.setText(Preferences.getInstance().getUsername());
+                     mUsernameEditText.setText(UserPreferences.getInstance().getUsername());
                   }
 
                } catch (Exception e) {
-                  mUsernameEditText.setText(Preferences.getInstance().getUsername());
+                  mUsernameEditText.setText(UserPreferences.getInstance().getUsername());
                }
             }
          }, new Response.ErrorListener() {
@@ -459,7 +457,7 @@ public class LeftDrawerHelper {
             public void onErrorResponse(VolleyError error) {
                if (mActivityState == null || mActivityState.isActivityDestroyed())
                   return;
-               mUsernameEditText.setText(Preferences.getInstance().getUsername());
+               mUsernameEditText.setText(UserPreferences.getInstance().getUsername());
             }
          });
       }
@@ -500,7 +498,7 @@ public class LeftDrawerHelper {
          @Override
          public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             try {
-               if (!Preferences.getInstance().getUsername().equals(charSequence.toString())) {
+               if (!UserPreferences.getInstance().getUsername().equals(charSequence.toString())) {
                   mIsUsernameChanged = true;
                   setSaveButtonVisibility(mIsUsernameChanged, mIsBioChanged);
                } else {
@@ -526,7 +524,7 @@ public class LeftDrawerHelper {
 
          @Override
          public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            User user = Preferences.getInstance().getUser();
+            User user = UserPreferences.getInstance().getUser();
             if (!user.getBio().equals(charSequence.toString())) {
                mIsBioChanged = true;
                setSaveButtonVisibility(mIsUsernameChanged, mIsBioChanged);

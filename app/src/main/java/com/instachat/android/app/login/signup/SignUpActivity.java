@@ -26,7 +26,7 @@ import com.instachat.android.font.FontUtil;
 import com.instachat.android.data.model.User;
 import com.instachat.android.util.ActivityUtil;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
 
@@ -209,8 +209,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     MLog.i("test", "savedUser: " + string);
                     if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                         user.copyFrom(response.getJSONObject(NetworkApi.RESPONSE_DATA));
-                        Preferences.getInstance().saveUser(user);
-                        Preferences.getInstance().saveLastSignIn(username);
+                        UserPreferences.getInstance().saveUser(user);
+                        UserPreferences.getInstance().saveLastSignIn(username);
                         createFirebaseAccount();
                     } else {
                         Toast.makeText(SignUpActivity.this, "Error creating account (1): " + response.getString("status"), Toast.LENGTH_SHORT).show();

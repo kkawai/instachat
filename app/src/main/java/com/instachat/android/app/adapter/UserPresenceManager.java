@@ -9,7 +9,7 @@ import com.instachat.android.Constants;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 
 import org.json.JSONObject;
 
@@ -132,17 +132,17 @@ public class UserPresenceManager {
             if (!isNotifyOthers)
                 continue;
 
-            if (privateChatSummary.getOnlineStatus() != PrivateChatSummary.USER_OFFLINE && Integer.parseInt(privateChatSummary.getId()) != Preferences.getInstance().getUserId()) {
+            if (privateChatSummary.getOnlineStatus() != PrivateChatSummary.USER_OFFLINE && Integer.parseInt(privateChatSummary.getId()) != UserPreferences.getInstance().getUserId()) {
 
                 if (!ChatSummariesPrefs.isNotifiedRecently(privateChatSummary.getId())) {
 
-                    FirebaseDatabase.getInstance().getReference("/users/" + privateChatSummary.getId() + "/private_summaries/" + Preferences.getInstance().getUserId() + "/accepted").addListenerForSingleValueEvent(new ValueEventListener() {
+                    FirebaseDatabase.getInstance().getReference("/users/" + privateChatSummary.getId() + "/private_summaries/" + UserPreferences.getInstance().getUserId() + "/accepted").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if (dataSnapshot.exists() && dataSnapshot.getValue(Boolean.class)) {
                                 try {
                                     JSONObject msg = new JSONObject();
-                                    msg.put(Constants.KEY_USERNAME, Preferences.getInstance().getUsername());
+                                    msg.put(Constants.KEY_USERNAME, UserPreferences.getInstance().getUsername());
                                     networkApi.gcmsend(Integer.parseInt(privateChatSummary.getId()), Constants.GcmMessageType.notify_friend_in, msg);
                                     ChatSummariesPrefs.updateLastNotifiedTime(privateChatSummary.getId());
                                 } catch (Exception e) {

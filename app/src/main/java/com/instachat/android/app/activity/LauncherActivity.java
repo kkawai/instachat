@@ -10,7 +10,7 @@ import com.instachat.android.R;
 import com.instachat.android.app.login.SignInActivity;
 import com.instachat.android.app.login.signup.SignUpActivity;
 import com.instachat.android.util.ActivityUtil;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 
 /**
  * Created by kevin on 8/9/2016.
@@ -21,7 +21,7 @@ public final class LauncherActivity extends AppCompatActivity {
    public void onCreate(Bundle savedInstanceState) {
       setTheme(R.style.Theme_App);
       super.onCreate(savedInstanceState);
-      if (Preferences.getInstance().getUser() != null) {
+      if (UserPreferences.getInstance().getUser() != null) {
          startActivity(new Intent(this, GroupChatActivity.class));
          finish();
          return;

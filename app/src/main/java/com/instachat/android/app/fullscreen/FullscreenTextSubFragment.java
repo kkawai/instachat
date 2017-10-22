@@ -21,7 +21,7 @@ import com.instachat.android.font.FontUtil;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.StringUtil;
 import com.instachat.android.view.TextViewUtil;
 import com.instachat.android.view.ZoomImageListener;
@@ -56,7 +56,7 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
         mFriendlyMessage = getArguments().getParcelable(Constants.KEY_FRIENDLY_MESSAGE);
         if (mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
             setCustomFragmentToolbarTitle("");
-            if (mFriendlyMessage.getUserid() != Preferences.getInstance().getUserId()) {
+            if (mFriendlyMessage.getUserid() != UserPreferences.getInstance().getUserId()) {
                 FirebaseDatabase.getInstance().getReference(getArguments().getString(Constants.KEY_FRIENDLY_MESSAGE_DATABASE)).
                         child(mFriendlyMessage.getId()).
                         child(Constants.CHILD_MESSAGE_CONSUMED_BY_PARTNER).
@@ -183,7 +183,7 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
     public void onDestroy() {
         if (mFriendlyMessage != null &&
                 mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
-            if (mFriendlyMessage.getUserid() != Preferences.getInstance().getUserId()) {
+            if (mFriendlyMessage.getUserid() != UserPreferences.getInstance().getUserId()) {
                 OneTimeMessageDb.getInstance().insertMessageId(mFriendlyMessage.getId());
             }
         }

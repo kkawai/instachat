@@ -20,7 +20,7 @@ import com.instachat.android.R;
 import com.instachat.android.app.adapter.MessageViewHolder;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.data.model.PrivateChatSummary;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -74,7 +74,7 @@ public class RequestsFragment extends BaseFragment {
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
                         sweetAlertDialog.cancel();
-                        FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(userid, Preferences.getInstance().getUserId())).removeValue();
+                        FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(userid, UserPreferences.getInstance().getUserId())).removeValue();
                         FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF()).child("" + userid).removeValue();
                         FirebaseAnalytics.getInstance(getActivity()).logEvent(Events.PENDING_REQUEST_DENIED, null);
                     }

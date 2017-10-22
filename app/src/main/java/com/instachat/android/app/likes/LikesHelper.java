@@ -9,7 +9,7 @@ import com.instachat.android.Constants;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.User;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 
 /**
  * Created by kevin on 10/22/2016.
@@ -45,7 +45,7 @@ public class LikesHelper {
             }
         });
 
-        final User me = Preferences.getInstance().getUser();
+        final User me = UserPreferences.getInstance().getUser();
         final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MESSAGE_LIKES_REF(friendlyMessage.getId())).
                 child(me.getId() + "");
         //check if I already liked it, if so increment my counter

@@ -34,7 +34,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
-import com.instachat.android.TheApp;
 import com.instachat.android.app.MessageOptionsDialogHelper;
 import com.instachat.android.app.activity.ActivityState;
 import com.instachat.android.app.blocks.BlockUserDialogHelper;
@@ -46,7 +45,7 @@ import com.instachat.android.data.db.OneTimeMessageDb;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.Preferences;
+import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.TimeUtil;
 import com.tooltip.Tooltip;
@@ -56,8 +55,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import javax.inject.Inject;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
@@ -100,7 +97,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         mMessagesRef = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mMaxPeriscopesPerItem = (int) FirebaseRemoteConfig.getInstance().getLong(Constants.KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM);
-        mMyUserid = Preferences.getInstance().getUserId();
+        mMyUserid = UserPreferences.getInstance().getUserId();
         this.map = map;
     }
 
