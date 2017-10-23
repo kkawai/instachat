@@ -1,16 +1,22 @@
 package com.instachat.android.app.activity;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
+import com.instachat.android.TheApp;
+import com.instachat.android.app.activity.group.GroupChatActivity;
 import com.instachat.android.app.adapter.MessageViewHolder;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapter;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
+import com.instachat.android.app.analytics.Events;
+import com.instachat.android.app.blocks.BlockedUserListener;
 import com.instachat.android.app.ui.base.BaseViewModel;
 import com.instachat.android.data.DataManager;
 import com.instachat.android.data.model.FriendlyMessage;
@@ -30,10 +36,17 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     public static final String TAG = "AbstractChatViewModel";
 
     private String databaseRoot;
+
     private MessagesRecyclerAdapter messagesAdapter;
 
     public AbstractChatViewModel(DataManager dataManager, SchedulerProvider schedulerProvider) {
         super(dataManager, schedulerProvider);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        cleanup();
     }
 
     //invoke after calling setNavigator
@@ -97,6 +110,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
                 map);
         messagesAdapter.setIsPrivateChat(isPrivateChat());
         messagesAdapter.setDatabaseRoot(getDatabaseRoot());
+        messagesAdapter.setBlockedUserListener(blockedUserListener);
         return messagesAdapter;
     }
 
@@ -139,4 +153,29 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     public String myUsername() {
         return UserPreferences.getInstance().getUsername() + "";
     }
+
+    public abstract void cleanup();
+
+    public BlockedUserListener getBlockedUserListener() {
+        return blockedUserListener;
+    }
+
+    private BlockedUserListener blockedUserListener = new BlockedUserListener() {
+        @Override
+        public void onUserBlocked(int userid) {
+            Bundle payload = new Bundle();
+            payload.putString("by", myUsername());
+            payload.putInt("userid", userid);
+            FirebaseAnalytics.getInstance(TheApp.getInstance()).logEvent(Events.USER_BLOCKED, payload);
+        }
+
+        @Override
+        public void onUserUnblocked(int userid) {
+            Bundle payload = new Bundle();
+            payload.putString("by", myUsername());
+            payload.putInt("userid", userid);
+            FirebaseAnalytics.getInstance(TheApp.getInstance()).logEvent(Events.USER_UNBLOCKED, payload);
+        }
+    };
+
 }

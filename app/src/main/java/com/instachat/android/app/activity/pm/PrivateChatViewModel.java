@@ -15,4 +15,9 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
     public boolean isPrivateChat() {
         return true;
     }
+
+    @Override
+    public void cleanup() {
+
+    }
 }

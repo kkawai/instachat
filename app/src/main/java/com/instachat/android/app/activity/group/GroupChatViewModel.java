@@ -1,15 +1,32 @@
 package com.instachat.android.app.activity.group;
 
+import android.support.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.Constants;
 import com.instachat.android.app.activity.AbstractChatViewModel;
-import com.instachat.android.app.ui.base.BaseViewModel;
 import com.instachat.android.data.DataManager;
-import com.instachat.android.util.UserPreferences;
+import com.instachat.android.util.MLog;
 import com.instachat.android.util.rx.SchedulerProvider;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator> {
 
     //public ObservableArrayList<ItemViewModel> list = new ObservableArrayList<>();
+    private long groupId;
+    private long mLastTypingTime;
+    private DatabaseReference mTypingInRoomReference;
+    private ChildEventListener mTypingInRoomEventListener;
+    private DatabaseReference mMeTypingRef;
+    private Map<String, Object> mMeTypingMap = new HashMap<>(3);
 
     public GroupChatViewModel(DataManager dataManager, SchedulerProvider schedulerProvider) {
         super(dataManager, schedulerProvider);
@@ -18,6 +35,92 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
     @Override
     public boolean isPrivateChat() {
         return false;
+    }
+
+    public long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
+    }
+
+    public void listenForTyping() {
+
+        mMeTypingRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(getGroupId(),
+                myUserid())).
+                child(Constants.CHILD_TYPING);
+        mMeTypingRef.setValue(false);
+
+        mTypingInRoomReference = FirebaseDatabase.getInstance().getReference(Constants
+                .GROUP_CHAT_USERS_TYPING_PARENT_REF(getGroupId()));
+        mTypingInRoomEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                MLog.d(TAG, "isTyping: onChildAdded() dataSnapshot ", dataSnapshot, " s: ", s);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                MLog.d(TAG, "isTyping: onChildChanged() dataSnapshot ", dataSnapshot, " s: ", s);
+                MLog.d(TAG, "isTyping: onDataChange() dataSnapshot ", dataSnapshot);
+                if (dataSnapshot.exists() && dataSnapshot.hasChild(Constants.CHILD_TYPING)) {
+                    boolean isTyping = dataSnapshot.child(Constants.CHILD_TYPING).getValue(Boolean.class);
+                    String username = dataSnapshot.child(Constants.CHILD_USERNAME).getValue(String.class);
+                    //String dpid = dataSnapshot.child(Constants.CHILD_DPID).getValue(String.class);
+                    int userid = Integer.parseInt(dataSnapshot.getKey());
+                    //MLog.d(TAG, "isTyping: ", isTyping, " dpid: ", dpid, " userid ", userid);
+                    if (isTyping) {
+                        getNavigator().showUserTyping(username);
+                    }
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                MLog.d(TAG, "isTyping: onChildRemoved() dataSnapshot ", dataSnapshot);
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        mTypingInRoomReference.addChildEventListener(mTypingInRoomEventListener);
+    }
+
+    public void onMeTyping() {
+        try {
+            if (System.currentTimeMillis() - mLastTypingTime < 3000)
+                return;
+            mLastTypingTime = System.currentTimeMillis();
+            if (mMeTypingMap.size() == 0) {
+                mMeTypingMap.put(Constants.CHILD_TYPING, true);
+                mMeTypingMap.put(Constants.CHILD_USERNAME, myUsername());
+            }
+            FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(getGroupId(), myUserid()))
+                    .setValue(mMeTypingMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    //immediately flip the value back to false in order
+                    //to pick up further typing by my person
+                    mMeTypingRef.setValue(false);
+                }
+            });
+        } catch (Exception e) {
+            MLog.e(TAG, "onMeTyping() failed", e);
+        }
+    }
+
+    @Override
+    public void cleanup() {
+        if (mTypingInRoomReference != null && mTypingInRoomEventListener != null)
+            mTypingInRoomReference.removeEventListener(mTypingInRoomEventListener);
     }
 
     /*public void fetchHomeData(List<Item> cache) {

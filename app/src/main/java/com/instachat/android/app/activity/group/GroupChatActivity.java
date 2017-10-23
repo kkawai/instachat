@@ -51,7 +51,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -81,7 +80,6 @@ import com.instachat.android.app.adapter.MessagesRecyclerAdapter;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.app.analytics.Events;
-import com.instachat.android.app.blocks.BlockedUserListener;
 import com.instachat.android.app.blocks.BlocksFragment;
 import com.instachat.android.app.fullscreen.FriendlyMessageContainer;
 import com.instachat.android.app.fullscreen.FullScreenTextFragment;
@@ -116,9 +114,7 @@ import com.smaato.soma.exception.AdReceiveFailed;
 import com.tooltip.Tooltip;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
@@ -177,7 +173,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     private Toolbar mToolbar;
 
     private EditText mMessageEditText;
-    private DatabaseReference mMeTypingRef;
 
     private ProgressDialog mProgressDialog;
 
@@ -187,7 +182,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     private ExternalSendIntentConsumer mExternalSendIntentConsumer;
     private Uri mSharePhotoUri;
     private String mShareText;
-    private long mGroupId = 0L;
     private boolean mIsPendingRequestsAvailable;
     private ActivityMainBinding binding;
     private GroupChatViewModel groupChatViewModel;
@@ -237,7 +231,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
                 if (length > 0) {
                     setEnableSendButton(true);
-                    onMeTyping();
+                    groupChatViewModel.onMeTyping();
                     showSendOptionsTooltip(binding.sendButton);
                 } else {
                     setEnableSendButton(false);
@@ -279,12 +273,11 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             mMessageEditText.setText(getIntent().getStringExtra(Constants.KEY_SHARE_MESSAGE));
             getIntent().removeExtra(Constants.KEY_SHARE_MESSAGE);
         }
-        listenForTyping();
+        groupChatViewModel.listenForTyping();
         final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.cancel(InstachatMessagingService.NOTIFICATION_ID_PENDING_REQUESTS);
         notificationManager.cancel(InstachatMessagingService.NOTIFICATION_ID_FRIEND_JUMPED_IN);
         groupChatViewModel.smallProgressCheck();
-
     }
 
     private DatabaseReference mGroupSummaryRef;
@@ -294,96 +287,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         if (mGroupSummaryRef != null && mGroupSummaryListener != null) {
             mGroupSummaryRef.removeEventListener(mGroupSummaryListener);
         }
-    }
-
-    private long mLastTypingTime;
-
-    private Map<String, Object> mMeTypingMap = new HashMap<>(3);
-
-    protected void onMeTyping() {
-        try {
-            if (System.currentTimeMillis() - mLastTypingTime < 3000)
-                return;
-            mLastTypingTime = System.currentTimeMillis();
-            if (mMeTypingMap.size() == 0) {
-                mMeTypingMap.put(Constants.CHILD_TYPING, true);
-                mMeTypingMap.put(Constants.CHILD_USERNAME, groupChatViewModel.myUsername());
-            }
-            FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, groupChatViewModel.myUserid()))
-                    .setValue(mMeTypingMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    //immediately flip the value back to false in order
-                    //to pick up further typing by my person
-                    mMeTypingRef.setValue(false);
-                }
-            });
-        } catch (Exception e) {
-            MLog.e(TAG, "onMeTyping() failed", e);
-        }
-    }
-
-    private DatabaseReference mTypingInRoomReference;
-    private ChildEventListener mTypingInRoomEventListener;
-
-    private void listenForTyping() {
-
-        mMeTypingRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId,
-                groupChatViewModel.myUserid())).
-                child(Constants.CHILD_TYPING);
-        mMeTypingRef.setValue(false);
-
-        mTypingInRoomReference = FirebaseDatabase.getInstance().getReference(Constants
-                .GROUP_CHAT_USERS_TYPING_PARENT_REF(mGroupId));
-        mTypingInRoomEventListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                MLog.d(TAG, "isTyping: onChildAdded() dataSnapshot ", dataSnapshot, " s: ", s);
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                MLog.d(TAG, "isTyping: onChildChanged() dataSnapshot ", dataSnapshot, " s: ", s);
-                if (isActivityDestroyed())
-                    return;
-                MLog.d(TAG, "isTyping: onDataChange() dataSnapshot ", dataSnapshot);
-                if (dataSnapshot.exists() && dataSnapshot.hasChild(Constants.CHILD_TYPING)) {
-                    boolean isTyping = dataSnapshot.child(Constants.CHILD_TYPING).getValue(Boolean.class);
-                    String username = dataSnapshot.child(Constants.CHILD_USERNAME).getValue(String.class);
-                    //String dpid = dataSnapshot.child(Constants.CHILD_DPID).getValue(String.class);
-                    int userid = Integer.parseInt(dataSnapshot.getKey());
-                    //MLog.d(TAG, "isTyping: ", isTyping, " dpid: ", dpid, " userid ", userid);
-                    if (isTyping) {
-                        onRemoteUserTyping(userid, username, null);
-                    }
-                }
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                MLog.d(TAG, "isTyping: onChildRemoved() dataSnapshot ", dataSnapshot);
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        mTypingInRoomReference.addChildEventListener(mTypingInRoomEventListener);
-
-        UsersInGroupListener usersInGroupListener = new UsersInGroupListener() {
-            @Override
-            public void onNumUsersUpdated(long groupId, String groupName, int numUsers) {
-                if (getSupportActionBar() != null && groupId == mGroupId)
-                    getSupportActionBar().setTitle(groupName + getCount(numUsers));
-            }
-        };
-        chatsRecyclerViewAdapter.setUsersInGroupListener(usersInGroupListener);
     }
 
     private String getCount(int count) {
@@ -439,23 +342,23 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             mExternalSendIntentConsumer.cleanup();
         if (mGroupChatUsersRecyclerAdapter != null)
             mGroupChatUsersRecyclerAdapter.cleanup();
-        mBlockedUserListener = null;
-        if (mTypingInRoomReference != null && mTypingInRoomEventListener != null)
-            mTypingInRoomReference.removeEventListener(mTypingInRoomEventListener);
+        groupChatViewModel.cleanup();
         super.onDestroy();
     }
 
     protected void initDatabaseRef() {
         String databaseRef;
+        long groupId;
         if (getIntent() != null && getIntent().hasExtra(Constants.KEY_GROUPID)) {
-            mGroupId = getIntent().getLongExtra(Constants.KEY_GROUPID, Constants.DEFAULT_PUBLIC_GROUP_ID);
-            databaseRef = Constants.GROUP_CHAT_REF(mGroupId);
-            UserPreferences.getInstance().setLastGroupChatRoomVisited(mGroupId);
+            groupId = getIntent().getLongExtra(Constants.KEY_GROUPID, Constants.DEFAULT_PUBLIC_GROUP_ID);
+            databaseRef = Constants.GROUP_CHAT_REF(groupId);
+            UserPreferences.getInstance().setLastGroupChatRoomVisited(groupId);
         } else {
-            mGroupId = UserPreferences.getInstance().getLastGroupChatRoomVisited();
-            databaseRef = Constants.GROUP_CHAT_REF(mGroupId);
+            groupId = UserPreferences.getInstance().getLastGroupChatRoomVisited();
+            databaseRef = Constants.GROUP_CHAT_REF(groupId);
         }
         groupChatViewModel.setDatabaseRoot(databaseRef);
+        groupChatViewModel.setGroupId(groupId);
     }
 
     private void setEnableSendButton(final boolean isEnable) {
@@ -603,6 +506,10 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         return true;
     }
 
+    /**
+     * {@link FriendlyMessageListener}
+     * @param friendlyMessage
+     */
     @Override
     public void onFriendlyMessageSuccess(FriendlyMessage friendlyMessage) {
         try {
@@ -617,11 +524,15 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         Bundle payload = new Bundle();
         payload.putString("from", groupChatViewModel.myUsername());
         payload.putString("type", friendlyMessage.getImageUrl() != null ? "photo" : "text");
-        payload.putLong("group", mGroupId);
+        payload.putLong("group", groupChatViewModel.getGroupId());
         payload.putBoolean("one-time", friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
         FirebaseAnalytics.getInstance(this).logEvent(Events.MESSAGE_GROUP_SENT_EVENT, payload);
     }
 
+    /**
+     * {@link FriendlyMessageListener}
+     * @param friendlyMessage
+     */
     @Override
     public void onFriendlyMessageFail(FriendlyMessage friendlyMessage) {
         if (isActivityDestroyed())
@@ -814,6 +725,14 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         recyclerView.setLayoutManager(new StickyLayoutManager(this, chatsRecyclerViewAdapter));
         recyclerView.setAdapter(chatsRecyclerViewAdapter);
         chatsRecyclerViewAdapter.populateData();
+        UsersInGroupListener usersInGroupListener = new UsersInGroupListener() {
+            @Override
+            public void onNumUsersUpdated(long groupId, String groupName, int numUsers) {
+                if (getSupportActionBar() != null && groupId == groupChatViewModel.getGroupId())
+                    getSupportActionBar().setTitle(groupName + getCount(numUsers));
+            }
+        };
+        chatsRecyclerViewAdapter.setUsersInGroupListener(usersInGroupListener);
     }
 
     private DatabaseReference mRightRef;
@@ -825,7 +744,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         final View headerView = getLayoutInflater().inflate(R.layout.right_nav_header, binding.rightNavView, false);
 
         mRightRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_ROOMS).child
-                (mGroupId + "");
+                (groupChatViewModel.getGroupId() + "");
         mRightListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -833,7 +752,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
                 if (groupChatSummary == null || groupChatSummary.getName() == null) {
                     /*
-                     * group was deleted
+                     * group was deleted; go to the global default public room
                      */
                     startGroupChatActivity(GroupChatActivity.this, Constants.DEFAULT_PUBLIC_GROUP_ID, "Main", null,
                             null);
@@ -856,7 +775,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         drawerRecyclerView.setLayoutManager(linearLayoutManager);
 
-        mGroupChatUsersRecyclerAdapter = new GroupChatUsersRecyclerAdapter(this, this, this, mGroupId);
+        mGroupChatUsersRecyclerAdapter = new GroupChatUsersRecyclerAdapter(this, this, this, groupChatViewModel.getGroupId());
         drawerRecyclerView.setAdapter(mGroupChatUsersRecyclerAdapter);
         mGroupChatUsersRecyclerAdapter.populateData();
     }
@@ -994,32 +913,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     public void onPermissionsDenied(int requestCode, List<String> perms) {
     }
 
-    private BlockedUserListener mBlockedUserListener = new BlockedUserListener() {
-        @Override
-        public void onUserBlocked(int userid) {
-            GroupChatActivity.this.onUserBlocked(userid);
-        }
-
-        @Override
-        public void onUserUnblocked(int userid) {
-            GroupChatActivity.this.onUserUnblocked(userid);
-        }
-    };
-
-    protected void onUserBlocked(int userid) {
-        Bundle payload = new Bundle();
-        payload.putString("by", groupChatViewModel.myUsername());
-        payload.putInt("userid", userid);
-        FirebaseAnalytics.getInstance(this).logEvent(Events.USER_BLOCKED, payload);
-    }
-
-    protected void onUserUnblocked(int userid) {
-        Bundle payload = new Bundle();
-        payload.putString("by", groupChatViewModel.myUsername());
-        payload.putInt("userid", userid);
-        FirebaseAnalytics.getInstance(this).logEvent(Events.USER_UNBLOCKED, payload);
-    }
-
     private void initFirebaseAdapter() {
         messagesAdapter = groupChatViewModel.getMessagesAdapter(firebaseRemoteConfig, map);
         messagesAdapter.setActivity(this, this, binding.fragmentContent);
@@ -1029,7 +922,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 openFullScreenTextView(position);
             }
         });
-        messagesAdapter.setBlockedUserListener(mBlockedUserListener);
         messagesAdapter.setFriendlyMessageListener(this);
         messagesAdapter.setUserThumbClickedListener(this);
         messagesAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
@@ -1211,7 +1103,8 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 null);
     }
 
-    protected void onRemoteUserTyping(int userid, String username, String dpid) {
+    @Override
+    public void showUserTyping(String username) {
         if (isActivityDestroyed()) {
             return;
         }
@@ -1305,7 +1198,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     protected void addUserPresenceToGroup() {
 
         mGroupSummaryRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_ROOMS).
-                child(mGroupId + "");
+                child(groupChatViewModel.getGroupId() + "");
         mGroupSummaryListener = mGroupSummaryRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -1325,16 +1218,16 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                             if (isActivityDestroyed())
                                 return;
 
-                            MLog.d(TAG, "addUserPresenceToGroup() mGroupId: ", mGroupId, " username: ", groupChatViewModel.myUsername());
+                            MLog.d(TAG, "addUserPresenceToGroup() groupChatViewModel.getGroupId(): ", groupChatViewModel.getGroupId(), " username: ", groupChatViewModel.myUsername());
                             User me = UserPreferences.getInstance().getUser();
                             final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants
-                                    .GROUP_CHAT_USERS_REF(mGroupId)).
+                                    .GROUP_CHAT_USERS_REF(groupChatViewModel.getGroupId())).
                                     child(groupChatViewModel.myUserid() + "");
                             ref.updateChildren(me.toMap(true)).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (chatsRecyclerViewAdapter != null)
-                                        chatsRecyclerViewAdapter.removeUserFromAllGroups(groupChatViewModel.myUserid(), mGroupId);
+                                        chatsRecyclerViewAdapter.removeUserFromAllGroups(groupChatViewModel.myUserid(), groupChatViewModel.getGroupId());
                                 }
                             });
                             me.setCurrentGroupId(groupChatSummary.getId());
@@ -1356,14 +1249,14 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     protected void removeUserPresenceFromGroup() {
         removeGroupInfoListener();
-        MLog.d(TAG, "removeUserPresenceFromGroup() mGroupId: ", mGroupId, " username: ", groupChatViewModel.myUsername());
-        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(mGroupId)).child(groupChatViewModel.myUserid() + "")
+        MLog.d(TAG, "removeUserPresenceFromGroup() groupChatViewModel.getGroupId(): ", groupChatViewModel.getGroupId(), " username: ", groupChatViewModel.myUsername());
+        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(groupChatViewModel.getGroupId())).child(groupChatViewModel.myUserid() + "")
                 .removeValue();
         FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(groupChatViewModel.myUserid())).child(Constants
                 .FIELD_CURRENT_GROUP_ID).removeValue();
         FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(groupChatViewModel.myUserid())).child(Constants
                 .FIELD_CURRENT_GROUP_NAME).removeValue();
-        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId, groupChatViewModel.myUserid()))
+        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(groupChatViewModel.getGroupId(), groupChatViewModel.myUserid()))
                 .removeValue();
     }
 

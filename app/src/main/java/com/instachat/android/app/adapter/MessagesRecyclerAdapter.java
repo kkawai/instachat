@@ -510,6 +510,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                         mMessagesRef.child(mDatabaseRef).child(lastFriendlyMessage.getId()).updateChildren(lastFriendlyMessage.toMap()).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
+                                if (mActivityState == null || mActivityState.isActivityDestroyed()) return;
                                 if (task.isSuccessful()) {
                                     /**
                                      * since we are appending to an existing friendly message, we need
@@ -532,8 +533,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         mMessagesRef.child(mDatabaseRef).push().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (mActivityState == null || mActivityState.isActivityDestroyed())
-                    return;
+                if (mActivityState == null || mActivityState.isActivityDestroyed()) return;
                 friendlyMessage.setId(dataSnapshot.getKey());
                 MLog.d(TAG, "pushed message. debug possibleAdult content ", friendlyMessage.isPossibleAdultImage());
                 mMessagesRef.child(mDatabaseRef).child(friendlyMessage.getId()).setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -551,8 +551,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                if (mActivityState == null || mActivityState.isActivityDestroyed())
-                    return;
+                if (mActivityState == null || mActivityState.isActivityDestroyed()) return;
                 mFriendlyMessageListener.onFriendlyMessageFail(friendlyMessage);
                 MLog.e(TAG, "could not send message. ", databaseError);
             }
@@ -581,8 +580,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (mActivityState == null || mActivityState.isActivityDestroyed())
-                    return;
+                if (mActivityState == null || mActivityState.isActivityDestroyed()) return;
                 mBlockedUsersListener = new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
