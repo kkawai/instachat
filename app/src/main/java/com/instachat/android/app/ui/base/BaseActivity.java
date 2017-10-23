@@ -176,6 +176,9 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
         disposableList.add(disposable);
     }
 
+    /**
+     * May not be used because the default case could be to show
+     */
     public void showSmallProgressCircle() {
         ProgressBar progressBar = findViewById(R.id.progressBar);
         if (progressBar != null && progressBar.getVisibility() != View.VISIBLE) {

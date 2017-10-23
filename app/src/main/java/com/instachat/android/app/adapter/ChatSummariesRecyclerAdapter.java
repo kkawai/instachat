@@ -556,8 +556,8 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
             if (i != -1) {
                 GroupChatSummary groupChatSummary = (GroupChatSummary) data.get(i);
                 groupChatSummary.setUsersInRoomCount(groupChatSummary.getUsersInRoomCount() - 1);
-                mUsersInGroupListener.onNumUsersUpdated(groupChatSummary.getId(), groupChatSummary
-                        .getName(), groupChatSummary.getUsersInRoomCount());
+                if (mUsersInGroupListener != null)
+                    mUsersInGroupListener.onNumUsersUpdated(groupChatSummary.getId(), groupChatSummary.getName(), groupChatSummary.getUsersInRoomCount());
                 notifyItemChanged(i);
                 MLog.d(TAG, "removeUserFromPublicGroupChat() groupid ", groupid);
             }
@@ -573,8 +573,8 @@ onChildRemoved() dataSnapshot: DataSnapshot { key = 234fakeUserid, value = {user
             if (i != -1) {
                 GroupChatSummary groupChatSummary = (GroupChatSummary) data.get(i);
                 groupChatSummary.setUsersInRoomCount(groupChatSummary.getUsersInRoomCount() + 1);
-                mUsersInGroupListener.onNumUsersUpdated(groupChatSummary.getId(), groupChatSummary
-                        .getName(), groupChatSummary.getUsersInRoomCount());
+                if (mUsersInGroupListener != null)
+                    mUsersInGroupListener.onNumUsersUpdated(groupChatSummary.getId(), groupChatSummary.getName(), groupChatSummary.getUsersInRoomCount());
                 notifyItemChanged(i);
             }
         }

@@ -1,15 +1,23 @@
 package com.instachat.android.app.activity.group;
 
+import com.instachat.android.Constants;
+import com.instachat.android.app.activity.AbstractChatViewModel;
 import com.instachat.android.app.ui.base.BaseViewModel;
 import com.instachat.android.data.DataManager;
+import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.rx.SchedulerProvider;
 
-public class GroupChatViewModel extends BaseViewModel<GroupChatNavigator> {
+public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator> {
 
     //public ObservableArrayList<ItemViewModel> list = new ObservableArrayList<>();
 
     public GroupChatViewModel(DataManager dataManager, SchedulerProvider schedulerProvider) {
         super(dataManager, schedulerProvider);
+    }
+
+    @Override
+    public boolean isPrivateChat() {
+        return false;
     }
 
     /*public void fetchHomeData(List<Item> cache) {

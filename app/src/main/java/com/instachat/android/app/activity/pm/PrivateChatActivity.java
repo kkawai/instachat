@@ -20,7 +20,6 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.LinearLayoutManager;
@@ -64,7 +63,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -76,6 +74,7 @@ import com.instachat.android.BR;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.app.MessageOptionsDialogHelper;
+import com.instachat.android.app.activity.AbstractChatNavigator;
 import com.instachat.android.app.activity.AdHelper;
 import com.instachat.android.app.activity.AttachPhotoOptionsDialogHelper;
 import com.instachat.android.app.activity.ExternalSendIntentConsumer;
@@ -83,10 +82,8 @@ import com.instachat.android.app.activity.LeftDrawerEventListener;
 import com.instachat.android.app.activity.LeftDrawerHelper;
 import com.instachat.android.app.activity.PhotoUploadHelper;
 import com.instachat.android.app.activity.PresenceHelper;
-import com.instachat.android.app.activity.UsersInGroupListener;
 import com.instachat.android.app.activity.group.GroupChatActivity;
 import com.instachat.android.app.activity.group.LogoutDialogHelper;
-import com.instachat.android.app.adapter.AdapterPopulateHolderListener;
 import com.instachat.android.app.adapter.ChatSummariesRecyclerAdapter;
 import com.instachat.android.app.adapter.ChatsItemClickedListener;
 import com.instachat.android.app.adapter.FriendlyMessageListener;
@@ -120,10 +117,10 @@ import com.instachat.android.messaging.InstachatMessagingService;
 import com.instachat.android.messaging.NotificationHelper;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.TimeUtil;
+import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.rx.SchedulerProvider;
 import com.smaato.soma.AdDownloaderInterface;
 import com.smaato.soma.AdListenerInterface;
@@ -169,35 +166,26 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     private static final String TAG = "PrivateChatActivity";
     private long mLastTypingTime;
     private ValueEventListener mUserInfoValueEventListener = null;
-    private View mMessageRecyclerViewParent;
     private ImageView mProfilePic;
     private AppBarLayout mAppBarLayout;
     private GestureDetectorCompat mGestureDetector;
     private static int sUserid;
     private static String sUsername, sProfilePicUrl;
-    private View mLikesParent;
-    private TextView mLikesCount;
     private ActivityPrivateChatBinding binding;
     private PrivateChatViewModel privateChatViewModel;
-    private RecyclerView messageRecyclerView;
 
     private Toolbar mToolbar;
-    private View mSendButton, mAttachButton;
 
     private EditText mMessageEditText;
-    private DrawerLayout mDrawerLayout;
-    private DatabaseReference mMeTypingRef;
 
-    private ProgressDialog mProgressDialog;
+    private ProgressDialog measuredProgressDialog;
 
     private PhotoUploadHelper mPhotoUploadHelper;
     private LeftDrawerHelper mLeftDrawerHelper;
     private String mDatabaseRoot;
-    private View mDotsLayoutParent;
     private ExternalSendIntentConsumer mExternalSendIntentConsumer;
     private Uri mSharePhotoUri;
     private String mShareText;
-    private long mGroupId = 0L;
     private boolean mIsPendingRequestsAvailable;
 
     @Inject
@@ -239,12 +227,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     ChatSummariesRecyclerAdapter chatsRecyclerViewAdapter;
 
     //@Override
-    protected void doDataBinding() {
-        binding = getViewDataBinding();
-        binding.setVisibleAd(true);
-    }
-
-    //@Override
     protected void setVisibleAd(boolean visibleAd) {
         binding.setVisibleAd(visibleAd);
     }
@@ -253,43 +235,26 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.Theme_App);
         super.onCreate(savedInstanceState);
-
-
-        if (!UserPreferences.getInstance().isLoggedIn() || UserPreferences.getInstance().getUser() == null || UserPreferences
-                .getInstance().getUsername() == null) {
-            // Not signed in, launch the Sign In activity
-            startActivity(new Intent(this, SignInActivity.class));
-            finish();
-            return;
-        }
-
-        initDatabaseRef();
-        doDataBinding();
         privateChatViewModel.setNavigator(this);
+        privateChatViewModel.onCreate();
+        initDatabaseRef();
+        binding =  getViewDataBinding();
 
         initPhotoHelper(savedInstanceState);
         setupDrawers();
         setupToolbar();
-        mDotsLayoutParent = findViewById(R.id.dotsLayout);
 
         gcmHelper.onCreate(this);
 
         linearLayoutManager.setStackFromEnd(true);
 
-        try {
-            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-            MLog.w(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) succeeded");
-        } catch (Exception e) {
-            //MLog.e(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) failed: " + e);
-        }
-
         NotificationHelper.createNotificationChannels(this);
-        fetchConfig();
-        initFirebaseAdapter();
-        messageRecyclerView = findViewById(R.id.messageRecyclerView);
-        messageRecyclerView.setLayoutManager(linearLayoutManager);
-        messageRecyclerView.setAdapter(messagesAdapter);
 
+        initFirebaseAdapter();
+        binding.messageRecyclerView.setLayoutManager(linearLayoutManager);
+        binding.messageRecyclerView.setAdapter(messagesAdapter);
+
+        binding.setVisibleAd(true);
         adsHelper.loadAd(this);
 
         LinearLayout messageEditTextParent = (LinearLayout) findViewById(R.id.messageEditTextParent);
@@ -314,7 +279,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
                 if (length > 0) {
                     setEnableSendButton(true);
                     onMeTyping();
-                    showSendOptionsTooltip(mSendButton);
+                    showSendOptionsTooltip(binding.sendButton);
                 } else {
                     setEnableSendButton(false);
                 }
@@ -324,29 +289,25 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
             public void afterTextChanged(Editable editable) {
             }
         });
-        //initDownloadReceiver();
+        privateChatViewModel.fetchConfig(firebaseRemoteConfig);
         initButtons();
-
-        if (getIntent() != null && getIntent().hasExtra(Constants.KEY_GROUP_NAME)) {
-            getSupportActionBar().setTitle(getIntent().getStringExtra(Constants.KEY_GROUP_NAME));
-        }
 
         mExternalSendIntentConsumer = new ExternalSendIntentConsumer(this);
         mExternalSendIntentConsumer.setListener(new ExternalSendIntentConsumer.ExternalSendIntentListener() {
             @Override
             public void onHandleSendImage(final Uri imageUri) {
-                mDrawerLayout.openDrawer(GravityCompat.START);
+                binding.drawerLayout.openDrawer(GravityCompat.START);
                 mSharePhotoUri = imageUri;
             }
 
             @Override
             public void onHandleSendText(final String text) {
-                mDrawerLayout.openDrawer(GravityCompat.START);
+                binding.drawerLayout.openDrawer(GravityCompat.START);
                 mShareText = text;
             }
         });
         if (getIntent() != null && getIntent().hasExtra(Constants.KEY_SHARE_PHOTO_URI)) {
-            mPhotoUploadHelper.setStorageRefString(getDatabaseRoot());
+            mPhotoUploadHelper.setStorageRefString(privateChatViewModel.getDatabaseRoot());
             mPhotoUploadHelper.consumeExternallySharedPhoto((Uri) getIntent().getParcelableExtra(Constants
                     .KEY_SHARE_PHOTO_URI));
             getIntent().removeExtra(Constants.KEY_SHARE_PHOTO_URI);
@@ -355,13 +316,10 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
             mMessageEditText.setText(getIntent().getStringExtra(Constants.KEY_SHARE_MESSAGE));
             getIntent().removeExtra(Constants.KEY_SHARE_MESSAGE);
         }
-        listenForTyping();
         final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.cancel(InstachatMessagingService.NOTIFICATION_ID_PENDING_REQUESTS);
         notificationManager.cancel(InstachatMessagingService.NOTIFICATION_ID_FRIEND_JUMPED_IN);
-        checkForNoData();
-        hideSmallProgressAfter();
-
+        privateChatViewModel.smallProgressCheck();
         onNewIntent(getIntent());
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
     }
@@ -375,10 +333,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         mProfilePic = (ImageView) findViewById(R.id.profile_pic);
-        mMessageRecyclerViewParent = findViewById(R.id.messageRecyclerViewParent);
         mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
-        mLikesParent = findViewById(R.id.likesParent);
-        mLikesCount = (TextView) findViewById(R.id.likesCount);
         getSupportActionBar().setTitle("");
         sUserid = getIntent().getIntExtra(Constants.KEY_USERID, 0);
         sUsername = getIntent().getStringExtra(Constants.KEY_USERNAME);
@@ -487,7 +442,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
                 customTitlePairInParallax.setAlpha(alpha);
                 toolbarProfileImageView.setAlpha(1 - alpha);
                 customTitlePairInToolbar.setAlpha(1 - alpha);
-                mMessageRecyclerViewParent.setAlpha(1 - (alpha / 2f));
+                binding.messageRecyclerViewParent.setAlpha(1 - (alpha / 2f));
 
                 MLog.d(TAG, "mAppBarLayout.height: " + appBarLayout.getHeight(), " verticalOffset ", verticalOffset,
                         " toolbarHeight ", getToolbarHeight(), " alpha ", alpha);
@@ -514,7 +469,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
                 return mGestureDetector.onTouchEvent(motionEvent);
             }
         });
-        updateLastActiveTimestamp();
+        presenceHelper.updateLastActiveTimestamp();
         listenForUpdatedLikeCount(sUserid);
     }
 
@@ -592,7 +547,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
     //@Override
     protected void initDatabaseRef() {
-        setDatabaseRoot(Constants.PRIVATE_CHAT_REF(getIntent().getIntExtra(Constants.KEY_USERID, 0)));
+        privateChatViewModel.setDatabaseRoot(Constants.PRIVATE_CHAT_REF(getIntent().getIntExtra(Constants.KEY_USERID, 0)));
     }
 
     @Override
@@ -602,8 +557,8 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
             if (isActivityDestroyed())
                 return;
             MLog.d(TAG,"C kevin scroll: "+(messagesAdapter.getItemCount() - 1) + " text: "+ messagesAdapter.peekLastMessage());
-            messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
-            updateLastActiveTimestamp();
+            binding.messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
+            presenceHelper.updateLastActiveTimestamp();
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
         }
@@ -620,7 +575,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         if (isPrivateChat()) {
             Bundle payload = new Bundle();
             payload.putString("to", sUsername);
-            payload.putString("from", myUsername());
+            payload.putString("from", privateChatViewModel.myUsername());
             payload.putString("type", friendlyMessage.getImageUrl() != null ? "photo" : "text");
             payload.putBoolean("one-time", friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
             FirebaseAnalytics.getInstance(this).logEvent(Events.MESSAGE_PRIVATE_SENT_EVENT, payload);
@@ -633,8 +588,10 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
             if (System.currentTimeMillis() - mLastTypingTime < 3000) {
                 return;
             }
-            FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHAT_TYPING_REF(sUserid)).child("" +
-                    myUserid()).child(Constants.CHILD_TYPING).setValue(true);
+            FirebaseDatabase.getInstance()
+                    .getReference(Constants.PRIVATE_CHAT_TYPING_REF(sUserid))
+                    .child("" +privateChatViewModel.myUserid())
+                    .child(Constants.CHILD_TYPING).setValue(true);
             mLastTypingTime = System.currentTimeMillis();
         } catch (Exception e) {
             MLog.e(TAG, "onMeTyping() failed", e);
@@ -861,7 +818,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
             finish();
         }
         Bundle payload = new Bundle();
-        payload.putString("by", myUsername());
+        payload.putString("by", privateChatViewModel.myUsername());
         payload.putInt("userid", userid);
         FirebaseAnalytics.getInstance(this).logEvent(Events.USER_BLOCKED, payload);
     }
@@ -1014,10 +971,9 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
             public void onDataChange(DataSnapshot dataSnapshot) {
                 MLog.d(TAG, "onDataChange() snapshot: " + dataSnapshot, " ref: ", ref);
                 ref.removeEventListener(this);
-                if (dataSnapshot.getValue() == null) {
-                    //
-                } else {
-                    Toast.makeText(PrivateChatActivity.this, getString(R.string.cannot_chat_you_blocked_them,
+                if (dataSnapshot.getValue() != null) {
+                    Toast.makeText(PrivateChatActivity.this,
+                            getString(R.string.cannot_chat_you_blocked_them,
                             sUsername), Toast.LENGTH_LONG).show();
                 }
             }
@@ -1043,7 +999,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
                 menu.add(0, R.id.menu_pending_requests, 0, getString(R.string.menu_option_pending_requests));
         }
 
-        if (isPrivateChat() && sUserid == myUserid()) {
+        if (isPrivateChat() && sUserid == privateChatViewModel.myUserid()) {
             if (menu.findItem(R.id.menu_block_user) != null) {
                 menu.removeItem(R.id.menu_block_user);
             }
@@ -1065,20 +1021,22 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     private ValueEventListener mTotalLikesEventListener;
 
     private void listenForUpdatedLikeCount(int userid) {
+        final View likesParent = findViewById(R.id.likesParent);
+        final TextView likesCount = findViewById(R.id.likesCount);
         mTotalLikesRef = FirebaseDatabase.getInstance().getReference(Constants.USER_TOTAL_LIKES_RECEIVED_REF(userid));
         mTotalLikesEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    if (mLikesParent.getVisibility() != View.VISIBLE) {
-                        mLikesParent.setVisibility(View.VISIBLE);
-                        mLikesCount.setVisibility(View.VISIBLE);
+                    if (likesParent.getVisibility() != View.VISIBLE) {
+                        likesParent.setVisibility(View.VISIBLE);
+                        likesCount.setVisibility(View.VISIBLE);
                     }
                     long count = dataSnapshot.getValue(Long.class);
                     if (count == 1) {
-                        mLikesCount.setText(getString(R.string.like_singular));
+                        likesCount.setText(getString(R.string.like_singular));
                     } else {
-                        mLikesCount.setText(getString(R.string.likes_plural, count + ""));
+                        likesCount.setText(getString(R.string.likes_plural, count + ""));
                     }
                 }
             }
@@ -1089,7 +1047,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
             }
         };
         mTotalLikesRef.addValueEventListener(mTotalLikesEventListener);
-        mLikesParent.setOnClickListener(new View.OnClickListener() {
+        likesParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Fragment fragment = new UserLikedUserFragment();
@@ -1144,7 +1102,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     @Override
     public void setCurrentFriendlyMessage(int position) {
         MLog.d(TAG,"A kevin scroll: "+(position + 1) + " text: "+ messagesAdapter.peekLastMessage());
-        messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount()-1);
+        binding.messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount()-1);
     }
 
     @Override
@@ -1166,31 +1124,26 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     }
 
     private boolean isLeftDrawerOpen() {
-        return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START);
+        return binding.drawerLayout != null && binding.drawerLayout.isDrawerOpen(GravityCompat.START);
     }
 
     private boolean isRightDrawerOpen() {
-        return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.END);
+        return binding.drawerLayout != null && binding.drawerLayout.isDrawerOpen(GravityCompat.END);
     }
 
     private void closeLeftDrawer() {
-        if (mDrawerLayout != null)
-            mDrawerLayout.closeDrawer(GravityCompat.START);
+        if (binding.drawerLayout != null)
+            binding.drawerLayout.closeDrawer(GravityCompat.START);
     }
 
     private void closeRightDrawer() {
-        if (mDrawerLayout != null)
-            mDrawerLayout.closeDrawer(GravityCompat.END);
-    }
-
-    private void openRightDrawer() {
-        if (mDrawerLayout != null)
-            mDrawerLayout.openDrawer(GravityCompat.END);
+        if (binding.drawerLayout != null)
+            binding.drawerLayout.closeDrawer(GravityCompat.END);
     }
 
     private void openLeftDrawer() {
-        if (mDrawerLayout != null)
-            mDrawerLayout.openDrawer(GravityCompat.START);
+        if (binding.drawerLayout != null)
+            binding.drawerLayout.openDrawer(GravityCompat.START);
     }
 
     private boolean closeBothDrawers() {
@@ -1253,10 +1206,10 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         MLog.i(TAG, "onPhotoUploadProgress() " + current + " / " + max);
         if (isActivityDestroyed())
             return;
-        if (mProgressDialog != null) {
+        if (measuredProgressDialog != null) {
             try {
-                mProgressDialog.setMax(max);
-                mProgressDialog.setProgress(current);
+                measuredProgressDialog.setMax(max);
+                measuredProgressDialog.setProgress(current);
             } catch (Exception e) {
                 MLog.e(TAG, "set photo upload progress failed ", e);
             }
@@ -1272,7 +1225,10 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
         if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.chatRoomPhoto) {
 
-            final FriendlyMessage friendlyMessage = new FriendlyMessage("", myUsername(), myUserid(), myDpid(),
+            final FriendlyMessage friendlyMessage = new FriendlyMessage("",
+                    privateChatViewModel.myUsername(),
+                    privateChatViewModel.myUserid(),
+                    privateChatViewModel.myDpid(),
                     photoUrl, isPossiblyAdultImage, isPossiblyViolentImage, null, System.currentTimeMillis());
             friendlyMessage.setMessageType(mAttachPhotoMessageType);
             MLog.d(TAG, "uploadFromUri:onSuccess photoUrl: " + photoUrl, " debug possibleAdult: ", friendlyMessage
@@ -1304,45 +1260,33 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     }
 
     private void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            mProgressDialog.setIndeterminate(false);
-            mProgressDialog.setProgressNumberFormat("%1dk / %2dk");
+        if (measuredProgressDialog == null) {
+            measuredProgressDialog = new ProgressDialog(this);
+            measuredProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            measuredProgressDialog.setIndeterminate(false);
+            measuredProgressDialog.setProgressNumberFormat("%1dk / %2dk");
         }
-        mProgressDialog.show();
+        measuredProgressDialog.show();
     }
 
     private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.dismiss();
+        if (measuredProgressDialog != null && measuredProgressDialog.isShowing()) {
+            measuredProgressDialog.dismiss();
         }
     }
 
     private int mAttachPhotoMessageType;
 
-    protected Integer myUserid() {
-        return UserPreferences.getInstance().getUserId();
-    }
-
-    protected String myDpid() {
-        return UserPreferences.getInstance().getUser().getProfilePicUrl();
-    }
-
-    protected String myUsername() {
-        return UserPreferences.getInstance().getUsername() + "";
-    }
-
     @Override
     public void onPhotoGallery() {
-        mPhotoUploadHelper.setStorageRefString(getDatabaseRoot());
+        mPhotoUploadHelper.setStorageRefString(privateChatViewModel.getDatabaseRoot());
         mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.chatRoomPhoto);
         mPhotoUploadHelper.launchCamera(false);
     }
 
     @Override
     public void onPhotoTake() {
-        mPhotoUploadHelper.setStorageRefString(getDatabaseRoot());
+        mPhotoUploadHelper.setStorageRefString(privateChatViewModel.getDatabaseRoot());
         mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.chatRoomPhoto);
         mPhotoUploadHelper.launchCamera(true);
     }
@@ -1367,10 +1311,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         FirebaseAnalytics.getInstance(this).logEvent(Events.MESSAGE_FAILED, null);
     }
 
-    protected final void updateLastActiveTimestamp() {
-        presenceHelper.updateLastActiveTimestamp();
-    }
-
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         MLog.d(TAG, "onConnectionFailed:" + connectionResult);
@@ -1379,7 +1319,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     @Override
     public void onReceiveAd(AdDownloaderInterface adDownloaderInterface, ReceivedBannerInterface receivedBanner) throws AdReceiveFailed {
         if(receivedBanner.getErrorCode() != ErrorCode.NO_ERROR){
-            //Toast.makeText(getBaseContext(), receivedBanner.getErrorMessage(), Toast.LENGTH_SHORT).show();
             setVisibleAd(false);
             adsHelper.loadAd(this);
         } else {
@@ -1399,7 +1338,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     }
 
     private void setupDrawers() {
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         setupLeftDrawerContent();
     }
 
@@ -1414,56 +1352,9 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         setToolbarOnClickListener(mToolbar);
     }
 
-    public void fetchConfig() {
-        long cacheExpiration = 3600; // 1 hour in seconds
-        // If developer mode is enabled reduce cacheExpiration to 0 so that each fetch goes to the
-        // server. This should not be used in release builds.
-        if (firebaseRemoteConfig.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
-            cacheExpiration = 0;
-        }
-        firebaseRemoteConfig.fetch(cacheExpiration).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                // Make the fetched config available via FirebaseRemoteConfig get<type> calls.
-                firebaseRemoteConfig.activateFetched();
-                applyRetrievedLengthLimit();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                // There has been an error fetching the config
-                MLog.w(TAG, "Error fetching config: " + e.getMessage());
-                applyRetrievedLengthLimit();
-            }
-        });
-    }
-
-    /**
-     * Apply retrieved length limit to edit text field. This result may be fresh from the server or it may be from
-     * cached values.
-     */
-    private void applyRetrievedLengthLimit() {
-        Long friendly_msg_length = firebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_LENGTH);
-        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(friendly_msg_length.intValue())});
-        MLog.d(TAG, "FML is: " + friendly_msg_length);
-    }
-
     private void initFirebaseAdapter() {
-        messagesAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class,
-                R.layout.item_message,
-                MessageViewHolder.class,
-                FirebaseDatabase.getInstance().getReference(mDatabaseRoot).
-                        limitToLast((int) firebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)),
-                map);
-        messagesAdapter.setIsPrivateChat(isPrivateChat());
-        messagesAdapter.setDatabaseRoot(mDatabaseRoot);
+        messagesAdapter = privateChatViewModel.getMessagesAdapter(firebaseRemoteConfig, map);
         messagesAdapter.setActivity(this, this, (FrameLayout) findViewById(R.id.fragment_content));
-        messagesAdapter.setAdapterPopulateHolderListener(new AdapterPopulateHolderListener() {
-            @Override
-            public void onViewHolderPopulated() {
-                //todo
-            }
-        });
         messagesAdapter.setMessageTextClickedListener(new MessageTextClickedListener() {
             @Override
             public void onMessageClicked(final int position) {
@@ -1484,7 +1375,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
                         +" positionStart: "+positionStart + " friendlyMessageCount: "+friendlyMessageCount);
                 if (lastVisiblePosition == -1 || ((lastVisiblePosition+4) >=  positionStart)) {
                     MLog.d(TAG,"B kevin scroll: "+(positionStart) + " text: "+ messagesAdapter.peekLastMessage());
-                    messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount()-1);
+                    binding.messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount()-1);
                 }
                 notifyPagerAdapterDataSetChanged();
             }
@@ -1508,7 +1399,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         final Bundle args = new Bundle();
         args.putInt(Constants.KEY_STARTING_POS, startingPos);
         fragment.setArguments(args);
-        ((FullScreenTextFragment) fragment).setFriendlyMessageContainer(this);
         getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim
                 .slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, FullScreenTextFragment.TAG)
                 .addToBackStack(null).commit();
@@ -1583,11 +1473,12 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
             }
         }
         Uri linkUri = inputContentInfo.getLinkUri();
-        //MLog.d(TAG, "linkUri: " + linkUri.toString() + ": " + inputContentInfo.getDescription().toString(), " : ",
-        // inputContentInfo);
         if (inputContentInfo != null && inputContentInfo.getDescription() != null) {
             if (inputContentInfo.getDescription().toString().contains("image/gif")) {
-                final FriendlyMessage friendlyMessage = new FriendlyMessage("", myUsername(), myUserid(), myDpid(),
+                final FriendlyMessage friendlyMessage = new FriendlyMessage("",
+                        privateChatViewModel.myUsername(),
+                        privateChatViewModel.myUserid(),
+                        privateChatViewModel.myDpid(),
                         linkUri.toString(), false, false, null, System.currentTimeMillis());
                 friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
                 messagesAdapter.sendFriendlyMessage(friendlyMessage);
@@ -1598,10 +1489,10 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
     private void setEnableSendButton(final boolean isEnable) {
 
-        if (isEnable && mSendButton.isEnabled() || !isEnable && !mSendButton.isEnabled())
+        if (isEnable && binding.sendButton.isEnabled() || !isEnable && !binding.sendButton.isEnabled())
             return; //already set
 
-        mSendButton.setEnabled(isEnable);
+        binding.sendButton.setEnabled(isEnable);
 
         final Animation hideAnimation = AnimationUtils.loadAnimation(PrivateChatActivity.this, R.anim.fab_scale_down);
         final Animation showAnimation = AnimationUtils.loadAnimation(PrivateChatActivity.this, R.anim.fab_scale_up);
@@ -1613,15 +1504,15 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                mSendButton.startAnimation(showAnimation);
-                //mSendButton.setEnabled(isEnable);
+                binding.sendButton.startAnimation(showAnimation);
+                //binding.sendButton.setEnabled(isEnable);
             }
 
             @Override
             public void onAnimationRepeat(Animation animation) {
             }
         });
-        mSendButton.startAnimation(hideAnimation);
+        binding.sendButton.startAnimation(hideAnimation);
     }
 
     @Override
@@ -1639,7 +1530,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
                 String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
                 MLog.d(TAG, "Invitations sent: " + ids.length);
                 payload.putInt("num_inv", ids.length);
-                payload.putString("username", myUsername());
+                payload.putString("username", privateChatViewModel.myUsername());
                 FirebaseAnalytics.getInstance(this).logEvent(FirebaseAnalytics.Event.SHARE, payload);
             } else {
                 // Use Firebase Measurement to log that invitation was not sent
@@ -1654,9 +1545,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     }
 
     private void showSendOptionsTooltip(View anchor) {
-        //        if (UserPreferences.getInstance().hasShownToolbarProfileTooltip())
-        //            return;
-        //        UserPreferences.getInstance().setShownToolbarProfileTooltip(true);
         if (mShownSendOptionsProtips) {
             return;
         }
@@ -1678,16 +1566,14 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     private boolean mShownSendOptionsProtips;
 
     private void initButtons() {
-        mSendButton = findViewById(R.id.sendButton);
-        mAttachButton = findViewById(R.id.attachButton);
-        mSendButton.setOnClickListener(new View.OnClickListener() {
+        binding.sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final String text = mMessageEditText.getText().toString();
                 validateBeforeSendText(text, false);
             }
         });
-        mSendButton.setOnLongClickListener(new View.OnLongClickListener() {
+        binding.sendButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
                 final String text = mMessageEditText.getText().toString();
@@ -1695,7 +1581,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
                 return true;
             }
         });
-        mAttachButton.setOnClickListener(new View.OnClickListener() {
+        binding.attachButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (isNeedsDp())
@@ -1704,10 +1590,10 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
                 showFileOptions();
             }
         });
-        mAttachButton.setOnLongClickListener(new View.OnLongClickListener() {
+        binding.attachButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                new MessageOptionsDialogHelper().showSendOptions(PrivateChatActivity.this, mAttachButton, null, new
+                new MessageOptionsDialogHelper().showSendOptions(PrivateChatActivity.this, binding.attachButton, null, new
                         MessageOptionsDialogHelper.SendOptionsListener() {
                             @Override
                             public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
@@ -1732,13 +1618,16 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         }
         if (isNeedsDp())
             return false;
-        final FriendlyMessage friendlyMessage = new FriendlyMessage(text, myUsername(), myUserid(), myDpid(), null,
+        final FriendlyMessage friendlyMessage = new FriendlyMessage(text,
+                privateChatViewModel.myUsername(),
+                privateChatViewModel.myUserid(),
+                privateChatViewModel.myDpid(), null,
                 false, false, null, System.currentTimeMillis());
         if (!showOptions) {
             sendText(friendlyMessage);
             return true;
         }
-        new MessageOptionsDialogHelper().showSendOptions(PrivateChatActivity.this, mSendButton, friendlyMessage, new
+        new MessageOptionsDialogHelper().showSendOptions(PrivateChatActivity.this, binding.sendButton, friendlyMessage, new
                 MessageOptionsDialogHelper.SendOptionsListener() {
                     @Override
                     public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
@@ -1757,7 +1646,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
     private boolean isNeedsDp() {
 
-        if (!TextUtils.isEmpty(myDpid()))
+        if (!TextUtils.isEmpty(privateChatViewModel.myDpid()))
             return false;
         new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE).setTitleText(this.getString(R.string
                 .display_photo_title)).setContentText(this.getString(R.string.display_photo)).setCancelText(this
@@ -1807,104 +1696,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         new AttachPhotoOptionsDialogHelper(this, this).showBottomDialog();
     }
 
-    private void listenForTyping() {
-
-        mMeTypingRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(mGroupId,
-                myUserid())).
-                child(Constants.CHILD_TYPING);
-        mMeTypingRef.setValue(false);
-
-        mTypingInRoomReference = FirebaseDatabase.getInstance().getReference(Constants
-                .GROUP_CHAT_USERS_TYPING_PARENT_REF(mGroupId));
-        mTypingInRoomEventListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                MLog.d(TAG, "isTyping: onChildAdded() dataSnapshot ", dataSnapshot, " s: ", s);
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                MLog.d(TAG, "isTyping: onChildChanged() dataSnapshot ", dataSnapshot, " s: ", s);
-                if (isActivityDestroyed())
-                    return;
-                MLog.d(TAG, "isTyping: onDataChange() dataSnapshot ", dataSnapshot);
-                if (dataSnapshot.exists() && dataSnapshot.hasChild(Constants.CHILD_TYPING)) {
-                    boolean isTyping = dataSnapshot.child(Constants.CHILD_TYPING).getValue(Boolean.class);
-                    String username = dataSnapshot.child(Constants.CHILD_USERNAME).getValue(String.class);
-                    //String dpid = dataSnapshot.child(Constants.CHILD_DPID).getValue(String.class);
-                    int userid = Integer.parseInt(dataSnapshot.getKey());
-                    //MLog.d(TAG, "isTyping: ", isTyping, " dpid: ", dpid, " userid ", userid);
-                    if (isTyping) {
-                        onRemoteUserTyping(userid, username, null);
-                    }
-                }
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                MLog.d(TAG, "isTyping: onChildRemoved() dataSnapshot ", dataSnapshot);
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        mTypingInRoomReference.addChildEventListener(mTypingInRoomEventListener);
-
-        UsersInGroupListener usersInGroupListener = new UsersInGroupListener() {
-            @Override
-            public void onNumUsersUpdated(long groupId, String groupName, int numUsers) {
-                if (getSupportActionBar() != null && groupId == mGroupId)
-                    getSupportActionBar().setTitle(groupName + getCount(numUsers));
-            }
-        };
-        chatsRecyclerViewAdapter.setUsersInGroupListener(usersInGroupListener);
-    }
-
-    private DatabaseReference mTypingInRoomReference;
-    private ChildEventListener mTypingInRoomEventListener;
-
-    protected final String getDatabaseRoot() {
-        return mDatabaseRoot;
-    }
-
-    protected final void setDatabaseRoot(final String root) {
-        mDatabaseRoot = root;
-    }
-
-    private String getCount(int count) {
-        if (count > 0)
-            return " (" + count + ")";
-        return "";
-    }
-
-    private void checkForNoData() {
-        /**
-         * if after 10 seconds and there is no chat data from firebase, log it
-         */
-        addDisposable(Observable.interval(0, 1000, TimeUnit.MILLISECONDS)
-                .take(10)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doFinally(new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        if (messagesAdapter == null || messagesAdapter.getItemCount() == 0) {
-                            FirebaseAnalytics.getInstance(PrivateChatActivity.this).logEvent(Events.NO_DATA_AFTER_8_SEC,
-                                    null);
-                        } else {
-                            FirebaseAnalytics.getInstance(PrivateChatActivity.this).logEvent(Events.GOT_DATA, null);
-                        }
-                    }
-                })
-                .subscribe());
-    }
-
     protected BlockedUserListener getBlockedUserListener() {
         return mBlockedUserListener;
     }
@@ -1938,7 +1729,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
     protected void onUserUnblocked(int userid) {
         Bundle payload = new Bundle();
-        payload.putString("by", myUsername());
+        payload.putString("by", privateChatViewModel.myUsername());
         payload.putInt("userid", userid);
         FirebaseAnalytics.getInstance(this).logEvent(Events.USER_UNBLOCKED, payload);
     }
@@ -1959,11 +1750,11 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     }
 
     private void showDotsParent(boolean isAnimate) {
-        if (mDotsLayoutParent.getVisibility() == View.VISIBLE)
+        if (binding.dotsLayout.getVisibility() == View.VISIBLE)
             return;
-        mDotsLayoutParent.setVisibility(View.VISIBLE);
+        binding.dotsLayout.setVisibility(View.VISIBLE);
         if (isAnimate)
-            AnimationUtil.fadeInAnimation(mDotsLayoutParent);
+            AnimationUtil.fadeInAnimation(binding.dotsLayout);
     }
 
     private Handler mDotsHandler = new Handler();
@@ -1977,9 +1768,9 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     };
 
     private void hideDotsParent() {
-        if (mDotsLayoutParent.getVisibility() == View.GONE)
+        if (binding.dotsLayout.getVisibility() == View.GONE)
             return;
-        mDotsLayoutParent.setVisibility(View.GONE);
+        binding.dotsLayout.setVisibility(View.GONE);
     }
 
     private void sendText(FriendlyMessage friendlyMessage) {
@@ -2009,7 +1800,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         View drawerView = getLayoutInflater().inflate(R.layout.left_drawer_layout, navigationView, false);
         navigationView.addView(drawerView);
         navigationView.addHeaderView(headerView);
-        mLeftDrawerHelper = new LeftDrawerHelper(networkApi, this, this, mDrawerLayout, mLeftDrawerEventListener);
+        mLeftDrawerHelper = new LeftDrawerHelper(networkApi, this, this, binding.drawerLayout, mLeftDrawerEventListener);
         mLeftDrawerHelper.setup(navigationView);
         mLeftDrawerHelper.setUserLikedUserListener(mUserLikedUserListener);
 
@@ -2050,7 +1841,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
     private void onProfilePicChangeRequest(boolean isLaunchCamera) {
         mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.userProfilePhoto);
-        mPhotoUploadHelper.setStorageRefString(Constants.DP_STORAGE_BASE_REF(myUserid()));
+        mPhotoUploadHelper.setStorageRefString(Constants.DP_STORAGE_BASE_REF(privateChatViewModel.myUserid()));
         mPhotoUploadHelper.launchCamera(isLaunchCamera);
     }
 
@@ -2059,12 +1850,29 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         public void onMyLikersClicked() {
             Fragment fragment = new UserLikedUserFragment();
             Bundle bundle = new Bundle();
-            bundle.putInt(Constants.KEY_USERID, myUserid());
-            bundle.putString(Constants.KEY_USERNAME, myUsername());
+            bundle.putInt(Constants.KEY_USERID, privateChatViewModel.myUserid());
+            bundle.putString(Constants.KEY_USERNAME, privateChatViewModel.myUsername());
             fragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R
                     .anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, UserLikedUserFragment
                     .TAG).addToBackStack(null).commit();
         }
     };
+
+    /**
+     * Implementation of {@link AbstractChatNavigator}
+     */
+    @Override
+    public void showSignIn() {
+        startActivity(new Intent(this, SignInActivity.class));
+        finish();
+    }
+
+    /**
+     * Implementation of {@link AbstractChatNavigator}
+     */
+    @Override
+    public void setMaxMessageLength(int maxMessageLength) {
+        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxMessageLength)});
+    }
 }

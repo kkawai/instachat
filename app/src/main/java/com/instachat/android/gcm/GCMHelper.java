@@ -98,7 +98,7 @@ public class GCMHelper {
             return;
         }
 
-        registerIfNecessary(TheApp.getInstance());
+        registerIfNecessary(activity.getApplicationContext());
     }
 
     public void onResume(final Activity activity) {

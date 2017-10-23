@@ -1,5 +1,6 @@
 package com.instachat.android.app.fullscreen;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -23,6 +24,15 @@ public class FullScreenTextFragment extends Fragment {
     private FriendlyMessageContainer mFriendlyMessageContainer;
     private FragmentStatePagerAdapter mPagerAdapter;
     private int mLastPos;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (!(context instanceof FriendlyMessageContainer)) {
+            throw new IllegalStateException("parent activity does not implement FriendlyMessageContainer");
+        }
+        mFriendlyMessageContainer = (FriendlyMessageContainer)context;
+    }
 
     @Nullable
     @Override
@@ -83,10 +93,6 @@ public class FullScreenTextFragment extends Fragment {
         } else {
             return mFriendlyMessageContainer.getFriendlyMessageCount() - 1;
         }
-    }
-
-    public void setFriendlyMessageContainer(final FriendlyMessageContainer messageContainer) {
-        mFriendlyMessageContainer = messageContainer;
     }
 
     public void notifyDataSetChanged() {

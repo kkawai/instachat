@@ -1,5 +1,7 @@
 package com.instachat.android.app.activity.pm;
 
-public interface PrivateChatNavigator {
+import com.instachat.android.app.activity.AbstractChatNavigator;
+
+public interface PrivateChatNavigator extends AbstractChatNavigator {
 
 }

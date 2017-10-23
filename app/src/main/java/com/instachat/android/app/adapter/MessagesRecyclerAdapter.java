@@ -80,7 +80,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private DatabaseReference mMessagesRef;
     private WeakReference<Activity> mActivity;
     private ActivityState mActivityState;
-    private AdapterPopulateHolderListener mAdapterPopulateHolderListener;
     private MessageTextClickedListener mMessageTextClickedListener;
     private UserClickedListener mUserClickedListener;
     private FriendlyMessageListener mFriendlyMessageListener;
@@ -116,10 +115,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         mActivityState = activityState;
         mEntireScreenFrameLayout = entireScreenLayout;
         mEntireScreenFrameLayout.setOnTouchListener(mOnTouchListener);
-    }
-
-    public void setAdapterPopulateHolderListener(AdapterPopulateHolderListener listener) {
-        mAdapterPopulateHolderListener = listener;
     }
 
     public void setMessageTextClickedListener(MessageTextClickedListener listener) {
@@ -482,7 +477,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         mActivity = null;
         mActivityState = null;
         mUserClickedListener = null;
-        mAdapterPopulateHolderListener = null;
         mMessageTextClickedListener = null;
         mBlockedUserListener = null;
         if (mBlockedUsersRef != null && mBlockedUsersListener != null)
@@ -583,7 +577,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private void listenForBlockedUsers() {
         if (mIsListeningForBlockedUsers)
             return;
-        mAdapterPopulateHolderListener.onViewHolderPopulated();
         mIsListeningForBlockedUsers = true;
         new Handler().postDelayed(new Runnable() {
             @Override
