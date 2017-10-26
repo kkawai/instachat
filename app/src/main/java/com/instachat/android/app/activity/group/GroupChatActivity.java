@@ -47,8 +47,6 @@ import com.brandongogetap.stickyheaders.StickyLayoutManager;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -116,11 +114,13 @@ import com.tooltip.Tooltip;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.reactivex.Observable;
+import io.reactivex.functions.Action;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupChatViewModel> implements GoogleApiClient.OnConnectionFailedListener,
@@ -190,7 +190,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         groupChatViewModel.setNavigator(this);
-        groupChatViewModel.onCreate();
         initDatabaseRef();
         binding =  getViewDataBinding();
 
@@ -280,15 +279,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         groupChatViewModel.smallProgressCheck();
     }
 
-    private DatabaseReference mGroupSummaryRef;
-    private ValueEventListener mGroupSummaryListener;
-
-    private void removeGroupInfoListener() {
-        if (mGroupSummaryRef != null && mGroupSummaryListener != null) {
-            mGroupSummaryRef.removeEventListener(mGroupSummaryListener);
-        }
-    }
-
     private String getCount(int count) {
         if (count > 0)
             return " (" + count + ")";
@@ -304,7 +294,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             showFirstMessageDialog(GroupChatActivity.this);
             if (mExternalSendIntentConsumer != null)
                 mExternalSendIntentConsumer.consumeIntent(getIntent());
-            addUserPresenceToGroup();
+            groupChatViewModel.addUserPresenceToGroup();
         } else {
             finish();
         }
@@ -314,7 +304,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     @Override
     public void onPause() {
         super.onPause();
-        removeUserPresenceFromGroup();
+        groupChatViewModel.removeUserPresenceFromGroup();
     }
 
     @Override
@@ -423,22 +413,24 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             @Override
             public void onClick(View view) {
                 final String text = mMessageEditText.getText().toString();
-                validateBeforeSendText(text, false);
+                groupChatViewModel.validateMessage(text, false);
             }
         });
         binding.sendButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
                 final String text = mMessageEditText.getText().toString();
-                validateBeforeSendText(text, true);
+                groupChatViewModel.validateMessage(text, false);
                 return true;
             }
         });
         binding.attachButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isNeedsDp())
+                if (StringUtil.isEmpty(groupChatViewModel.myDpid())) {
+                    showNeedPhotoDialog();
                     return;
+                }
                 mAttachPhotoMessageType = FriendlyMessage.MESSAGE_TYPE_NORMAL;
                 showFileOptions();
             }
@@ -465,45 +457,14 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         });
     }
 
-    private void sendText(FriendlyMessage friendlyMessage) {
+    @Override
+    public void sendText(FriendlyMessage friendlyMessage) {
         try {
             messagesAdapter.sendFriendlyMessage(friendlyMessage);
             mMessageEditText.setText("");//fast double taps on send can cause 2x sends!
         } catch (Exception e) {
             MLog.e(TAG, "", e);
         }
-    }
-
-    private boolean validateBeforeSendText(final String text, boolean showOptions) {
-        if (StringUtil.isEmpty(text)) {
-            return false;
-        }
-        if (isNeedsDp())
-            return false;
-        final FriendlyMessage friendlyMessage = new FriendlyMessage(text,
-                groupChatViewModel.myUsername(),
-                groupChatViewModel.myUserid(),
-                groupChatViewModel.myDpid(), null,
-                false, false, null, System.currentTimeMillis());
-        if (!showOptions) {
-            sendText(friendlyMessage);
-            return true;
-        }
-        new MessageOptionsDialogHelper().showSendOptions(GroupChatActivity.this, binding.sendButton, friendlyMessage, new
-                MessageOptionsDialogHelper.SendOptionsListener() {
-                    @Override
-                    public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
-                        friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
-                        sendText(friendlyMessage);
-                    }
-
-                    @Override
-                    public void onSendOneTimeRequested(FriendlyMessage friendlyMessage) {
-                        friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
-                        sendText(friendlyMessage);
-                    }
-                });
-        return true;
     }
 
     /**
@@ -634,13 +595,13 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     }
 
     private void showPhotoReduceError() {
-        addDisposable(Observable.fromCallable(new Callable<Boolean>() {
+        add(Observable.fromCallable(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 Toast.makeText(GroupChatActivity.this, "Could not read photo", Toast.LENGTH_SHORT).show();
                 return false;
             }
-        }).subscribeOn(schedulerProvider.ui()).subscribe());
+        }).subscribeOn(schedulerProvider.ui()).observeOn(schedulerProvider.ui()).subscribe());
     }
 
     @Override
@@ -740,8 +701,8 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     protected void setupRightDrawerContent() {
 
-        RecyclerView drawerRecyclerView = (RecyclerView)getLayoutInflater().inflate(R.layout.right_drawer_layout, binding.rightNavView, false);
-        final View headerView = getLayoutInflater().inflate(R.layout.right_nav_header, binding.rightNavView, false);
+        RecyclerView rightDrawerRecyclerView = (RecyclerView)getLayoutInflater().inflate(R.layout.right_drawer_layout, binding.rightNavView, false);
+        final View rightHeaderView = getLayoutInflater().inflate(R.layout.right_nav_header, binding.rightNavView, false);
 
         mRightRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_ROOMS).child
                 (groupChatViewModel.getGroupId() + "");
@@ -758,7 +719,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                             null);
                     return;
                 }
-                ((TextView) headerView.findViewById(R.id.groupname)).setText(groupChatSummary.getName());
+                ((TextView) rightHeaderView.findViewById(R.id.groupname)).setText(groupChatSummary.getName());
             }
 
             @Override
@@ -768,15 +729,15 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         };
         mRightRef.addValueEventListener(mRightListener);
 
-        binding.rightNavView.addHeaderView(headerView);
-        binding.rightNavView.addHeaderView(drawerRecyclerView);
+        binding.rightNavView.addHeaderView(rightHeaderView);
+        binding.rightNavView.addHeaderView(rightDrawerRecyclerView);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        drawerRecyclerView.setLayoutManager(linearLayoutManager);
+        rightDrawerRecyclerView.setLayoutManager(linearLayoutManager);
 
         mGroupChatUsersRecyclerAdapter = new GroupChatUsersRecyclerAdapter(this, this, this, groupChatViewModel.getGroupId());
-        drawerRecyclerView.setAdapter(mGroupChatUsersRecyclerAdapter);
+        rightDrawerRecyclerView.setAdapter(mGroupChatUsersRecyclerAdapter);
         mGroupChatUsersRecyclerAdapter.populateData();
     }
 
@@ -957,14 +918,12 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
          */
         if (mMessageEditText.hasFocus()) {
             ScreenUtil.hideVirtualKeyboard(mMessageEditText);
-            new Handler().postDelayed(new Runnable() {
+            add(Observable.timer(175, TimeUnit.MILLISECONDS).subscribeOn(schedulerProvider.io()).doOnComplete(new Action() {
                 @Override
-                public void run() {
-                    if (isActivityDestroyed())
-                        return;
+                public void run() throws Exception {
                     showPhotoOptionsDialog();
                 }
-            }, 175);
+            }).observeOn(schedulerProvider.ui()).subscribe());
         } else {
             showPhotoOptionsDialog();
         }
@@ -1059,10 +1018,8 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         }
     }
 
-    private boolean isNeedsDp() {
-
-        if (!TextUtils.isEmpty(groupChatViewModel.myDpid()))
-            return false;
+    @Override
+    public void showNeedPhotoDialog() {
         new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE).setTitleText(this.getString(R.string
                 .display_photo_title)).setContentText(this.getString(R.string.display_photo)).setCancelText(this
                 .getString(android.R.string.cancel)).setConfirmText(this.getString(android.R.string.ok))
@@ -1082,7 +1039,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 }
             }
         }).show();
-        return true;
     }
 
     @Override
@@ -1137,7 +1093,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     @Override
     public void onGroupChatClicked(GroupChatSummary groupChatSummary) {
-        removeUserPresenceFromGroup();
+        groupChatViewModel.removeUserPresenceFromGroup();
         closeBothDrawers();
         startGroupChatActivity(this, groupChatSummary.getId(), groupChatSummary.getName(), mSharePhotoUri, mShareText);
         mSharePhotoUri = null;
@@ -1195,69 +1151,9 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         }
     }
 
-    protected void addUserPresenceToGroup() {
-
-        mGroupSummaryRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_ROOMS).
-                child(groupChatViewModel.getGroupId() + "");
-        mGroupSummaryListener = mGroupSummaryRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChildren()) {
-                    final GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
-                    getSupportActionBar().setSubtitle(R.string.app_name);
-
-                    /**
-                     * run this delayed, if the user re-enters
-                     * the same room (for a variety of reasons)
-                     * give them some time to remove themself
-                     * before immediately adding them back again.
-                     */
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (isActivityDestroyed())
-                                return;
-
-                            MLog.d(TAG, "addUserPresenceToGroup() groupChatViewModel.getGroupId(): ", groupChatViewModel.getGroupId(), " username: ", groupChatViewModel.myUsername());
-                            User me = UserPreferences.getInstance().getUser();
-                            final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants
-                                    .GROUP_CHAT_USERS_REF(groupChatViewModel.getGroupId())).
-                                    child(groupChatViewModel.myUserid() + "");
-                            ref.updateChildren(me.toMap(true)).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (chatsRecyclerViewAdapter != null)
-                                        chatsRecyclerViewAdapter.removeUserFromAllGroups(groupChatViewModel.myUserid(), groupChatViewModel.getGroupId());
-                                }
-                            });
-                            me.setCurrentGroupId(groupChatSummary.getId());
-                            me.setCurrentGroupName(groupChatSummary.getName());
-                            FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(groupChatViewModel.myUserid()))
-                                    .updateChildren(me.toMap(true));
-
-                        }
-                    }, 2000);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    protected void removeUserPresenceFromGroup() {
-        removeGroupInfoListener();
-        MLog.d(TAG, "removeUserPresenceFromGroup() groupChatViewModel.getGroupId(): ", groupChatViewModel.getGroupId(), " username: ", groupChatViewModel.myUsername());
-        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(groupChatViewModel.getGroupId())).child(groupChatViewModel.myUserid() + "")
-                .removeValue();
-        FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(groupChatViewModel.myUserid())).child(Constants
-                .FIELD_CURRENT_GROUP_ID).removeValue();
-        FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(groupChatViewModel.myUserid())).child(Constants
-                .FIELD_CURRENT_GROUP_NAME).removeValue();
-        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(groupChatViewModel.getGroupId(), groupChatViewModel.myUserid()))
-                .removeValue();
+    @Override
+    public void showSubtitle() {
+        getSupportActionBar().setSubtitle(R.string.app_name);
     }
 
     private void toggleRightDrawer() {
@@ -1276,7 +1172,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             @Override
             public void onConfirmLogout() {
                 firebaseAuth.signOut();
-                removeUserPresenceFromGroup();
+                groupChatViewModel.removeUserPresenceFromGroup();
                 gcmHelper.unregister(UserPreferences.getInstance().getUserId() + "");
                 UserPreferences.getInstance().clearUser();
                 startActivity(new Intent(GroupChatActivity.this, SignInActivity.class));
@@ -1515,5 +1411,28 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     @Override
     public void setMaxMessageLength(int maxMessageLength) {
         mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxMessageLength)});
+    }
+
+    @Override
+    public void removeUserFromAllGroups(int userid, long exceptionGroupId) {
+        if (chatsRecyclerViewAdapter != null)
+            chatsRecyclerViewAdapter.removeUserFromAllGroups(userid, exceptionGroupId);
+    }
+
+    public void showSendOptions(FriendlyMessage friendlyMessage) {
+        new MessageOptionsDialogHelper().showSendOptions(this, binding.sendButton, friendlyMessage, new
+                MessageOptionsDialogHelper.SendOptionsListener() {
+                    @Override
+                    public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
+                        friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
+                        sendText(friendlyMessage);
+                    }
+
+                    @Override
+                    public void onSendOneTimeRequested(FriendlyMessage friendlyMessage) {
+                        friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
+                        sendText(friendlyMessage);
+                    }
+                });
     }
 }

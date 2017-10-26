@@ -11,7 +11,6 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.TheApp;
-import com.instachat.android.app.activity.group.GroupChatActivity;
 import com.instachat.android.app.adapter.MessageViewHolder;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapter;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
@@ -21,6 +20,7 @@ import com.instachat.android.app.ui.base.BaseViewModel;
 import com.instachat.android.data.DataManager;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.util.MLog;
+import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.rx.SchedulerProvider;
 
@@ -28,19 +28,28 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 
 public abstract class AbstractChatViewModel<Navigator extends AbstractChatNavigator> extends BaseViewModel<Navigator> {
 
-    public static final String TAG = "AbstractChatViewModel";
+    private static final String TAG = "AbstractChatViewModel";
 
     private String databaseRoot;
 
     private MessagesRecyclerAdapter messagesAdapter;
 
-    public AbstractChatViewModel(DataManager dataManager, SchedulerProvider schedulerProvider) {
+    protected final FirebaseRemoteConfig firebaseRemoteConfig;
+    protected final FirebaseDatabase firebaseDatabase;
+
+    public AbstractChatViewModel(DataManager dataManager,
+                                 SchedulerProvider schedulerProvider,
+                                 FirebaseRemoteConfig firebaseRemoteConfig,
+                                 FirebaseDatabase firebaseDatabase) {
         super(dataManager, schedulerProvider);
+        this.firebaseRemoteConfig = firebaseRemoteConfig;
+        this.firebaseDatabase = firebaseDatabase;
     }
 
     @Override
@@ -49,14 +58,15 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
         cleanup();
     }
 
-    //invoke after calling setNavigator
-    public void onCreate() {
+    @Override
+    public void setNavigator(Navigator navigator) {
+        super.setNavigator(navigator);
         if (!UserPreferences.getInstance().isLoggedIn()) {
-            getNavigator().showSignIn();
+            navigator.showSignIn();
             return;
         }
         try {
-            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            firebaseDatabase.setPersistenceEnabled(true);
             MLog.w(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) succeeded");
         } catch (Exception e) {
             //MLog.e(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) failed: " + e);
@@ -116,6 +126,10 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
 
     public abstract boolean isPrivateChat();
 
+    public void add(Disposable disposable) {
+        getCompositeDisposable().add(disposable);
+    }
+
     /**
      * Check every second for up to 5 seconds if messagesAdapter
      * has messages.  Hide the small progress circle if any messages
@@ -123,10 +137,10 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
      * just hide.
      */
     public void smallProgressCheck() {
-        getCompositeDisposable().add(Observable.interval(0, 1000, TimeUnit.MILLISECONDS)
+        add(Observable.interval(0, 1000, TimeUnit.MILLISECONDS, getSchedulerProvider().io())
                 .take(5)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doFinally(new Action() {
+                .observeOn(getSchedulerProvider().ui())
+                .doOnComplete(new Action() {
                     @Override
                     public void run() throws Exception {
                         getNavigator().hideSmallProgressCircle();
@@ -177,5 +191,26 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
             FirebaseAnalytics.getInstance(TheApp.getInstance()).logEvent(Events.USER_UNBLOCKED, payload);
         }
     };
+
+    public boolean validateMessage(final String text, boolean showOptions) {
+        if (StringUtil.isEmpty(text)) {
+            return false;
+        }
+        if (StringUtil.isEmpty(myDpid())) {
+            getNavigator().showNeedPhotoDialog();
+            return false;
+        }
+        final FriendlyMessage friendlyMessage = new FriendlyMessage(text,
+                myUsername(),
+                myUserid(),
+                myDpid(), null,
+                false, false, null, System.currentTimeMillis());
+        if (!showOptions) {
+            getNavigator().sendText(friendlyMessage);
+            return true;
+        }
+        getNavigator().showSendOptions(friendlyMessage);
+        return true;
+    }
 
 }

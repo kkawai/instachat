@@ -8,6 +8,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.gson.Gson;
 import com.instachat.android.app.activity.AdHelper;
@@ -18,6 +19,7 @@ import com.instachat.android.app.activity.group.LogoutDialogHelper;
 import com.instachat.android.app.adapter.UserPresenceManager;
 import com.instachat.android.data.AppDataManager;
 import com.instachat.android.data.DataManager;
+import com.instachat.android.data.api.APIClient;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.gcm.GCMHelper;
 import com.instachat.android.gcm.GCMRegistrationManager;
@@ -54,6 +56,12 @@ public class AppModule {
 
     @Provides
     @Singleton
+    APIClient provideAPIClient() {
+        return new APIClient();
+    }
+
+    @Provides
+    @Singleton
     DataManager provideDataManager(AppDataManager appDataManager) {
         return appDataManager;
     }
@@ -62,6 +70,12 @@ public class AppModule {
     @Singleton
     FirebaseRemoteConfig provideFirebaseRemoteConfig() {
         return new RemoteConfigHelper().initializeRemoteConfig();
+    }
+
+    @Provides
+    @Singleton
+    FirebaseDatabase provideFirebaseDatabase() {
+        return FirebaseDatabase.getInstance();
     }
 
     @Provides

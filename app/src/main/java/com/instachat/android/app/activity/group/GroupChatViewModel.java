@@ -9,16 +9,30 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.app.activity.AbstractChatViewModel;
 import com.instachat.android.data.DataManager;
+import com.instachat.android.data.model.FriendlyMessage;
+import com.instachat.android.data.model.GroupChatSummary;
+import com.instachat.android.data.model.User;
 import com.instachat.android.util.MLog;
+import com.instachat.android.util.StringUtil;
+import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.rx.SchedulerProvider;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 
 public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator> {
+
+    private static final String TAG = "GroupChatViewModel";
 
     //public ObservableArrayList<ItemViewModel> list = new ObservableArrayList<>();
     private long groupId;
@@ -27,9 +41,14 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
     private ChildEventListener mTypingInRoomEventListener;
     private DatabaseReference mMeTypingRef;
     private Map<String, Object> mMeTypingMap = new HashMap<>(3);
+    private DatabaseReference mGroupSummaryRef;
+    private ValueEventListener mGroupSummaryListener;
 
-    public GroupChatViewModel(DataManager dataManager, SchedulerProvider schedulerProvider) {
-        super(dataManager, schedulerProvider);
+    public GroupChatViewModel(DataManager dataManager,
+                              SchedulerProvider schedulerProvider,
+                              FirebaseRemoteConfig firebaseRemoteConfig,
+                              FirebaseDatabase firebaseDatabase) {
+        super(dataManager, schedulerProvider, firebaseRemoteConfig, firebaseDatabase);
     }
 
     @Override
@@ -121,6 +140,76 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
     public void cleanup() {
         if (mTypingInRoomReference != null && mTypingInRoomEventListener != null)
             mTypingInRoomReference.removeEventListener(mTypingInRoomEventListener);
+    }
+
+    public void removeGroupInfoListener() {
+        if (mGroupSummaryRef != null && mGroupSummaryListener != null) {
+            mGroupSummaryRef.removeEventListener(mGroupSummaryListener);
+        }
+    }
+
+    public void addUserPresenceToGroup() {
+
+        mGroupSummaryRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_ROOMS).
+                child(getGroupId() + "");
+        mGroupSummaryListener = mGroupSummaryRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChildren()) {
+                    final GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
+                    getNavigator().showSubtitle();
+
+                    /**
+                     * run this delayed, if the user re-enters
+                     * the same room (for a variety of reasons)
+                     * give them some time to remove themself
+                     * before immediately adding them back again.
+                     */
+                    add(Observable.timer(2000, TimeUnit.MILLISECONDS)
+                            .subscribeOn(getSchedulerProvider().io())
+                            .observeOn(getSchedulerProvider().ui())
+                            .doOnComplete(new Action() {
+                                @Override
+                                public void run() throws Exception {
+                                    MLog.d(TAG, "addUserPresenceToGroup() groupChatViewModel.getGroupId(): ", getGroupId(), " username: ", myUsername());
+                                    User me = UserPreferences.getInstance().getUser();
+                                    final DatabaseReference ref = firebaseDatabase.getReference(Constants
+                                            .GROUP_CHAT_USERS_REF(getGroupId())).
+                                            child(myUserid() + "");
+                                    ref.updateChildren(me.toMap(true)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            getNavigator().removeUserFromAllGroups(myUserid(), getGroupId());
+                                        }
+                                    });
+                                    me.setCurrentGroupId(groupChatSummary.getId());
+                                    me.setCurrentGroupName(groupChatSummary.getName());
+                                    firebaseDatabase.getReference(Constants.USER_INFO_REF(myUserid()))
+                                            .updateChildren(me.toMap(true));
+                                }
+                            }).subscribe());
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void removeUserPresenceFromGroup() {
+        removeGroupInfoListener();
+        MLog.d(TAG, "removeUserPresenceFromGroup() groupChatViewModel.getGroupId(): ", getGroupId(), " username: ", myUsername());
+        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(getGroupId())).child(myUserid() + "")
+                .removeValue();
+        FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(myUserid())).child(Constants
+                .FIELD_CURRENT_GROUP_ID).removeValue();
+        FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(myUserid())).child(Constants
+                .FIELD_CURRENT_GROUP_NAME).removeValue();
+        FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_TYPING_REF(getGroupId(), myUserid()))
+                .removeValue();
     }
 
     /*public void fetchHomeData(List<Item> cache) {

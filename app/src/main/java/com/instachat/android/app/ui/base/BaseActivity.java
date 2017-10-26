@@ -24,7 +24,6 @@ import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -35,7 +34,6 @@ import android.widget.ProgressBar;
 import com.android.volley.RequestQueue;
 import com.instachat.android.R;
 import com.instachat.android.app.activity.ActivityState;
-import com.instachat.android.util.MLog;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -172,7 +170,7 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
         return mIsDestroyed || isFinishing();
     }
 
-    public void addDisposable(Disposable disposable) {
+    public void add(Disposable disposable) {
         disposableList.add(disposable);
     }
 

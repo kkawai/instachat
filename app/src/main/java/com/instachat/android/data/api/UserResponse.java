@@ -3,7 +3,7 @@ package com.instachat.android.data.api;
 import com.google.gson.annotations.SerializedName;
 import com.instachat.android.data.model.User;
 
-public class UserResult {
+public class UserResponse {
 
     @SerializedName("status")
     public String status;

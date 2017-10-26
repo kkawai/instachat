@@ -27,8 +27,10 @@ public class GroupChatModule {
 
     @Provides
     GroupChatViewModel provideGroupChatViewModel(DataManager dataManager,
-                                                 SchedulerProvider schedulerProvider) {
-        return new GroupChatViewModel(dataManager, schedulerProvider);
+                                                 SchedulerProvider schedulerProvider,
+                                                 FirebaseRemoteConfig firebaseRemoteConfig,
+                                                 FirebaseDatabase firebaseDatabase) {
+        return new GroupChatViewModel(dataManager, schedulerProvider, firebaseRemoteConfig, firebaseDatabase);
     }
 
     @Provides

@@ -33,7 +33,11 @@ public final class APIClient {
    private static Retrofit retrofit = null;
    private static APIInterface apiInterface = null;
 
-   public static synchronized APIInterface getApi() {
+   public APIClient() {
+
+   }
+
+   public APIInterface getApi() {
       if (apiInterface == null) {
          apiInterface = getClient().create(APIInterface.class);
       }

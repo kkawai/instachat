@@ -2,7 +2,7 @@ package com.instachat.android.data.api;
 
 import com.google.gson.annotations.SerializedName;
 
-public class BasicResult {
+public class BasicResponse {
 
     @SerializedName("status")
     public String status;

@@ -58,8 +58,6 @@ import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
@@ -67,7 +65,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.BR;
@@ -88,7 +85,6 @@ import com.instachat.android.app.adapter.ChatSummariesRecyclerAdapter;
 import com.instachat.android.app.adapter.ChatsItemClickedListener;
 import com.instachat.android.app.adapter.FriendlyMessageListener;
 import com.instachat.android.app.adapter.MessageTextClickedListener;
-import com.instachat.android.app.adapter.MessageViewHolder;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapter;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
 import com.instachat.android.app.adapter.UserClickedListener;
@@ -134,7 +130,6 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -142,9 +137,7 @@ import javax.inject.Inject;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
 import pub.devrel.easypermissions.EasyPermissions;
 
 /**
@@ -182,7 +175,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
     private PhotoUploadHelper mPhotoUploadHelper;
     private LeftDrawerHelper mLeftDrawerHelper;
-    private String mDatabaseRoot;
     private ExternalSendIntentConsumer mExternalSendIntentConsumer;
     private Uri mSharePhotoUri;
     private String mShareText;
@@ -205,6 +197,9 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
+
+    @Inject
+    FirebaseDatabase firebaseDatabase;
 
     @Inject
     LinearLayoutManager linearLayoutManager;
@@ -236,7 +231,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         setTheme(R.style.Theme_App);
         super.onCreate(savedInstanceState);
         privateChatViewModel.setNavigator(this);
-        privateChatViewModel.onCreate();
         initDatabaseRef();
         binding =  getViewDataBinding();
 
@@ -343,7 +337,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         }
         MLog.d(TAG, "before grab from server, intent data: sUserid: ", sUserid, " sUsernane: ", sUsername, " " +
                 "sProfilePicUrl: ", sProfilePicUrl);
-        loadBasicData(getIntent());
+        setPartnerInfo(getIntent());
         networkApi.getUserById(this, sUserid, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -356,9 +350,9 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
                     populateUserProfile(toUser);
                     setCustomTitles(toUser.getUsername(), 0);
                     listenForPartnerTyping();
-                    checkIfPartnerIsBlocked();
+                    getViewModel().checkIfPartnerIsBlocked(sUsername, sUserid);
 
-                    mUserInfoValueEventListener = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF
+                    mUserInfoValueEventListener = firebaseDatabase.getReference(Constants.USER_INFO_REF
                             (sUserid)).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -479,19 +473,17 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         UserPreferences.getInstance().setShownToolbarProfileTooltip(true);
         final Tooltip tooltip = new Tooltip.Builder(anchor, R.style.drawer_tooltip_non_cancellable).setText(getString
                 (R.string.toolbar_user_profile_tooltip)).show();
-        new Handler().postDelayed(new Runnable() {
+        add(Observable.timer(firebaseRemoteConfig.getLong(Constants.KEY_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME), TimeUnit.MILLISECONDS).subscribeOn(schedulerProvider.io()).doOnComplete(new Action() {
             @Override
-            public void run() {
-                if (isActivityDestroyed())
-                    return;
+            public void run() throws Exception {
                 if (tooltip.isShowing())
                     tooltip.dismiss();
             }
-        }, firebaseRemoteConfig.getLong(Constants.KEY_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME));
-
+        }).observeOn(schedulerProvider.ui()).subscribe());
     }
 
-    private void showErrorToast(String extra) {
+    @Override
+    public void showErrorToast(String extra) {
         try {
             Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, extra), Toast
                     .LENGTH_SHORT).show();
@@ -510,23 +502,11 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
     private boolean mIsAppBarExpanded = true; //initially it's expanded
 
-    private void initializePrivateChatSummary() {
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants
-                .MY_PRIVATE_CHATS_SUMMARY_PARENT_REF()).child(sUserid + "");
-        PrivateChatSummary summary = new PrivateChatSummary();
-        summary.setName(sUsername);
-        summary.setDpid(sProfilePicUrl);
-        summary.setAccepted(true);
-        Map<String, Object> map = summary.toMap();
-        map.put(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP, ServerValue.TIMESTAMP);
-        ref.updateChildren(map);
-    }
-
     @Override
     public void onDestroy() {
         if (mUserInfoValueEventListener != null) {
             try {
-                FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(sUserid)).removeEventListener
+                firebaseDatabase.getReference(Constants.USER_INFO_REF(sUserid)).removeEventListener
                         (mUserInfoValueEventListener);
             } catch (Exception e) {
                 MLog.e(TAG, "", e);
@@ -571,7 +551,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         if (mIsAppBarExpanded) {
             mAppBarLayout.setExpanded(false, true);
         }
-        initializePrivateChatSummary();
+        privateChatViewModel.initializePrivateChatSummary(sUsername,sUserid,sProfilePicUrl);
         if (isPrivateChat()) {
             Bundle payload = new Bundle();
             payload.putString("to", sUsername);
@@ -588,7 +568,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
             if (System.currentTimeMillis() - mLastTypingTime < 3000) {
                 return;
             }
-            FirebaseDatabase.getInstance()
+            firebaseDatabase
                     .getReference(Constants.PRIVATE_CHAT_TYPING_REF(sUserid))
                     .child("" +privateChatViewModel.myUserid())
                     .child(Constants.CHILD_TYPING).setValue(true);
@@ -634,27 +614,14 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         showTypingDots();
     }
 
-    private void loadBasicData(Intent intent) {
+    private void setPartnerInfo(Intent intent) {
 
         ((TextView) findViewById(R.id.customTitleInToolbar)).setText(sUsername);
         ((TextView) findViewById(R.id.customTitleInParallax)).setText(sUsername);
 
         if (intent.getBooleanExtra(Constants.KEY_AUTO_ADD_PERSON, false)) {
             //add this person to my left drawer and remove them from pending requests
-            PrivateChatSummary privateChatSummary = new PrivateChatSummary();
-            privateChatSummary.setName(sUsername);
-            privateChatSummary.setDpid(sProfilePicUrl);
-            privateChatSummary.setAccepted(true);
-            privateChatSummary.setLastMessageSentTimestamp(System.currentTimeMillis());
-            final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants
-                    .MY_PRIVATE_CHATS_SUMMARY_PARENT_REF()).child(sUserid + "");
-            ref.updateChildren(privateChatSummary.toMap());
-
-            /**
-             * remove the person from your pending requests
-             */
-            FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_REQUEST_STATUS_PARENT_REF(sUserid,
-                    UserPreferences.getInstance().getUserId())).removeValue();
+            privateChatViewModel.addUser(sUsername,sProfilePicUrl,sUserid);
         }
 
     }
@@ -670,7 +637,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
             toolbarProfileImageView.setImageResource(R.drawable.ic_anon_person_36dp);
             miniPic.setImageResource(R.drawable.ic_anon_person_36dp);
             mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
-            collapseAppbarAfterDelay();
+            privateChatViewModel.collapseAppbarAfterDelay();
         } else {
             try {
                 Glide.with(PrivateChatActivity.this).load(toUser.getProfilePicUrl()).error(R.drawable
@@ -682,7 +649,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
                                                        boolean isFirstResource) {
                                 if (isActivityDestroyed())
                                     return false;
-                                collapseAppbarAfterDelay();
+                                privateChatViewModel.collapseAppbarAfterDelay();
                                 return false;
                             }
 
@@ -692,7 +659,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
                                                            boolean isFirstResource) {
                                 if (isActivityDestroyed())
                                     return false;
-                                collapseAppbarAfterDelay();
+                                privateChatViewModel.collapseAppbarAfterDelay();
                                 return false;
                             }
                         }).into(mProfilePic);
@@ -704,7 +671,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
             } catch (Exception e) {
                 MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
                 miniPic.setImageResource(R.drawable.ic_anon_person_36dp);
-                collapseAppbarAfterDelay();
+                privateChatViewModel.collapseAppbarAfterDelay();
             }
         }
         bio.setVisibility(TextUtils.isEmpty(toUser.getBio()) ? View.GONE : View.VISIBLE);
@@ -734,21 +701,18 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
     }
 
-    private void collapseAppbarAfterDelay() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isActivityDestroyed())
-                    return;
-                if (mIsAppBarExpanded)
-                    mAppBarLayout.setExpanded(false, true);
-            }
-        }, firebaseRemoteConfig.getLong(Constants.KEY_COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY));
+    public void collapseAppBar() {
+        if (mIsAppBarExpanded)
+            mAppBarLayout.setExpanded(false, true);
+    }
+
+    public void expandAppBar() {
+        mAppBarLayout.setExpanded(true, true);
     }
 
     private void clearPrivateUnreadMessages(int toUserid) {
         try {
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants
+            DatabaseReference ref = firebaseDatabase.getReference(Constants
                     .MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
             ref.child(toUserid + "").child(Constants.CHILD_UNREAD_MESSAGES).removeValue();
         } catch (Exception e) {
@@ -859,7 +823,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     private ValueEventListener mTypingValueEventListener;
 
     private void listenForPartnerTyping() {
-        mTypingReference = FirebaseDatabase.getInstance().getReference(Constants.PRIVATE_CHAT_TYPING_REF(sUserid)).
+        mTypingReference = firebaseDatabase.getReference(Constants.PRIVATE_CHAT_TYPING_REF(sUserid)).
                 child("" + sUserid).child(Constants.CHILD_TYPING);
         mTypingReference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
@@ -914,7 +878,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     @Override
     public void onUserClicked(int userid, String username, String dpid, View transitionImageView) {
         if (userid == sUserid) {
-            mAppBarLayout.setExpanded(true, true);
+            expandAppBar();
         } else {
             closeBothDrawers();
             ScreenUtil.hideVirtualKeyboard(mMessageEditText);
@@ -964,7 +928,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     }
 
     private void checkIfPartnerIsBlocked() {
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF()).child
+        final DatabaseReference ref = firebaseDatabase.getReference(Constants.MY_BLOCKS_REF()).child
                 (sUserid + "");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -1023,7 +987,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     private void listenForUpdatedLikeCount(int userid) {
         final View likesParent = findViewById(R.id.likesParent);
         final TextView likesCount = findViewById(R.id.likesCount);
-        mTotalLikesRef = FirebaseDatabase.getInstance().getReference(Constants.USER_TOTAL_LIKES_RECEIVED_REF(userid));
+        mTotalLikesRef = firebaseDatabase.getReference(Constants.USER_TOTAL_LIKES_RECEIVED_REF(userid));
         mTotalLikesEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -1061,27 +1025,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
             }
         });
-    }
-
-    private void hideSmallProgressAfter() {
-        addDisposable(Observable.interval(0, 1000, TimeUnit.MILLISECONDS)
-                .take(5)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doFinally(new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        hideSmallProgressCircle();
-                    }
-                })
-                .subscribe(new Consumer<Long>() {
-                    @Override
-                    public void accept(Long value) throws Exception {
-                        if (messagesAdapter.getItemCount() > 0) {
-                            hideSmallProgressCircle();
-                        }
-                    }
-                }));
-
     }
 
     @Override
@@ -1169,13 +1112,13 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
 
     private void showPhotoReduceError() {
-        addDisposable(Observable.fromCallable(new Callable<Boolean>() {
+        add(Observable.fromCallable(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 Toast.makeText(PrivateChatActivity.this, "Could not read photo", Toast.LENGTH_SHORT).show();
                 return false;
             }
-        }).subscribeOn(schedulerProvider.ui()).subscribe());
+        }).observeOn(schedulerProvider.ui()).subscribeOn(schedulerProvider.ui()).subscribe());
     }
 
     @Override
@@ -1185,7 +1128,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
     @Override
     public String getFriendlyMessageDatabase() {
-        return mDatabaseRoot;
+        return privateChatViewModel.getDatabaseRoot();
     }
 
     @Override
@@ -1773,7 +1716,8 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         binding.dotsLayout.setVisibility(View.GONE);
     }
 
-    private void sendText(FriendlyMessage friendlyMessage) {
+    @Override
+    public void sendText(FriendlyMessage friendlyMessage) {
         try {
             messagesAdapter.sendFriendlyMessage(friendlyMessage);
             mMessageEditText.setText("");//fast double taps on send can cause 2x sends!
@@ -1874,5 +1818,53 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     @Override
     public void setMaxMessageLength(int maxMessageLength) {
         mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxMessageLength)});
+    }
+
+    @Override
+    public void showCannotChatWithBlockedUser(String username) {
+        Toast.makeText(PrivateChatActivity.this,
+                getString(R.string.cannot_chat_you_blocked_them,
+                        sUsername), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showSendOptions(FriendlyMessage friendlyMessage) {
+        new MessageOptionsDialogHelper().showSendOptions(this, binding.sendButton, friendlyMessage, new
+                MessageOptionsDialogHelper.SendOptionsListener() {
+                    @Override
+                    public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
+                        friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
+                        sendText(friendlyMessage);
+                    }
+
+                    @Override
+                    public void onSendOneTimeRequested(FriendlyMessage friendlyMessage) {
+                        friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
+                        sendText(friendlyMessage);
+                    }
+                });
+    }
+
+    @Override
+    public void showNeedPhotoDialog() {
+        new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE).setTitleText(this.getString(R.string
+                .display_photo_title)).setContentText(this.getString(R.string.display_photo)).setCancelText(this
+                .getString(android.R.string.cancel)).setConfirmText(this.getString(android.R.string.ok))
+                .showCancelButton(true).setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                sweetAlertDialog.cancel();
+            }
+        }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                sweetAlertDialog.dismiss();
+                if (isRightDrawerOpen())
+                    closeRightDrawer();
+                if (!isLeftDrawerOpen()) {
+                    openLeftDrawer();
+                }
+            }
+        }).show();
     }
 }
