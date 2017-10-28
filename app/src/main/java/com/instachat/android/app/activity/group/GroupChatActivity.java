@@ -191,7 +191,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         super.onCreate(savedInstanceState);
         groupChatViewModel.setNavigator(this);
         initDatabaseRef();
-        binding =  getViewDataBinding();
+        binding = getViewDataBinding();
 
         initPhotoHelper(savedInstanceState);
         setupDrawers();
@@ -469,6 +469,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     /**
      * {@link FriendlyMessageListener}
+     *
      * @param friendlyMessage
      */
     @Override
@@ -492,6 +493,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     /**
      * {@link FriendlyMessageListener}
+     *
      * @param friendlyMessage
      */
     @Override
@@ -701,7 +703,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     protected void setupRightDrawerContent() {
 
-        RecyclerView rightDrawerRecyclerView = (RecyclerView)getLayoutInflater().inflate(R.layout.right_drawer_layout, binding.rightNavView, false);
+        RecyclerView rightDrawerRecyclerView = (RecyclerView) getLayoutInflater().inflate(R.layout.right_drawer_layout, binding.rightNavView, false);
         final View rightHeaderView = getLayoutInflater().inflate(R.layout.right_nav_header, binding.rightNavView, false);
 
         mRightRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_ROOMS).child
@@ -918,12 +920,16 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
          */
         if (mMessageEditText.hasFocus()) {
             ScreenUtil.hideVirtualKeyboard(mMessageEditText);
-            add(Observable.timer(175, TimeUnit.MILLISECONDS).subscribeOn(schedulerProvider.io()).doOnComplete(new Action() {
-                @Override
-                public void run() throws Exception {
-                    showPhotoOptionsDialog();
-                }
-            }).observeOn(schedulerProvider.ui()).subscribe());
+            add(Observable.timer(175, TimeUnit.MILLISECONDS)
+                    .subscribeOn(schedulerProvider.io())
+                    .observeOn(schedulerProvider.ui())
+                    .doOnComplete(new Action() {
+                        @Override
+                        public void run() throws Exception {
+                            showPhotoOptionsDialog();
+                        }
+                    }).subscribe());
+
         } else {
             showPhotoOptionsDialog();
         }

@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v13.view.inputmethod.EditorInfoCompat;
@@ -30,7 +29,6 @@ import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -57,13 +55,8 @@ import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -114,10 +107,10 @@ import com.instachat.android.messaging.NotificationHelper;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.ScreenUtil;
-import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.TimeUtil;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.rx.SchedulerProvider;
+import com.instachat.android.view.FlingGestureListener;
 import com.smaato.soma.AdDownloaderInterface;
 import com.smaato.soma.AdListenerInterface;
 import com.smaato.soma.ErrorCode;
@@ -126,7 +119,6 @@ import com.smaato.soma.exception.AdReceiveFailed;
 import com.tooltip.Tooltip;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.List;
@@ -232,7 +224,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         super.onCreate(savedInstanceState);
         privateChatViewModel.setNavigator(this);
         initDatabaseRef();
-        binding =  getViewDataBinding();
+        binding = getViewDataBinding();
 
         initPhotoHelper(savedInstanceState);
         setupDrawers();
@@ -338,86 +330,11 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         MLog.d(TAG, "before grab from server, intent data: sUserid: ", sUserid, " sUsernane: ", sUsername, " " +
                 "sProfilePicUrl: ", sProfilePicUrl);
         setPartnerInfo(getIntent());
-        networkApi.getUserById(this, sUserid, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    final User toUser = User.fromResponse(response);
-                    sUsername = toUser.getUsername();
-                    sProfilePicUrl = toUser.getProfilePicUrl();
-                    MLog.d(TAG, "after grab from server: toUser: ", toUser.getId(), " ", toUser.getUsername(), " ",
-                            toUser.getProfilePicUrl());
-                    populateUserProfile(toUser);
-                    setCustomTitles(toUser.getUsername(), 0);
-                    listenForPartnerTyping();
-                    getViewModel().checkIfPartnerIsBlocked(sUsername, sUserid);
-
-                    mUserInfoValueEventListener = firebaseDatabase.getReference(Constants.USER_INFO_REF
-                            (sUserid)).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if (isActivityDestroyed())
-                                return;
-                            try {
-                                if (dataSnapshot.getValue() != null) {
-                                    User user = dataSnapshot.getValue(User.class);
-
-                                    //check if only the last active time changed
-                                    boolean onlyUpdateLastActiveTime = true;
-                                    if (!toUser.getUsername().equals(user.getUsername())) {
-                                        onlyUpdateLastActiveTime = false;
-                                        toUser.setUsername(user.getUsername());
-                                    }
-                                    if (!toUser.getProfilePicUrl().equals(user.getProfilePicUrl())) {
-                                        onlyUpdateLastActiveTime = false;
-                                        toUser.setProfilePicUrl(user.getProfilePicUrl());
-                                    }
-                                    String existingBio = toUser.getBio();
-                                    String newBio = user.getBio();
-                                    if (!existingBio.equals(newBio)) {
-                                        onlyUpdateLastActiveTime = false;
-                                        toUser.setBio(user.getBio());
-                                    }
-
-                                    if (toUser.getCurrentGroupId() != user.getCurrentGroupId()) {
-                                        onlyUpdateLastActiveTime = false;
-                                        toUser.setCurrentGroupName(user.getCurrentGroupName());
-                                        toUser.setCurrentGroupId(user.getCurrentGroupId());
-                                    }
-                                    setCustomTitles(user.getUsername(), user.getLastOnline());
-                                    if (!onlyUpdateLastActiveTime) {
-                                        populateUserProfile(toUser);
-                                    }
-                                    MLog.d(TAG, "user info changed onlyUpdateLastActiveTime: ",
-                                            onlyUpdateLastActiveTime);
-
-                                }
-                            } catch (Exception e) {
-                                MLog.e(TAG, "", e);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-
-                } catch (Exception e) {
-                    showErrorToast("pca 1");
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                MLog.e(TAG, "NetworkApi.getUserById(" + sUserid + ") failed in onCreate()", error);
-                showErrorToast("pca 2");
-            }
-        });
+        privateChatViewModel.fetchUser(sUserid);
         final NotificationManager notificationManager = ((NotificationManager) getSystemService(NOTIFICATION_SERVICE));
         notificationManager.cancel(sUserid);
         MLog.d(TAG, "Cancelled notification " + sUserid);
-        clearPrivateUnreadMessages(sUserid);
+        privateChatViewModel.clearPrivateUnreadMessages(sUserid);
 
         final View customTitlePairInParallax = findViewById(R.id.customTitlePairInParallax);
         final View customTitlePairInToolbar = findViewById(R.id.customTitlePairInToolbar);
@@ -464,7 +381,22 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
             }
         });
         presenceHelper.updateLastActiveTimestamp();
-        listenForUpdatedLikeCount(sUserid);
+        privateChatViewModel.listenForUpdatedLikeCount(sUserid);
+        findViewById(R.id.likesParent)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Fragment fragment = new UserLikedUserFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putInt(Constants.KEY_USERID, sUserid);
+                        bundle.putString(Constants.KEY_USERNAME, sUsername);
+                        fragment.setArguments(bundle);
+                        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim
+                                .slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment,
+                                UserLikedUserFragment.TAG).addToBackStack(null).commit();
+
+                    }
+                });
     }
 
     private void checkIfSeenToolbarProfileTooltip(View anchor) {
@@ -473,13 +405,16 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         UserPreferences.getInstance().setShownToolbarProfileTooltip(true);
         final Tooltip tooltip = new Tooltip.Builder(anchor, R.style.drawer_tooltip_non_cancellable).setText(getString
                 (R.string.toolbar_user_profile_tooltip)).show();
-        add(Observable.timer(firebaseRemoteConfig.getLong(Constants.KEY_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME), TimeUnit.MILLISECONDS).subscribeOn(schedulerProvider.io()).doOnComplete(new Action() {
-            @Override
-            public void run() throws Exception {
-                if (tooltip.isShowing())
-                    tooltip.dismiss();
-            }
-        }).observeOn(schedulerProvider.ui()).subscribe());
+        add(Observable.timer(firebaseRemoteConfig.getLong(Constants.KEY_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME), TimeUnit.MILLISECONDS)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        if (tooltip.isShowing())
+                            tooltip.dismiss();
+                    }
+                }).subscribe());
     }
 
     @Override
@@ -504,25 +439,10 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
     @Override
     public void onDestroy() {
-        if (mUserInfoValueEventListener != null) {
-            try {
-                firebaseDatabase.getReference(Constants.USER_INFO_REF(sUserid)).removeEventListener
-                        (mUserInfoValueEventListener);
-            } catch (Exception e) {
-                MLog.e(TAG, "", e);
-            }
-        }
-        if (mTypingValueEventListener != null && mTypingReference != null) {
-            mTypingReference.removeEventListener(mTypingValueEventListener);
-        }
-        if (mTotalLikesRef != null)
-            mTotalLikesRef.removeEventListener(mTotalLikesEventListener);
         super.onDestroy();
-
         sUserid = 0;
         sUsername = null;
         sProfilePicUrl = null;
-
     }
 
     //@Override
@@ -536,7 +456,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         try {
             if (isActivityDestroyed())
                 return;
-            MLog.d(TAG,"C kevin scroll: "+(messagesAdapter.getItemCount() - 1) + " text: "+ messagesAdapter.peekLastMessage());
+            MLog.d(TAG, "C kevin scroll: " + (messagesAdapter.getItemCount() - 1) + " text: " + messagesAdapter.peekLastMessage());
             binding.messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
             presenceHelper.updateLastActiveTimestamp();
         } catch (final Exception e) {
@@ -551,7 +471,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         if (mIsAppBarExpanded) {
             mAppBarLayout.setExpanded(false, true);
         }
-        privateChatViewModel.initializePrivateChatSummary(sUsername,sUserid,sProfilePicUrl);
+        privateChatViewModel.initializePrivateChatSummary(sUsername, sUserid, sProfilePicUrl);
         if (isPrivateChat()) {
             Bundle payload = new Bundle();
             payload.putString("to", sUsername);
@@ -570,7 +490,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
             }
             firebaseDatabase
                     .getReference(Constants.PRIVATE_CHAT_TYPING_REF(sUserid))
-                    .child("" +privateChatViewModel.myUserid())
+                    .child("" + privateChatViewModel.myUserid())
                     .child(Constants.CHILD_TYPING).setValue(true);
             mLastTypingTime = System.currentTimeMillis();
         } catch (Exception e) {
@@ -606,14 +526,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         return sUserid;
     }
 
-    //@Override
-    protected void onRemoteUserTyping(int userid, String username, String dpid) {
-        if (isActivityDestroyed() || this.sUserid != userid) {
-            return;
-        }
-        showTypingDots();
-    }
-
     private void setPartnerInfo(Intent intent) {
 
         ((TextView) findViewById(R.id.customTitleInToolbar)).setText(sUsername);
@@ -621,14 +533,17 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
         if (intent.getBooleanExtra(Constants.KEY_AUTO_ADD_PERSON, false)) {
             //add this person to my left drawer and remove them from pending requests
-            privateChatViewModel.addUser(sUsername,sProfilePicUrl,sUserid);
+            privateChatViewModel.addUser(sUsername, sProfilePicUrl, sUserid);
         }
 
     }
 
-    private void populateUserProfile(final User toUser) {
+    @Override
+    public void showUserProfile(final User toUser) {
         if (toUser == null || isActivityDestroyed())
             return;
+        sUsername = toUser.getUsername(); //username might have changed at the server
+        sProfilePicUrl = toUser.getProfilePicUrl(); //profile pic might have changed at server
         final ImageView toolbarProfileImageView = (ImageView) findViewById(R.id.topCornerUserThumb);
         final ImageView miniPic = (ImageView) findViewById(R.id.superSmallProfileImage);
         final TextView bio = (TextView) findViewById(R.id.bio);
@@ -710,16 +625,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         mAppBarLayout.setExpanded(true, true);
     }
 
-    private void clearPrivateUnreadMessages(int toUserid) {
-        try {
-            DatabaseReference ref = firebaseDatabase.getReference(Constants
-                    .MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
-            ref.child(toUserid + "").child(Constants.CHILD_UNREAD_MESSAGES).removeValue();
-        } catch (Exception e) {
-            MLog.e(TAG, "", e);
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -738,8 +643,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
                     toggleAppbar();
                 return true;
             case R.id.menu_block_user:
-                new BlockUserDialogHelper().showBlockUserQuestionDialog(this, sUserid, sUsername, sProfilePicUrl,
-                        getBlockedUserListener());
+                new BlockUserDialogHelper().showBlockUserQuestionDialog(this, sUserid, sUsername, sProfilePicUrl, mBlockedUserListener);
                 return true;
             case R.id.menu_report_user:
                 new ReportUserDialogHelper().showReportUserQuestionDialog(this, sUserid, sUsername, sProfilePicUrl);
@@ -789,7 +693,8 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
     private long mLastOnlineTimestamp = 0;
 
-    private void setCustomTitles(String username, long lastOnline) {
+    @Override
+    public void showCustomTitles(String username, long lastOnline) {
 
         if (lastOnline > mLastOnlineTimestamp) {
             String lastActive = "";
@@ -817,42 +722,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         GroupChatActivity.startGroupChatActivity(this, groupChatSummary.getId(), groupChatSummary.getName(), mSharePhotoUri, mShareText);
         mSharePhotoUri = null;
         mShareText = null;
-    }
-
-    private DatabaseReference mTypingReference;
-    private ValueEventListener mTypingValueEventListener;
-
-    private void listenForPartnerTyping() {
-        mTypingReference = firebaseDatabase.getReference(Constants.PRIVATE_CHAT_TYPING_REF(sUserid)).
-                child("" + sUserid).child(Constants.CHILD_TYPING);
-        mTypingReference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                mTypingValueEventListener = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (isActivityDestroyed())
-                            return;
-                        MLog.d(TAG, "isTyping: onDataChange() dataSnapshot ", dataSnapshot);
-                        if (dataSnapshot.exists()) {
-                            boolean isTyping = dataSnapshot.getValue(Boolean.class);
-                            MLog.d(TAG, "isTyping: ", isTyping);
-                            if (isTyping) {
-                                onRemoteUserTyping(sUserid, sUsername, sProfilePicUrl);
-                                mTypingReference.setValue(false);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                };
-                mTypingReference.addValueEventListener(mTypingValueEventListener);
-            }
-        });
-
     }
 
     //@Override
@@ -888,32 +757,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
     }
 
     private GestureDetectorCompat initializeGestureDetector() {
-        return new GestureDetectorCompat(this, new GestureDetector.OnGestureListener() {
-            @Override
-            public boolean onDown(MotionEvent motionEvent) {
-                return false;
-            }
-
-            @Override
-            public void onShowPress(MotionEvent motionEvent) {
-
-            }
-
-            @Override
-            public boolean onSingleTapUp(MotionEvent motionEvent) {
-                return false;
-            }
-
-            @Override
-            public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-                return false;
-            }
-
-            @Override
-            public void onLongPress(MotionEvent motionEvent) {
-
-            }
-
+        return new GestureDetectorCompat(this, new FlingGestureListener() {
             @Override
             public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
                 if (velocityY > 20) {
@@ -923,29 +767,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
                     }
                 }
                 return false;
-            }
-        });
-    }
-
-    private void checkIfPartnerIsBlocked() {
-        final DatabaseReference ref = firebaseDatabase.getReference(Constants.MY_BLOCKS_REF()).child
-                (sUserid + "");
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                MLog.d(TAG, "onDataChange() snapshot: " + dataSnapshot, " ref: ", ref);
-                ref.removeEventListener(this);
-                if (dataSnapshot.getValue() != null) {
-                    Toast.makeText(PrivateChatActivity.this,
-                            getString(R.string.cannot_chat_you_blocked_them,
-                            sUsername), Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                ref.removeEventListener(this);
-                showErrorToast("p");
             }
         });
     }
@@ -981,52 +802,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         return super.onMenuOpened(featureId, menu);
     }
 
-    private DatabaseReference mTotalLikesRef;
-    private ValueEventListener mTotalLikesEventListener;
-
-    private void listenForUpdatedLikeCount(int userid) {
-        final View likesParent = findViewById(R.id.likesParent);
-        final TextView likesCount = findViewById(R.id.likesCount);
-        mTotalLikesRef = firebaseDatabase.getReference(Constants.USER_TOTAL_LIKES_RECEIVED_REF(userid));
-        mTotalLikesEventListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    if (likesParent.getVisibility() != View.VISIBLE) {
-                        likesParent.setVisibility(View.VISIBLE);
-                        likesCount.setVisibility(View.VISIBLE);
-                    }
-                    long count = dataSnapshot.getValue(Long.class);
-                    if (count == 1) {
-                        likesCount.setText(getString(R.string.like_singular));
-                    } else {
-                        likesCount.setText(getString(R.string.likes_plural, count + ""));
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        mTotalLikesRef.addValueEventListener(mTotalLikesEventListener);
-        likesParent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Fragment fragment = new UserLikedUserFragment();
-                Bundle bundle = new Bundle();
-                bundle.putInt(Constants.KEY_USERID, sUserid);
-                bundle.putString(Constants.KEY_USERNAME, sUsername);
-                fragment.setArguments(bundle);
-                getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim
-                        .slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment,
-                        UserLikedUserFragment.TAG).addToBackStack(null).commit();
-
-            }
-        });
-    }
-
     @Override
     public PrivateChatViewModel getViewModel() {
         return (privateChatViewModel = ViewModelProviders.of(this, viewModelFactory).get(PrivateChatViewModel.class));
@@ -1044,8 +819,8 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
     @Override
     public void setCurrentFriendlyMessage(int position) {
-        MLog.d(TAG,"A kevin scroll: "+(position + 1) + " text: "+ messagesAdapter.peekLastMessage());
-        binding.messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount()-1);
+        MLog.d(TAG, "A kevin scroll: " + (position + 1) + " text: " + messagesAdapter.peekLastMessage());
+        binding.messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
     }
 
     @Override
@@ -1118,7 +893,10 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
                 Toast.makeText(PrivateChatActivity.this, "Could not read photo", Toast.LENGTH_SHORT).show();
                 return false;
             }
-        }).observeOn(schedulerProvider.ui()).subscribeOn(schedulerProvider.ui()).subscribe());
+        })
+        .observeOn(schedulerProvider.ui())
+        .subscribeOn(schedulerProvider.ui())
+        .subscribe());
     }
 
     @Override
@@ -1261,7 +1039,7 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
 
     @Override
     public void onReceiveAd(AdDownloaderInterface adDownloaderInterface, ReceivedBannerInterface receivedBanner) throws AdReceiveFailed {
-        if(receivedBanner.getErrorCode() != ErrorCode.NO_ERROR){
+        if (receivedBanner.getErrorCode() != ErrorCode.NO_ERROR) {
             setVisibleAd(false);
             adsHelper.loadAd(this);
         } else {
@@ -1314,11 +1092,11 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
                 super.onItemRangeInserted(positionStart, itemCount);
                 int friendlyMessageCount = messagesAdapter.getItemCount();
                 int lastVisiblePosition = linearLayoutManager.findLastVisibleItemPosition();
-                MLog.d(TAG,"scroll debug: lastVisiblePosition: "+lastVisiblePosition + " text: "+ messagesAdapter.peekLastMessage()
-                        +" positionStart: "+positionStart + " friendlyMessageCount: "+friendlyMessageCount);
-                if (lastVisiblePosition == -1 || ((lastVisiblePosition+4) >=  positionStart)) {
-                    MLog.d(TAG,"B kevin scroll: "+(positionStart) + " text: "+ messagesAdapter.peekLastMessage());
-                    binding.messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount()-1);
+                MLog.d(TAG, "scroll debug: lastVisiblePosition: " + lastVisiblePosition + " text: " + messagesAdapter.peekLastMessage()
+                        + " positionStart: " + positionStart + " friendlyMessageCount: " + friendlyMessageCount);
+                if (lastVisiblePosition == -1 || ((lastVisiblePosition + 4) >= positionStart)) {
+                    MLog.d(TAG, "B kevin scroll: " + (positionStart) + " text: " + messagesAdapter.peekLastMessage());
+                    binding.messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
                 }
                 notifyPagerAdapterDataSetChanged();
             }
@@ -1513,14 +1291,14 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
             @Override
             public void onClick(View view) {
                 final String text = mMessageEditText.getText().toString();
-                validateBeforeSendText(text, false);
+                privateChatViewModel.validateMessage(text, false);
             }
         });
         binding.sendButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
                 final String text = mMessageEditText.getText().toString();
-                validateBeforeSendText(text, true);
+                privateChatViewModel.validateMessage(text, true);
                 return true;
             }
         });
@@ -1553,38 +1331,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
                 return true;
             }
         });
-    }
-
-    private boolean validateBeforeSendText(final String text, boolean showOptions) {
-        if (StringUtil.isEmpty(text)) {
-            return false;
-        }
-        if (isNeedsDp())
-            return false;
-        final FriendlyMessage friendlyMessage = new FriendlyMessage(text,
-                privateChatViewModel.myUsername(),
-                privateChatViewModel.myUserid(),
-                privateChatViewModel.myDpid(), null,
-                false, false, null, System.currentTimeMillis());
-        if (!showOptions) {
-            sendText(friendlyMessage);
-            return true;
-        }
-        new MessageOptionsDialogHelper().showSendOptions(PrivateChatActivity.this, binding.sendButton, friendlyMessage, new
-                MessageOptionsDialogHelper.SendOptionsListener() {
-                    @Override
-                    public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
-                        friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
-                        sendText(friendlyMessage);
-                    }
-
-                    @Override
-                    public void onSendOneTimeRequested(FriendlyMessage friendlyMessage) {
-                        friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
-                        sendText(friendlyMessage);
-                    }
-                });
-        return true;
     }
 
     private boolean isNeedsDp() {
@@ -1639,10 +1385,6 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         new AttachPhotoOptionsDialogHelper(this, this).showBottomDialog();
     }
 
-    protected BlockedUserListener getBlockedUserListener() {
-        return mBlockedUserListener;
-    }
-
     private BlockedUserListener mBlockedUserListener = new BlockedUserListener() {
         @Override
         public void onUserBlocked(int userid) {
@@ -1685,7 +1427,8 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
         return mToolbar;
     }
 
-    protected void showTypingDots() {
+    @Override
+    public void showTypingDots() {
         showDotsParent(true);
         mDotsHandler.removeCallbacks(mDotsHideRunner);
         mDotsHandler.postDelayed(mDotsHideRunner, firebaseRemoteConfig.getLong(Constants
@@ -1867,4 +1610,22 @@ public class PrivateChatActivity extends BaseActivity<ActivityPrivateChatBinding
             }
         }).show();
     }
+
+    @Override
+    public void showLikesCount(int count) {
+        final View likesParent = findViewById(R.id.likesParent);
+        final TextView likesCount = findViewById(R.id.likesCount);
+
+        if (likesParent.getVisibility() != View.VISIBLE) {
+            likesParent.setVisibility(View.VISIBLE);
+            likesCount.setVisibility(View.VISIBLE);
+        }
+
+        if (count == 1) {
+            likesCount.setText(getString(R.string.like_singular));
+        } else {
+            likesCount.setText(getString(R.string.likes_plural, count + ""));
+        }
+    }
+
 }

@@ -11,7 +11,7 @@ import com.instachat.android.di.component.DaggerAppComponent;
 import javax.inject.Inject;
 
 /**
- * @author kkawai`
+ * @author kkawai
  */
 public class MyNetworkImageView extends NetworkImageView {
 

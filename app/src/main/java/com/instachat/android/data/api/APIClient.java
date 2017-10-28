@@ -27,6 +27,10 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * Now deprecated; see {@link NetworkModule}
+ */
+@Deprecated
 public final class APIClient {
 
    private static final String TAG = "APIClient";

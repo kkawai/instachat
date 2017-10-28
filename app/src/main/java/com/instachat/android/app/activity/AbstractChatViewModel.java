@@ -27,10 +27,9 @@ import com.instachat.android.util.rx.SchedulerProvider;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Predicate;
 
 public abstract class AbstractChatViewModel<Navigator extends AbstractChatNavigator> extends BaseViewModel<Navigator> {
 
@@ -107,11 +106,11 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
 
     private void applyRetrievedLengthLimit(FirebaseRemoteConfig firebaseRemoteConfig) {
         long maxMessageLength = firebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_LENGTH);
-        getNavigator().setMaxMessageLength((int)maxMessageLength);
+        getNavigator().setMaxMessageLength((int) maxMessageLength);
     }
 
     public MessagesRecyclerAdapter getMessagesAdapter(FirebaseRemoteConfig firebaseRemoteConfig,
-                                                                 MessagesRecyclerAdapterHelper map) {
+                                                      MessagesRecyclerAdapterHelper map) {
         messagesAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class,
                 R.layout.item_message,
                 MessageViewHolder.class,
@@ -137,23 +136,29 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
      * just hide.
      */
     public void smallProgressCheck() {
-        add(Observable.interval(0, 1000, TimeUnit.MILLISECONDS, getSchedulerProvider().io())
-                .take(5)
+
+        //keep checking every half second if message adapter has messages
+        //for up to 5 seconds.  close the smallProgressCircle as soon as
+        //messages are detected or 5 seconds has elapsed, whichever comes
+        //first.
+        add(Observable.interval(500,500, TimeUnit.MILLISECONDS)
+                .subscribeOn(getSchedulerProvider().io())
                 .observeOn(getSchedulerProvider().ui())
+                .take(10).takeUntil(new Predicate<Long>() {
+                    @Override
+                    public boolean test(Long aLong) throws Exception {
+                        return (messagesAdapter.getItemCount() > 0);
+                    }
+                })
                 .doOnComplete(new Action() {
+
                     @Override
                     public void run() throws Exception {
                         getNavigator().hideSmallProgressCircle();
                     }
                 })
-                .subscribe(new Consumer<Long>() {
-                    @Override
-                    public void accept(Long value) throws Exception {
-                        if (messagesAdapter.getItemCount() > 0) {
-                            getNavigator().hideSmallProgressCircle();
-                        }
-                    }
-                }));
+                .subscribe());
+
     }
 
     public Integer myUserid() {

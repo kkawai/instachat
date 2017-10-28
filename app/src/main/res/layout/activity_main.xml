@@ -149,41 +149,6 @@
                         android:layout_weight="1"
                         android:orientation="horizontal"/>
 
-                    <!--<EditText-->
-                    <!--android:id="@+id/messageEditText"-->
-                    <!--android:layout_width="0dp"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_gravity="center_vertical"-->
-                    <!--android:layout_marginLeft="10dp"-->
-                    <!--android:layout_marginRight="10dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:backgroundTint="@color/jonPink"-->
-                    <!--android:hint="@string/message_hint"-->
-                    <!--android:imeOptions="actionSend|flagNoEnterAction"-->
-                    <!--android:inputType="textShortMessage|textAutoCorrect|textCapSentences|textMultiLine"/>-->
-
-                    <!-- at.markushi.ui.CircleButton
-                    <at.markushi.ui.CircleButton
-                        android:enabled="false"
-                        android:id="@+id/sendButton"
-                        android:layout_width="50dip"
-                        android:layout_height="50dip"
-                        android:src="@drawable/ic_send_black_24dp"
-                        app:cb_color="#cfd8dc"
-                        app:cb_pressedRingWidth="8dip"
-                        android:layout_gravity="bottom"/> -->
-
-                    <!-- <android.support.design.widget.FloatingActionButton
-                        android:enabled="false"
-                        android:id="@+id/sendButton"
-                        android:layout_width="@dimen/send_button_size"
-                        android:layout_height="@dimen/send_button_size"
-                        android:src="@drawable/ic_send_black_24dp"
-                        android:layout_gravity="bottom"
-                        android:background="@null"
-                        app:rippleColor="@color/colorPrimaryDark"
-                        app:useCompatPadding="true"
-                        />-->
                     <com.github.clans.fab.FloatingActionButton
                         android:id="@+id/sendButton"
                         android:layout_width="@dimen/send_button_size"

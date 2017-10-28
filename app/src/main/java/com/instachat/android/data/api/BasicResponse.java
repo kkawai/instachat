@@ -6,4 +6,7 @@ public class BasicResponse {
 
     @SerializedName("status")
     public String status;
+
+    @SerializedName("descr")
+    public String descr;
 }
