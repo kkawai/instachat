@@ -16,6 +16,7 @@ import com.instachat.android.app.activity.group.LogoutDialogHelper;
 import com.instachat.android.app.adapter.ChatSummariesRecyclerAdapter;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
 import com.instachat.android.app.adapter.UserPresenceManager;
+import com.instachat.android.app.blocks.BlockUserDialogHelper;
 import com.instachat.android.data.AppDataManager;
 import com.instachat.android.data.DataManager;
 import com.instachat.android.data.api.NetworkApi;

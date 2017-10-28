@@ -1,6 +1,7 @@
 package com.instachat.android.app.activity.group;
 
 import android.support.annotation.NonNull;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -12,13 +13,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
+import com.instachat.android.R;
 import com.instachat.android.app.activity.AbstractChatViewModel;
 import com.instachat.android.data.DataManager;
-import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.data.model.User;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.rx.SchedulerProvider;
 
@@ -28,7 +28,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
 
 public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator> {
 
@@ -43,6 +42,8 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
     private Map<String, Object> mMeTypingMap = new HashMap<>(3);
     private DatabaseReference mGroupSummaryRef;
     private ValueEventListener mGroupSummaryListener;
+    private DatabaseReference mRightRef;
+    private ValueEventListener mRightListener;
 
     public GroupChatViewModel(DataManager dataManager,
                               SchedulerProvider schedulerProvider,
@@ -140,6 +141,8 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
     public void cleanup() {
         if (mTypingInRoomReference != null && mTypingInRoomEventListener != null)
             mTypingInRoomReference.removeEventListener(mTypingInRoomEventListener);
+        if (mRightRef != null && mRightListener != null)
+            mRightRef.removeEventListener(mRightListener);
     }
 
     public void removeGroupInfoListener() {
@@ -277,5 +280,32 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
             return arrayList;
         }
     }*/
+
+    public void fetchGroupName() {
+        mRightRef = firebaseDatabase.getReference(Constants.GROUP_CHAT_ROOMS).child
+                (getGroupId() + "");
+        mRightListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                MLog.d(TAG, "setupRightDrawerContent() dataSnapshot: ", dataSnapshot);
+                GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
+                if (groupChatSummary == null || groupChatSummary.getName() == null) {
+                    /*
+                     * group was deleted; go to the global default public room
+                     */
+                    getNavigator().showGroupChatActivity(Constants.DEFAULT_PUBLIC_GROUP_ID, "Main", null,
+                            null);
+                    return;
+                }
+                getNavigator().showGroupName(groupChatSummary.getName());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        mRightRef.addValueEventListener(mRightListener);
+    }
 
 }

@@ -38,17 +38,6 @@ Document differences between activity_main.xml here:
             android:background="@color/chat_background_screen_color"
             tools:context="com.instachat.PrivateChatActivity">
 
-            <!--
-            <com.google.android.gms.ads.AdView
-                android:id="@+id/adView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                ads:adSize="BANNER"
-                ads:adUnitId="@string/banner_ad_unit_id">
-            </com.google.android.gms.ads.AdView> -->
-
             <android.support.design.widget.CoordinatorLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -114,16 +103,6 @@ Document differences between activity_main.xml here:
                         app:civ_border_overlay="true"
                         app:civ_border_width="0px"/>
 
-                    <!--
-                    <com.instachat.android.view.AnimatedDotLoadingView
-                        android:id="@+id/text_dot_loader"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        app:color_array="@array/dot_colors"
-                        app:dot_radius="4dp"
-                        android:layout_marginLeft="4dp"
-                        app:number_of_dots="3"/> -->
                     <com.github.silvestrpredko.dotprogressbar.DotProgressBar
                         android:id="@+id/dot_progress_bar"
                         android:layout_width="30dp"
@@ -142,19 +121,6 @@ Document differences between activity_main.xml here:
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
-
-                    <!--
-                    <android.support.design.widget.FloatingActionButton
-                        android:enabled="false"
-                        android:id="@+id/attachButton"
-                        android:layout_width="@dimen/send_button_size"
-                        android:layout_height="@dimen/send_button_size"
-                        android:src="@drawable/ic_photo_camera_black_24dp"
-                        android:layout_gravity="bottom"
-                        android:background="@null"
-                        app:rippleColor="@color/colorPrimaryDark"
-                        app:useCompatPadding="true"
-                        />-->
 
                     <com.github.clans.fab.FloatingActionButton
                         android:id="@+id/attachButton"
@@ -180,28 +146,6 @@ Document differences between activity_main.xml here:
                         android:layout_weight="1"
                         android:orientation="horizontal"/>
 
-                    <!-- at.markushi.ui.CircleButton
-                    <at.markushi.ui.CircleButton
-                        android:enabled="false"
-                        android:id="@+id/sendButton"
-                        android:layout_width="50dip"
-                        android:layout_height="50dip"
-                        android:src="@drawable/ic_send_black_24dp"
-                        app:cb_color="#cfd8dc"
-                        app:cb_pressedRingWidth="8dip"
-                        android:layout_gravity="bottom"/> -->
-
-                    <!-- <android.support.design.widget.FloatingActionButton
-                        android:enabled="false"
-                        android:id="@+id/sendButton"
-                        android:layout_width="@dimen/send_button_size"
-                        android:layout_height="@dimen/send_button_size"
-                        android:src="@drawable/ic_send_black_24dp"
-                        android:layout_gravity="bottom"
-                        android:background="@null"
-                        app:rippleColor="@color/colorPrimaryDark"
-                        app:useCompatPadding="true"
-                        />-->
                     <com.github.clans.fab.FloatingActionButton
                         android:id="@+id/sendButton"
                         android:layout_width="@dimen/send_button_size"

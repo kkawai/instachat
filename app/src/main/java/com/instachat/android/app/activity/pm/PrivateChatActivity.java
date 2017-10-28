@@ -10,43 +10,24 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.NavigationView;
-import android.support.v13.view.inputmethod.EditorInfoCompat;
-import android.support.v13.view.inputmethod.InputConnectionCompat;
-import android.support.v13.view.inputmethod.InputContentInfoCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.AppCompatEditText;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.InputFilter;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputConnection;
-import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.brandongogetap.stickyheaders.StickyLayoutManager;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -54,15 +35,8 @@ import com.instachat.android.BR;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.app.activity.AbstractChatActivity;
-import com.instachat.android.app.activity.AbstractChatNavigator;
 import com.instachat.android.app.activity.AttachPhotoOptionsDialogHelper;
-import com.instachat.android.app.activity.LeftDrawerEventListener;
-import com.instachat.android.app.activity.LeftDrawerHelper;
-import com.instachat.android.app.activity.PhotoUploadHelper;
-import com.instachat.android.app.activity.group.GroupChatActivity;
-import com.instachat.android.app.adapter.ChatsItemClickedListener;
 import com.instachat.android.app.adapter.FriendlyMessageListener;
-import com.instachat.android.app.adapter.MessageTextClickedListener;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.blocks.BlockUserDialogHelper;
@@ -70,19 +44,12 @@ import com.instachat.android.app.blocks.BlockedUserListener;
 import com.instachat.android.app.blocks.BlocksFragment;
 import com.instachat.android.app.blocks.ReportUserDialogHelper;
 import com.instachat.android.app.fullscreen.FriendlyMessageContainer;
-import com.instachat.android.app.fullscreen.FullScreenTextFragment;
 import com.instachat.android.app.likes.UserLikedUserFragment;
-import com.instachat.android.app.likes.UserLikedUserListener;
-import com.instachat.android.app.login.SignInActivity;
-import com.instachat.android.app.requests.RequestsFragment;
 import com.instachat.android.data.api.UploadListener;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
-import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.data.model.User;
 import com.instachat.android.databinding.ActivityPrivateChatBinding;
-import com.instachat.android.font.FontUtil;
-import com.instachat.android.messaging.NotificationHelper;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.ScreenUtil;
@@ -98,16 +65,12 @@ import com.tooltip.Tooltip;
 
 import org.json.JSONException;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.reactivex.Observable;
 import io.reactivex.functions.Action;
-import pub.devrel.easypermissions.EasyPermissions;
 
 /**
  * Created by kevin on 9/16/2016.
@@ -119,11 +82,9 @@ import pub.devrel.easypermissions.EasyPermissions;
  * Private needs to fetch partner user from network api
  */
 public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateChatBinding, PrivateChatViewModel> implements GoogleApiClient.OnConnectionFailedListener,
-        FriendlyMessageContainer, EasyPermissions.PermissionCallbacks, UploadListener, UserClickedListener,
-        ChatsItemClickedListener, FriendlyMessageListener, AttachPhotoOptionsDialogHelper.PhotoOptionsListener,
+        FriendlyMessageContainer, UploadListener, UserClickedListener,
+        FriendlyMessageListener, AttachPhotoOptionsDialogHelper.PhotoOptionsListener,
         AdListenerInterface, PrivateChatNavigator {
-
-    private static final int REQUEST_INVITE = 1;
 
     private static final String TAG = "PrivateChatActivity";
     private ImageView mProfilePic;
@@ -137,9 +98,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
     @Inject
     ViewModelProvider.Factory viewModelFactory;
 
-    @Inject
-    LinearLayoutManager linearLayoutManager;
-
     //@Override
     protected void setVisibleAd(boolean visibleAd) {
         binding.setVisibleAd(visibleAd);
@@ -152,18 +110,13 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         privateChatViewModel.setNavigator(this);
         initDatabaseRef();
         binding = getViewDataBinding();
-
         initPhotoHelper(savedInstanceState);
         setupDrawers();
         setupToolbar();
 
         gcmHelper.onCreate(this);
 
-        linearLayoutManager.setStackFromEnd(true);
-
-        NotificationHelper.createNotificationChannels(this);
-
-        initFirebaseAdapter();
+        initFirebaseAdapter(binding.fragmentContent, binding.messageRecyclerView,this, linearLayoutManager);
         binding.messageRecyclerView.setLayoutManager(linearLayoutManager);
         binding.messageRecyclerView.setAdapter(messagesAdapter);
 
@@ -286,16 +239,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
                             tooltip.dismiss();
                     }
                 }).subscribe());
-    }
-
-    @Override
-    public void showErrorToast(String extra) {
-        try {
-            Toast.makeText(PrivateChatActivity.this, getString(R.string.general_api_error, extra), Toast
-                    .LENGTH_SHORT).show();
-        } catch (Exception e) {
-            MLog.e(TAG, "", e);
-        }
     }
 
     private void toggleAppbar() {
@@ -498,16 +441,16 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
                     toggleAppbar();
                 return true;
             case R.id.menu_block_user:
-                new BlockUserDialogHelper().showBlockUserQuestionDialog(this, sUserid, sUsername, sProfilePicUrl, mBlockedUserListener);
+                new BlockUserDialogHelper(firebaseDatabase).showBlockUserQuestionDialog(this, sUserid, sUsername, sProfilePicUrl, mBlockedUserListener);
                 return true;
             case R.id.menu_report_user:
                 new ReportUserDialogHelper().showReportUserQuestionDialog(this, sUserid, sUsername, sProfilePicUrl);
                 return true;
             case R.id.menu_pending_requests:
-                onPendingRequestsClicked();
+                showPendingRequests();
                 return true;
             case R.id.menu_invite:
-                sendInvitation();
+                showAppInviteActivity();
                 return true;
             case R.id.menu_manage_blocks:
                 if (isLeftDrawerOpen()) {
@@ -523,7 +466,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         }
     }
 
-    //@Override
+    @Override
     protected void setToolbarOnClickListener(Toolbar toolbar) {
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -573,10 +516,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         if (UserPreferences.getInstance().getLastGroupChatRoomVisited() == groupChatSummary.getId()) {
             finish();
         }
-        closeBothDrawers();
-        GroupChatActivity.startGroupChatActivity(this, groupChatSummary.getId(), groupChatSummary.getName(), mSharePhotoUri, mShareText);
-        mSharePhotoUri = null;
-        mShareText = null;
+        super.onGroupChatClicked(groupChatSummary);
     }
 
     //@Override
@@ -604,10 +544,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         if (userid == sUserid) {
             expandAppBar();
         } else {
-            closeBothDrawers();
-            ScreenUtil.hideVirtualKeyboard(mMessageEditText);
-            PrivateChatActivity.startPrivateChatActivity(this, userid, username, dpid, false, transitionImageView, null,
-                    null);
+            super.onUserClicked(userid,username, dpid, transitionImageView);
         }
     }
 
@@ -673,69 +610,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
     }
 
     @Override
-    public void setCurrentFriendlyMessage(int position) {
-        MLog.d(TAG, "A kevin scroll: " + (position + 1) + " text: " + messagesAdapter.peekLastMessage());
-        binding.messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
-    }
-
-    @Override
-    public void onPermissionsGranted(int requestCode, List<String> perms) {
-        mPhotoUploadHelper.onPermissionsGranted(requestCode, perms);
-    }
-
-    @Override
-    public void onPermissionsDenied(int requestCode, List<String> perms) {
-    }
-
-    @Override
-    public void onPrivateChatClicked(PrivateChatSummary privateChatSummary) {
-        closeBothDrawers();
-        PrivateChatActivity.startPrivateChatActivity(this, Integer.parseInt(privateChatSummary.getId()),
-                privateChatSummary.getName(), privateChatSummary.getDpid(), false, null, mSharePhotoUri, mShareText);
-        mSharePhotoUri = null;
-        mShareText = null;
-    }
-
-    @Override
-    public FriendlyMessage getFriendlyMessage(int position) {
-        return (FriendlyMessage) messagesAdapter.getItem(position);
-    }
-
-    @Override
-    public String getFriendlyMessageDatabase() {
-        return privateChatViewModel.getDatabaseRoot();
-    }
-
-    @Override
-    public int getFriendlyMessageCount() {
-        return messagesAdapter.getItemCount();
-    }
-
-    @Override
-    public void onPhotoGallery() {
-        mPhotoUploadHelper.setStorageRefString(privateChatViewModel.getDatabaseRoot());
-        mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.chatRoomPhoto);
-        mPhotoUploadHelper.launchCamera(false);
-    }
-
-    @Override
-    public void onPhotoTake() {
-        mPhotoUploadHelper.setStorageRefString(privateChatViewModel.getDatabaseRoot());
-        mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.chatRoomPhoto);
-        mPhotoUploadHelper.launchCamera(true);
-    }
-
-    @Override
-    public void onFriendlyMessageFail(FriendlyMessage friendlyMessage) {
-        if (isActivityDestroyed())
-            return;
-        mMessageEditText.setText(friendlyMessage.getText());
-        new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE).setContentText(getString(R.string
-                .could_not_send_message)).show();
-        FirebaseAnalytics.getInstance(this).logEvent(Events.MESSAGE_FAILED, null);
-    }
-
-    @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         MLog.d(TAG, "onConnectionFailed:" + connectionResult);
     }
@@ -750,266 +624,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         }
     }
 
-    private void setupDrawers() {
-        drawerLayout = binding.drawerLayout;
-        setupLeftDrawerContent();
-    }
-
-    private void setupToolbar() {
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-
-        ActionBar ab = getSupportActionBar();
-        ab.setHomeAsUpIndicator(R.drawable.ic_menu);
-        ab.setDisplayHomeAsUpEnabled(true);
-        setupToolbarTitle(mToolbar);
-        setToolbarOnClickListener(mToolbar);
-    }
-
-    private void initFirebaseAdapter() {
-        messagesAdapter = privateChatViewModel.getMessagesAdapter(firebaseRemoteConfig, map);
-        messagesAdapter.setActivity(this, this, (FrameLayout) findViewById(R.id.fragment_content));
-        messagesAdapter.setMessageTextClickedListener(new MessageTextClickedListener() {
-            @Override
-            public void onMessageClicked(final int position) {
-                openFullScreenTextView(position);
-            }
-        });
-        messagesAdapter.setBlockedUserListener(mBlockedUserListener);
-        messagesAdapter.setFriendlyMessageListener(this);
-        messagesAdapter.setUserThumbClickedListener(this);
-        messagesAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-
-                super.onItemRangeInserted(positionStart, itemCount);
-                int friendlyMessageCount = messagesAdapter.getItemCount();
-                int lastVisiblePosition = linearLayoutManager.findLastVisibleItemPosition();
-                MLog.d(TAG, "scroll debug: lastVisiblePosition: " + lastVisiblePosition + " text: " + messagesAdapter.peekLastMessage()
-                        + " positionStart: " + positionStart + " friendlyMessageCount: " + friendlyMessageCount);
-                if (lastVisiblePosition == -1 || ((lastVisiblePosition + 4) >= positionStart)) {
-                    MLog.d(TAG, "B kevin scroll: " + (positionStart) + " text: " + messagesAdapter.peekLastMessage());
-                    binding.messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
-                }
-                notifyPagerAdapterDataSetChanged();
-            }
-
-            @Override
-            public void onItemRangeRemoved(int positionStart, int itemCount) {
-                super.onItemRangeRemoved(positionStart, itemCount);
-                notifyPagerAdapterDataSetChanged();
-            }
-        });
-    }
-
-    protected void openFullScreenTextView(final int startingPos) {
-        closeBothDrawers();
-        ScreenUtil.hideVirtualKeyboard(mMessageEditText);
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FullScreenTextFragment.TAG);
-        if (fragment != null) {
-            return;
-        }
-        fragment = new FullScreenTextFragment();
-        final Bundle args = new Bundle();
-        args.putInt(Constants.KEY_STARTING_POS, startingPos);
-        fragment.setArguments(args);
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim
-                .slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, FullScreenTextFragment.TAG)
-                .addToBackStack(null).commit();
-    }
-
-    private void notifyPagerAdapterDataSetChanged() {
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FullScreenTextFragment.TAG);
-        if (fragment == null) {
-            return;
-        }
-        ((FullScreenTextFragment) fragment).notifyDataSetChanged();
-    }
-
-    private EditText createEditTextWithContentMimeTypes(String[] contentMimeTypes) {
-        final CharSequence hintText;
-        final String[] mimeTypes;  // our own copy of contentMimeTypes.
-        if (contentMimeTypes == null || contentMimeTypes.length == 0) {
-            hintText = "MIME: []";
-            mimeTypes = new String[0];
-        } else {
-            hintText = "MIME: " + Arrays.toString(contentMimeTypes);
-            mimeTypes = Arrays.copyOf(contentMimeTypes, contentMimeTypes.length);
-        }
-        AppCompatEditText editText = new AppCompatEditText(this) {
-            @Override
-            public InputConnection onCreateInputConnection(EditorInfo editorInfo) {
-                final InputConnection ic = super.onCreateInputConnection(editorInfo);
-                EditorInfoCompat.setContentMimeTypes(editorInfo, mimeTypes);
-                final InputConnectionCompat.OnCommitContentListener callback =
-                        new InputConnectionCompat.OnCommitContentListener() {
-                            @Override
-                            public boolean onCommitContent(InputContentInfoCompat inputContentInfo,
-                                                           int flags, Bundle opts) {
-                                return PrivateChatActivity.this.onCommitContent(
-                                        inputContentInfo, flags, opts, mimeTypes);
-                            }
-                        };
-                return InputConnectionCompat.createWrapper(ic, editorInfo, callback);
-            }
-        };
-        editText.setHint(R.string.message_hint);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        editText.setLayoutParams(params);
-        return editText;
-    }
-
-    private boolean onCommitContent(InputContentInfoCompat inputContentInfo, int flags,
-                                    Bundle opts, String[] contentMimeTypes) {
-
-        boolean supported = false;
-        for (final String mimeType : contentMimeTypes) {
-            if (inputContentInfo.getDescription().hasMimeType(mimeType)) {
-                supported = true;
-                break;
-            }
-        }
-        if (!supported) {
-            return false;
-        }
-
-        return onCommitContentInternal(inputContentInfo, flags);
-    }
-
-    private boolean onCommitContentInternal(InputContentInfoCompat inputContentInfo, int flags) {
-        if ((flags & InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION) != 0) {
-            try {
-                inputContentInfo.requestPermission();
-            } catch (Exception e) {
-                Log.e(TAG, "InputContentInfoCompat#requestPermission() failed.", e);
-                return false;
-            }
-        }
-        Uri linkUri = inputContentInfo.getLinkUri();
-        if (inputContentInfo != null && inputContentInfo.getDescription() != null) {
-            if (inputContentInfo.getDescription().toString().contains("image/gif")) {
-                final FriendlyMessage friendlyMessage = new FriendlyMessage("",
-                        privateChatViewModel.myUsername(),
-                        privateChatViewModel.myUserid(),
-                        privateChatViewModel.myDpid(),
-                        linkUri.toString(), false, false, null, System.currentTimeMillis());
-                friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
-                messagesAdapter.sendFriendlyMessage(friendlyMessage);
-            }
-        }
-        return true;
-    }
-
-    private void setEnableSendButton(final boolean isEnable) {
-
-        if (isEnable && binding.sendButton.isEnabled() || !isEnable && !binding.sendButton.isEnabled())
-            return; //already set
-
-        binding.sendButton.setEnabled(isEnable);
-
-        final Animation hideAnimation = AnimationUtils.loadAnimation(PrivateChatActivity.this, R.anim.fab_scale_down);
-        final Animation showAnimation = AnimationUtils.loadAnimation(PrivateChatActivity.this, R.anim.fab_scale_up);
-
-        hideAnimation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                binding.sendButton.startAnimation(showAnimation);
-                //binding.sendButton.setEnabled(isEnable);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-            }
-        });
-        binding.sendButton.startAnimation(hideAnimation);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        MLog.d(TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
-        mPhotoUploadHelper.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_INVITE) {
-            if (resultCode == RESULT_OK) {
-                // Use Firebase Measurement to log that invitation was sent.
-                Bundle payload = new Bundle();
-                payload.putString(FirebaseAnalytics.Param.VALUE, "inv_sent");
-
-                // Check how many invitations were sent and log.
-                String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
-                MLog.d(TAG, "Invitations sent: " + ids.length);
-                payload.putInt("num_inv", ids.length);
-                payload.putString("username", privateChatViewModel.myUsername());
-                FirebaseAnalytics.getInstance(this).logEvent(FirebaseAnalytics.Event.SHARE, payload);
-            } else {
-                // Use Firebase Measurement to log that invitation was not sent
-                Bundle payload = new Bundle();
-                payload.putString(FirebaseAnalytics.Param.VALUE, "inv_not_sent");
-                FirebaseAnalytics.getInstance(this).logEvent(FirebaseAnalytics.Event.SHARE, payload);
-                // Sending failed or it was canceled, show failure message to the user
-                MLog.d(TAG, "Failed to send invitation.");
-            }
-        }
-
-    }
-
-    private boolean isNeedsDp() {
-
-        if (!TextUtils.isEmpty(privateChatViewModel.myDpid()))
-            return false;
-        new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE).setTitleText(this.getString(R.string
-                .display_photo_title)).setContentText(this.getString(R.string.display_photo)).setCancelText(this
-                .getString(android.R.string.cancel)).setConfirmText(this.getString(android.R.string.ok))
-                .showCancelButton(true).setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-            @Override
-            public void onClick(SweetAlertDialog sweetAlertDialog) {
-                sweetAlertDialog.cancel();
-            }
-        }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-            @Override
-            public void onClick(SweetAlertDialog sweetAlertDialog) {
-                sweetAlertDialog.dismiss();
-                if (isRightDrawerOpen())
-                    closeRightDrawer();
-                if (!isLeftDrawerOpen()) {
-                    openLeftDrawer();
-                }
-            }
-        }).show();
-        return true;
-    }
-
-    private void showFileOptions() {
-
-        /**
-         * if the keyboard is open, close it first before showing
-         * the bottom dialog otherwise there is flicker.
-         * The delay is bad, but it works for now.
-         */
-        if (mMessageEditText.hasFocus()) {
-            ScreenUtil.hideVirtualKeyboard(mMessageEditText);
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (isActivityDestroyed())
-                        return;
-                    showPhotoOptionsDialog();
-                }
-            }, 175);
-        } else {
-            showPhotoOptionsDialog();
-        }
-    }
-
-    private void showPhotoOptionsDialog() {
-        new AttachPhotoOptionsDialogHelper(this, this).showBottomDialog();
-    }
-
     private BlockedUserListener mBlockedUserListener = new BlockedUserListener() {
         @Override
         public void onUserBlocked(int userid) {
@@ -1022,34 +636,15 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         }
     };
 
-    private void onPendingRequestsClicked() {
-        closeLeftDrawer();
-        Fragment fragment = new RequestsFragment();
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim
-                .slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, RequestsFragment.TAG)
-                .addToBackStack(null).commit();
-    }
-
-    protected void sendInvitation() {
-        Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title)).setMessage
-                (getString(R.string.invitation_message)).setCallToActionText(getString(R.string.invitation_cta))
-                .build();
-        startActivityForResult(intent, REQUEST_INVITE);
-    }
-
     protected void onUserUnblocked(int userid) {
         Bundle payload = new Bundle();
-        payload.putString("by", privateChatViewModel.myUsername());
+        payload.putString("by", getViewModel().myUsername());
         payload.putInt("userid", userid);
         FirebaseAnalytics.getInstance(this).logEvent(Events.USER_UNBLOCKED, payload);
     }
 
     protected int getToolbarHeight() {
         return mToolbar.getHeight();
-    }
-
-    protected Toolbar getToolbar() {
-        return mToolbar;
     }
 
     @Override
@@ -1094,100 +689,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         }
     }
 
-    private void setupToolbarTitle(Toolbar toolbar) {
-        for (int i = 0; i < toolbar.getChildCount(); i++) {
-            View view = toolbar.getChildAt(i);
-            if (view instanceof TextView) {
-                FontUtil.setTextViewFont((TextView) view);
-                break;
-            }
-        }
-    }
-
-    private void setupLeftDrawerContent() {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        if (navigationView == null)
-            return;
-        View headerView = getLayoutInflater().inflate(R.layout.left_nav_header, navigationView, false);
-        View drawerView = getLayoutInflater().inflate(R.layout.left_drawer_layout, navigationView, false);
-        navigationView.addView(drawerView);
-        navigationView.addHeaderView(headerView);
-        mLeftDrawerHelper = new LeftDrawerHelper(networkApi, this, this, binding.drawerLayout, mLeftDrawerEventListener);
-        mLeftDrawerHelper.setup(navigationView);
-        mLeftDrawerHelper.setUserLikedUserListener(mUserLikedUserListener);
-
-        chatsRecyclerViewAdapter.setup(this, this, true);
-        RecyclerView recyclerView = (RecyclerView) drawerView.findViewById(R.id.drawerRecyclerView);
-        recyclerView.setLayoutManager(new StickyLayoutManager(this, chatsRecyclerViewAdapter));
-        recyclerView.setAdapter(chatsRecyclerViewAdapter);
-        chatsRecyclerViewAdapter.populateData();
-    }
-
-    private LeftDrawerEventListener mLeftDrawerEventListener = new LeftDrawerEventListener() {
-        @Override
-        public void onProfilePicChangeRequest(boolean isLaunchCamera) {
-            PrivateChatActivity.this.onProfilePicChangeRequest(isLaunchCamera);
-        }
-
-        @Override
-        public void onPendingRequestsClicked() {
-            PrivateChatActivity.this.onPendingRequestsClicked();
-        }
-
-        @Override
-        public void onPendingRequestsAvailable() {
-            mIsPendingRequestsAvailable = true;
-            ActionBar ab = getSupportActionBar();
-            if (ab != null)
-                ab.setHomeAsUpIndicator(R.drawable.ic_menu_new);
-        }
-
-        @Override
-        public void onPendingRequestsCleared() {
-            mIsPendingRequestsAvailable = false;
-            ActionBar ab = getSupportActionBar();
-            if (ab != null)
-                ab.setHomeAsUpIndicator(R.drawable.ic_menu);
-        }
-    };
-
-    private void onProfilePicChangeRequest(boolean isLaunchCamera) {
-        mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.userProfilePhoto);
-        mPhotoUploadHelper.setStorageRefString(Constants.DP_STORAGE_BASE_REF(privateChatViewModel.myUserid()));
-        mPhotoUploadHelper.launchCamera(isLaunchCamera);
-    }
-
-    private UserLikedUserListener mUserLikedUserListener = new UserLikedUserListener() {
-        @Override
-        public void onMyLikersClicked() {
-            Fragment fragment = new UserLikedUserFragment();
-            Bundle bundle = new Bundle();
-            bundle.putInt(Constants.KEY_USERID, privateChatViewModel.myUserid());
-            bundle.putString(Constants.KEY_USERNAME, privateChatViewModel.myUsername());
-            fragment.setArguments(bundle);
-            getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R
-                    .anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, UserLikedUserFragment
-                    .TAG).addToBackStack(null).commit();
-        }
-    };
-
-    /**
-     * Implementation of {@link AbstractChatNavigator}
-     */
-    @Override
-    public void showSignIn() {
-        startActivity(new Intent(this, SignInActivity.class));
-        finish();
-    }
-
-    /**
-     * Implementation of {@link AbstractChatNavigator}
-     */
-    @Override
-    public void setMaxMessageLength(int maxMessageLength) {
-        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxMessageLength)});
-    }
-
     @Override
     public void showCannotChatWithBlockedUser(String username) {
         Toast.makeText(PrivateChatActivity.this,
@@ -1216,5 +717,11 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
             likesCount.setText(getString(R.string.likes_plural, count + ""));
         }
     }
+
+    @Override
+    protected void toggleRightDrawer() {
+
+    }
+
 
 }

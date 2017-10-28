@@ -7,4 +7,6 @@ public interface GroupChatNavigator extends AbstractChatNavigator {
     void showUserTyping(String username);
     void showSubtitle();
     void removeUserFromAllGroups(int userid, long exceptionGroupId);
+    void showManageBlocks();
+    void showGroupName(String groupName);
 }

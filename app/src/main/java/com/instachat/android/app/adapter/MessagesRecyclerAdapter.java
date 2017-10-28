@@ -45,9 +45,9 @@ import com.instachat.android.data.db.OneTimeMessageDb;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.TimeUtil;
+import com.instachat.android.util.UserPreferences;
 import com.tooltip.Tooltip;
 
 import java.lang.ref.WeakReference;
@@ -643,7 +643,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
             @Override
             public void onBlockPersonRequested(final FriendlyMessage friendlyMessage) {
-                new BlockUserDialogHelper().showBlockUserQuestionDialog(mActivity.get(),
+                new BlockUserDialogHelper(FirebaseDatabase.getInstance()).showBlockUserQuestionDialog(mActivity.get(),
                         friendlyMessage.getUserid(),
                         friendlyMessage.getName(),
                         friendlyMessage.getDpid(),

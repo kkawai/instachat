@@ -1,7 +1,6 @@
 package com.instachat.android.app.activity;
 
-import android.support.annotation.NonNull;
-import android.support.v4.widget.DrawerLayout;
+import android.net.Uri;
 
 import com.instachat.android.data.model.FriendlyMessage;
 
@@ -16,4 +15,8 @@ public interface AbstractChatNavigator {
     void showSendOptions(FriendlyMessage friendlyMessage);
     void sendText(FriendlyMessage friendlyMessage);
     void showNeedPhotoDialog();
+    void showTypingDots();
+    void showErrorToast(String message);
+    void showGroupChatActivity(long groupId, String groupName, Uri sharePhotoUri,
+                               String shareMessage);
 }

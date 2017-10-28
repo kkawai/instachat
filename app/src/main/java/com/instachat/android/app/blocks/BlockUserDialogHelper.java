@@ -15,6 +15,9 @@ import com.instachat.android.util.UserPreferences;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
@@ -22,6 +25,12 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
  */
 
 public class BlockUserDialogHelper {
+
+    private final FirebaseDatabase firebaseDatabase;
+
+    public BlockUserDialogHelper(FirebaseDatabase firebaseDatabase) {
+        this.firebaseDatabase = firebaseDatabase;
+    }
 
     public void showBlockUserQuestionDialog(final Activity activity,
                                             final int userid,
@@ -53,22 +62,14 @@ public class BlockUserDialogHelper {
                 map.put("name", username);
                 if (!TextUtils.isEmpty(dpid))
                     map.put("dpid", dpid);
-                FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF()).
+                firebaseDatabase.getReference(Constants.MY_BLOCKS_REF()).
                         child(userid + "").updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            /*new SweetAlertDialog(activity, SweetAlertDialog.SUCCESS_TYPE)
-                                    .setTitleText(activity.getString(R.string.success_exclamation))
-                                    .setContentText(activity.getString(R.string.block_person_success, username))
-                                    .show();*/
-                            /**
-                             * in this case, it's better to show the toast since blocking a user
-                             * happens in private chat, which will be finished
-                             */
                             Toast.makeText(activity, activity.getString(R.string.block_person_success, username), Toast.LENGTH_SHORT).show();
                             listener.onUserBlocked(userid);
-                            FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF())
+                            firebaseDatabase.getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF())
                                     .child(userid + "")
                                     .removeValue();
                         } else {
