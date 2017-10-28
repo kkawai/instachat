@@ -1,7 +1,5 @@
 package com.instachat.android.app.activity.group;
 
-import android.app.NotificationManager;
-import android.app.ProgressDialog;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -12,70 +10,45 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.v13.view.inputmethod.EditorInfoCompat;
-import android.support.v13.view.inputmethod.InputConnectionCompat;
-import android.support.v13.view.inputmethod.InputContentInfoCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputConnection;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.brandongogetap.stickyheaders.StickyLayoutManager;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.BR;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
-import com.instachat.android.app.MessageOptionsDialogHelper;
+import com.instachat.android.app.activity.AbstractChatActivity;
 import com.instachat.android.app.activity.AbstractChatNavigator;
-import com.instachat.android.app.activity.AdHelper;
 import com.instachat.android.app.activity.AttachPhotoOptionsDialogHelper;
-import com.instachat.android.app.activity.ExternalSendIntentConsumer;
 import com.instachat.android.app.activity.LeftDrawerEventListener;
 import com.instachat.android.app.activity.LeftDrawerHelper;
 import com.instachat.android.app.activity.PhotoUploadHelper;
-import com.instachat.android.app.activity.PresenceHelper;
 import com.instachat.android.app.activity.UsersInGroupListener;
 import com.instachat.android.app.activity.pm.PrivateChatActivity;
-import com.instachat.android.app.adapter.ChatSummariesRecyclerAdapter;
 import com.instachat.android.app.adapter.ChatsItemClickedListener;
 import com.instachat.android.app.adapter.FriendlyMessageListener;
 import com.instachat.android.app.adapter.GroupChatUsersRecyclerAdapter;
 import com.instachat.android.app.adapter.MessageTextClickedListener;
-import com.instachat.android.app.adapter.MessagesRecyclerAdapter;
-import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.blocks.BlocksFragment;
@@ -85,35 +58,25 @@ import com.instachat.android.app.likes.UserLikedUserFragment;
 import com.instachat.android.app.likes.UserLikedUserListener;
 import com.instachat.android.app.login.SignInActivity;
 import com.instachat.android.app.requests.RequestsFragment;
-import com.instachat.android.app.ui.base.BaseActivity;
-import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.api.UploadListener;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.data.model.PrivateChatSummary;
-import com.instachat.android.data.model.User;
 import com.instachat.android.databinding.ActivityMainBinding;
 import com.instachat.android.font.FontUtil;
-import com.instachat.android.gcm.GCMHelper;
-import com.instachat.android.messaging.InstachatMessagingService;
 import com.instachat.android.messaging.NotificationHelper;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.ScreenUtil;
-import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.UserPreferences;
-import com.instachat.android.util.rx.SchedulerProvider;
 import com.instachat.android.view.ThemedAlertDialog;
 import com.smaato.soma.AdDownloaderInterface;
 import com.smaato.soma.AdListenerInterface;
 import com.smaato.soma.ErrorCode;
 import com.smaato.soma.ReceivedBannerInterface;
 import com.smaato.soma.exception.AdReceiveFailed;
-import com.tooltip.Tooltip;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -123,26 +86,12 @@ import io.reactivex.Observable;
 import io.reactivex.functions.Action;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupChatViewModel> implements GoogleApiClient.OnConnectionFailedListener,
+public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding, GroupChatViewModel> implements GoogleApiClient.OnConnectionFailedListener,
         FriendlyMessageContainer, EasyPermissions.PermissionCallbacks, UploadListener, UserClickedListener,
         ChatsItemClickedListener, FriendlyMessageListener, AttachPhotoOptionsDialogHelper.PhotoOptionsListener,
         AdListenerInterface, GroupChatNavigator {
 
     private static final String TAG = "GroupChatActivity";
-
-    private static final int REQUEST_INVITE = 1;
-
-    @Inject
-    SchedulerProvider schedulerProvider;
-
-    @Inject
-    FirebaseRemoteConfig firebaseRemoteConfig;
-
-    @Inject
-    MessagesRecyclerAdapterHelper map;
-
-    @Inject
-    PresenceHelper presenceHelper;
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
@@ -150,39 +99,8 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     @Inject
     LinearLayoutManager linearLayoutManager;
 
-    MessagesRecyclerAdapter messagesAdapter;
-
-    @Inject
-    NetworkApi networkApi;
-
-    @Inject
-    GCMHelper gcmHelper;
-
-    @Inject
-    LogoutDialogHelper logoutDialogHelper;
-
-    @Inject
-    FirebaseAuth firebaseAuth;
-
-    @Inject
-    ChatSummariesRecyclerAdapter chatsRecyclerViewAdapter;
-
-    @Inject
-    AdHelper adsHelper;
-
-    private Toolbar mToolbar;
-
-    private EditText mMessageEditText;
-
-    private ProgressDialog mProgressDialog;
-
-    private PhotoUploadHelper mPhotoUploadHelper;
-    private LeftDrawerHelper mLeftDrawerHelper;
     private GroupChatUsersRecyclerAdapter mGroupChatUsersRecyclerAdapter;
-    private ExternalSendIntentConsumer mExternalSendIntentConsumer;
-    private Uri mSharePhotoUri;
-    private String mShareText;
-    private boolean mIsPendingRequestsAvailable;
+
     private ActivityMainBinding binding;
     private GroupChatViewModel groupChatViewModel;
 
@@ -210,72 +128,18 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         binding.setVisibleAd(true);
         adsHelper.loadAd(this);
 
-        mMessageEditText = createEditTextWithContentMimeTypes(
-                new String[]{"image/png", "image/gif", "image/jpeg", "image/webp"});
-        binding.messageEditTextParent.addView(mMessageEditText);
-        FontUtil.setTextViewFont(mMessageEditText);
-        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter((int) firebaseRemoteConfig
-                .getLong(Constants.KEY_MAX_MESSAGE_LENGTH))});
-        mMessageEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int before, int count) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-
-                int length = mMessageEditText.getText().toString().trim().length();
-                //MLog.i(TAG, "input onTextChanged() text [start]: " + start + " [before]: " + before + " [count]: "
-                // + count, " last delta: ", lastDelta, " length: ", length);
-
-                if (length > 0) {
-                    setEnableSendButton(true);
-                    groupChatViewModel.onMeTyping();
-                    showSendOptionsTooltip(binding.sendButton);
-                } else {
-                    setEnableSendButton(false);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
+        initMessageEditText(binding.sendButton, binding.messageEditTextParent);
         groupChatViewModel.fetchConfig(firebaseRemoteConfig);
-        initButtons();
+        initButtons(binding.sendButton, binding.attachButton);
 
         if (getIntent() != null && getIntent().hasExtra(Constants.KEY_GROUP_NAME)) {
             getSupportActionBar().setTitle(getIntent().getStringExtra(Constants.KEY_GROUP_NAME));
         }
 
-        mExternalSendIntentConsumer = new ExternalSendIntentConsumer(this);
-        mExternalSendIntentConsumer.setListener(new ExternalSendIntentConsumer.ExternalSendIntentListener() {
-            @Override
-            public void onHandleSendImage(final Uri imageUri) {
-                binding.drawerLayout.openDrawer(GravityCompat.START);
-                mSharePhotoUri = imageUri;
-            }
-
-            @Override
-            public void onHandleSendText(final String text) {
-                binding.drawerLayout.openDrawer(GravityCompat.START);
-                mShareText = text;
-            }
-        });
-        if (getIntent() != null && getIntent().hasExtra(Constants.KEY_SHARE_PHOTO_URI)) {
-            mPhotoUploadHelper.setStorageRefString(groupChatViewModel.getDatabaseRoot());
-            mPhotoUploadHelper.consumeExternallySharedPhoto((Uri) getIntent().getParcelableExtra(Constants
-                    .KEY_SHARE_PHOTO_URI));
-            getIntent().removeExtra(Constants.KEY_SHARE_PHOTO_URI);
-        }
-        if (getIntent() != null && getIntent().hasExtra(Constants.KEY_SHARE_MESSAGE)) {
-            mMessageEditText.setText(getIntent().getStringExtra(Constants.KEY_SHARE_MESSAGE));
-            getIntent().removeExtra(Constants.KEY_SHARE_MESSAGE);
-        }
+        initExternalSendIntentConsumer(binding.drawerLayout);
+        checkIncomingShareIntent();
         groupChatViewModel.listenForTyping();
-        final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.cancel(InstachatMessagingService.NOTIFICATION_ID_PENDING_REQUESTS);
-        notificationManager.cancel(InstachatMessagingService.NOTIFICATION_ID_FRIEND_JUMPED_IN);
+        cancelNotificationsDueToEntry();
         groupChatViewModel.smallProgressCheck();
     }
 
@@ -328,8 +192,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
             mLeftDrawerHelper.cleanup();
         if (chatsRecyclerViewAdapter != null)
             chatsRecyclerViewAdapter.cleanup();
-        if (mExternalSendIntentConsumer != null)
-            mExternalSendIntentConsumer.cleanup();
         if (mGroupChatUsersRecyclerAdapter != null)
             mGroupChatUsersRecyclerAdapter.cleanup();
         groupChatViewModel.cleanup();
@@ -349,122 +211,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         }
         groupChatViewModel.setDatabaseRoot(databaseRef);
         groupChatViewModel.setGroupId(groupId);
-    }
-
-    private void setEnableSendButton(final boolean isEnable) {
-
-        if (isEnable && binding.sendButton.isEnabled() || !isEnable && !binding.sendButton.isEnabled())
-            return; //already set
-
-        binding.sendButton.setEnabled(isEnable);
-
-        final Animation hideAnimation = AnimationUtils.loadAnimation(GroupChatActivity.this, R.anim.fab_scale_down);
-        final Animation showAnimation = AnimationUtils.loadAnimation(GroupChatActivity.this, R.anim.fab_scale_up);
-
-        hideAnimation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                binding.sendButton.startAnimation(showAnimation);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-            }
-        });
-        binding.sendButton.startAnimation(hideAnimation);
-    }
-
-    private void initPhotoHelper(Bundle savedInstanceState) {
-        mPhotoUploadHelper = new PhotoUploadHelper(this, this);
-        mPhotoUploadHelper.setStorageRefString(groupChatViewModel.getDatabaseRoot());
-        mPhotoUploadHelper.setPhotoUploadListener(this);
-        if (savedInstanceState != null && savedInstanceState.containsKey(Constants.KEY_PHOTO_TYPE)) {
-            PhotoUploadHelper.PhotoType photoType = PhotoUploadHelper.PhotoType.valueOf(savedInstanceState.getString
-                    (Constants.KEY_PHOTO_TYPE));
-            mPhotoUploadHelper.setPhotoType(photoType);
-            MLog.d(TAG, "initPhotoHelper: retrieved from saved instance state: " + photoType);
-        }
-    }
-
-    private void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            mProgressDialog.setIndeterminate(false);
-            mProgressDialog.setProgressNumberFormat("%1dk / %2dk");
-        }
-        mProgressDialog.show();
-    }
-
-    private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.dismiss();
-        }
-    }
-
-    private int mAttachPhotoMessageType;
-
-    private void initButtons() {
-        binding.sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final String text = mMessageEditText.getText().toString();
-                groupChatViewModel.validateMessage(text, false);
-            }
-        });
-        binding.sendButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                final String text = mMessageEditText.getText().toString();
-                groupChatViewModel.validateMessage(text, false);
-                return true;
-            }
-        });
-        binding.attachButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (StringUtil.isEmpty(groupChatViewModel.myDpid())) {
-                    showNeedPhotoDialog();
-                    return;
-                }
-                mAttachPhotoMessageType = FriendlyMessage.MESSAGE_TYPE_NORMAL;
-                showFileOptions();
-            }
-        });
-        binding.attachButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                new MessageOptionsDialogHelper().showSendOptions(GroupChatActivity.this, binding.attachButton, null, new
-                        MessageOptionsDialogHelper.SendOptionsListener() {
-                            @Override
-                            public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
-                                mAttachPhotoMessageType = FriendlyMessage.MESSAGE_TYPE_NORMAL;
-                                showFileOptions();
-                            }
-
-                            @Override
-                            public void onSendOneTimeRequested(FriendlyMessage friendlyMessage) {
-                                mAttachPhotoMessageType = FriendlyMessage.MESSAGE_TYPE_ONE_TIME;
-                                showFileOptions();
-                            }
-                        });
-                return true;
-            }
-        });
-    }
-
-    @Override
-    public void sendText(FriendlyMessage friendlyMessage) {
-        try {
-            messagesAdapter.sendFriendlyMessage(friendlyMessage);
-            mMessageEditText.setText("");//fast double taps on send can cause 2x sends!
-        } catch (Exception e) {
-            MLog.e(TAG, "", e);
-        }
     }
 
     /**
@@ -550,7 +296,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
                 groupChatViewModel.fetchConfig(firebaseRemoteConfig);
                 return true;
             case R.id.full_screen_texts_menu:
-                openFullScreenTextView(-1);
+                showFullScreenTextView(-1);
                 return true;
             case R.id.menu_pending_requests:
                 onPendingRequestsClicked();
@@ -596,16 +342,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
 
     }
 
-    private void showPhotoReduceError() {
-        add(Observable.fromCallable(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                Toast.makeText(GroupChatActivity.this, "Could not read photo", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        }).subscribeOn(schedulerProvider.ui()).observeOn(schedulerProvider.ui()).subscribe());
-    }
-
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         MLog.d(TAG, "onConnectionFailed:" + connectionResult);
@@ -636,6 +372,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     }
 
     private void setupDrawers() {
+        drawerLayout = binding.drawerLayout;
         setupLeftDrawerContent();
         setupRightDrawerContent();
     }
@@ -706,7 +443,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         RecyclerView rightDrawerRecyclerView = (RecyclerView) getLayoutInflater().inflate(R.layout.right_drawer_layout, binding.rightNavView, false);
         final View rightHeaderView = getLayoutInflater().inflate(R.layout.right_nav_header, binding.rightNavView, false);
 
-        mRightRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_ROOMS).child
+        mRightRef = firebaseDatabase.getReference(Constants.GROUP_CHAT_ROOMS).child
                 (groupChatViewModel.getGroupId() + "");
         mRightListener = new ValueEventListener() {
             @Override
@@ -743,47 +480,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         mGroupChatUsersRecyclerAdapter.populateData();
     }
 
-    private boolean isLeftDrawerOpen() {
-        return binding.drawerLayout != null && binding.drawerLayout.isDrawerOpen(GravityCompat.START);
-    }
-
-    private boolean isRightDrawerOpen() {
-        return binding.drawerLayout != null && binding.drawerLayout.isDrawerOpen(GravityCompat.END);
-    }
-
-    private void closeLeftDrawer() {
-        if (binding.drawerLayout != null)
-            binding.drawerLayout.closeDrawer(GravityCompat.START);
-    }
-
-    private void closeRightDrawer() {
-        if (binding.drawerLayout != null)
-            binding.drawerLayout.closeDrawer(GravityCompat.END);
-    }
-
-    private void openRightDrawer() {
-        if (binding.drawerLayout != null)
-            binding.drawerLayout.openDrawer(GravityCompat.END);
-    }
-
-    private void openLeftDrawer() {
-        if (binding.drawerLayout != null)
-            binding.drawerLayout.openDrawer(GravityCompat.START);
-    }
-
-    private boolean closeBothDrawers() {
-        boolean atLeastOneClosed = false;
-        if (isRightDrawerOpen()) {
-            closeRightDrawer();
-            atLeastOneClosed = true;
-        }
-        if (isLeftDrawerOpen()) {
-            closeLeftDrawer();
-            atLeastOneClosed = true;
-        }
-        return atLeastOneClosed;
-    }
-
     @Override
     public void onBackPressed() {
         if (closeBothDrawers()) {
@@ -796,7 +492,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         super.onBackPressed();
     }
 
-    protected void openFullScreenTextView(final int startingPos) {
+    private void showFullScreenTextView(final int startingPos) {
         closeBothDrawers();
         ScreenUtil.hideVirtualKeyboard(mMessageEditText);
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(FullScreenTextFragment.TAG);
@@ -882,7 +578,7 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         messagesAdapter.setMessageTextClickedListener(new MessageTextClickedListener() {
             @Override
             public void onMessageClicked(final int position) {
-                openFullScreenTextView(position);
+                showFullScreenTextView(position);
             }
         });
         messagesAdapter.setFriendlyMessageListener(this);
@@ -951,110 +647,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         mPhotoUploadHelper.setStorageRefString(groupChatViewModel.getDatabaseRoot());
         mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.chatRoomPhoto);
         mPhotoUploadHelper.launchCamera(true);
-    }
-
-    @Override
-    public void onErrorReducingPhotoSize() {
-        MLog.i(TAG, "onErrorReducingPhotoSize()");
-        if (isActivityDestroyed())
-            return;
-        showPhotoReduceError();
-    }
-
-    @Override
-    public void onPhotoUploadStarted() {
-        MLog.i(TAG, "onPhotoUploadStarted()");
-        if (isActivityDestroyed())
-            return;
-        showProgressDialog();
-    }
-
-    @Override
-    public void onPhotoUploadProgress(int max, int current) {
-        MLog.i(TAG, "onPhotoUploadProgress() " + current + " / " + max);
-        if (isActivityDestroyed())
-            return;
-        if (mProgressDialog != null) {
-            try {
-                mProgressDialog.setMax(max);
-                mProgressDialog.setProgress(current);
-            } catch (Exception e) {
-                MLog.e(TAG, "set photo upload progress failed ", e);
-            }
-        }
-    }
-
-    @Override
-    public void onPhotoUploadSuccess(String photoUrl, boolean isPossiblyAdultImage, boolean isPossiblyViolentImage) {
-        if (isActivityDestroyed()) {
-            return;
-        }
-        hideProgressDialog();
-
-        if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.chatRoomPhoto) {
-
-            final FriendlyMessage friendlyMessage = new FriendlyMessage("", groupChatViewModel.myUsername(), groupChatViewModel.myUserid(), groupChatViewModel.myDpid(),
-                    photoUrl, isPossiblyAdultImage, isPossiblyViolentImage, null, System.currentTimeMillis());
-            friendlyMessage.setMessageType(mAttachPhotoMessageType);
-            MLog.d(TAG, "uploadFromUri:onSuccess photoUrl: " + photoUrl, " debug possibleAdult: ", friendlyMessage
-                    .isPossibleAdultImage(), " parameter: ", isPossiblyAdultImage);
-            try {
-                messagesAdapter.sendFriendlyMessage(friendlyMessage);
-            } catch (final Exception e) {
-                MLog.e(TAG, "", e);
-            }
-
-        } else if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.userProfilePhoto) {
-
-            final User user = UserPreferences.getInstance().getUser();
-            user.setProfilePicUrl(photoUrl);
-            UserPreferences.getInstance().saveUser(user);
-            networkApi.saveUser(null, user, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    MLog.d(TAG, "saveUser() success via uploadFromUri(): " + response);
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    MLog.e(TAG, "saveUser() failed via uploadFromUri() ", error);
-                }
-            });
-            mLeftDrawerHelper.updateProfilePic(photoUrl);
-        }
-    }
-
-    @Override
-    public void showNeedPhotoDialog() {
-        new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE).setTitleText(this.getString(R.string
-                .display_photo_title)).setContentText(this.getString(R.string.display_photo)).setCancelText(this
-                .getString(android.R.string.cancel)).setConfirmText(this.getString(android.R.string.ok))
-                .showCancelButton(true).setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-            @Override
-            public void onClick(SweetAlertDialog sweetAlertDialog) {
-                sweetAlertDialog.cancel();
-            }
-        }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-            @Override
-            public void onClick(SweetAlertDialog sweetAlertDialog) {
-                sweetAlertDialog.dismiss();
-                if (isRightDrawerOpen())
-                    closeRightDrawer();
-                if (!isLeftDrawerOpen()) {
-                    openLeftDrawer();
-                }
-            }
-        }).show();
-    }
-
-    @Override
-    public void onPhotoUploadError(Exception exception) {
-        MLog.i(TAG, "onPhotoUploadError() ", exception);
-        if (isActivityDestroyed())
-            return;
-        hideProgressDialog();
-        new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE).setContentText(getString(R.string.error_send_photo))
-                .show();
     }
 
     @Override
@@ -1201,30 +793,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         }
     };
 
-    private boolean mShownSendOptionsProtips;
-
-    private void showSendOptionsTooltip(View anchor) {
-        //        if (UserPreferences.getInstance().hasShownToolbarProfileTooltip())
-        //            return;
-        //        UserPreferences.getInstance().setShownToolbarProfileTooltip(true);
-        if (mShownSendOptionsProtips) {
-            return;
-        }
-        mShownSendOptionsProtips = true;
-        final Tooltip tooltip = new Tooltip.Builder(anchor, R.style.drawer_tooltip_non_cancellable).setText(getString
-                (R.string.send_option_protips)).show();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isActivityDestroyed())
-                    return;
-                if (tooltip.isShowing())
-                    tooltip.dismiss();
-            }
-        }, 2000);
-
-    }
-
     private void onPendingRequestsClicked() {
         closeLeftDrawer();
         Fragment fragment = new RequestsFragment();
@@ -1300,83 +868,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
         }).show();
     }
 
-    private EditText createEditTextWithContentMimeTypes(String[] contentMimeTypes) {
-        final CharSequence hintText;
-        final String[] mimeTypes;  // our own copy of contentMimeTypes.
-        if (contentMimeTypes == null || contentMimeTypes.length == 0) {
-            hintText = "MIME: []";
-            mimeTypes = new String[0];
-        } else {
-            hintText = "MIME: " + Arrays.toString(contentMimeTypes);
-            mimeTypes = Arrays.copyOf(contentMimeTypes, contentMimeTypes.length);
-        }
-        AppCompatEditText editText = new AppCompatEditText(this) {
-            @Override
-            public InputConnection onCreateInputConnection(EditorInfo editorInfo) {
-                final InputConnection ic = super.onCreateInputConnection(editorInfo);
-                EditorInfoCompat.setContentMimeTypes(editorInfo, mimeTypes);
-                final InputConnectionCompat.OnCommitContentListener callback =
-                        new InputConnectionCompat.OnCommitContentListener() {
-                            @Override
-                            public boolean onCommitContent(InputContentInfoCompat inputContentInfo,
-                                                           int flags, Bundle opts) {
-                                return GroupChatActivity.this.onCommitContent(
-                                        inputContentInfo, flags, opts, mimeTypes);
-                            }
-                        };
-                return InputConnectionCompat.createWrapper(ic, editorInfo, callback);
-            }
-        };
-        editText.setHint(R.string.message_hint);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        editText.setLayoutParams(params);
-        return editText;
-    }
-
-    private boolean onCommitContent(InputContentInfoCompat inputContentInfo, int flags,
-                                    Bundle opts, String[] contentMimeTypes) {
-
-        boolean supported = false;
-        for (final String mimeType : contentMimeTypes) {
-            if (inputContentInfo.getDescription().hasMimeType(mimeType)) {
-                supported = true;
-                break;
-            }
-        }
-        if (!supported) {
-            return false;
-        }
-
-        return onCommitContentInternal(inputContentInfo, flags);
-    }
-
-    private boolean onCommitContentInternal(InputContentInfoCompat inputContentInfo, int flags) {
-        if ((flags & InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION) != 0) {
-            try {
-                inputContentInfo.requestPermission();
-            } catch (Exception e) {
-                Log.e(TAG, "InputContentInfoCompat#requestPermission() failed.", e);
-                return false;
-            }
-        }
-        Uri linkUri = inputContentInfo.getLinkUri();
-        //MLog.d(TAG, "linkUri: " + linkUri.toString() + ": " + inputContentInfo.getDescription().toString(), " : ",
-        // inputContentInfo);
-        if (inputContentInfo != null && inputContentInfo.getDescription() != null) {
-            if (inputContentInfo.getDescription().toString().contains("image/gif")) {
-                final FriendlyMessage friendlyMessage = new FriendlyMessage("",
-                        groupChatViewModel.myUsername(),
-                        groupChatViewModel.myUserid(),
-                        groupChatViewModel.myDpid(),
-                        linkUri.toString(), false, false, null, System.currentTimeMillis());
-                friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
-                messagesAdapter.sendFriendlyMessage(friendlyMessage);
-            }
-        }
-        return true;
-    }
-
     @Override
     public void onReceiveAd(AdDownloaderInterface adDownloaderInterface, ReceivedBannerInterface receivedBanner) throws AdReceiveFailed {
         if (receivedBanner.getErrorCode() != ErrorCode.NO_ERROR) {
@@ -1426,19 +917,6 @@ public class GroupChatActivity extends BaseActivity<ActivityMainBinding, GroupCh
     }
 
     public void showSendOptions(FriendlyMessage friendlyMessage) {
-        new MessageOptionsDialogHelper().showSendOptions(this, binding.sendButton, friendlyMessage, new
-                MessageOptionsDialogHelper.SendOptionsListener() {
-                    @Override
-                    public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
-                        friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
-                        sendText(friendlyMessage);
-                    }
-
-                    @Override
-                    public void onSendOneTimeRequested(FriendlyMessage friendlyMessage) {
-                        friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
-                        sendText(friendlyMessage);
-                    }
-                });
+        showSendOptions(friendlyMessage, binding.sendButton);
     }
 }

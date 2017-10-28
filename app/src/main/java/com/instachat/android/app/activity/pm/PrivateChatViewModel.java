@@ -37,6 +37,7 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
     private DatabaseReference mTotalLikesRef;
     private ValueEventListener mTotalLikesEventListener;
     private User toUser;
+    private long mLastTypingTime;
 
     public PrivateChatViewModel(DataManager dataManager,
                                 SchedulerProvider schedulerProvider,
@@ -273,6 +274,22 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
             ref.child(toUserid + "").child(Constants.CHILD_UNREAD_MESSAGES).removeValue();
         } catch (Exception e) {
             MLog.e(TAG, "", e);
+        }
+    }
+
+    @Override
+    public void onMeTyping() {
+        try {
+            if (System.currentTimeMillis() - mLastTypingTime < 3000) {
+                return;
+            }
+            firebaseDatabase
+                    .getReference(Constants.PRIVATE_CHAT_TYPING_REF(myUserid()))
+                    .child("" + myUserid())
+                    .child(Constants.CHILD_TYPING).setValue(true);
+            mLastTypingTime = System.currentTimeMillis();
+        } catch (Exception e) {
+            MLog.e(TAG, "onMeTyping() failed", e);
         }
     }
 

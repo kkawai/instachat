@@ -1,5 +1,8 @@
 package com.instachat.android.app.activity;
 
+import android.support.annotation.NonNull;
+import android.support.v4.widget.DrawerLayout;
+
 import com.instachat.android.data.model.FriendlyMessage;
 
 /**

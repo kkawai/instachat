@@ -46,7 +46,7 @@ import io.reactivex.disposables.Disposable;
 public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseViewModel> extends AppCompatActivity implements BaseFragment.Callback, ActivityState {
 
     @Inject
-    RequestQueue requestQueue;
+    protected RequestQueue requestQueue;
 
     // TODO
     // this can probably depend on isLoading variable of BaseViewModel,
@@ -154,7 +154,7 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
 
     @Override
     protected void onDestroy() {
-        requestQueue.cancelAll(this);
+        requestQueue.cancelAll(this); //todo: eventually volley will be replaced
         mIsDestroyed = true;
         for (Disposable disposable : disposableList) {
             disposable.dispose();

@@ -1,7 +1,11 @@
 package com.instachat.android.app.activity;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v13.view.inputmethod.InputConnectionCompat;
+import android.support.v13.view.inputmethod.InputContentInfoCompat;
+import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -125,6 +129,8 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
 
     public abstract boolean isPrivateChat();
 
+    public abstract void onMeTyping();
+
     public void add(Disposable disposable) {
         getCompositeDisposable().add(disposable);
     }
@@ -215,6 +221,49 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
             return true;
         }
         getNavigator().showSendOptions(friendlyMessage);
+        return true;
+    }
+
+    public boolean onCommitContent(InputContentInfoCompat inputContentInfo, int flags,
+                                    Bundle opts, String[] contentMimeTypes) {
+
+        boolean supported = false;
+        for (final String mimeType : contentMimeTypes) {
+            if (inputContentInfo.getDescription().hasMimeType(mimeType)) {
+                supported = true;
+                break;
+            }
+        }
+        if (!supported) {
+            return false;
+        }
+
+        return onCommitContentInternal(inputContentInfo, flags);
+    }
+
+    private boolean onCommitContentInternal(InputContentInfoCompat inputContentInfo, int flags) {
+        if ((flags & InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION) != 0) {
+            try {
+                inputContentInfo.requestPermission();
+            } catch (Exception e) {
+                Log.e(TAG, "InputContentInfoCompat#requestPermission() failed.", e);
+                return false;
+            }
+        }
+        Uri linkUri = inputContentInfo.getLinkUri();
+        //MLog.d(TAG, "linkUri: " + linkUri.toString() + ": " + inputContentInfo.getDescription().toString(), " : ",
+        // inputContentInfo);
+        if (inputContentInfo != null && inputContentInfo.getDescription() != null) {
+            if (inputContentInfo.getDescription().toString().contains("image/gif")) {
+                final FriendlyMessage friendlyMessage = new FriendlyMessage("",
+                        myUsername(),
+                        myUserid(),
+                        myDpid(),
+                        linkUri.toString(), false, false, null, System.currentTimeMillis());
+                friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
+                messagesAdapter.sendFriendlyMessage(friendlyMessage);
+            }
+        }
         return true;
     }
 
