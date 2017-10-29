@@ -31,7 +31,6 @@ public class User {
     @SerializedName("bio")
     private String bio;
 
-    private String instagramId;
     private long lastOnline;
     private String currentGroupName;
     private long currentGroupId;
@@ -85,10 +84,6 @@ public class User {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getInstagramId() {
-        return instagramId;
     }
 
     public String getUsername() {

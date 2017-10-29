@@ -9,10 +9,6 @@
         <import type="android.view.View"/>
 
         <variable
-            name="visibleAd"
-            type="boolean"/>
-
-        <variable
             name="viewModel"
             type="com.instachat.android.app.activity.group.GroupChatViewModel" />
 
@@ -71,8 +67,7 @@
                     android:layout_gravity="bottom"
                     android:orientation="horizontal"
                     android:paddingTop="8dp"
-                    android:visibility="gone"
-                    >
+                    android:visibility="gone">
 
                     <com.github.silvestrpredko.dotprogressbar.DotProgressBar
                         android:id="@+id/dot_progress_bar"
@@ -118,7 +113,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:visibility="@{visibleAd ? View.VISIBLE : View.GONE}"/>
+                    android:visibility="@{viewModel.isAdReady ? View.VISIBLE : View.GONE}"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"

@@ -37,7 +37,7 @@ import com.instachat.android.data.api.UploadListener;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.databinding.ActivityMainBinding;
-import com.instachat.android.font.FontUtil;
+import com.instachat.android.util.FontUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.view.ThemedAlertDialog;
@@ -82,7 +82,6 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         binding.messageRecyclerView.setLayoutManager(linearLayoutManager);
         binding.messageRecyclerView.setAdapter(messagesAdapter);
 
-        binding.setVisibleAd(true);
         adsHelper.loadAd(this);
 
         initMessageEditText(binding.sendButton, binding.messageEditTextParent);
@@ -376,10 +375,10 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     @Override
     public void onReceiveAd(AdDownloaderInterface adDownloaderInterface, ReceivedBannerInterface receivedBanner) throws AdReceiveFailed {
         if (receivedBanner.getErrorCode() != ErrorCode.NO_ERROR) {
-            binding.setVisibleAd(false);
+            getViewModel().isAdReady.set(true);
             adsHelper.loadAd(this);
         } else {
-            binding.setVisibleAd(true);
+            getViewModel().isAdReady.set(false);
         }
     }
 

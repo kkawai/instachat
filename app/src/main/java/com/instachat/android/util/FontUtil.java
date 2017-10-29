@@ -1,4 +1,4 @@
-package com.instachat.android.font;
+package com.instachat.android.util;
 
 import android.graphics.Typeface;
 import android.support.design.widget.TextInputLayout;
@@ -12,15 +12,11 @@ public final class FontUtil {
     private FontUtil() {
     }
 
-    private static Typeface sGlobalEditTextFont = null;
-
     public static void setTextViewFont(TextInputLayout textInputLayout) {
         setTextViewFont(textInputLayout.getEditText());
     }
 
     public static void setTextViewFont(TextView textView) {
-        if (sGlobalEditTextFont == null)
-            sGlobalEditTextFont = Typeface.createFromAsset(textView.getContext().getAssets(), "fonts/Lato-Regular.ttf");
-        textView.setTypeface(sGlobalEditTextFont);
+        Bindings.setCustomTypeface(textView, "Lato-Regular");
     }
 }

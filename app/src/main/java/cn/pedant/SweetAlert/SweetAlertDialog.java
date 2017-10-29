@@ -20,7 +20,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.instachat.android.R;
-import com.instachat.android.font.FontUtil;
+import com.instachat.android.util.FontUtil;
 import com.instachat.android.view.CircleTransform;
 import com.pnikosis.materialishprogress.ProgressWheel;
 

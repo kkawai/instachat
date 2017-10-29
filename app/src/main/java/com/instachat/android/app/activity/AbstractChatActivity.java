@@ -71,7 +71,7 @@ import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.data.model.User;
-import com.instachat.android.font.FontUtil;
+import com.instachat.android.util.FontUtil;
 import com.instachat.android.gcm.GCMHelper;
 import com.instachat.android.messaging.InstachatMessagingService;
 import com.instachat.android.messaging.NotificationHelper;

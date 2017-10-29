@@ -17,7 +17,7 @@ import com.instachat.android.Constants;
 import com.instachat.android.app.activity.pm.PrivateChatActivity;
 import com.instachat.android.R;
 import com.instachat.android.data.db.OneTimeMessageDb;
-import com.instachat.android.font.FontUtil;
+import com.instachat.android.util.FontUtil;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;

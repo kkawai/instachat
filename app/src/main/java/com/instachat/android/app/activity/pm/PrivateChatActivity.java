@@ -98,11 +98,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
     @Inject
     ViewModelProvider.Factory viewModelFactory;
 
-    //@Override
-    protected void setVisibleAd(boolean visibleAd) {
-        binding.setVisibleAd(visibleAd);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.Theme_App);
@@ -120,7 +115,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         binding.messageRecyclerView.setLayoutManager(linearLayoutManager);
         binding.messageRecyclerView.setAdapter(messagesAdapter);
 
-        binding.setVisibleAd(true);
         adsHelper.loadAd(this);
 
         initMessageEditText(binding.sendButton, binding.messageEditTextParent);
@@ -617,10 +611,10 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
     @Override
     public void onReceiveAd(AdDownloaderInterface adDownloaderInterface, ReceivedBannerInterface receivedBanner) throws AdReceiveFailed {
         if (receivedBanner.getErrorCode() != ErrorCode.NO_ERROR) {
-            setVisibleAd(false);
+            getViewModel().isAdReady.set(true);
             adsHelper.loadAd(this);
         } else {
-            setVisibleAd(true);
+            getViewModel().isAdReady.set(false);
         }
     }
 

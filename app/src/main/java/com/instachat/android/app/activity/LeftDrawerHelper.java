@@ -37,7 +37,7 @@ import com.instachat.android.app.likes.UserLikedUserListener;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.data.model.User;
-import com.instachat.android.font.FontUtil;
+import com.instachat.android.util.FontUtil;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;

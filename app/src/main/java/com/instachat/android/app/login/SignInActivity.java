@@ -40,7 +40,7 @@ import com.instachat.android.app.ui.base.BaseActivity;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.model.User;
 import com.instachat.android.databinding.ActivitySignInBinding;
-import com.instachat.android.font.FontUtil;
+import com.instachat.android.util.FontUtil;
 import com.instachat.android.util.ActivityUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;

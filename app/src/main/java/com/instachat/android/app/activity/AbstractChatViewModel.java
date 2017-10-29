@@ -1,5 +1,6 @@
 package com.instachat.android.app.activity;
 
+import android.databinding.ObservableField;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -38,6 +39,8 @@ import io.reactivex.functions.Predicate;
 public abstract class AbstractChatViewModel<Navigator extends AbstractChatNavigator> extends BaseViewModel<Navigator> {
 
     private static final String TAG = "AbstractChatViewModel";
+
+    public ObservableField<Boolean> isAdReady = new ObservableField<>(true);
 
     private String databaseRoot;
 

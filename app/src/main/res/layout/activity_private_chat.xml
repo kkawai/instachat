@@ -7,6 +7,7 @@ Document differences between activity_main.xml here:
 -->
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:bind="http://schemas.android.com/apk/res-auto"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:fab="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
@@ -16,8 +17,8 @@ Document differences between activity_main.xml here:
         <import type="android.view.View"/>
 
         <variable
-            name="visibleAd"
-            type="boolean"/>
+            name="viewModel"
+            type="com.instachat.android.app.activity.pm.PrivateChatViewModel" />
 
     </data>
 
@@ -45,7 +46,8 @@ Document differences between activity_main.xml here:
                 android:layout_height="match_parent"
                 android:layout_above="@+id/linearLayout">
 
-                <include layout="@layout/merge_private_appbar"/>
+                <include layout="@layout/merge_private_appbar"
+                         bind:viewModel="@{viewModel}"/>
 
                 <FrameLayout
                     android:id="@+id/messageRecyclerViewParent"
@@ -82,7 +84,8 @@ Document differences between activity_main.xml here:
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:gravity="center"/>
+                    android:gravity="center"
+                    android:visibility="@{viewModel.isAdReady ? View.VISIBLE : View.GONE}"/>
 
                 <LinearLayout
                     android:id="@+id/dotsLayout"

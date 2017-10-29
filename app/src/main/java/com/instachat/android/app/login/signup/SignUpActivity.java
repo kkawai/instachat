@@ -22,7 +22,7 @@ import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.activity.group.GroupChatActivity;
 import com.instachat.android.R;
 import com.instachat.android.data.api.NetworkApi;
-import com.instachat.android.font.FontUtil;
+import com.instachat.android.util.FontUtil;
 import com.instachat.android.data.model.User;
 import com.instachat.android.util.ActivityUtil;
 import com.instachat.android.util.MLog;
