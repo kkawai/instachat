@@ -37,12 +37,13 @@ import com.instachat.android.app.likes.UserLikedUserListener;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.data.model.User;
-import com.instachat.android.util.FontUtil;
+import com.instachat.android.databinding.DialogPictureChooseBinding;
 import com.instachat.android.util.AnimationUtil;
+import com.instachat.android.util.FontUtil;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
+import com.instachat.android.util.UserPreferences;
 import com.tooltip.Tooltip;
 
 import org.json.JSONObject;
@@ -338,19 +339,19 @@ public class LeftDrawerHelper {
       final LayoutInflater inflater = mActivity.getLayoutInflater();
       // Inflate and set the layout for the dialog
       // Pass null as the parent view because its going in the dialog layout
-      final View view = inflater.inflate(R.layout.dialog_picture_choose, null);
-      builder.setView(view);
+      DialogPictureChooseBinding binding = DialogPictureChooseBinding.inflate(inflater);
+      builder.setView(binding.getRoot());
       builder.setCancelable(true);
       final AlertDialog dialog = builder.create();
 
-      view.findViewById(R.id.menu_choose_photo).setOnClickListener(new View.OnClickListener() {
+      binding.menuChoosePhoto.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
             dialog.dismiss();
             mLeftDrawerEventListener.onProfilePicChangeRequest(true);
          }
       });
-      view.findViewById(R.id.menu_take_photo).setOnClickListener(new View.OnClickListener() {
+      binding.menuTakePhoto.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
             dialog.dismiss();

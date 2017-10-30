@@ -348,7 +348,7 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
 
    private AlertDialog showNewEmailDialog(@NonNull final Context context, final String username, final String password) {
       final Object tag = new Object();
-      DialogInputEmailBinding binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.dialog_input_email, null, false);
+      DialogInputEmailBinding binding = DialogInputEmailBinding.inflate(getLayoutInflater());
       final View view = binding.getRoot();
       final TextView textView = (TextView) view.findViewById(R.id.input_email);
       final TextInputLayout textInputLayout = (TextInputLayout) view.findViewById(R.id.input_email_layout);

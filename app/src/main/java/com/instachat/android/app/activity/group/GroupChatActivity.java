@@ -5,18 +5,17 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -37,7 +36,9 @@ import com.instachat.android.data.api.UploadListener;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.databinding.ActivityMainBinding;
-import com.instachat.android.util.FontUtil;
+import com.instachat.android.databinding.DialogInputCommentBinding;
+import com.instachat.android.databinding.RightDrawerLayoutBinding;
+import com.instachat.android.databinding.RightNavHeaderBinding;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.view.ThemedAlertDialog;
@@ -73,7 +74,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         initDatabaseRef();
         binding = getViewDataBinding();
         initPhotoHelper(savedInstanceState);
-        setupDrawers();
+        setupDrawers(binding.navView);
         setupToolbar();
 
         gcmHelper.onCreate(this);
@@ -234,8 +235,8 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     }
 
     @Override
-    public void setupLeftDrawerContent() {
-        super.setupLeftDrawerContent();
+    public void setupLeftDrawerContent(NavigationView navigationView) {
+        super.setupLeftDrawerContent(navigationView);
         UsersInGroupListener usersInGroupListener = new UsersInGroupListener() {
             @Override
             public void onNumUsersUpdated(long groupId, String groupName, int numUsers) {
@@ -246,22 +247,23 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         chatsRecyclerViewAdapter.setUsersInGroupListener(usersInGroupListener);
     }
 
+
+
     @Override
     public void setupRightDrawerContent() {
 
-        RecyclerView rightDrawerRecyclerView = (RecyclerView) getLayoutInflater().inflate(R.layout.right_drawer_layout, binding.rightNavView, false);
-        final View rightHeaderView = getLayoutInflater().inflate(R.layout.right_nav_header, binding.rightNavView, false);
-        rightHeaderGroupName = rightHeaderView.findViewById(R.id.groupname);
+        RightDrawerLayoutBinding rightDrawerLayoutBinding = RightDrawerLayoutBinding.inflate(getLayoutInflater(), binding.rightNavView, false);
+        RightNavHeaderBinding rightNavHeaderBinding = RightNavHeaderBinding.inflate(getLayoutInflater(), binding.rightNavView, false);
 
-        binding.rightNavView.addHeaderView(rightHeaderView);
-        binding.rightNavView.addHeaderView(rightDrawerRecyclerView);
+        binding.rightNavView.addHeaderView(rightNavHeaderBinding.getRoot());
+        binding.rightNavView.addHeaderView(rightDrawerLayoutBinding.getRoot());
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        rightDrawerRecyclerView.setLayoutManager(linearLayoutManager);
+        rightDrawerLayoutBinding.drawerRecyclerView.setLayoutManager(linearLayoutManager);
 
-        mGroupChatUsersRecyclerAdapter = new GroupChatUsersRecyclerAdapter(this, this, this, groupChatViewModel.getGroupId());
-        rightDrawerRecyclerView.setAdapter(mGroupChatUsersRecyclerAdapter);
+        mGroupChatUsersRecyclerAdapter = new GroupChatUsersRecyclerAdapter(this, groupChatViewModel.getGroupId());
+        rightDrawerLayoutBinding.drawerRecyclerView.setAdapter(mGroupChatUsersRecyclerAdapter);
         mGroupChatUsersRecyclerAdapter.populateData();
 
         groupChatViewModel.fetchGroupName();
@@ -339,18 +341,15 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         if (UserPreferences.getInstance().hasShownSendFirstMessageDialog()) {
             return;
         }
-        final View view = getLayoutInflater().inflate(R.layout.dialog_input_comment, null);
-        final TextView textView = (TextView) view.findViewById(R.id.input_text);
-        final TextView textViewTitle = (TextView) view.findViewById(R.id.intro_message_title);
-        textViewTitle.setText(getString(R.string.enter_first_comment, groupChatViewModel.myUsername()));
-        FontUtil.setTextViewFont(textView);
-        final AlertDialog dialog = new ThemedAlertDialog.Builder(context).
-                setView(view).
+        final DialogInputCommentBinding binding = DialogInputCommentBinding.inflate(getLayoutInflater(), null, false);
+        binding.setName(getViewModel().myUsername());
+        new ThemedAlertDialog.Builder(context).
+                setView(binding.getRoot()).
                 setCancelable(false).
                 setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        final String text = textView.getText().toString();
+                        final String text = binding.inputText.getText().toString();
                         if (!TextUtils.isEmpty(text)) {
                             UserPreferences.getInstance().setShownSendFirstMessageDialog(true);
                             final FriendlyMessage friendlyMessage = new FriendlyMessage(text,

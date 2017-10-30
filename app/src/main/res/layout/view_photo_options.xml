@@ -1,34 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical">
+<layout>
 
-    <TextView
-        android:id="@+id/menu_take_photo"
-        style="@android:style/TextAppearance.DeviceDefault.SearchResult.Title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?android:selectableItemBackground"
-        android:clickable="true"
-        android:drawableLeft="@drawable/ic_photo_camera_black_36dp"
-        android:drawablePadding="@dimen/activity_horizontal_margin"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        android:padding="@dimen/activity_horizontal_margin"
-        android:text="@string/menu_take_photo"/>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/menu_choose_photo"
-        style="@android:style/TextAppearance.DeviceDefault.SearchResult.Title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?android:selectableItemBackground"
-        android:clickable="true"
-        android:drawableLeft="@drawable/ic_photo_library_black_36dp"
-        android:drawablePadding="@dimen/activity_horizontal_margin"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        android:padding="@dimen/activity_horizontal_margin"
-        android:text="@string/menu_choose_photo"/>
-</LinearLayout>
+        <TextView
+            android:id="@+id/menu_take_photo"
+            style="@android:style/TextAppearance.DeviceDefault.SearchResult.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:drawableLeft="@drawable/ic_photo_camera_black_36dp"
+            android:drawablePadding="@dimen/activity_horizontal_margin"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:text="@string/menu_take_photo"/>
+
+        <TextView
+            android:id="@+id/menu_choose_photo"
+            style="@android:style/TextAppearance.DeviceDefault.SearchResult.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:drawableLeft="@drawable/ic_photo_library_black_36dp"
+            android:drawablePadding="@dimen/activity_horizontal_margin"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:text="@string/menu_choose_photo"/>
+    </LinearLayout>
+</layout>

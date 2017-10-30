@@ -1,23 +1,24 @@
 package com.instachat.android.app.likes;
 
 import android.app.Activity;
+import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.instachat.android.app.activity.ActivityState;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
+import com.instachat.android.app.activity.ActivityState;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.data.model.User;
+import com.instachat.android.databinding.ItemPersonLikedUsersPostsBinding;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;
 
@@ -26,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class UserLikedUserAdapter<T, VH extends RecyclerView.ViewHolder> extends FirebaseRecyclerAdapter<User, UserLikedUserViewHolder> {
+public final class UserLikedUserAdapter<T, VH extends RecyclerView.ViewHolder> extends FirebaseRecyclerAdapter<User, UserLikedUserAdapter.UserLikedUserViewHolder> {
 
    private static final String TAG = "UserLikedUserAdapter";
 
@@ -35,8 +36,8 @@ public final class UserLikedUserAdapter<T, VH extends RecyclerView.ViewHolder> e
    private ActivityState mActivityState;
    private List<Map.Entry<DatabaseReference, ValueEventListener>> mUserInfoChangeListeners = new ArrayList<>();
 
-   public UserLikedUserAdapter(Class<User> modelClass, int modelLayout, Class<UserLikedUserViewHolder> viewHolderClass, DatabaseReference ref) {
-      super(modelClass, modelLayout, viewHolderClass, ref);
+   public UserLikedUserAdapter(DatabaseReference ref) {
+      super(User.class, R.layout.item_person_liked_users_posts, UserLikedUserViewHolder.class, ref);
    }
 
    public void setUserClickedListener(UserClickedListener userClickedListener) {
@@ -50,12 +51,13 @@ public final class UserLikedUserAdapter<T, VH extends RecyclerView.ViewHolder> e
 
    @Override
    public UserLikedUserViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-      final UserLikedUserViewHolder holder = super.onCreateViewHolder(parent, viewType);
+      ItemPersonLikedUsersPostsBinding binding = ItemPersonLikedUsersPostsBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+      final UserLikedUserViewHolder holder = new UserLikedUserViewHolder(binding);
       holder.itemView.setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
             User user = getItem(holder.getAdapterPosition());
-            mUserClickedListener.onUserClicked(user.getId(), user.getUsername(), user.getProfilePicUrl(), holder.userPic);
+            mUserClickedListener.onUserClicked(user.getId(), user.getUsername(), user.getProfilePicUrl(), holder.binding.userPic);
          }
       });
       return holder;
@@ -63,24 +65,7 @@ public final class UserLikedUserAdapter<T, VH extends RecyclerView.ViewHolder> e
 
    @Override
    protected void populateViewHolder(final UserLikedUserViewHolder viewHolder, User model, int position) {
-      viewHolder.username.setText(model.getUsername());
-      if (model.getLikes() <= 1)
-         viewHolder.likedPersonsPosts.setText(mActivity.getString(R.string.gave_like_singular));
-      else
-         viewHolder.likedPersonsPosts.setText(mActivity.getString(R.string.gave_likes_plural, model.getLikes() + ""));
-      if (TextUtils.isEmpty(model.getProfilePicUrl())) {
-         viewHolder.userPic.setImageResource(R.drawable.ic_anon_person_36dp);
-         return;
-      }
-      try {
-         Glide.with(mActivity).
-               load(model.getProfilePicUrl()).
-               error(R.drawable.ic_anon_person_36dp).
-               into(viewHolder.userPic);
-      } catch (final Exception e) {
-         MLog.e(TAG, "", e);
-         viewHolder.userPic.setImageResource(R.drawable.ic_anon_person_36dp);
-      }
+      viewHolder.binding.setUser(model);
    }
 
    @Override
@@ -152,5 +137,13 @@ public final class UserLikedUserAdapter<T, VH extends RecyclerView.ViewHolder> e
          map.put("profilePicUrl", user.getProfilePicUrl());
       map.put("id", user.getId());
       FirebaseDatabase.getInstance().getReference(Constants.USER_RECEIVED_LIKES_REF(UserPreferences.getInstance().getUserId())).child(user.getId() + "").updateChildren(map);
+   }
+
+   final static class UserLikedUserViewHolder extends RecyclerView.ViewHolder {
+      private final ItemPersonLikedUsersPostsBinding binding;
+      UserLikedUserViewHolder(ItemPersonLikedUsersPostsBinding binding) {
+         super(binding.getRoot());
+         this.binding = binding;
+      }
    }
 }

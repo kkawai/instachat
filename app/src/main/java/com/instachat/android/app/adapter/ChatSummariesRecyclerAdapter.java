@@ -1,7 +1,6 @@
 package com.instachat.android.app.adapter;
 
 import android.content.res.Resources;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,16 +13,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.instachat.android.TheApp;
-import com.instachat.android.app.activity.ActivityState;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
+import com.instachat.android.TheApp;
+import com.instachat.android.app.activity.ActivityState;
 import com.instachat.android.app.activity.UsersInGroupListener;
 import com.instachat.android.data.model.GroupChatHeader;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.data.model.PrivateChatHeader;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.data.model.User;
+import com.instachat.android.databinding.DrawerHeaderItemBinding;
+import com.instachat.android.databinding.DrawerListItemBinding;
 import com.instachat.android.util.MLog;
 
 import java.util.ArrayList;
@@ -376,16 +377,16 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_GROUP_HEADER) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_header_item, parent, false);
-            ChatHeaderViewHolder holder = new ChatHeaderViewHolder(view);
+            DrawerHeaderItemBinding binding = DrawerHeaderItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            ChatHeaderViewHolder holder = new ChatHeaderViewHolder(binding.getRoot());
             return holder;
         } else if (viewType == TYPE_PRIVATE_HEADER) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_header_item, parent, false);
-            ChatHeaderViewHolder holder = new ChatHeaderViewHolder(view);
+            DrawerHeaderItemBinding binding = DrawerHeaderItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            ChatHeaderViewHolder holder = new ChatHeaderViewHolder(binding.getRoot());
             return holder;
         } else if (viewType == TYPE_GROUP_SUMMARY) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_list_item, parent, false);
-            final GroupChatSummaryViewHolder holder = new GroupChatSummaryViewHolder(view);
+            DrawerListItemBinding binding = DrawerListItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            final GroupChatSummaryViewHolder holder = new GroupChatSummaryViewHolder(binding.getRoot());
             holder.name.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -395,8 +396,8 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
             });
             return holder;
         } else if (viewType == TYPE_PRIVATE_SUMMARY) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_list_item, parent, false);
-            final PrivateChatSummaryViewHolder holder = new PrivateChatSummaryViewHolder(view);
+            DrawerListItemBinding binding = DrawerListItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            final PrivateChatSummaryViewHolder holder = new PrivateChatSummaryViewHolder(binding.getRoot());
             holder.name.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:text="@{blockedUser.name}"
-            android:textColor="@android:color/white"
+            android:textColor="@android:color/black"
             android:textSize="15sp"
             app:customTypeface="@{'Lato-Bold'}"/>
 

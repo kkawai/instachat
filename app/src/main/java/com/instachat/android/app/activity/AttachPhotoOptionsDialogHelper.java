@@ -1,12 +1,14 @@
 package com.instachat.android.app.activity;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 
 import com.instachat.android.R;
+import com.instachat.android.databinding.ViewPhotoOptionsBinding;
 
 public class AttachPhotoOptionsDialogHelper {
 
@@ -22,20 +24,20 @@ public class AttachPhotoOptionsDialogHelper {
     }
 
     public void showBottomDialog() {
-        View bottomSheetView = LayoutInflater.from(context).inflate(R.layout.view_photo_options, null);
+        ViewPhotoOptionsBinding binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.view_photo_options, null, false);
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
-        bottomSheetDialog.setContentView(bottomSheetView);
-        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from((View) bottomSheetView.getParent());
+        bottomSheetDialog.setContentView(binding.getRoot());
+        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from((View) binding.getRoot().getParent());
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         bottomSheetDialog.show();
-        bottomSheetView.findViewById(R.id.menu_take_photo).setOnClickListener(new View.OnClickListener() {
+        binding.menuTakePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 listener.onPhotoGallery();
                 bottomSheetDialog.dismiss();
             }
         });
-        bottomSheetView.findViewById(R.id.menu_choose_photo).setOnClickListener(new View.OnClickListener() {
+        binding.menuChoosePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 listener.onPhotoTake();

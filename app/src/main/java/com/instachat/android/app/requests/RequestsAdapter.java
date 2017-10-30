@@ -1,6 +1,5 @@
 package com.instachat.android.app.requests;
 
-import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +29,7 @@ public final class RequestsAdapter<T, VH extends RecyclerView.ViewHolder> extend
 
     @Override
     public RequestsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        ItemRequestBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),R.layout.item_request, parent, false);
+        ItemRequestBinding binding = ItemRequestBinding.inflate(LayoutInflater.from(parent.getContext()),parent,false);
         final RequestsViewHolder holder = new RequestsViewHolder(binding);
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override

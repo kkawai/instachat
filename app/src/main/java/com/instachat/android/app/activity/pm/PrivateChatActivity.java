@@ -106,7 +106,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         initDatabaseRef();
         binding = getViewDataBinding();
         initPhotoHelper(savedInstanceState);
-        setupDrawers();
+        setupDrawers(binding.navView);
         setupToolbar();
 
         gcmHelper.onCreate(this);

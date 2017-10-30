@@ -54,4 +54,12 @@ public class Bindings {
         textView.setTypeface(typeface);
     }
 
+    @BindingAdapter("likesCount")
+    public static void setLikesCount(TextView textView, int likes) {
+        if (likes <= 1)
+            textView.setText(textView.getContext().getString(R.string.gave_like_singular));
+        else
+            textView.setText(textView.getContext().getString(R.string.gave_likes_plural,(""+likes)));
+    }
+
 }

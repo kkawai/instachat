@@ -41,7 +41,7 @@ public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends 
 
     @Override
     public BlocksViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        ItemBlockedPersonBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_blocked_person, parent, false);
+        ItemBlockedPersonBinding binding = ItemBlockedPersonBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         final BlocksViewHolder holder = new BlocksViewHolder(binding);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,7 +56,6 @@ public final class BlocksAdapter<T, VH extends RecyclerView.ViewHolder> extends 
     @Override
     protected void populateViewHolder(final BlocksViewHolder viewHolder, BlockedUser model, int position) {
         viewHolder.binding.setBlockedUser(model);
-        viewHolder.binding.username.setTextColor(Color.BLACK);
     }
 
     @Override

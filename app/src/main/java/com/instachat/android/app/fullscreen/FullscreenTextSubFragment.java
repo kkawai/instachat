@@ -37,7 +37,7 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_fullscreen_item, container, false);
+        binding = FragmentFullscreenItemBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 

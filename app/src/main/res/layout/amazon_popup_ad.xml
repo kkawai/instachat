@@ -1,40 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:Amazon="http://schemas.android.com/apk/lib/com.amazon.device.ads"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:layout_gravity="center"
-    >
-    
-    <ImageView
-        android:id="@+id/dummy"
-        android:layout_width="300dip"
-        android:layout_height="250dip" 
-        android:layout_centerInParent="true"
-        android:clickable="false"
-        android:background="@android:color/transparent"
-        android:visibility="invisible"
-        />    
+<layout xmlns:Amazon="http://schemas.android.com/apk/lib/com.amazon.device.ads"
+        xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ImageButton
-        android:id="@+id/close_ad_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/dummy"
-        android:layout_above="@+id/dummy"
-        android:background="@android:color/transparent"
-        android:src="@drawable/close" 
-        />    
-    
-    <com.amazon.device.ads.AdLayout
-        android:id="@+id/ad_view"
-        android:layout_width="300dip"
-        android:layout_height="250dip" 
-        Amazon:adSize="300x250"
-        android:layout_centerHorizontal="true"
-        android:layout_centerInParent="true"
-        android:clickable="true"
-        />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:background="@android:color/white"
+        >
 
-</RelativeLayout>
+        <ImageView
+            android:id="@+id/dummy"
+            android:layout_width="300dip"
+            android:layout_height="250dip"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent"
+            android:clickable="false"
+            android:visibility="invisible"
+            />
+
+        <ImageButton
+            android:id="@+id/close_ad_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/dummy"
+            android:layout_toRightOf="@+id/dummy"
+            android:background="@android:color/transparent"
+            android:src="@drawable/close"
+            />
+
+        <com.amazon.device.ads.AdLayout
+            android:id="@+id/ad_view"
+            android:layout_width="300dip"
+            android:layout_height="250dip"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:clickable="true"
+            Amazon:adSize="300x250"
+            />
+
+    </RelativeLayout>
+
+</layout>

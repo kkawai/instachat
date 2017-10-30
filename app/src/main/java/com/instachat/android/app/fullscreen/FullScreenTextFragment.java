@@ -41,7 +41,7 @@ public class FullScreenTextFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater,R.layout.fragment_fullscreen, container, false);
+        binding = FragmentFullscreenBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 

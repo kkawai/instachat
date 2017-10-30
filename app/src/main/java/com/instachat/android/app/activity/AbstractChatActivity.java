@@ -71,11 +71,13 @@ import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.data.model.User;
-import com.instachat.android.util.FontUtil;
+import com.instachat.android.databinding.LeftDrawerLayoutBinding;
+import com.instachat.android.databinding.LeftNavHeaderBinding;
 import com.instachat.android.gcm.GCMHelper;
 import com.instachat.android.messaging.InstachatMessagingService;
 import com.instachat.android.messaging.NotificationHelper;
 import com.instachat.android.util.AnimationUtil;
+import com.instachat.android.util.FontUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
@@ -155,6 +157,8 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     protected RecyclerView messageRecyclerView;
     protected View dotsLayout;
     protected View sendButton;
+    protected LeftNavHeaderBinding leftNavHeaderBinding;
+    protected LeftDrawerLayoutBinding leftDrawerLayoutBinding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -634,8 +638,8 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
         return atLeastOneClosed;
     }
 
-    public void setupDrawers() {
-        setupLeftDrawerContent();
+    public void setupDrawers(NavigationView navigationView) {
+        setupLeftDrawerContent(navigationView);
         setupRightDrawerContent();
     }
 
@@ -653,22 +657,18 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
         }
     };
 
-    public void setupLeftDrawerContent() {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        if (navigationView == null)
-            return;
-        View headerView = getLayoutInflater().inflate(R.layout.left_nav_header, navigationView, false);
-        View drawerView = getLayoutInflater().inflate(R.layout.left_drawer_layout, navigationView, false);
-        navigationView.addView(drawerView);
-        navigationView.addHeaderView(headerView);
+    public void setupLeftDrawerContent(NavigationView navigationView) {
+        leftNavHeaderBinding = LeftNavHeaderBinding.inflate(getLayoutInflater(), navigationView, false);
+        leftDrawerLayoutBinding = LeftDrawerLayoutBinding.inflate(getLayoutInflater(), navigationView, false);
+        navigationView.addView(leftNavHeaderBinding.getRoot());
+        navigationView.addHeaderView(leftDrawerLayoutBinding.getRoot());
         mLeftDrawerHelper = new LeftDrawerHelper(networkApi, this, this, drawerLayout, mLeftDrawerEventListener);
         mLeftDrawerHelper.setup(navigationView);
         mLeftDrawerHelper.setUserLikedUserListener(mUserLikedUserListener);
 
         chatsRecyclerViewAdapter.setup(this, this, true);
-        RecyclerView recyclerView = (RecyclerView) drawerView.findViewById(R.id.drawerRecyclerView);
-        recyclerView.setLayoutManager(new StickyLayoutManager(this, chatsRecyclerViewAdapter));
-        recyclerView.setAdapter(chatsRecyclerViewAdapter);
+        leftDrawerLayoutBinding.drawerRecyclerView.setLayoutManager(new StickyLayoutManager(this, chatsRecyclerViewAdapter));
+        leftDrawerLayoutBinding.drawerRecyclerView.setAdapter(chatsRecyclerViewAdapter);
         chatsRecyclerViewAdapter.populateData();
     }
 

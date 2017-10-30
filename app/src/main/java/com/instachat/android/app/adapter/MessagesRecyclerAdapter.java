@@ -179,16 +179,16 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
     private MessageViewHolder createMessageViewHolder(ViewGroup parent, int viewType) {
         if (viewType == ITEM_VIEW_TYPE_STANDARD_MESSAGE) {
-            ItemMessageBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_message, parent, false);
+            ItemMessageBinding binding = ItemMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new MessageViewHolder(binding.getRoot());
         } else if (viewType == ITEM_VIEW_TYPE_STANDARD_MESSAGE_ME) {
-            ItemMessageBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_message_me, parent, false);
+            ItemMessageBinding binding = ItemMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new MessageViewHolder(binding.getRoot());
         } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
-            ItemMessageBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_message_web_clipping, parent, false);
+            ItemMessageBinding binding = ItemMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new MessageViewHolder(binding.getRoot());
         } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK_ME) {
-            ItemMessageBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_message_me_web_clipping, parent, false);
+            ItemMessageBinding binding = ItemMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new MessageViewHolder(binding.getRoot());
         }
         throw new IllegalArgumentException("unknown viewType");

@@ -34,7 +34,7 @@ public class UserLikedUserFragment extends BaseFragment {
 
    @Override
    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-      binding = DataBindingUtil.inflate(inflater, R.layout.fragment_generic_users, container, false);
+      binding = FragmentGenericUsersBinding.inflate(inflater, container, false);
       View view = binding.getRoot();
       recyclerView = binding.recyclerView;
       return view;
@@ -51,7 +51,7 @@ public class UserLikedUserFragment extends BaseFragment {
          }
       };
       DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.USER_RECEIVED_LIKES_REF(getArguments().getInt(Constants.KEY_USERID)));
-      mAdapter = new UserLikedUserAdapter(User.class, R.layout.item_person_liked_users_posts, UserLikedUserViewHolder.class, ref);
+      mAdapter = new UserLikedUserAdapter(ref);
       mAdapter.setActivity(getActivity(), this);
       mAdapter.setUserClickedListener(mUserClickedListener);
       LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
