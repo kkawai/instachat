@@ -3,6 +3,7 @@ package com.instachat.android.app.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Handler;
@@ -43,6 +44,7 @@ import com.instachat.android.app.blocks.ReportUserDialogHelper;
 import com.instachat.android.app.likes.LikesHelper;
 import com.instachat.android.data.db.OneTimeMessageDb;
 import com.instachat.android.data.model.FriendlyMessage;
+import com.instachat.android.databinding.ItemMessageBinding;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.StringUtil;
@@ -177,13 +179,17 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
     private MessageViewHolder createMessageViewHolder(ViewGroup parent, int viewType) {
         if (viewType == ITEM_VIEW_TYPE_STANDARD_MESSAGE) {
-            return super.onCreateViewHolder(parent, viewType);
+            ItemMessageBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_message, parent, false);
+            return new MessageViewHolder(binding.getRoot());
         } else if (viewType == ITEM_VIEW_TYPE_STANDARD_MESSAGE_ME) {
-            return new MessageViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_me, parent, false));
+            ItemMessageBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_message_me, parent, false);
+            return new MessageViewHolder(binding.getRoot());
         } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
-            return new MessageViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_web_clipping, parent, false));
+            ItemMessageBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_message_web_clipping, parent, false);
+            return new MessageViewHolder(binding.getRoot());
         } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK_ME) {
-            return new MessageViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_me_web_clipping, parent, false));
+            ItemMessageBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_message_me_web_clipping, parent, false);
+            return new MessageViewHolder(binding.getRoot());
         }
         throw new IllegalArgumentException("unknown viewType");
     }

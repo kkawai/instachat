@@ -3,6 +3,16 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+
+        <import type="com.instachat.android.util.TimeUtil"/>
+
+        <variable
+            name="privateChatSummary"
+            type="com.instachat.android.data.model.PrivateChatSummary"/>
+
+    </data>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,7 +24,9 @@
             android:layout_width="@dimen/user_thumb_pic_size"
             android:layout_height="@dimen/user_thumb_pic_size"
             android:layout_gravity="bottom"
-            android:transitionName="profilePic"/>
+            android:transitionName="profilePic"
+            app:imageUrl="@{privateChatSummary.imageUrl}"
+            />
 
         <me.himanshusoni.chatmessageview.ChatMessageView
             android:id="@+id/contentMessageChat"
@@ -39,26 +51,29 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <com.instachat.android.view.CustomFontTextView
+                    <TextView
                         android:id="@+id/messengerTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/chat_sender_username"
                         android:textSize="@dimen/message_sender_name_size"
-                        app:font2="Lato-Bold.ttf"/>
+                        android:text="@{privateChatSummary.name}"
+                        app:customTypeface="@{'Lato-Bold'}"
+                        />
 
-                    <com.instachat.android.view.CustomFontTextView
+                    <TextView
                         android:id="@+id/messageTimeTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
                         android:textColor="@color/chat_time_message_sent"
                         android:textSize="@dimen/message_sent_time_ago_size"
-                        app:font2="Lato-Regular.ttf"/>
+                        android:text="@{TimeUtil.getTimeAgo(privateChatSummary.lastMessageSentTimestamp)}"
+                        app:customTypeface="@{'Lato-Regular'}"/>
 
                 </LinearLayout>
 
-                <com.instachat.android.view.CustomFontTextView
+                <TextView
                     android:id="@+id/messageTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -66,7 +81,8 @@
                     android:lineSpacingExtra="2dp"
                     android:textColor="@color/chat_message_color"
                     android:textSize="@dimen/message_text_size"
-                    app:font2="Lato-Regular.ttf"/>
+                    android:text="@{privateChatSummary.lastMessage}"
+                    app:customTypeface="@{'Lato-Regular'}"/>
 
             </LinearLayout>
 

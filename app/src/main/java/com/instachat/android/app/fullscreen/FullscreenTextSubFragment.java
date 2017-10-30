@@ -1,5 +1,6 @@
 package com.instachat.android.app.fullscreen;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -8,24 +9,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.google.firebase.database.FirebaseDatabase;
-import com.instachat.android.app.BaseFragment;
 import com.instachat.android.Constants;
-import com.instachat.android.app.activity.pm.PrivateChatActivity;
 import com.instachat.android.R;
+import com.instachat.android.app.BaseFragment;
+import com.instachat.android.app.activity.pm.PrivateChatActivity;
 import com.instachat.android.data.db.OneTimeMessageDb;
-import com.instachat.android.util.FontUtil;
 import com.instachat.android.data.model.FriendlyMessage;
+import com.instachat.android.databinding.FragmentFullscreenItemBinding;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.StringUtil;
+import com.instachat.android.util.UserPreferences;
 import com.instachat.android.view.TextViewUtil;
 import com.instachat.android.view.ZoomImageListener;
-import com.instachat.android.view.ZoomableImageView;
 
 /**
  * Created by kevin on 8/21/2016.
@@ -34,20 +32,13 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
 
     public static final String TAG = "FullscreenTextSubFragment";
     private FriendlyMessage mFriendlyMessage;
-    private ZoomableImageView mZoomableImageView;
-    private TextView mAutoResizeTextView, mTextView;
-    private ImageView mRotateButton;
+    private FragmentFullscreenItemBinding binding;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_fullscreen_item, container, false);
-        mZoomableImageView = (ZoomableImageView) view.findViewById(R.id.messagePhotoView);
-        mAutoResizeTextView = (TextView) view.findViewById(R.id.autoResizeTextView);
-        mTextView = (TextView) view.findViewById(R.id.messageTextView);
-        mRotateButton = (ImageView) view.findViewById(R.id.rotate90);
-        mRotateButton.setVisibility(View.GONE);
-        return view;
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_fullscreen_item, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -66,7 +57,7 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
         } else
             setCustomFragmentToolbarTitle(mFriendlyMessage.getName());
 
-        getView().findViewById(R.id.toolbar).setOnClickListener(new View.OnClickListener() {
+        binding.toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 PrivateChatActivity.startPrivateChatActivity(getActivity(), mFriendlyMessage.getUserid(), mFriendlyMessage.getName(), mFriendlyMessage.getDpid(), false, null, null, null);
@@ -87,15 +78,14 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
         }
 
         if (!TextUtils.isEmpty(mFriendlyMessage.getImageUrl())) {
-            mZoomableImageView.setZoomableImageListener(this);
-            mZoomableImageView.setImageUrl(mFriendlyMessage.getImageUrl());
+            binding.messagePhotoView.setZoomableImageListener(this);
+            binding.messagePhotoView.setImageUrl(mFriendlyMessage.getImageUrl());
         }
 
         if (TextUtils.isEmpty(mFriendlyMessage.getImageUrl())) {
-            FontUtil.setTextViewFont(mAutoResizeTextView);
             if (mFriendlyMessage.getText() != null)
-                mAutoResizeTextView.setText(StringUtil.stripNewLines(mFriendlyMessage.getText()));
-            mAutoResizeTextView.setMaxLines(Integer.MAX_VALUE);
+                binding.autoResizeTextView.setText(StringUtil.stripNewLines(mFriendlyMessage.getText()));
+            binding.autoResizeTextView.setMaxLines(Integer.MAX_VALUE);
             //float t = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()), getResources().getDisplayMetrics());
             //textView.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, ScreenUtil.getScreenHeight(getActivity()), getResources().getDisplayMetrics()));
             //float x = getResources().getDimension(R.dimen.max_fullscreen_text_size);
@@ -105,28 +95,28 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
              * https://code.google.com/p/android/issues/detail?id=69706  opengl bug, which is quite stupid
              * to me; they haven't fixed it in over 2 years
              */
-            mAutoResizeTextView.setTextSize(Constants.MAX_FULLSCREEN_FONT_SIZE);
+            binding.autoResizeTextView.setTextSize(Constants.MAX_FULLSCREEN_FONT_SIZE);
         } else if (!TextUtils.isEmpty(mFriendlyMessage.getImageUrl()) && !TextUtils.isEmpty(mFriendlyMessage.getText())) {
-            mTextView.setText(mFriendlyMessage.getText());
+            binding.messageTextView.setText(mFriendlyMessage.getText());
         }
 
         if (mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
             if (OneTimeMessageDb.getInstance().messageExists(mFriendlyMessage.getId())) {
                 if (!mFriendlyMessage.getText().equals(photoNotAvailable)) {
-                    mAutoResizeTextView.post(new Runnable() {
+                    binding.autoResizeTextView.post(new Runnable() {
                         @Override
                         public void run() {
-                            TextViewUtil.blurText(mAutoResizeTextView, true);
+                            TextViewUtil.blurText(binding.autoResizeTextView, true);
                         }
                     });
                 }
             }
         }
 
-        mRotateButton.setOnClickListener(new View.OnClickListener() {
+        binding.rotate90.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mZoomableImageView.rotate();
+                binding.messagePhotoView.rotate();
                 animateRotateButton();
             }
         });
@@ -147,10 +137,10 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
 
     @Override
     public void onSetImageBitmap() {
-        mRotateButton.setVisibility(View.VISIBLE);
+        binding.rotate90.setVisibility(View.VISIBLE);
         if (!mHasShownInitialScaleInAnimation) {
             mHasShownInitialScaleInAnimation = true;
-            AnimationUtil.scaleInFromCenter(mRotateButton);
+            AnimationUtil.scaleInFromCenter(binding.rotate90);
         }
     }
 
@@ -168,7 +158,7 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
             public void onAnimationEnd(Animation animation) {
                 RotateAnimation anim = new RotateAnimation(-90, -0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
                 anim.setDuration(300);
-                mRotateButton.startAnimation(anim);
+                binding.rotate90.startAnimation(anim);
             }
 
             @Override
@@ -176,7 +166,7 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
 
             }
         });
-        mRotateButton.startAnimation(anim);
+        binding.rotate90.startAnimation(anim);
     }
 
     @Override

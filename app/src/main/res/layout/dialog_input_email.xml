@@ -9,7 +9,7 @@
         android:orientation="vertical"
         android:padding="10dp">
 
-        <com.instachat.android.view.CustomFontTextView
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -17,7 +17,7 @@
             android:text="@string/welcome_back_old_user"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:font2="Lato-Bold.ttf"/>
+            app:customTypeface="@{'Lato-Bold'}"/>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/input_email_layout"

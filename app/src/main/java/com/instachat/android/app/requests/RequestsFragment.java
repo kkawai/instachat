@@ -1,25 +1,24 @@
 package com.instachat.android.app.requests;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.instachat.android.app.BaseFragment;
 import com.instachat.android.Constants;
-import com.instachat.android.app.analytics.Events;
-import com.instachat.android.app.activity.pm.PrivateChatActivity;
 import com.instachat.android.R;
-import com.instachat.android.app.adapter.MessageViewHolder;
+import com.instachat.android.app.BaseFragment;
+import com.instachat.android.app.activity.pm.PrivateChatActivity;
 import com.instachat.android.app.adapter.UserClickedListener;
+import com.instachat.android.app.analytics.Events;
 import com.instachat.android.data.model.PrivateChatSummary;
+import com.instachat.android.databinding.FragmentGenericUsersBinding;
 import com.instachat.android.util.UserPreferences;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -31,22 +30,20 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class RequestsFragment extends BaseFragment {
 
     public static final String TAG = "RequestsFragment";
-    private RecyclerView mRecyclerView;
     private UserClickedListener mUserClickedListener;
     private RequestsAdapter mRequestsAdapter;
+    private FragmentGenericUsersBinding binding;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_generic_users, container, false);
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-        return view;
+        binding = DataBindingUtil.inflate(inflater,R.layout.fragment_generic_users, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        TextView fragmentTitle = (TextView) getView().findViewById(R.id.customFragmentToolbarTitle);
-        fragmentTitle.setText(R.string.pending_requests_title);
+        binding.customFragmentToolbarTitle.setText(R.string.pending_requests_title);
         mUserClickedListener = new UserClickedListener() {
             @Override
             public void onUserClicked(final int userid, final String username, final String dpid, final View transitionImageView) {
@@ -54,12 +51,12 @@ public class RequestsFragment extends BaseFragment {
             }
         };
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_REQUESTS_REF());
-        mRequestsAdapter = new RequestsAdapter(PrivateChatSummary.class, R.layout.item_request, MessageViewHolder.class, ref);
+        mRequestsAdapter = new RequestsAdapter(PrivateChatSummary.class, ref);
         mRequestsAdapter.setUserClickedListener(mUserClickedListener);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerView.setAdapter(mRequestsAdapter);
+        binding.recyclerView.setLayoutManager(linearLayoutManager);
+        binding.recyclerView.setAdapter(mRequestsAdapter);
     }
 
     private void acceptUserPrompt(final int userid, final String username, final String dpid, final View transitionImageView) {

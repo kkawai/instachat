@@ -1,5 +1,6 @@
 package com.instachat.android.app.blocks;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,6 +20,7 @@ import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.data.model.PrivateChatSummary;
+import com.instachat.android.databinding.FragmentGenericUsersBinding;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -29,22 +31,20 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class BlocksFragment extends BaseFragment {
 
     public static final String TAG = "BlocksFragment";
-    private RecyclerView mBlocksRecyclerView;
     private UserClickedListener mUserClickedListener;
     private BlocksAdapter mBlocksAdapter;
+    private FragmentGenericUsersBinding binding;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_generic_users, container, false);
-        mBlocksRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-        return view;
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_generic_users, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        TextView fragmentTitle = (TextView) getView().findViewById(R.id.customFragmentToolbarTitle);
-        fragmentTitle.setText(R.string.manage_blocks);
+        binding.customFragmentToolbarTitle.setText(R.string.manage_blocks);
         mUserClickedListener = new UserClickedListener() {
             @Override
             public void onUserClicked(final int userid, final String username, final String dpid, final View transitionImageView) {
@@ -88,13 +88,12 @@ public class BlocksFragment extends BaseFragment {
             }
         };
         DatabaseReference userBlocksRef = FirebaseDatabase.getInstance().getReference(Constants.MY_BLOCKS_REF());
-        mBlocksAdapter = new BlocksAdapter(BlockedUser.class, R.layout.item_person, BlocksViewHolder.class, userBlocksRef);
-        mBlocksAdapter.setActivity(getActivity(), this);
+        mBlocksAdapter = new BlocksAdapter(BlockedUser.class, userBlocksRef);
         mBlocksAdapter.setUserClickedListener(mUserClickedListener);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        mBlocksRecyclerView.setLayoutManager(linearLayoutManager);
-        mBlocksRecyclerView.setAdapter(mBlocksAdapter);
+        binding.recyclerView.setLayoutManager(linearLayoutManager);
+        binding.recyclerView.setAdapter(mBlocksAdapter);
     }
 
     private void createPrivateChatSummary(int userid, String username, String dpid) {

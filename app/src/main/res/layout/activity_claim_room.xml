@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools">
+<layout>
 
     <FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/claim_room_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,7 +19,7 @@
             android:text="@string/name_your_room"
             android:textSize="45sp"
             android:textStyle="bold"
-            app:font2="SignPainter-HouseScript.ttf"
+            app:customTypeface="@{'SignPainter-HouseScript'}"
             />
 
         <LinearLayout

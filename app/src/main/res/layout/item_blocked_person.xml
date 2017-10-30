@@ -3,6 +3,14 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+
+        <variable
+            name="blockedUser"
+            type="com.instachat.android.app.blocks.BlockedUser"/>
+
+    </data>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,28 +24,19 @@
             android:layout_width="@dimen/user_thumb_pic_size"
             android:layout_height="@dimen/user_thumb_pic_size"
             android:src="@drawable/ic_anon_person_36dp"
-            android:transitionName="image"
+            android:transitionName="profilePic"
             app:civ_border_color="@color/colorAccent"
             app:civ_border_overlay="true"
-            app:civ_border_width="2px"/>
+            app:civ_border_width="2px"
+            app:imageUrl="@{blockedUser.dpid}"/>
 
         <TextView
             android:id="@+id/username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
-            android:text="theonetrevor"
-            android:textColor="@android:color/black"
-            android:textSize="15sp"
-            app:customTypeface="@{'Lato-Bold'}"/>
-
-        <TextView
-            android:id="@+id/likedPersonsPosts"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="4dp"
-            android:text="Likes my posts 56 times"
-            android:textColor="@android:color/black"
+            android:text="@{blockedUser.name}"
+            android:textColor="@android:color/white"
             android:textSize="15sp"
             app:customTypeface="@{'Lato-Bold'}"/>
 

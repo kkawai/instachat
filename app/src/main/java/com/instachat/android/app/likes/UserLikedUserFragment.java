@@ -1,5 +1,6 @@
 package com.instachat.android.app.likes;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,6 +18,7 @@ import com.instachat.android.app.activity.pm.PrivateChatActivity;
 import com.instachat.android.R;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.data.model.User;
+import com.instachat.android.databinding.FragmentGenericUsersBinding;
 
 /**
  * Created by kevin on 10/12/2016.
@@ -28,19 +30,20 @@ public class UserLikedUserFragment extends BaseFragment {
    private RecyclerView recyclerView;
    private UserClickedListener mUserClickedListener;
    private UserLikedUserAdapter mAdapter;
+   FragmentGenericUsersBinding binding;
 
    @Override
    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-      View view = inflater.inflate(R.layout.fragment_generic_users, container, false);
-      recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
+      binding = DataBindingUtil.inflate(inflater, R.layout.fragment_generic_users, container, false);
+      View view = binding.getRoot();
+      recyclerView = binding.recyclerView;
       return view;
    }
 
    @Override
    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
       super.onActivityCreated(savedInstanceState);
-      TextView fragmentTitle = (TextView) getView().findViewById(R.id.customFragmentToolbarTitle);
-      fragmentTitle.setText(getString(R.string.likes_plural, getArguments().getString(Constants.KEY_USERNAME)));
+      binding.customFragmentToolbarTitle.setText(getString(R.string.likes_plural, getArguments().getString(Constants.KEY_USERNAME)));
       mUserClickedListener = new UserClickedListener() {
          @Override
          public void onUserClicked(final int userid, final String username, final String dpid, View transitionImageView) {

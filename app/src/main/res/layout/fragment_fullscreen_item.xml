@@ -1,158 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@color/white_baby_powder"
-              android:orientation="vertical">
+<layout>
 
-    <!-- if you want elevation in the toolbar, surround Toolbar with AppbarLayout (see fragment_blocks)
-    However, in this full screen photo fragment, we don't want that.  -->
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@null"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:app="http://schemas.android.com/apk/res-auto"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:background="@color/white_baby_powder"
+                  android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|left"
-            android:src="@drawable/ic_arrow_back_white_24dp"/>
-
-        <com.instachat.android.view.CustomFontTextView
-            android:id="@+id/customFragmentToolbarTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
-            app:font2="Lato-Regular.ttf"/>
-
-        <ImageView
-            android:id="@+id/rotate90"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|right"
+        <!-- if you want elevation in the toolbar, surround Toolbar with AppbarLayout (see fragment_blocks)
+        However, in this full screen photo fragment, we don't want that.  -->
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
             android:background="@null"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:src="@drawable/ic_rotate_90_degrees_ccw_black_36dp"/>
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-    </android.support.v7.widget.Toolbar>
-
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                 xmlns:app="http://schemas.android.com/apk/res-auto"
-                 android:layout_width="match_parent"
-                 android:layout_height="match_parent"
-                 android:background="@color/white_baby_powder">
-
-        <com.instachat.android.view.AutoResizeTextView
-            android:id="@+id/autoResizeTextView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:autoLink="web|map|email|phone"
-            android:gravity="center"
-            android:textAlignment="center"
-            />
-
-        <com.instachat.android.view.ZoomableImageView
-            android:id="@+id/messagePhotoView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"/>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom">
-
-            <!-- android:layout_toRightOf="@+id/likeButton" -->
-            <com.instachat.android.view.CustomFontTextView
-                android:id="@+id/messageTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="148dp"
-                android:layout_above="@+id/location"
-                android:layout_centerHorizontal="true"
-                android:layout_marginLeft="16dip"
-                android:layout_marginRight="16dip"
-                android:autoLink="web|map|email|phone"
-                android:gravity="bottom"
-                android:scrollbars="vertical"
-                android:text=""
-                android:textAlignment="center"
-                android:textColor="@color/text_color"
-                android:textSize="15sp"
-                app:font2="Lato-Regular.ttf"
-                />
-
-            <!--
-            <CheckBox
-                android:id="@+id/likeButton"
+            <ImageView
+                android:id="@+id/back"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_above="@+id/location"
-                android:layout_alignParentLeft="true"
-                android:layout_marginLeft="3dip"
-                android:layout_marginRight="3dip"
-                android:layout_marginTop="3dip"
-                android:button="@drawable/stream_photo_activity_button_like"
-                android:clickable="true"/>  -->
+                android:layout_gravity="center_vertical|left"
+                android:src="@drawable/ic_arrow_back_white_24dp"/>
 
             <TextView
-                android:id="@+id/location"
+                android:id="@+id/customFragmentToolbarTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginBottom="3dip"
-                android:layout_marginRight="3dip"
-                android:gravity="right"
-                android:text=""
-                android:textColor="@color/link_color"
-                android:textStyle="bold"/>
+                android:layout_gravity="center_vertical"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                app:customTypeface="@{'Lato-Regular'}"/>
 
-        </RelativeLayout>
+            <ImageView
+                android:id="@+id/rotate90"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|right"
+                android:background="@null"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:src="@drawable/ic_rotate_90_degrees_ccw_black_36dp"/>
 
-        <ImageView
-            android:id="@+id/doubletap_heart"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:src="@drawable/doubletap_heart"
-            android:visibility="gone"/>
+        </android.support.v7.widget.Toolbar>
 
-        <!--
-        <ImageView
-            android:id="@+id/playVideo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|right"
-            android:layout_margin="4dip"
-            android:background="@null"
-            android:contentDescription="@string/ih_play"
-            android:src="@drawable/video_play_filterscreen"/>  -->
+        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                     xmlns:app="http://schemas.android.com/apk/res-auto"
+                     android:layout_width="match_parent"
+                     android:layout_height="match_parent"
+                     android:background="@color/white_baby_powder">
 
-        <!--
-        <VideoView
-            android:id="@+id/videoView"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone"
-            />  -->
+            <com.instachat.android.view.AutoResizeTextView
+                android:id="@+id/autoResizeTextView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:autoLink="web|map|email|phone"
+                android:gravity="center"
+                android:textAlignment="center"
+                app:customTypeface="@{'Lato-Regular'}"
+                />
 
-        <TextView
-            android:id="@+id/likesCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|start"
-            android:layout_margin="4dip"
-            android:text=""/>
+            <com.instachat.android.view.ZoomableImageView
+                android:id="@+id/messagePhotoView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"/>
 
-    </FrameLayout>
-</LinearLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom">
 
+                <!-- android:layout_toRightOf="@+id/likeButton" -->
+                <TextView
+                    android:id="@+id/messageTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="148dp"
+                    android:layout_above="@+id/location"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginLeft="16dip"
+                    android:layout_marginRight="16dip"
+                    android:autoLink="web|map|email|phone"
+                    android:gravity="bottom"
+                    android:scrollbars="vertical"
+                    android:text=""
+                    android:textAlignment="center"
+                    android:textColor="@color/text_color"
+                    android:textSize="15sp"
+                    app:customTypeface="@{'Lato-Regular'}"
+                    />
+
+                <!--
+                <CheckBox
+                    android:id="@+id/likeButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/location"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="3dip"
+                    android:layout_marginRight="3dip"
+                    android:layout_marginTop="3dip"
+                    android:button="@drawable/stream_photo_activity_button_like"
+                    android:clickable="true"/>  -->
+
+                <TextView
+                    android:id="@+id/location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginBottom="3dip"
+                    android:layout_marginRight="3dip"
+                    android:gravity="right"
+                    android:text=""
+                    android:textColor="@color/link_color"
+                    android:textStyle="bold"/>
+
+            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/doubletap_heart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/doubletap_heart"
+                android:visibility="gone"/>
+
+            <!--
+            <ImageView
+                android:id="@+id/playVideo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_margin="4dip"
+                android:background="@null"
+                android:contentDescription="@string/ih_play"
+                android:src="@drawable/video_play_filterscreen"/>  -->
+
+            <!--
+            <VideoView
+                android:id="@+id/videoView"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                />  -->
+
+            <TextView
+                android:id="@+id/likesCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|start"
+                android:layout_margin="4dip"
+                android:text=""/>
+
+        </FrameLayout>
+    </LinearLayout>
+
+</layout>

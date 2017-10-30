@@ -1,28 +1,27 @@
 package com.instachat.android.app.requests;
 
+import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.instachat.android.R;
-import com.instachat.android.app.adapter.MessageViewHolder;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.data.model.PrivateChatSummary;
-import com.instachat.android.util.MLog;
-import com.instachat.android.util.TimeUtil;
+import com.instachat.android.databinding.ItemRequestBinding;
 
-public final class RequestsAdapter<T, VH extends RecyclerView.ViewHolder> extends FirebaseRecyclerAdapter<PrivateChatSummary, MessageViewHolder> {
+public final class RequestsAdapter<T, VH extends RecyclerView.ViewHolder> extends FirebaseRecyclerAdapter<PrivateChatSummary, RequestsAdapter.RequestsViewHolder> {
 
     private static final String TAG = "RequestsAdapter";
 
     private UserClickedListener mUserClickedListener;
 
-    public RequestsAdapter(Class<PrivateChatSummary> modelClass, int modelLayout, Class<MessageViewHolder> viewHolderClass, DatabaseReference ref) {
-        super(modelClass, modelLayout, viewHolderClass, ref);
+    public RequestsAdapter(Class<PrivateChatSummary> modelClass, DatabaseReference ref) {
+        super(modelClass, R.layout.item_request, RequestsViewHolder.class, ref);
     }
 
     public void setUserClickedListener(UserClickedListener userClickedListener) {
@@ -30,31 +29,32 @@ public final class RequestsAdapter<T, VH extends RecyclerView.ViewHolder> extend
     }
 
     @Override
-    public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final MessageViewHolder holder = super.onCreateViewHolder(parent, viewType);
+    public RequestsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        ItemRequestBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),R.layout.item_request, parent, false);
+        final RequestsViewHolder holder = new RequestsViewHolder(binding);
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 PrivateChatSummary privateChatSummary = getItem(holder.getAdapterPosition());
-                mUserClickedListener.onUserClicked(Integer.parseInt(privateChatSummary.getId()), privateChatSummary.getName(), privateChatSummary.getDpid(), holder.messengerImageView);
+                mUserClickedListener.onUserClicked(Integer.parseInt(privateChatSummary.getId()), privateChatSummary.getName(), privateChatSummary.getDpid(), holder.binding.messengerImageView);
             }
         };
         holder.itemView.setOnClickListener(onClickListener);
-        holder.messageTextParent.setOnClickListener(onClickListener);
+        holder.binding.messageTextParent.setOnClickListener(onClickListener);
         return holder;
     }
 
     @Override
-    protected void populateViewHolder(final MessageViewHolder viewHolder, PrivateChatSummary model, int position) {
-        viewHolder.messengerTextView.setText(model.getName());
-        viewHolder.messageTimeTextView.setText(TimeUtil.getTimeAgo(model.getLastMessageSentTimestamp()));
-        try {
-            Glide.with(viewHolder.messengerImageView.getContext()).load(model.getDpid()).error(R.drawable.ic_anon_person_36dp).into(viewHolder.messengerImageView);
-        } catch (final Exception e) {
-            MLog.e(TAG, "", e);
-            viewHolder.messengerImageView.setImageResource(R.drawable.ic_anon_person_36dp);
+    protected void populateViewHolder(final RequestsViewHolder viewHolder, PrivateChatSummary model, int position) {
+        viewHolder.binding.setPrivateChatSummary(model);
+    }
+
+    static final class RequestsViewHolder extends RecyclerView.ViewHolder {
+        private final ItemRequestBinding binding;
+        RequestsViewHolder(ItemRequestBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
-        viewHolder.messageTextView.setText(model.getLastMessage());
     }
 
     @Override

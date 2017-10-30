@@ -81,7 +81,7 @@
                         app:endColor="@color/dotColor3"
                         app:startColor="@color/dotColor1"/>
 
-                    <com.instachat.android.view.CustomFontTextView
+                    <TextView
                         android:id="@+id/usernameTyping"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -89,7 +89,7 @@
                         android:layout_marginLeft="4dp"
                         android:textColor="@color/chat_time_message_sent"
                         android:textSize="@dimen/message_sent_time_ago_size"
-                        app:font2="Lato-HeavyItalic.ttf"/>
+                        app:customTypeface="@{'Lato-HeavyItalic'}"/>
 
                 </LinearLayout>
 

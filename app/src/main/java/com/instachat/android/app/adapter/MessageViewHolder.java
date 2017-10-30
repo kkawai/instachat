@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.instachat.android.R;
+import com.instachat.android.databinding.ItemMessageBinding;
 import com.instachat.android.view.PeriscopeLayout;
 import com.sackcentury.shinebuttonlib.ShineButton;
 
@@ -42,6 +43,16 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
 
     public MessageViewHolder(View v) {
         super(v);
+
+        /**
+         * Still using 'findViewById' because MessageViewHolder is being re-used for a
+         * variety of different layout xml that happen to have the same views and ids.
+         * Not a great solution, but a 'for now' compromise when cutting everything over
+         * to data binding and mvvm architecture.
+         *
+         * Ideally, we would want a different ViewHolder for each different layout
+         * and adapter respectively.  And the unique binding to go into each ViewHolder.
+         */
         messageTextParent = itemView.findViewById(R.id.contentMessageChat);
         messageTextView = (TextView) itemView.findViewById(R.id.messageTextView);
         messengerTextView = (TextView) itemView.findViewById(R.id.messengerTextView);

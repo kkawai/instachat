@@ -1,41 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/left_drawer_list_background_color"
-                android:paddingBottom="4dp"
-                android:paddingTop="8dp">
+<layout>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/left_drawer_list_background_color"
+                    android:paddingBottom="4dp"
+                    android:paddingTop="8dp">
 
 
-    <com.instachat.android.view.CustomFontTextView
-        android:id="@+id/name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:ellipsize="marquee"
-        android:maxLines="1"
-        android:paddingLeft="13dp"
-        android:text="# Channels"
-        android:textSize="18sp"
-        app:font2="Lato-Heavy.ttf"
-        />
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:ellipsize="marquee"
+            android:maxLines="1"
+            android:paddingLeft="13dp"
+            android:text="# Channels"
+            android:textSize="18sp"
+            app:customTypeface="@{'Lato-Heavy'}"
+            />
 
-    <!--
-    todo: add feature to search for groups and users to add
-    for now, gone the view
-    -->
-    <ImageView
-        android:id="@+id/add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="14dp"
-        android:scaleType="fitXY"
-        android:src="@drawable/ic_add_circle_outline_white_24dp"
-        android:visibility="gone"
-        />
+        <!--
+        todo: add feature to search for groups and users to add
+        for now, gone the view
+        -->
+        <ImageView
+            android:id="@+id/add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="14dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_add_circle_outline_white_24dp"
+            android:visibility="gone"
+            />
 
-</RelativeLayout>
+    </RelativeLayout>
+</layout>

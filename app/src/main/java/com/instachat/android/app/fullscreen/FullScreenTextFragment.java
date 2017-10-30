@@ -1,6 +1,7 @@
 package com.instachat.android.app.fullscreen;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,8 @@ import android.view.ViewGroup;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.data.model.FriendlyMessage;
+import com.instachat.android.databinding.FragmentFullscreenBinding;
+import com.instachat.android.databinding.FragmentFullscreenItemBinding;
 import com.instachat.android.util.MLog;
 
 /**
@@ -24,6 +27,7 @@ public class FullScreenTextFragment extends Fragment {
     private FriendlyMessageContainer mFriendlyMessageContainer;
     private FragmentStatePagerAdapter mPagerAdapter;
     private int mLastPos;
+    private FragmentFullscreenBinding binding;
 
     @Override
     public void onAttach(Context context) {
@@ -37,14 +41,14 @@ public class FullScreenTextFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_fullscreen, container, false);
-        return view;
+        binding = DataBindingUtil.inflate(inflater,R.layout.fragment_fullscreen, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        final ViewPager viewPager = (ViewPager) getView().findViewById(R.id.view_pager);
+        final ViewPager viewPager = binding.viewPager;
         mPagerAdapter = new FragmentStatePagerAdapter(getChildFragmentManager()) {
             @Override
             public Fragment getItem(final int position) {

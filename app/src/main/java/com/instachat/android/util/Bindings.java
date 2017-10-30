@@ -8,12 +8,14 @@ import android.app.Activity;
 import android.databinding.BindingAdapter;
 import android.graphics.Typeface;
 import android.support.design.widget.TextInputLayout;
+import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.instachat.android.R;
+import com.instachat.android.data.model.PrivateChatSummary;
 
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +31,11 @@ public class Bindings {
 
     @BindingAdapter("imageUrl")
     public static void setImageUrl(ImageView imageView, String url) {
-        Glide.with((Activity)imageView.getContext()).load(url).into(imageView);
+        if (TextUtils.isEmpty(url)) {
+            imageView.setImageResource(R.drawable.ic_anon_person_36dp);
+        } else {
+            Glide.with((Activity) imageView.getContext()).load(url).error(R.drawable.ic_anon_person_36dp).into(imageView);
+        }
     }
 
     @BindingAdapter("customTypeface")
@@ -39,9 +45,10 @@ public class Bindings {
 
     @BindingAdapter("customTypeface")
     public static void setCustomTypeface(TextView textView, String name) {
+        name = name.endsWith(".ttf") ? ("fonts/"+name) : ("fonts/"+name+".tff");
         Typeface typeface = cache.get(name);
         if (typeface == null) {
-            typeface = Typeface.createFromAsset(textView.getContext().getAssets(), "fonts/"+name+".ttf");
+            typeface = Typeface.createFromAsset(textView.getContext().getAssets(), name);
             cache.put(name, typeface);
         }
         textView.setTypeface(typeface);

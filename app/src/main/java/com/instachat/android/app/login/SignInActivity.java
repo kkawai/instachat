@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
@@ -40,6 +41,7 @@ import com.instachat.android.app.ui.base.BaseActivity;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.model.User;
 import com.instachat.android.databinding.ActivitySignInBinding;
+import com.instachat.android.databinding.DialogInputEmailBinding;
 import com.instachat.android.util.FontUtil;
 import com.instachat.android.util.ActivityUtil;
 import com.instachat.android.util.MLog;
@@ -346,7 +348,8 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
 
    private AlertDialog showNewEmailDialog(@NonNull final Context context, final String username, final String password) {
       final Object tag = new Object();
-      final View view = getLayoutInflater().inflate(R.layout.dialog_input_email, null);
+      DialogInputEmailBinding binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.dialog_input_email, null, false);
+      final View view = binding.getRoot();
       final TextView textView = (TextView) view.findViewById(R.id.input_email);
       final TextInputLayout textInputLayout = (TextInputLayout) view.findViewById(R.id.input_email_layout);
       FontUtil.setTextViewFont(textView);
