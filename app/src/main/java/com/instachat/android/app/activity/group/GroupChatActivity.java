@@ -65,7 +65,6 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
 
     private ActivityMainBinding binding;
     private GroupChatViewModel groupChatViewModel;
-    private TextView rightHeaderGroupName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -247,13 +246,13 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         chatsRecyclerViewAdapter.setUsersInGroupListener(usersInGroupListener);
     }
 
-
-
+    private RightDrawerLayoutBinding rightDrawerLayoutBinding;
+    private RightNavHeaderBinding rightNavHeaderBinding;
     @Override
     public void setupRightDrawerContent() {
 
-        RightDrawerLayoutBinding rightDrawerLayoutBinding = RightDrawerLayoutBinding.inflate(getLayoutInflater(), binding.rightNavView, false);
-        RightNavHeaderBinding rightNavHeaderBinding = RightNavHeaderBinding.inflate(getLayoutInflater(), binding.rightNavView, false);
+        rightDrawerLayoutBinding = RightDrawerLayoutBinding.inflate(getLayoutInflater(), binding.rightNavView, false);
+        rightNavHeaderBinding = RightNavHeaderBinding.inflate(getLayoutInflater(), binding.rightNavView, false);
 
         binding.rightNavView.addHeaderView(rightNavHeaderBinding.getRoot());
         binding.rightNavView.addHeaderView(rightDrawerLayoutBinding.getRoot());
@@ -425,6 +424,6 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
 
     @Override
     public void showGroupName(String groupName) {
-        rightHeaderGroupName.setText(groupName);
+        rightNavHeaderBinding.groupname.setText(groupName);
     }
 }

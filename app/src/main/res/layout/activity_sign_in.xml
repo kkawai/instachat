@@ -4,6 +4,16 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="com.instachat.android.app.login.SignInViewModel" />
+
+    </data>
+
     <FrameLayout
         android:id="@+id/sign_in_layout"
         android:layout_width="match_parent"
