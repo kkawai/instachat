@@ -254,8 +254,8 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         rightDrawerLayoutBinding = RightDrawerLayoutBinding.inflate(getLayoutInflater(), binding.rightNavView, false);
         rightNavHeaderBinding = RightNavHeaderBinding.inflate(getLayoutInflater(), binding.rightNavView, false);
 
+        binding.rightNavView.addView(rightDrawerLayoutBinding.getRoot());
         binding.rightNavView.addHeaderView(rightNavHeaderBinding.getRoot());
-        binding.rightNavView.addHeaderView(rightDrawerLayoutBinding.getRoot());
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -327,11 +327,6 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         } else {
             if (menu.findItem(R.id.menu_manage_blocks) != null)
                 menu.removeItem(R.id.menu_manage_blocks);
-        }
-        if (!groupChatViewModel.isPrivateChat()) {
-            if (menu.findItem(R.id.menu_sign_out) != null) {
-                menu.removeItem(R.id.menu_sign_out);
-            }
         }
         return super.onMenuOpened(featureId, menu);
     }

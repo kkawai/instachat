@@ -1,4 +1,6 @@
-<resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <style name="Theme.Launcher" parent="@style/Theme.AppCompat.Light">
         <item name="windowNoTitle">true</item>
@@ -22,7 +24,12 @@
         <item name="colorButtonNormal">@drawable/button_selector</item>
         <item name="android:buttonStyle">@style/FriendlyButtonStyle</item>
         -->
+        <item name="android:textAppearance">@style/IcDefaultTextAppearance</item>
 
+    </style>
+
+    <style name="IcDefaultTextAppearance" parent="@android:style/TextAppearance">
+        <item name="app:customTypeface">Lato-Regular</item>
     </style>
 
     <style name="FriendlyButtonStyle" parent="Widget.AppCompat.Button">

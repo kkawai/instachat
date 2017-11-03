@@ -43,7 +43,7 @@
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:textColor="@android:color/black"
                     android:textSize="18sp"
-                    app:customTypeface="@{'Lato-Regular'}"/>
+                    />
 
             </android.support.v7.widget.Toolbar>
 

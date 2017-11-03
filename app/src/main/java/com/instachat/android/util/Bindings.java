@@ -45,7 +45,7 @@ public class Bindings {
 
     @BindingAdapter("customTypeface")
     public static void setCustomTypeface(TextView textView, String name) {
-        name = name.endsWith(".ttf") ? ("fonts/"+name) : ("fonts/"+name+".tff");
+        name = name.endsWith(".ttf") ? ("fonts/"+name) : ("fonts/"+name+".ttf");
         Typeface typeface = cache.get(name);
         if (typeface == null) {
             typeface = Typeface.createFromAsset(textView.getContext().getAssets(), name);

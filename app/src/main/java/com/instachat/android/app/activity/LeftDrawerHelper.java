@@ -38,6 +38,8 @@ import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.data.model.User;
 import com.instachat.android.databinding.DialogPictureChooseBinding;
+import com.instachat.android.databinding.LeftDrawerLayoutBinding;
+import com.instachat.android.databinding.LeftNavHeaderBinding;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.FontUtil;
 import com.instachat.android.util.MLog;
@@ -131,15 +133,15 @@ public class LeftDrawerHelper {
 
    private int mWhichDrawerLastOpened;
 
-   public void setup(NavigationView navigationView) {
-      mHeaderLayout = navigationView.getHeaderView(0); // 0-index header
+   public void setup(LeftDrawerLayoutBinding leftDrawerLayoutBinding, final LeftNavHeaderBinding leftNavHeaderBinding) {
+      mHeaderLayout = leftNavHeaderBinding.getRoot();
       mBioEditText = (EditText) mHeaderLayout.findViewById(R.id.input_bio);
       mUsernameEditText = (EditText) mHeaderLayout.findViewById(R.id.nav_username);
       mSaveButton = mHeaderLayout.findViewById(R.id.save_username);
       mDrawerLikesParent = mHeaderLayout.findViewById(R.id.drawerLikesParent);
       mDrawerLikesCountView = (TextView) mHeaderLayout.findViewById(R.id.drawerLikes);
       mDrawerLikesIcon = mHeaderLayout.findViewById(R.id.drawerLikesIcon);
-      mPendingRequests = (TextView) navigationView.findViewById(R.id.menu_pending_requests);
+      mPendingRequests = (TextView) leftDrawerLayoutBinding.getRoot().findViewById(R.id.menu_pending_requests);
       mHelpButton = mHeaderLayout.findViewById(R.id.help);
       setupUsernameAndBio();
       mProfilePic = (ImageView) mHeaderLayout.findViewById(R.id.nav_pic);

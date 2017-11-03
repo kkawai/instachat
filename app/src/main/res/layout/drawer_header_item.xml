@@ -22,7 +22,7 @@
             android:paddingLeft="13dp"
             android:text="# Channels"
             android:textSize="18sp"
-            app:customTypeface="@{'Lato-Heavy'}"
+
             />
 
         <!--

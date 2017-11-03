@@ -39,6 +39,6 @@
             android:textSize="16dp"
             android:textStyle="bold|italic"
             android:visibility="gone"
-            app:customTypeface="@{'Lato-HeavyItalic'}"/>
+            />
     </LinearLayout>
 </layout>
