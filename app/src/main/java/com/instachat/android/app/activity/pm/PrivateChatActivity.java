@@ -581,9 +581,9 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
                 menu.add(0, R.id.menu_sign_out, 1, getString(R.string.sign_out));
             }
         } else {
-            if (menu.findItem(R.id.menu_sign_out) != null) {
-                menu.removeItem(R.id.menu_sign_out);
-            }
+            //if (menu.findItem(R.id.menu_sign_out) != null) {
+            //    menu.removeItem(R.id.menu_sign_out);
+            //}
         }
         return super.onMenuOpened(featureId, menu);
     }

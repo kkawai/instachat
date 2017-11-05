@@ -214,12 +214,6 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
             case R.id.menu_sign_out:
                 signout();
                 return true;
-            case R.id.fresh_config_menu:
-                groupChatViewModel.fetchConfig(firebaseRemoteConfig);
-                return true;
-            case R.id.full_screen_texts_menu:
-                showFullScreenTextView(-1);
-                return true;
             case R.id.menu_pending_requests:
                 showPendingRequests();
                 return true;
@@ -329,9 +323,9 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
                 menu.removeItem(R.id.menu_manage_blocks);
         }
         if (!groupChatViewModel.isPrivateChat()) {
-            if (menu.findItem(R.id.menu_sign_out) != null) {
-                menu.removeItem(R.id.menu_sign_out);
-            }
+            //if (menu.findItem(R.id.menu_sign_out) != null) {
+            //    menu.removeItem(R.id.menu_sign_out);
+            //}
         }
         return super.onMenuOpened(featureId, menu);
     }
