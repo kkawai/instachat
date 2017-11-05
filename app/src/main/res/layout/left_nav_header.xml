@@ -22,7 +22,7 @@
             android:textSize="21sp"
             android:textStyle="bold"
             android:visibility="invisible"
-            app:customTypeface="@{'Lato-Bold'}"/>
+            android:fontFamily="@font/lato_bold"/>
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -94,7 +94,7 @@
                 android:textSize="13sp"
                 android:textStyle="bold"
                 android:visibility="invisible"
-                app:customTypeface="@{'Lato-Bold'}"/>
+                android:fontFamily="@font/lato_bold"/>
         </LinearLayout>
 
         <EditText
@@ -113,7 +113,7 @@
             android:textColor="@android:color/white"
             android:textSize="13sp"
             android:visibility="invisible"
-            app:customTypeface="@{'Lato-Regular'}"/>
+            android:fontFamily="@font/lato_regular"/>
 
     </LinearLayout>
 </layout>

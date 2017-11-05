@@ -45,7 +45,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/chat_sender_username"
                         android:textSize="@dimen/message_sender_name_size"
-                        app:customTypeface="@{'Lato-Bold'}"/>
+                        android:fontFamily="@font/lato_bold"/>
 
                     <TextView
                         android:id="@+id/messageTimeTextView"
@@ -54,7 +54,7 @@
                         android:layout_marginLeft="5dp"
                         android:textColor="@color/chat_time_message_sent"
                         android:textSize="@dimen/message_sent_time_ago_size"
-                        app:customTypeface="@{'Lato-Regular'}"/>
+                        android:fontFamily="@font/lato_regular"/>
 
                     <ImageView
                         android:id="@+id/messageReadConfirmationView"
@@ -101,7 +101,7 @@
                             android:textAlignment="center"
                             android:textColor="@color/chat_message_color"
                             android:textSize="@dimen/message_text_size"
-                            app:customTypeface="@{'Lato-Regular'}"/>
+                            android:fontFamily="@font/lato_regular"/>
 
                     </LinearLayout>
 
@@ -116,7 +116,7 @@
                     android:maxWidth="240dp"
                     android:textColor="@color/chat_message_color"
                     android:textSize="@dimen/message_text_size"
-                    app:customTypeface="@{'Lato-Regular'}"/>
+                    android:fontFamily="@font/lato_regular"/>
 
             </LinearLayout>
 
@@ -173,7 +173,7 @@
                     android:textColor="@color/chat_likes_count"
                     android:textSize="@dimen/message_likes_counter_size"
                     android:textStyle="bold"
-                    app:customTypeface="@{'Lato-Bold'}"/>
+                    android:fontFamily="@font/lato_bold"/>
             </FrameLayout>
         </FrameLayout>
 

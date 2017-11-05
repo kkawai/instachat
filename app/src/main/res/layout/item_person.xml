@@ -38,7 +38,7 @@
             android:text="@{user.username}"
             android:textColor="@android:color/white"
             android:textSize="15sp"
-            app:customTypeface="@{'Lato-Bold'}"/>
+            android:fontFamily="@font/lato_bold"/>
 
     </LinearLayout>
 

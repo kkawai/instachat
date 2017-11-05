@@ -19,7 +19,7 @@
             android:text="@string/name_your_room"
             android:textSize="45sp"
             android:textStyle="bold"
-            app:customTypeface="@{'SignPainter-HouseScript'}"
+            android:fontFamily="@font/signpainter_housescript"
             />
 
         <LinearLayout

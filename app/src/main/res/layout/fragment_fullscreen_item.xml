@@ -32,7 +32,7 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:textColor="@android:color/black"
                 android:textSize="18sp"
-                app:customTypeface="@{'Lato-Regular'}"/>
+                android:fontFamily="@font/lato_regular"/>
 
             <ImageView
                 android:id="@+id/rotate90"
@@ -59,7 +59,7 @@
                 android:autoLink="web|map|email|phone"
                 android:gravity="center"
                 android:textAlignment="center"
-                app:customTypeface="@{'Lato-Regular'}"
+                android:fontFamily="@font/lato_regular"
                 />
 
             <com.instachat.android.view.ZoomableImageView
@@ -89,7 +89,7 @@
                     android:textAlignment="center"
                     android:textColor="@color/text_color"
                     android:textSize="15sp"
-                    app:customTypeface="@{'Lato-Regular'}"
+                    android:fontFamily="@font/lato_regular"
                     />
 
                 <!--

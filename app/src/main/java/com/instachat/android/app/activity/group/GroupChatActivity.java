@@ -254,8 +254,8 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         rightDrawerLayoutBinding = RightDrawerLayoutBinding.inflate(getLayoutInflater(), binding.rightNavView, false);
         rightNavHeaderBinding = RightNavHeaderBinding.inflate(getLayoutInflater(), binding.rightNavView, false);
 
+        binding.rightNavView.addView(rightDrawerLayoutBinding.getRoot());
         binding.rightNavView.addHeaderView(rightNavHeaderBinding.getRoot());
-        binding.rightNavView.addHeaderView(rightDrawerLayoutBinding.getRoot());
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);

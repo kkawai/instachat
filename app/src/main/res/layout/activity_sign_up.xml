@@ -20,7 +20,7 @@
             android:text="@string/get_started"
             android:textSize="45sp"
             android:textStyle="bold"
-            app:customTypeface="@{'SignPainter-HouseScript'}"/>
+            android:fontFamily="@font/signpainter_housescript"/>
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -17,6 +17,6 @@ public final class FontUtil {
     }
 
     public static void setTextViewFont(TextView textView) {
-        Bindings.setCustomTypeface(textView, "Lato-Regular");
+        //Bindings.setCustomTypeface(textView, "Lato-Regular");
     }
 }

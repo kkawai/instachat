@@ -88,7 +88,7 @@
                         android:layout_marginLeft="4dp"
                         android:textColor="@color/chat_time_message_sent"
                         android:textSize="@dimen/message_sent_time_ago_size"
-                        app:customTypeface="@{'Lato-HeavyItalic'}"/>
+                        android:fontFamily="@font/lato_heavyitalic"/>
 
                 </LinearLayout>
 

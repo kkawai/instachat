@@ -660,10 +660,10 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     public void setupLeftDrawerContent(NavigationView navigationView) {
         leftNavHeaderBinding = LeftNavHeaderBinding.inflate(getLayoutInflater(), navigationView, false);
         leftDrawerLayoutBinding = LeftDrawerLayoutBinding.inflate(getLayoutInflater(), navigationView, false);
-        navigationView.addView(leftNavHeaderBinding.getRoot());
-        navigationView.addHeaderView(leftDrawerLayoutBinding.getRoot());
+        navigationView.addView(leftDrawerLayoutBinding.getRoot());
+        navigationView.addHeaderView(leftNavHeaderBinding.getRoot());
         mLeftDrawerHelper = new LeftDrawerHelper(networkApi, this, this, drawerLayout, mLeftDrawerEventListener);
-        mLeftDrawerHelper.setup(navigationView);
+        mLeftDrawerHelper.setup(leftDrawerLayoutBinding, leftNavHeaderBinding);
         mLeftDrawerHelper.setUserLikedUserListener(mUserLikedUserListener);
 
         chatsRecyclerViewAdapter.setup(this, this, true);

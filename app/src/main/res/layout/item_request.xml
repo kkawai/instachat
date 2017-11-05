@@ -58,7 +58,7 @@
                         android:textColor="@color/chat_sender_username"
                         android:textSize="@dimen/message_sender_name_size"
                         android:text="@{privateChatSummary.name}"
-                        app:customTypeface="@{'Lato-Bold'}"
+                        android:fontFamily="@font/lato_bold"
                         />
 
                     <TextView
@@ -69,7 +69,7 @@
                         android:textColor="@color/chat_time_message_sent"
                         android:textSize="@dimen/message_sent_time_ago_size"
                         android:text="@{TimeUtil.getTimeAgo(privateChatSummary.lastMessageSentTimestamp)}"
-                        app:customTypeface="@{'Lato-Regular'}"/>
+                        android:fontFamily="@font/lato_regular"/>
 
                 </LinearLayout>
 
@@ -82,7 +82,7 @@
                     android:textColor="@color/chat_message_color"
                     android:textSize="@dimen/message_text_size"
                     android:text="@{privateChatSummary.lastMessage}"
-                    app:customTypeface="@{'Lato-Regular'}"/>
+                    android:fontFamily="@font/lato_regular"/>
 
             </LinearLayout>
 
