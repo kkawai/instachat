@@ -72,7 +72,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
             return;
         }
         try {
-            firebaseDatabase.setPersistenceEnabled(true);
+            //firebaseDatabase.setPersistenceEnabled(true);
             MLog.w(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) succeeded");
         } catch (Exception e) {
             //MLog.e(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) failed: " + e);

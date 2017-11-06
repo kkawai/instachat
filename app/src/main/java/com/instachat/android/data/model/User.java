@@ -152,6 +152,8 @@ public class User {
                 object.put("password", password);
             if (email != null)
                 object.put("email", email);
+            if (profilePicUrl != null)
+                object.put("profilePicUrl", profilePicUrl);
             if (bio != null)
                 object.put("bio", bio);
             if (lastOnline != 0)
