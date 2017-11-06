@@ -30,6 +30,7 @@ import com.instachat.android.TheApp;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.likes.UserLikedUserListener;
 import com.instachat.android.data.api.NetworkApi;
+import com.instachat.android.data.api.UserResponse;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.data.model.User;
 import com.instachat.android.databinding.DialogPictureChooseBinding;
@@ -48,6 +49,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import io.reactivex.functions.Consumer;
 
 /**
  * Created by kevin on 9/4/2016.
@@ -70,8 +72,19 @@ public class LeftDrawerHelper {
     private final NetworkApi networkApi;
     private LeftDrawerLayoutBinding leftDrawerLayoutBinding; 
     private LeftNavHeaderBinding leftNavHeaderBinding;
+    private AbstractChatNavigator navigator;
+    private AbstractChatViewModel viewModel;
 
-    public LeftDrawerHelper(@NonNull NetworkApi networkApi, @NonNull Activity activity, @NonNull ActivityState activityState, @NonNull DrawerLayout drawerLayout, @NonNull LeftDrawerEventListener listener) {
+    public LeftDrawerHelper(
+            AbstractChatNavigator navigator,
+            AbstractChatViewModel viewModel,
+            @NonNull NetworkApi networkApi,
+            @NonNull Activity activity,
+            @NonNull ActivityState activityState,
+            @NonNull DrawerLayout drawerLayout,
+            @NonNull LeftDrawerEventListener listener) {
+        this.navigator = navigator;
+        this.viewModel = viewModel;
         mActivity = activity;
         mActivityState = activityState;
         mDrawerLayout = drawerLayout;
@@ -260,44 +273,7 @@ public class LeftDrawerHelper {
     }
 
     private void checkForRemoteUpdatesToMyDP() {
-        networkApi.getUserById(null, UserPreferences.getInstance().getUserId(), new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(final JSONObject response) {
-                try {
-                    if (mActivityState == null || mActivityState.isActivityDestroyed())
-                        return;
-                    final String status = response.getString(NetworkApi.KEY_RESPONSE_STATUS);
-                    if (status.equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
-                        final User remote = User.fromResponse(response);
-                        if (!TextUtils.isEmpty(remote.getProfilePicUrl())) {
-                            User local = UserPreferences.getInstance().getUser();
-                            if (TextUtils.isEmpty(local.getProfilePicUrl()) || !remote.getProfilePicUrl().equals(local.getProfilePicUrl())) {
-                                User user = UserPreferences.getInstance().getUser();
-                                user.setProfilePicUrl(remote.getProfilePicUrl());
-                                UserPreferences.getInstance().saveUser(user);
-
-                                MLog.i(TAG, "checkForRemoteUpdatesToMyDP() my pic changed remotely. attempt to update");
-                                try {
-                                    Glide.with(mActivity).load(remote.getProfilePicUrl()).error(R.drawable.ic_anon_person_36dp).crossFade().into(leftNavHeaderBinding.navPic);
-                                } catch (Exception e) {
-                                    MLog.e(TAG, "onDrawerOpened() could not find my photo in google cloud storage", e);
-                                }
-                            } else {
-                                MLog.i(TAG, "checkForRemoteUpdatesToMyDP() my pic did not change remotely. do not update.");
-                            }
-                        }
-                    }
-                } catch (final Exception e) {
-                    MLog.e(TAG, "checkIfOtherDeviceUpdatedProfilePic(1) failed", e);
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(final VolleyError error) {
-                MLog.e(TAG, "checkForRemoteUpdatesToMyDP(2) failed: " + error);
-            }
-        });
-
+        viewModel.checkForRemoteUpdatesToMyDP();
     }
 
     public void cleanup() {

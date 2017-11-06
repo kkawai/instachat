@@ -6,8 +6,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v13.view.inputmethod.InputConnectionCompat;
 import android.support.v13.view.inputmethod.InputContentInfoCompat;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -23,7 +25,10 @@ import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.blocks.BlockedUserListener;
 import com.instachat.android.app.ui.base.BaseViewModel;
 import com.instachat.android.data.DataManager;
+import com.instachat.android.data.api.NetworkApi;
+import com.instachat.android.data.api.UserResponse;
 import com.instachat.android.data.model.FriendlyMessage;
+import com.instachat.android.data.model.User;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.UserPreferences;
@@ -34,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
 
 public abstract class AbstractChatViewModel<Navigator extends AbstractChatNavigator> extends BaseViewModel<Navigator> {
@@ -41,6 +47,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     private static final String TAG = "AbstractChatViewModel";
 
     public ObservableField<Boolean> isAdReady = new ObservableField<>(true);
+    public ObservableField<String> profilePicUrl = new ObservableField<>("");
 
     private String databaseRoot;
 
@@ -150,7 +157,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
         //for up to 5 seconds.  close the smallProgressCircle as soon as
         //messages are detected or 5 seconds has elapsed, whichever comes
         //first.
-        add(Observable.interval(500,500, TimeUnit.MILLISECONDS)
+        add(Observable.interval(500, 500, TimeUnit.MILLISECONDS)
                 .subscribeOn(getSchedulerProvider().io())
                 .observeOn(getSchedulerProvider().ui())
                 .take(10).takeUntil(new Predicate<Long>() {
@@ -183,10 +190,6 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     }
 
     public abstract void cleanup();
-
-    public BlockedUserListener getBlockedUserListener() {
-        return blockedUserListener;
-    }
 
     private BlockedUserListener blockedUserListener = new BlockedUserListener() {
         @Override
@@ -228,7 +231,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     }
 
     public boolean onCommitContent(InputContentInfoCompat inputContentInfo, int flags,
-                                    Bundle opts, String[] contentMimeTypes) {
+                                   Bundle opts, String[] contentMimeTypes) {
 
         boolean supported = false;
         for (final String mimeType : contentMimeTypes) {
@@ -254,8 +257,6 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
             }
         }
         Uri linkUri = inputContentInfo.getLinkUri();
-        //MLog.d(TAG, "linkUri: " + linkUri.toString() + ": " + inputContentInfo.getDescription().toString(), " : ",
-        // inputContentInfo);
         if (inputContentInfo != null && inputContentInfo.getDescription() != null) {
             if (inputContentInfo.getDescription().toString().contains("image/gif")) {
                 final FriendlyMessage friendlyMessage = new FriendlyMessage("",
@@ -268,6 +269,45 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
             }
         }
         return true;
+    }
+
+    public void saveUserPhoto(@NonNull String photoUrl) {
+        final User user = UserPreferences.getInstance().getUser();
+        user.setProfilePicUrl(photoUrl);
+        UserPreferences.getInstance().saveUser(user);
+        add(getDataManager().saveUser3((long) user.getId(), user.getUsername(), user.getPassword(),
+                user.getEmail(), user.getProfilePicUrl(), user.getBio())
+                .subscribe());
+    }
+
+    public void checkForRemoteUpdatesToMyDP() {
+        add(getDataManager().getUserById(myUserid())
+                .subscribe(new Consumer<UserResponse>() {
+                    @Override
+                    public void accept(UserResponse userResponse) throws Exception {
+                        if (userResponse.status.equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
+                            final User remote = userResponse.user;
+                            if (!TextUtils.isEmpty(remote.getProfilePicUrl())) {
+                                String localProfilePic = UserPreferences.getInstance().getUser().getProfilePicUrl()+"";
+                                String remoteProfilePic = remote.getProfilePicUrl()+"";
+                                if (StringUtil.isNotEmpty(remoteProfilePic) && !localProfilePic.equals(remoteProfilePic)) {
+                                    User user = UserPreferences.getInstance().getUser();
+                                    user.setProfilePicUrl(remoteProfilePic);
+                                    UserPreferences.getInstance().saveUser(user);
+                                    profilePicUrl.set(remote.getProfilePicUrl());
+                                    MLog.i(TAG, "checkForRemoteUpdatesToMyDP() my pic changed remotely. attempt to update");
+                                } else {
+                                    MLog.i(TAG, "checkForRemoteUpdatesToMyDP() my pic did not change remotely. do not update.");
+                                }
+                            }
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        MLog.e(TAG,"checkForRemoteUpdatesToMyDP() failed", throwable);
+                    }
+                }));
     }
 
 }

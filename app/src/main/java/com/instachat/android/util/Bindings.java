@@ -38,6 +38,18 @@ public class Bindings {
         }
     }
 
+    @BindingAdapter("myProfileImage")
+    public static void setMyProfileImageUrl(ImageView imageView, String url) {
+        if (TextUtils.isEmpty(url)) {
+            imageView.setImageResource(R.drawable.ic_anon_person_36dp);
+        } else {
+            Glide.with((Activity) imageView.getContext())
+                    .load(url)
+                    .error(R.drawable.ic_anon_person_36dp)
+                    .crossFade().into(imageView);
+        }
+    }
+
     @BindingAdapter("likesCount")
     public static void setLikesCount(TextView textView, int likes) {
         if (likes <= 1)

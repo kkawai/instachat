@@ -2,6 +2,16 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="com.instachat.android.app.activity.AbstractChatViewModel" />
+
+    </data>
+
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="@dimen/left_drawer_header_height"
                   android:focusableInTouchMode="true"
@@ -35,7 +45,8 @@
                 android:layout_gravity="center_horizontal"
                 app:civ_border_color="@android:color/white"
                 app:civ_border_overlay="true"
-                app:civ_border_width="2px"/>
+                app:civ_border_width="2px"
+                app:myProfileImage="@{viewModel.profilePicUrl}"/>
 
             <Button
                 android:id="@+id/save_username"

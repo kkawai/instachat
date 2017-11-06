@@ -36,8 +36,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.brandongogetap.stickyheaders.StickyLayoutManager;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -70,7 +68,6 @@ import com.instachat.android.data.api.UploadListener;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.data.model.PrivateChatSummary;
-import com.instachat.android.data.model.User;
 import com.instachat.android.databinding.LeftDrawerLayoutBinding;
 import com.instachat.android.databinding.LeftNavHeaderBinding;
 import com.instachat.android.gcm.GCMHelper;
@@ -81,7 +78,6 @@ import com.instachat.android.util.FontUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
-import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.rx.SchedulerProvider;
 import com.tooltip.Tooltip;
 
@@ -250,20 +246,7 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
 
         } else if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.userProfilePhoto) {
 
-            final User user = UserPreferences.getInstance().getUser();
-            user.setProfilePicUrl(photoUrl);
-            UserPreferences.getInstance().saveUser(user);
-            networkApi.saveUser(null, user, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    MLog.d(TAG, "saveUser() success via uploadFromUri(): " + response);
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    MLog.e(TAG, "saveUser() failed via uploadFromUri() ", error);
-                }
-            });
+            getViewModel().saveUserPhoto(photoUrl);
             mLeftDrawerHelper.updateProfilePic(photoUrl);
         }
     }
@@ -660,9 +643,10 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     public void setupLeftDrawerContent(NavigationView navigationView) {
         leftNavHeaderBinding = LeftNavHeaderBinding.inflate(getLayoutInflater(), navigationView, false);
         leftDrawerLayoutBinding = LeftDrawerLayoutBinding.inflate(getLayoutInflater(), navigationView, false);
+        leftNavHeaderBinding.setViewModel(getViewModel());
         navigationView.addView(leftDrawerLayoutBinding.getRoot());
         navigationView.addHeaderView(leftNavHeaderBinding.getRoot());
-        mLeftDrawerHelper = new LeftDrawerHelper(networkApi, this, this, drawerLayout, mLeftDrawerEventListener);
+        mLeftDrawerHelper = new LeftDrawerHelper(this, getViewModel(), networkApi, this, this, drawerLayout, mLeftDrawerEventListener);
         mLeftDrawerHelper.setup(leftDrawerLayoutBinding, leftNavHeaderBinding);
         mLeftDrawerHelper.setUserLikedUserListener(mUserLikedUserListener);
 
