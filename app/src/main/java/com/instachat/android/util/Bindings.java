@@ -38,22 +38,6 @@ public class Bindings {
         }
     }
 
-    @BindingAdapter("customTypeface")
-    public static void setCustomTypeface(TextInputLayout textInputLayout, String name) {
-        setCustomTypeface(textInputLayout.getEditText(), name);
-    }
-
-    @BindingAdapter("customTypeface")
-    public static void setCustomTypeface(TextView textView, String name) {
-        name = name.endsWith(".ttf") ? ("fonts/"+name) : ("fonts/"+name+".ttf");
-        Typeface typeface = cache.get(name);
-        if (typeface == null) {
-            typeface = Typeface.createFromAsset(textView.getContext().getAssets(), name);
-            cache.put(name, typeface);
-        }
-        textView.setTypeface(typeface);
-    }
-
     @BindingAdapter("likesCount")
     public static void setLikesCount(TextView textView, int likes) {
         if (likes <= 1)

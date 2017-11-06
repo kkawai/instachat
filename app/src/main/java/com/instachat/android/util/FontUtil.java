@@ -2,11 +2,10 @@ package com.instachat.android.util;
 
 import android.graphics.Typeface;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.res.ResourcesCompat;
 import android.widget.TextView;
 
-/**
- * Created by kevin on 10/6/2016.
- */
+import com.instachat.android.R;
 
 public final class FontUtil {
     private FontUtil() {
@@ -17,6 +16,6 @@ public final class FontUtil {
     }
 
     public static void setTextViewFont(TextView textView) {
-        //Bindings.setCustomTypeface(textView, "Lato-Regular");
+        textView.setTypeface(ResourcesCompat.getFont(textView.getContext(), R.font.lato_regular));
     }
 }

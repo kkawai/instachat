@@ -29,7 +29,7 @@
     </style>
 
     <style name="IcDefaultTextAppearance" parent="@android:style/TextAppearance">
-        <item name="app:customTypeface">Lato-Regular</item>
+        <item name="android:fontFamily">lato_regular</item>
     </style>
 
     <style name="FriendlyButtonStyle" parent="Widget.AppCompat.Button">
