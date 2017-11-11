@@ -269,4 +269,8 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
             notifyItemRemoved(position);
         }
     }
+
+    protected ArrayList<T> getSnapshots() {
+        return mSnapshots;
+    }
 }

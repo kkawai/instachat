@@ -201,6 +201,14 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
             if (menu.findItem(R.id.menu_manage_blocks) != null)
                 menu.removeItem(R.id.menu_manage_blocks);
         }
+        if (!getViewModel().isAdmin()) {
+            if (menu.findItem(R.id.menu_clear_room) != null)
+                menu.removeItem(R.id.menu_clear_room);
+        } else {
+            if (menu.findItem(R.id.menu_clear_room) != null) {
+                menu.findItem(R.id.menu_clear_room).setTitle("Clear comments: "+getViewModel().getRoomCommentCount());
+            }
+        }
         return super.onMenuOpened(featureId, menu);
     }
 
@@ -229,6 +237,9 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
                 return true;
             case R.id.menu_pending_requests:
                 showPendingRequests();
+                return true;
+            case R.id.menu_clear_room:
+                getViewModel().clearRoomComments();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

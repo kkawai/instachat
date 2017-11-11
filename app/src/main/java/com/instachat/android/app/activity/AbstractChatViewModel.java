@@ -12,6 +12,7 @@ import android.util.Log;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
@@ -52,13 +53,13 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     public ObservableField<Integer> likes = new ObservableField<>(0);
     public ObservableField<Integer> pendingRequests = new ObservableField<>(0);
 
-    private String databaseRoot;
-
-    private MessagesRecyclerAdapter messagesAdapter;
-
     protected final FirebaseRemoteConfig firebaseRemoteConfig;
     protected final FirebaseDatabase firebaseDatabase;
     protected FirebaseAnalytics firebaseAnalytics;
+
+    private String databaseRoot;
+    private DatabaseReference databaseReference;
+    private MessagesRecyclerAdapter messagesAdapter;
 
     public AbstractChatViewModel(DataManager dataManager,
                                  SchedulerProvider schedulerProvider,
@@ -124,6 +125,13 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
 
     public String getDatabaseRoot() {
         return databaseRoot;
+    }
+
+    public DatabaseReference getDatabaseReference() {
+        if (databaseReference == null) {
+            databaseReference = firebaseDatabase.getReference(getDatabaseRoot());
+        }
+        return databaseReference;
     }
 
     private void applyRetrievedLengthLimit(FirebaseRemoteConfig firebaseRemoteConfig) {
@@ -395,6 +403,14 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
             return;
         }
         getNavigator().showGroupChatActivity(groupId, groupName, null, null);
+    }
+
+    private String adminId;
+    public boolean isAdmin() {
+        if (adminId == null) {
+            adminId = "["+myUserid()+"]";
+        }
+        return firebaseRemoteConfig.getString(Constants.KEY_ADMIN_USERS).contains(adminId);
     }
 
 }

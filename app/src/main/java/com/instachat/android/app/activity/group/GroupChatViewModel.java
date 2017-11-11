@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -14,6 +13,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.storage.FirebaseStorage;
 import com.instachat.android.Constants;
 import com.instachat.android.app.activity.AbstractChatViewModel;
 import com.instachat.android.app.analytics.Events;
@@ -40,6 +40,7 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
     public ObservableField<String> usernameTyping = new ObservableField<>("");
     private long groupId;
     private long mLastTypingTime;
+    private int roomCommentCount;
     private DatabaseReference mTypingInRoomReference;
     private ChildEventListener mTypingInRoomEventListener;
     private DatabaseReference mMeTypingRef;
@@ -142,6 +143,7 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
             mTypingInRoomReference.removeEventListener(mTypingInRoomEventListener);
         if (mRightRef != null && mRightListener != null)
             mRightRef.removeEventListener(mRightListener);
+        getDatabaseReference().removeEventListener(roomCommentCountValueEventListener);
     }
 
     public void removeGroupInfoListener() {
@@ -238,6 +240,9 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
             }
         };
         mRightRef.addValueEventListener(mRightListener);
+
+        if (isAdmin())
+            fetchRoomCommentsCount();
     }
 
     public void onToggleGroupChatAppbar() {
@@ -256,6 +261,32 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
         payload.putLong("group", getGroupId());
         payload.putBoolean("one-time", friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
         firebaseAnalytics.logEvent(Events.MESSAGE_GROUP_SENT_EVENT, payload);
+    }
+
+    public void clearRoomComments() {
+        firebaseDatabase.getReference(getDatabaseRoot()).removeValue();
+        FirebaseStorage.getInstance().getReference(getDatabaseRoot()).delete();
+    }
+
+    private ValueEventListener roomCommentCountValueEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            roomCommentCount = (int)dataSnapshot.getChildrenCount();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
+    private void fetchRoomCommentsCount() {
+        getDatabaseReference().removeEventListener(roomCommentCountValueEventListener);
+        getDatabaseReference().addListenerForSingleValueEvent(roomCommentCountValueEventListener);
+    }
+
+    public int getRoomCommentCount() {
+        return roomCommentCount;
     }
 
 }

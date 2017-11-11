@@ -53,6 +53,7 @@ import com.instachat.android.util.UserPreferences;
 import com.tooltip.Tooltip;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -654,7 +655,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                         friendlyMessage.getName(),
                         friendlyMessage.getDpid(),
                         mInternalBlockedUserListener);
-
             }
 
             @Override
@@ -663,6 +663,26 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                         friendlyMessage.getUserid(),
                         friendlyMessage.getName(),
                         friendlyMessage.getDpid());
+            }
+
+            @Override
+            public void onRemoveComments(FriendlyMessage friendlyMessage) {
+                removeMessages(friendlyMessage);
+            }
+
+            @Override
+            public void onBan5Minutes(FriendlyMessage friendlyMessage) {
+                //todo
+            }
+
+            @Override
+            public void onBan15Minutes(FriendlyMessage friendlyMessage) {
+//todo
+            }
+
+            @Override
+            public void onBan2Days(FriendlyMessage friendlyMessage) {
+//todo
             }
         });
     }
@@ -730,7 +750,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         } else {
             super.onAddItem(newFriendlyMessage);
         }
-
     }
 
     private boolean mItemWasRemoved;
@@ -744,5 +763,18 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     public static final long ONE_HOUR = 60*1000*60L;
     private boolean isSmallDifferenceInTime(long t1, long t2) {
         return Math.abs(t1 - t2) < ONE_HOUR;
+    }
+
+    private void removeMessages(FriendlyMessage friendlyMessage) {
+        ArrayList<FriendlyMessage> copy = new ArrayList<>(getSnapshots());
+        for (FriendlyMessage remove : copy) {
+            try {
+                if (remove.getUserid() == friendlyMessage.getUserid()) {
+                    mMessagesRef.child(mDatabaseRef).child(remove.getId()).removeValue();
+                }
+            }catch(Exception e) {
+                MLog.e(TAG,"removeMessages() error: "+e.getMessage());
+            }
+        }
     }
 }

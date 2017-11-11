@@ -31,6 +31,11 @@ public class MessageOptionsDialogHelper {
         void onReportPersonRequested(FriendlyMessage friendlyMessage);
 
         void onMessageOptionsDismissed();
+
+        void onBan5Minutes(FriendlyMessage friendlyMessage);
+        void onBan15Minutes(FriendlyMessage friendlyMessage);
+        void onBan2Days(FriendlyMessage friendlyMessage);
+        void onRemoveComments(FriendlyMessage friendlyMessage);
     }
 
     public interface SendOptionsListener {
@@ -73,6 +78,10 @@ public class MessageOptionsDialogHelper {
         popupMenu.show();
     }
 
+    private boolean isAdmin() {
+        return FirebaseRemoteConfig.getInstance().getString(Constants.KEY_ADMIN_USERS).contains("["+UserPreferences.getInstance().getUserId()+"]");
+    }
+
     public void showMessageOptions(
             @NonNull final Context context,
             @NonNull final View anchor,
@@ -90,7 +99,9 @@ public class MessageOptionsDialogHelper {
         }
         if (!FirebaseRemoteConfig.getInstance().getBoolean(Constants.KEY_ALLOW_DELETE_OTHER_MESSAGES)) {
             if (UserPreferences.getInstance().getUserId() != friendlyMessage.getUserid()) {
-                popupMenu.getMenu().removeItem(R.id.menu_delete_message);
+                if (!isAdmin()) {
+                    popupMenu.getMenu().removeItem(R.id.menu_delete_message);
+                }
             }
         }
         if (UserPreferences.getInstance().getUserId() == friendlyMessage.getUserid()) {
@@ -99,6 +110,12 @@ public class MessageOptionsDialogHelper {
         } else {
             popupMenu.getMenu().findItem(R.id.menu_block_user).setTitle(context.getString(R.string.block) + " " + friendlyMessage.getName());
             popupMenu.getMenu().findItem(R.id.menu_report_user).setTitle(context.getString(R.string.report) + " " + friendlyMessage.getName());
+        }
+        if (!isAdmin()) {
+            popupMenu.getMenu().removeItem(R.id.admin_menu_remove_comments);
+            popupMenu.getMenu().removeItem(R.id.admin_menu_ban_5);
+            popupMenu.getMenu().removeItem(R.id.admin_menu_ban_15);
+            popupMenu.getMenu().removeItem(R.id.admin_menu_ban_2_days);
         }
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
@@ -115,6 +132,18 @@ public class MessageOptionsDialogHelper {
                         break;
                     case R.id.menu_report_user:
                         listener.onReportPersonRequested(friendlyMessage);
+                        break;
+                    case R.id.admin_menu_remove_comments:
+                        listener.onRemoveComments(friendlyMessage);
+                        break;
+                    case R.id.admin_menu_ban_2_days:
+                        listener.onBan2Days(friendlyMessage);
+                        break;
+                    case R.id.admin_menu_ban_5:
+                        listener.onBan2Days(friendlyMessage);
+                        break;
+                    case R.id.admin_menu_ban_15:
+                        listener.onBan2Days(friendlyMessage);
                         break;
                     default:
                         break;
