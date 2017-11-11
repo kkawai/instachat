@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -16,7 +15,6 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -38,7 +36,6 @@ import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.databinding.ActivityMainBinding;
 import com.instachat.android.databinding.DialogInputCommentBinding;
 import com.instachat.android.databinding.RightDrawerLayoutBinding;
-import com.instachat.android.databinding.RightNavHeaderBinding;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.view.ThemedAlertDialog;
@@ -241,15 +238,12 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     }
 
     private RightDrawerLayoutBinding rightDrawerLayoutBinding;
-    private RightNavHeaderBinding rightNavHeaderBinding;
     @Override
     public void setupRightDrawerContent() {
 
         rightDrawerLayoutBinding = RightDrawerLayoutBinding.inflate(getLayoutInflater(), binding.rightNavView, false);
-        rightNavHeaderBinding = RightNavHeaderBinding.inflate(getLayoutInflater(), binding.rightNavView, false);
 
         binding.rightNavView.addView(rightDrawerLayoutBinding.getRoot());
-        binding.rightNavView.addHeaderView(rightNavHeaderBinding.getRoot());
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -416,8 +410,4 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
                 BlocksFragment.TAG).addToBackStack(null).commit();
     }
 
-    @Override
-    public void showGroupName(String groupName) {
-        rightNavHeaderBinding.groupname.setText(groupName);
-    }
 }

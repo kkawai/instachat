@@ -2,7 +2,6 @@ package com.instachat.android.app.activity.group;
 
 import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
-import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -14,7 +13,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
-import com.instachat.android.R;
 import com.instachat.android.app.activity.AbstractChatViewModel;
 import com.instachat.android.data.DataManager;
 import com.instachat.android.data.model.GroupChatSummary;
@@ -233,7 +231,6 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
                             null);
                     return;
                 }
-                getNavigator().showGroupName(groupChatSummary.getName());
             }
 
             @Override
