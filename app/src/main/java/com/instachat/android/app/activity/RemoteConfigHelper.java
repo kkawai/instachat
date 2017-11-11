@@ -36,6 +36,8 @@ public class RemoteConfigHelper {
         defaultConfigMap.put(Constants.KEY_DO_SHORTEN_IMAGE_URLS, Constants.DEFAULT_DO_SHORTEN_IMAGE_URLS);
         defaultConfigMap.put(Constants.KEY_DO_SHOW_SIGNOUT_BUTTON, Constants.DEFAULT_DO_SHOW_SIGNOUT_BUTTON);
         defaultConfigMap.put(Constants.KEY_DO_SHOW_ADS, Constants.DEFAULT_DO_SHOW_ADS);
+        defaultConfigMap.put(Constants.KEY_ADMIN_USERS, Constants.DEFAULT_ADMIN_USERS);
+
 
         // Apply config settings and default values.
         firebaseRemoteConfig.setConfigSettings(firebaseRemoteConfigSettings);

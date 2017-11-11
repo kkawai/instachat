@@ -109,12 +109,11 @@
                 android:paddingRight="8dp">
 
                 <RelativeLayout
-                    android:id="@+id/ad_container"
+                    android:id="@+id/ads_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:gravity="center"
-                    android:visibility="@{viewModel.isAdReady ? View.VISIBLE : View.GONE}"/>
+                    android:gravity="center"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"

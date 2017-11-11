@@ -29,7 +29,7 @@ public final class Constants {
    public static final int DEFAULT_MAX_MESSAGE_LENGTH = 256;
    public static final int DEFAULT_MAX_PERISCOPABLE_LIKES_PER_ITEM = 25;
    public static final boolean DEFAULT_DO_SHOW_ADS = true;
-   public static final String DEFAULT_ADMINS = "7,8"; //me and jon li
+   public static final String DEFAULT_ADMIN_USERS = "[7] [8] [133165] [136869]";
    public static final String KEY_MAX_MESSAGE_HISTORY = "MAX_MESSAGE_HISTORY";
    public static final String KEY_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS = "MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS";
    public static final String KEY_MAX_TYPING_DOTS_DISPLAY_TIME = "MAX_TYPING_DOTS_DISPLAY_TIME";
@@ -41,7 +41,7 @@ public final class Constants {
    public static final String KEY_DO_SHORTEN_IMAGE_URLS = "DO_SHORTEN_IMAGE_URLS";
    public static final String KEY_DO_SHOW_SIGNOUT_BUTTON = "DO_SHOW_SIGNOUT_BUTTON";
    public static final String KEY_DO_SHOW_ADS = "DO_SHOW_ADS";
-   public static final String KEY_ADMINS = "ADMINS";
+   public static final String KEY_ADMIN_USERS = "ADMIN_USERS";
 
    /*
     * CHANGE THESE WHEN MAKING PRODUCTION BUILDS

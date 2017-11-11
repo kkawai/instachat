@@ -113,7 +113,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         binding.messageRecyclerView.setLayoutManager(linearLayoutManager);
         binding.messageRecyclerView.setAdapter(messagesAdapter);
 
-        adsHelper.loadAd(this);
+        adsHelper.loadAd(this, firebaseRemoteConfig);
 
         initMessageEditText(binding.sendButton, binding.messageEditTextParent);
         privateChatViewModel.fetchConfig(firebaseRemoteConfig);
@@ -497,10 +497,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
     @Override
     public void onReceiveAd(AdDownloaderInterface adDownloaderInterface, ReceivedBannerInterface receivedBanner) throws AdReceiveFailed {
         if (receivedBanner.getErrorCode() != ErrorCode.NO_ERROR) {
-            getViewModel().isAdReady.set(true);
-            adsHelper.loadAd(this);
-        } else {
-            getViewModel().isAdReady.set(false);
+            adsHelper.loadAd(this, firebaseRemoteConfig);
         }
     }
 

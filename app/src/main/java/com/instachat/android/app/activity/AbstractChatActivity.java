@@ -131,7 +131,7 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     protected ChatSummariesRecyclerAdapter chatsRecyclerViewAdapter;
 
     @Inject
-    protected AdHelper adsHelper;
+    protected AdsHelper adsHelper;
 
     @Inject
     protected PresenceHelper presenceHelper;

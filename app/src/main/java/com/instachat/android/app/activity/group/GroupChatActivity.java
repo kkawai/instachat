@@ -79,7 +79,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         binding.messageRecyclerView.setLayoutManager(linearLayoutManager);
         binding.messageRecyclerView.setAdapter(messagesAdapter);
 
-        adsHelper.loadAd(this);
+        adsHelper.loadAd(this, firebaseRemoteConfig);
 
         initMessageEditText(binding.sendButton, binding.messageEditTextParent);
         groupChatViewModel.fetchConfig(firebaseRemoteConfig);
@@ -356,10 +356,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     @Override
     public void onReceiveAd(AdDownloaderInterface adDownloaderInterface, ReceivedBannerInterface receivedBanner) throws AdReceiveFailed {
         if (receivedBanner.getErrorCode() != ErrorCode.NO_ERROR) {
-            getViewModel().isAdReady.set(true);
-            adsHelper.loadAd(this);
-        } else {
-            getViewModel().isAdReady.set(false);
+            adsHelper.loadAd(this, firebaseRemoteConfig);
         }
     }
 

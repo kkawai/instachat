@@ -46,7 +46,6 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
 
     private static final String TAG = "AbstractChatViewModel";
 
-    public ObservableField<Boolean> isAdReady = new ObservableField<>(true);
     public ObservableField<String> profilePicUrl = new ObservableField<>("");
     public ObservableField<String> username = new ObservableField<>("");
     public ObservableField<String> bio = new ObservableField<>("");
