@@ -206,7 +206,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
             Bundle payload = new Bundle();
             payload.putString("by", myUsername());
             payload.putInt("userid", userid);
-            FirebaseAnalytics.getInstance(TheApp.getInstance()).logEvent(Events.USER_BLOCKED, payload);
+            firebaseAnalytics.logEvent(Events.USER_BLOCKED, payload);
         }
 
         @Override
@@ -214,7 +214,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
             Bundle payload = new Bundle();
             payload.putString("by", myUsername());
             payload.putInt("userid", userid);
-            FirebaseAnalytics.getInstance(TheApp.getInstance()).logEvent(Events.USER_UNBLOCKED, payload);
+            firebaseAnalytics.logEvent(Events.USER_UNBLOCKED, payload);
         }
     };
 

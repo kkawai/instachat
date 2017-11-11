@@ -159,7 +159,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
      * @param friendlyMessage
      */
     @Override
-    public void onFriendlyMessageSuccess(FriendlyMessage friendlyMessage) {
+    public void onFriendlyMessageSuccess(final @NonNull FriendlyMessage friendlyMessage) {
         try {
             if (isActivityDestroyed())
                 return;
@@ -169,12 +169,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
         }
-        Bundle payload = new Bundle();
-        payload.putString("from", groupChatViewModel.myUsername());
-        payload.putString("type", friendlyMessage.getImageUrl() != null ? "photo" : "text");
-        payload.putLong("group", groupChatViewModel.getGroupId());
-        payload.putBoolean("one-time", friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
-        FirebaseAnalytics.getInstance(this).logEvent(Events.MESSAGE_GROUP_SENT_EVENT, payload);
+        getViewModel().onFriendlyMessageSuccess(friendlyMessage);
     }
 
     @Override
@@ -344,7 +339,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
                                     groupChatViewModel.myUserid(),
                                     groupChatViewModel.myDpid(), null, false, false, null, System.currentTimeMillis());
                             sendText(friendlyMessage);
-                            FirebaseAnalytics.getInstance(GroupChatActivity.this).logEvent(Events
+                            firebaseAnalytics.logEvent(Events
                                     .WELCOME_MESSAGE_SENT, null);
                         }
                     }
@@ -412,6 +407,12 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
 
     @Override
     public void toggleGroupChatAppBar() {
-        toggleRightDrawer();
+        if (isRightDrawerOpen()) {
+            closeRightDrawer();
+            return;
+        } else if (isLeftDrawerOpen()) {
+            closeLeftDrawer();
+        }
+        openRightDrawer();
     }
 }

@@ -1,10 +1,12 @@
 package com.instachat.android.app.activity.group;
 
 import android.databinding.ObservableField;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -14,7 +16,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.app.activity.AbstractChatViewModel;
+import com.instachat.android.app.analytics.Events;
 import com.instachat.android.data.DataManager;
+import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.data.model.User;
 import com.instachat.android.util.MLog;
@@ -243,6 +247,20 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
 
     public void onToggleGroupChatAppbar() {
         getNavigator().toggleGroupChatAppBar();
+    }
+
+    /**
+     * For analytics purposes.
+     *
+     * @param friendlyMessage
+     */
+    public void onFriendlyMessageSuccess(FriendlyMessage friendlyMessage) {
+        Bundle payload = new Bundle();
+        payload.putString("from", myUsername());
+        payload.putString("type", friendlyMessage.getImageUrl() != null ? "photo" : "text");
+        payload.putLong("group", getGroupId());
+        payload.putBoolean("one-time", friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
+        firebaseAnalytics.logEvent(Events.MESSAGE_GROUP_SENT_EVENT, payload);
     }
 
 }

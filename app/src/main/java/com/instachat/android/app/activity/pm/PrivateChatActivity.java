@@ -249,14 +249,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
             mAppBarLayout.setExpanded(false, true);
         }
         privateChatViewModel.initializePrivateChatSummary(sUsername, sUserid, sProfilePicUrl);
-        if (isPrivateChat()) {
-            Bundle payload = new Bundle();
-            payload.putString("to", sUsername);
-            payload.putString("from", privateChatViewModel.myUsername());
-            payload.putString("type", friendlyMessage.getImageUrl() != null ? "photo" : "text");
-            payload.putBoolean("one-time", friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
-            FirebaseAnalytics.getInstance(this).logEvent(Events.MESSAGE_PRIVATE_SENT_EVENT, payload);
-        }
+        privateChatViewModel.onFriendlyMessageSuccess(friendlyMessage, sUsername);
     }
 
     public static void startPrivateChatActivity(Activity activity, int userid, String username, String profilePicUrl,
@@ -411,11 +404,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         super.onGroupChatClicked(groupChatSummary);
     }
 
-    //@Override
-    protected boolean isPrivateChat() {
-        return true;
-    }
-
     @Override
     public void onBackPressed() {
 
@@ -468,7 +456,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
                 menu.add(0, R.id.menu_pending_requests, 0, getString(R.string.menu_option_pending_requests));
         }
 
-        if (isPrivateChat() && sUserid == privateChatViewModel.myUserid()) {
+        if (sUserid == privateChatViewModel.myUserid()) {
             if (menu.findItem(R.id.menu_block_user) != null) {
                 menu.removeItem(R.id.menu_block_user);
             }
@@ -596,11 +584,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
     @Override
     public void showLikesCount(int count) {
         getViewModel().partnerLikesCount.set(count);
-    }
-
-    @Override
-    protected void toggleRightDrawer() {
-
     }
 
     @Override

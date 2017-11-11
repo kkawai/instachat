@@ -787,7 +787,7 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
         mMessageEditText.setText(friendlyMessage.getText());
         new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE).setContentText(getString(R.string
                 .could_not_send_message)).show();
-        FirebaseAnalytics.getInstance(this).logEvent(Events.MESSAGE_FAILED, null);
+        firebaseAnalytics.logEvent(Events.MESSAGE_FAILED, null);
     }
 
     public void setupToolbarTitle(Toolbar toolbar) {
@@ -878,12 +878,12 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
                 MLog.d(TAG, "Invitations sent: " + ids.length);
                 payload.putInt("num_inv", ids.length);
                 payload.putString("username", getViewModel().myUsername());
-                FirebaseAnalytics.getInstance(this).logEvent(FirebaseAnalytics.Event.SHARE, payload);
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SHARE, payload);
             } else {
                 // Use Firebase Measurement to log that invitation was not sent
                 Bundle payload = new Bundle();
                 payload.putString(FirebaseAnalytics.Param.VALUE, "inv_not_sent");
-                FirebaseAnalytics.getInstance(this).logEvent(FirebaseAnalytics.Event.SHARE, payload);
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SHARE, payload);
                 // Sending failed or it was canceled, show failure message to the user
                 MLog.d(TAG, "Failed to send invitation.");
             }
@@ -955,16 +955,6 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
 
     protected Toolbar getToolbar() {
         return mToolbar;
-    }
-
-    protected void toggleRightDrawer() {
-        if (isRightDrawerOpen()) {
-            closeRightDrawer();
-            return;
-        } else if (isLeftDrawerOpen()) {
-            closeLeftDrawer();
-        }
-        openRightDrawer();
     }
 
     @Override

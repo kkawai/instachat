@@ -1,9 +1,11 @@
 package com.instachat.android.app.activity.pm;
 
 import android.databinding.ObservableField;
+import android.os.Bundle;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -13,13 +15,17 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.app.activity.AbstractChatViewModel;
+import com.instachat.android.app.analytics.Events;
 import com.instachat.android.data.DataManager;
 import com.instachat.android.data.api.UserResponse;
+import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.data.model.User;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.rx.SchedulerProvider;
+
+import org.json.JSONException;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -319,6 +325,21 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
 
     public void onTogglePrivateChatAppbar() {
         getNavigator().togglePrivateChatAppBar();
+    }
+
+    /**
+     * For analytics purposes.
+     *
+     * @param friendlyMessage
+     * @param toUsername
+     */
+    public void onFriendlyMessageSuccess(final @NonNull FriendlyMessage friendlyMessage, final @NonNull String toUsername) {
+        Bundle payload = new Bundle();
+        payload.putString("to", toUsername);
+        payload.putString("from", myUsername());
+        payload.putString("type", friendlyMessage.getImageUrl() != null ? "photo" : "text");
+        payload.putBoolean("one-time", friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
+        firebaseAnalytics.logEvent(Events.MESSAGE_PRIVATE_SENT_EVENT, payload);
     }
 
 }
