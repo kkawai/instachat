@@ -317,4 +317,8 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
         getNavigator().showPartnerLikes();
     }
 
+    public void onTogglePrivateChatAppbar() {
+        getNavigator().togglePrivateChatAppBar();
+    }
+
 }

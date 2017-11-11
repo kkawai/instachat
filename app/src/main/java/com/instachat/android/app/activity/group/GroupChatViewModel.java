@@ -241,4 +241,8 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
         mRightRef.addValueEventListener(mRightListener);
     }
 
+    public void onToggleGroupChatAppbar() {
+        getNavigator().toggleGroupChatAppBar();
+    }
+
 }

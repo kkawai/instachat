@@ -183,13 +183,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
             }
         });
 
-        final View.OnClickListener appBarOnClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleAppbar();
-            }
-        };
-        mAppBarLayout.setOnClickListener(appBarOnClickListener);
         mGestureDetector = initializeGestureDetector();
         getToolbar().setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -217,14 +210,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
                             tooltip.dismiss();
                     }
                 }).subscribe());
-    }
-
-    private void toggleAppbar() {
-        if (!mIsAppBarExpanded) {
-            mAppBarLayout.setExpanded(true, true);
-            ScreenUtil.hideKeyboard(this);
-        } else
-            mAppBarLayout.setExpanded(false, true);
     }
 
     private boolean mIsAppBarExpanded = true; //initially it's expanded
@@ -357,7 +342,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
                 return true;
             case R.id.menu_view_profile:
                 if (!mIsAppBarExpanded)
-                    toggleAppbar();
+                    togglePrivateChatAppBar();
                 return true;
             case R.id.menu_block_user:
                 new BlockUserDialogHelper(firebaseDatabase).showBlockUserQuestionDialog(this, sUserid, sUsername, sProfilePicUrl, mBlockedUserListener);
@@ -383,16 +368,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    @Override
-    protected void setToolbarOnClickListener(Toolbar toolbar) {
-        toolbar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleAppbar();
-            }
-        });
     }
 
     //@Override
@@ -450,7 +425,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         }
 
         if (mIsAppBarExpanded) {
-            toggleAppbar();
+            togglePrivateChatAppBar();
             return;
         }
         super.onBackPressed();
@@ -471,7 +446,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
             public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
                 if (velocityY > 20) {
                     if (!mIsAppBarExpanded) {
-                        toggleAppbar();
+                        togglePrivateChatAppBar();
                         return true;
                     }
                 }
@@ -634,5 +609,14 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim
                 .slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment,
                 UserLikedUserFragment.TAG).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void togglePrivateChatAppBar() {
+        if (!mIsAppBarExpanded) {
+            mAppBarLayout.setExpanded(true, true);
+            ScreenUtil.hideKeyboard(this);
+        } else
+            mAppBarLayout.setExpanded(false, true);
     }
 }

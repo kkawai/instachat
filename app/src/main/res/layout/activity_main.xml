@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:bind="http://schemas.android.com/apk/res-auto"
         xmlns:fab="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
     <data>
@@ -48,7 +49,8 @@
                 android:layout_height="match_parent"
                 android:layout_above="@+id/linearLayout">
 
-                <include layout="@layout/merge_main_appbar"/>
+                <include layout="@layout/merge_main_appbar"
+                         bind:viewModel="@{viewModel}" />
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/messageRecyclerView"

@@ -14,4 +14,5 @@ public interface PrivateChatNavigator extends AbstractChatNavigator {
 
     //Show screen of people who liked the person I am viewing in private chat screen
     void showPartnerLikes();
+    void togglePrivateChatAppBar();
 }

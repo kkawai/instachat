@@ -156,10 +156,12 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     protected View sendButton;
     protected LeftNavHeaderBinding leftNavHeaderBinding;
     protected LeftDrawerLayoutBinding leftDrawerLayoutBinding;
+    protected FirebaseAnalytics firebaseAnalytics;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         NotificationHelper.createNotificationChannels(this);
         linearLayoutManager.setStackFromEnd(true);
 
@@ -169,7 +171,7 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
         dotsLayout = findViewById(R.id.dotsLayout);
         sendButton = findViewById(R.id.sendButton);
 
-        getViewModel().setFirebaseAnalytics(FirebaseAnalytics.getInstance(this));
+        getViewModel().setFirebaseAnalytics(firebaseAnalytics);
     }
 
     @Override
@@ -949,20 +951,10 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
         setupToolbarTitle(mToolbar);
-        setToolbarOnClickListener(mToolbar);
     }
 
     protected Toolbar getToolbar() {
         return mToolbar;
-    }
-
-    protected void setToolbarOnClickListener(Toolbar toolbar) {
-        toolbar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleRightDrawer();
-            }
-        });
     }
 
     protected void toggleRightDrawer() {

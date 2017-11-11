@@ -410,4 +410,8 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
                 BlocksFragment.TAG).addToBackStack(null).commit();
     }
 
+    @Override
+    public void toggleGroupChatAppBar() {
+        toggleRightDrawer();
+    }
 }
