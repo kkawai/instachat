@@ -1,5 +1,7 @@
 package com.instachat.android.app.activity.pm;
 
+import android.databinding.ObservableField;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -30,6 +32,13 @@ import io.reactivex.functions.Consumer;
 public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavigator> {
 
     private static final String TAG = "PrivateChatViewModel";
+
+    public ObservableField<String> partnerProfilePicUrl = new ObservableField<>("");
+    public ObservableField<String> partnerUsername = new ObservableField<>("");
+    public ObservableField<String> partnerBio = new ObservableField<>("");
+    public ObservableField<String> partnerCurrentGroup = new ObservableField<>("");
+    public ObservableField<String> partnerLastActive = new ObservableField<>("");
+    public ObservableField<Integer> partnerLikesCount = new ObservableField<>(0);
 
     private DatabaseReference mTypingReference;
     private ValueEventListener mTypingValueEventListener;
@@ -126,6 +135,7 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
                             throws Exception {
 
                         toUser = userResponse.user;
+                        partnerProfilePicUrl.set(toUser.getProfilePicUrl());
                         MLog.d(TAG, "after grab from server: toUser: ", toUser.getId(), " ", toUser.getUsername(), " ",
                                 toUser.getProfilePicUrl());
                         getNavigator().showUserProfile(toUser);
@@ -143,27 +153,26 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
 
                                         //check if only the last active time changed
                                         boolean onlyUpdateLastActiveTime = true;
-                                        if (!toUser.getUsername().equals(user.getUsername())) {
+                                        if (!strEq(toUser.getUsername(), user.getUsername())) {
                                             onlyUpdateLastActiveTime = false;
                                             toUser.setUsername(user.getUsername());
                                         }
-                                        if (!toUser.getProfilePicUrl().equals(user.getProfilePicUrl())) {
+                                        if (!strEq(toUser.getProfilePicUrl(),user.getProfilePicUrl())) {
                                             onlyUpdateLastActiveTime = false;
                                             toUser.setProfilePicUrl(user.getProfilePicUrl());
                                         }
-                                        String existingBio = toUser.getBio();
-                                        String newBio = user.getBio();
-                                        if (!existingBio.equals(newBio)) {
+                                        if (!strEq(toUser.getBio(), user.getBio())) {
                                             onlyUpdateLastActiveTime = false;
                                             toUser.setBio(user.getBio());
                                         }
-
                                         if (toUser.getCurrentGroupId() != user.getCurrentGroupId()) {
                                             onlyUpdateLastActiveTime = false;
                                             toUser.setCurrentGroupName(user.getCurrentGroupName());
                                             toUser.setCurrentGroupId(user.getCurrentGroupId());
                                         }
+
                                         getNavigator().showCustomTitles(user.getUsername(), user.getLastOnline());
+
                                         if (!onlyUpdateLastActiveTime) {
                                             getNavigator().showUserProfile(toUser);
                                         }
@@ -192,6 +201,13 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
                         getNavigator().showErrorToast("getUser()");
                     }
                 }));
+    }
+
+    private boolean strEq(String s1, String s2) {
+        if ((s1 == null && s2 == null) || (s1 == "" && s2 == "")) {
+            return true;
+        }
+        return s1 != null && s2 != null && s1.equals(s2);
     }
 
     private void listenForPartnerTyping(final User user) {
@@ -291,6 +307,10 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
         } catch (Exception e) {
             MLog.e(TAG, "onMeTyping() failed", e);
         }
+    }
+
+    public User getPartner() {
+        return toUser;
     }
 
 }

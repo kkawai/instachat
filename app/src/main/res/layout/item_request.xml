@@ -25,7 +25,7 @@
             android:layout_height="@dimen/user_thumb_pic_size"
             android:layout_gravity="bottom"
             android:transitionName="profilePic"
-            app:imageUrl="@{privateChatSummary.imageUrl}"
+            app:imageUrlNoCrossFade="@{privateChatSummary.imageUrl}"
             />
 
         <me.himanshusoni.chatmessageview.ChatMessageView

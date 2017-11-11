@@ -8,6 +8,7 @@ import android.databinding.ViewDataBinding;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v13.view.inputmethod.EditorInfoCompat;
@@ -167,6 +168,8 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
         drawerLayout = findViewById(R.id.drawer_layout);
         dotsLayout = findViewById(R.id.dotsLayout);
         sendButton = findViewById(R.id.sendButton);
+
+        getViewModel().setFirebaseAnalytics(FirebaseAnalytics.getInstance(this));
     }
 
     @Override
@@ -245,9 +248,7 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
             }
 
         } else if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.userProfilePhoto) {
-
             getViewModel().saveUserPhoto(photoUrl);
-            mLeftDrawerHelper.updateProfilePic(photoUrl);
         }
     }
 
@@ -644,9 +645,10 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
         leftNavHeaderBinding = LeftNavHeaderBinding.inflate(getLayoutInflater(), navigationView, false);
         leftDrawerLayoutBinding = LeftDrawerLayoutBinding.inflate(getLayoutInflater(), navigationView, false);
         leftNavHeaderBinding.setViewModel(getViewModel());
+        leftDrawerLayoutBinding.setViewModel(getViewModel());
         navigationView.addView(leftDrawerLayoutBinding.getRoot());
         navigationView.addHeaderView(leftNavHeaderBinding.getRoot());
-        mLeftDrawerHelper = new LeftDrawerHelper(this, getViewModel(), networkApi, this, this, drawerLayout, mLeftDrawerEventListener);
+        mLeftDrawerHelper = new LeftDrawerHelper(this, getViewModel(),this, this, drawerLayout, mLeftDrawerEventListener);
         mLeftDrawerHelper.setup(leftDrawerLayoutBinding, leftNavHeaderBinding);
         mLeftDrawerHelper.setUserLikedUserListener(mUserLikedUserListener);
 
@@ -1013,7 +1015,7 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     }
 
     @Override
-    public void showErrorToast(String extra) {
+    public void showErrorToast(@NonNull String extra) {
         try {
             Toast.makeText(this, getString(R.string.general_api_error, extra), Toast
                     .LENGTH_SHORT).show();
@@ -1021,4 +1023,14 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
             MLog.e(TAG, "", e);
         }
     }
-}
+
+    @Override
+    public void showUsernameExistsDialog(@NonNull String badUsername) {
+        new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE).setContentText(getString(R.string.username_exists, badUsername)).show();
+    }
+
+    @Override
+    public void showProfileUpdatedDialog() {
+        new SweetAlertDialog(this, SweetAlertDialog.SUCCESS_TYPE).setTitleText(getString(R.string.your_profile_has_been_updated_title)).setContentText(getString(R.string.your_profile_has_been_updated_msg)).show();
+        leftNavHeaderBinding.saveUsername.setVisibility(View.GONE);
+    }}

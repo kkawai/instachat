@@ -15,6 +15,7 @@ Document differences between activity_main.xml here:
     <data>
 
         <import type="android.view.View"/>
+        <import type="android.text.TextUtils"/>
 
         <variable
             name="viewModel"
@@ -104,7 +105,8 @@ Document differences between activity_main.xml here:
                         android:src="@drawable/ic_anon_person_36dp"
                         app:civ_border_color="@color/colorPrimaryDark"
                         app:civ_border_overlay="true"
-                        app:civ_border_width="0px"/>
+                        app:civ_border_width="0px"
+                        app:imageUrlWithCrossFade="@{viewModel.partnerProfilePicUrl}"/>
 
                     <com.github.silvestrpredko.dotprogressbar.DotProgressBar
                         android:id="@+id/dot_progress_bar"

@@ -6,7 +6,7 @@ import com.instachat.android.data.model.User;
 public class UserResponse {
 
     @SerializedName("status")
-    public String status;
+    public String status="";
 
     @SerializedName("data")
     public User user;

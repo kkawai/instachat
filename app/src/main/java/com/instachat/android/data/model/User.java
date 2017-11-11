@@ -204,6 +204,10 @@ public class User {
     }
 
     public void setCurrentGroupName(String currentGroupName) {
+        if (currentGroupName != null && currentGroupName.equals("null")) {
+            this.currentGroupName = null;
+            return;
+        }
         this.currentGroupName = currentGroupName;
     }
 

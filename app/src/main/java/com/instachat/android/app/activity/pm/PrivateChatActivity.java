@@ -24,10 +24,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -51,8 +47,10 @@ import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.data.model.User;
 import com.instachat.android.databinding.ActivityPrivateChatBinding;
 import com.instachat.android.util.AnimationUtil;
+import com.instachat.android.util.Bindings;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.ScreenUtil;
+import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.TimeUtil;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.view.FlingGestureListener;
@@ -320,8 +318,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
 
     private void setPartnerInfo(Intent intent) {
 
-        ((TextView) findViewById(R.id.customTitleInToolbar)).setText(sUsername);
-        ((TextView) findViewById(R.id.customTitleInParallax)).setText(sUsername);
+        getViewModel().partnerUsername.set(sUsername);
 
         if (intent.getBooleanExtra(Constants.KEY_AUTO_ADD_PERSON, false)) {
             //add this person to my left drawer and remove them from pending requests
@@ -336,76 +333,18 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
             return;
         sUsername = toUser.getUsername(); //username might have changed at the server
         sProfilePicUrl = toUser.getProfilePicUrl(); //profile pic might have changed at server
-        final ImageView toolbarProfileImageView = (ImageView) findViewById(R.id.topCornerUserThumb);
-        final ImageView miniPic = (ImageView) findViewById(R.id.superSmallProfileImage);
-        final TextView bio = (TextView) findViewById(R.id.bio);
-
-        if (TextUtils.isEmpty(toUser.getProfilePicUrl())) {
-            toolbarProfileImageView.setImageResource(R.drawable.ic_anon_person_36dp);
-            miniPic.setImageResource(R.drawable.ic_anon_person_36dp);
-            mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
-            privateChatViewModel.collapseAppbarAfterDelay();
-        } else {
-            try {
-                Glide.with(PrivateChatActivity.this).load(toUser.getProfilePicUrl()).error(R.drawable
-                        .ic_anon_person_36dp)
-                        //.crossFade()
-                        .listener(new RequestListener<String, GlideDrawable>() {
-                            @Override
-                            public boolean onException(Exception e, String model, Target<GlideDrawable> target,
-                                                       boolean isFirstResource) {
-                                if (isActivityDestroyed())
-                                    return false;
-                                privateChatViewModel.collapseAppbarAfterDelay();
-                                return false;
-                            }
-
-                            @Override
-                            public boolean onResourceReady(GlideDrawable resource, String model,
-                                                           Target<GlideDrawable> target, boolean isFromMemoryCache,
-                                                           boolean isFirstResource) {
-                                if (isActivityDestroyed())
-                                    return false;
-                                privateChatViewModel.collapseAppbarAfterDelay();
-                                return false;
-                            }
-                        }).into(mProfilePic);
-                Glide.with(PrivateChatActivity.this).load(toUser.getProfilePicUrl()).error(R.drawable
-                        .ic_anon_person_36dp).crossFade().into(miniPic);
-                Glide.with(PrivateChatActivity.this).load(toUser.getProfilePicUrl()).error(R.drawable
-                        .ic_anon_person_36dp).crossFade().into(toolbarProfileImageView);
-
-            } catch (Exception e) {
-                MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
-                miniPic.setImageResource(R.drawable.ic_anon_person_36dp);
-                privateChatViewModel.collapseAppbarAfterDelay();
-            }
-        }
-        bio.setVisibility(TextUtils.isEmpty(toUser.getBio()) ? View.GONE : View.VISIBLE);
+        Bindings.setPartnerProfilePic(mProfilePic, getViewModel());
         String bioStr = toUser.getBio() + "";
         bioStr = bioStr.equals("null") ? "" : bioStr;
-        bio.setText(bioStr);
-        TextView activeGroup = (TextView) findViewById(R.id.activeGroup);
-        if (toUser.getCurrentGroupId() != 0 && !TextUtils.isEmpty(toUser.getCurrentGroupName())) {
-            activeGroup.setVisibility(View.VISIBLE);
-            try {
-                activeGroup.setText(getString(R.string.user_active_in_group, toUser.getCurrentGroupName()));
-            } catch (Exception e) {
-                activeGroup.setText(toUser.getCurrentGroupName());
+        getViewModel().partnerBio.set(bioStr);
+        getViewModel().partnerBio.set(bioStr);
+        try {
+            if (StringUtil.isNotEmpty(toUser.getCurrentGroupName()) && !toUser.getCurrentGroupName().equals("null")) {
+                getViewModel().partnerCurrentGroup.set(getString(R.string.user_active_in_group, toUser.getCurrentGroupName()+""));
             }
-            activeGroup.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    GroupChatSummary groupChatSummary = new GroupChatSummary();
-                    groupChatSummary.setId(toUser.getCurrentGroupId());
-                    groupChatSummary.setName(toUser.getCurrentGroupName());
-                    onGroupChatClicked(groupChatSummary);
-                }
-            });
-        } else {
-            activeGroup.setVisibility(View.GONE);
+        } catch (Exception e) {
+            getViewModel().partnerCurrentGroup.set("");
         }
-
     }
 
     public void collapseAppBar() {
@@ -496,13 +435,11 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
                 if (lastActive.equals(getString(R.string.just_now))) {
                     lastActive = getString(R.string.online_now);
                 }
-                ((TextView) findViewById(R.id.customSubtitleInParallax)).setText(lastActive);
-                ((TextView) findViewById(R.id.customSubtitleInToolbar)).setText(lastActive);
+                getViewModel().partnerLastActive.set(lastActive);
             }
         }
 
-        ((TextView) findViewById(R.id.customTitleInToolbar)).setText(username);
-        ((TextView) findViewById(R.id.customTitleInParallax)).setText(username);
+        getViewModel().partnerUsername.set(username);
     }
 
     @Override
@@ -697,19 +634,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
 
     @Override
     public void showLikesCount(int count) {
-        final View likesParent = findViewById(R.id.likesParent);
-        final TextView likesCount = findViewById(R.id.likesCount);
-
-        if (likesParent.getVisibility() != View.VISIBLE) {
-            likesParent.setVisibility(View.VISIBLE);
-            likesCount.setVisibility(View.VISIBLE);
-        }
-
-        if (count == 1) {
-            likesCount.setText(getString(R.string.like_singular));
-        } else {
-            likesCount.setText(getString(R.string.likes_plural, count + ""));
-        }
+        getViewModel().partnerLikesCount.set(count);
     }
 
     @Override

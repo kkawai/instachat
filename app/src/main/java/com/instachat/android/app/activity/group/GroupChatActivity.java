@@ -279,7 +279,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         if (isActivityDestroyed()) {
             return;
         }
-        binding.usernameTyping.setText(username);
+        getViewModel().usernameTyping.set(username);
         showTypingDots();
     }
 

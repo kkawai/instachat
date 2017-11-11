@@ -9,7 +9,6 @@ import android.support.v13.view.inputmethod.InputContentInfoCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -25,6 +24,7 @@ import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.blocks.BlockedUserListener;
 import com.instachat.android.app.ui.base.BaseViewModel;
 import com.instachat.android.data.DataManager;
+import com.instachat.android.data.api.BasicExistenceResult;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.api.UserResponse;
 import com.instachat.android.data.model.FriendlyMessage;
@@ -48,6 +48,10 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
 
     public ObservableField<Boolean> isAdReady = new ObservableField<>(true);
     public ObservableField<String> profilePicUrl = new ObservableField<>("");
+    public ObservableField<String> username = new ObservableField<>("");
+    public ObservableField<String> bio = new ObservableField<>("");
+    public ObservableField<Integer> likes = new ObservableField<>(0);
+    public ObservableField<Integer> pendingRequests = new ObservableField<>(0);
 
     private String databaseRoot;
 
@@ -55,6 +59,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
 
     protected final FirebaseRemoteConfig firebaseRemoteConfig;
     protected final FirebaseDatabase firebaseDatabase;
+    protected FirebaseAnalytics firebaseAnalytics;
 
     public AbstractChatViewModel(DataManager dataManager,
                                  SchedulerProvider schedulerProvider,
@@ -63,6 +68,10 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
         super(dataManager, schedulerProvider);
         this.firebaseRemoteConfig = firebaseRemoteConfig;
         this.firebaseDatabase = firebaseDatabase;
+    }
+
+    public void setFirebaseAnalytics(FirebaseAnalytics firebaseAnalytics) {
+        this.firebaseAnalytics = firebaseAnalytics;
     }
 
     @Override
@@ -278,6 +287,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
         add(getDataManager().saveUser3((long) user.getId(), user.getUsername(), user.getPassword(),
                 user.getEmail(), user.getProfilePicUrl(), user.getBio())
                 .subscribe());
+        profilePicUrl.set(photoUrl);
     }
 
     public void checkForRemoteUpdatesToMyDP() {
@@ -288,8 +298,8 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
                         if (userResponse.status.equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                             final User remote = userResponse.user;
                             if (!TextUtils.isEmpty(remote.getProfilePicUrl())) {
-                                String localProfilePic = UserPreferences.getInstance().getUser().getProfilePicUrl()+"";
-                                String remoteProfilePic = remote.getProfilePicUrl()+"";
+                                String localProfilePic = UserPreferences.getInstance().getUser().getProfilePicUrl() + "";
+                                String remoteProfilePic = remote.getProfilePicUrl() + "";
                                 if (StringUtil.isNotEmpty(remoteProfilePic) && !localProfilePic.equals(remoteProfilePic)) {
                                     User user = UserPreferences.getInstance().getUser();
                                     user.setProfilePicUrl(remoteProfilePic);
@@ -305,9 +315,90 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        MLog.e(TAG,"checkForRemoteUpdatesToMyDP() failed", throwable);
+                        MLog.e(TAG, "checkForRemoteUpdatesToMyDP() failed", throwable);
                     }
                 }));
+    }
+
+    public void saveUser(final User user, final String newUsername, final String newBio, final boolean needToSaveBio, final boolean needToSaveUsername) {
+        if (needToSaveBio && !needToSaveUsername) {
+            user.setBio(newBio);
+            add(getDataManager().saveUser3((long) user.getId(),
+                    user.getUsername(),
+                    user.getPassword(),
+                    user.getEmail(),
+                    user.getProfilePicUrl(),
+                    user.getBio())
+                    .subscribe(new Consumer<UserResponse>() {
+                        @Override
+                        public void accept(UserResponse userResponse) throws Exception {
+                            if (userResponse.status.equals(NetworkApi.RESPONSE_OK)) {
+                                UserPreferences.getInstance().saveUser(user);
+                                getNavigator().showProfileUpdatedDialog();
+                            }
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            getNavigator().showErrorToast("");
+                            Bundle payload = new Bundle();
+                            payload.putString("why", throwable.toString());
+                            payload.putString("username", UserPreferences.getInstance().getUsername() + "");
+                            firebaseAnalytics.logEvent(Events.SAVED_PROFILE_FAILED, payload);
+                        }
+                    }));
+
+        } else if (needToSaveUsername) {
+            if (needToSaveBio)
+                user.setBio(newBio);
+
+            add(getDataManager().userNameExists(newUsername)
+                    .subscribe(new Consumer<BasicExistenceResult>() {
+                        @Override
+                        public void accept(BasicExistenceResult basicExistenceResult) throws Exception {
+                            if (basicExistenceResult.data.exists) {
+                                getNavigator().showUsernameExistsDialog(newUsername);
+                                username.set(UserPreferences.getInstance().getUsername());
+                            } else {
+                                user.setUsername(newUsername);
+                                saveUser(user);
+                            }
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            getNavigator().showErrorToast("");
+                            username.set(UserPreferences.getInstance().getUsername());
+                            Bundle payload = new Bundle();
+                            payload.putString("why", throwable.toString());
+                            payload.putString("username", UserPreferences.getInstance().getUsername() + "");
+                            firebaseAnalytics.getInstance(TheApp.getInstance()).logEvent(Events.SAVED_PROFILE_FAILED, payload);
+                        }
+                    }));
+
+        }
+
+    }
+
+    private void saveUser(@NonNull final User user) {
+        getDataManager().saveUser3((long) user.getId(), user.getUsername(), user.getPassword(), user.getEmail(), user.getProfilePicUrl(), user.getBio())
+                .subscribe(new Consumer<UserResponse>() {
+                    @Override
+                    public void accept(UserResponse userResponse) throws Exception {
+                        UserPreferences.getInstance().saveUser(user);
+                        UserPreferences.getInstance().saveLastSignIn(user.getUsername());
+                        Bundle payload = new Bundle();
+                        payload.putString("username", UserPreferences.getInstance().getUsername() + "");
+                        firebaseAnalytics.logEvent(Events.SAVED_PROFILE, payload);
+                    }
+                });
+    }
+
+    public void onGroupChatClicked(long groupId, String groupName) {
+        if (groupId == 0 || StringUtil.isEmpty(groupName)) {
+            return;
+        }
+        getNavigator().showGroupChatActivity(groupId, groupName, null, null);
     }
 
 }

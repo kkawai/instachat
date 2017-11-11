@@ -1,5 +1,6 @@
 package com.instachat.android.app.activity.group;
 
+import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
 import android.widget.TextView;
 
@@ -34,6 +35,7 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
     private static final String TAG = "GroupChatViewModel";
 
     //public ObservableArrayList<ItemViewModel> list = new ObservableArrayList<>();
+    public ObservableField<String> usernameTyping = new ObservableField<>("");
     private long groupId;
     private long mLastTypingTime;
     private DatabaseReference mTypingInRoomReference;
