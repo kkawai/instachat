@@ -61,11 +61,6 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
         super(dataManager, schedulerProvider, firebaseRemoteConfig, firebaseDatabase);
     }
 
-    @Override
-    public boolean isPrivateChat() {
-        return true;
-    }
-
     public void collapseAppbarAfterDelay() {
 
         add(Observable.timer(firebaseRemoteConfig.getLong(Constants.KEY_COLLAPSE_PRIVATE_CHAT_APPBAR_DELAY), TimeUnit.MILLISECONDS)

@@ -13,7 +13,6 @@ import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -110,6 +109,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         gcmHelper.onCreate(this);
 
         initFirebaseAdapter(binding.fragmentContent, binding.messageRecyclerView,this, linearLayoutManager);
+        messagesAdapter.setIsPrivateChat(true);
         binding.messageRecyclerView.setLayoutManager(linearLayoutManager);
         binding.messageRecyclerView.setAdapter(messagesAdapter);
 
@@ -328,6 +328,37 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
     }
 
     @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (menu == null)
+            return false;
+
+        if (!mIsPendingRequestsAvailable) {
+            if (menu.findItem(R.id.menu_pending_requests) != null)
+                menu.removeItem(R.id.menu_pending_requests);
+        } else {
+            if (menu.findItem(R.id.menu_pending_requests) == null)
+                menu.add(0, R.id.menu_pending_requests, 0, getString(R.string.menu_option_pending_requests));
+        }
+
+        if (sUserid == privateChatViewModel.myUserid()) {
+            if (menu.findItem(R.id.menu_block_user) != null) {
+                menu.removeItem(R.id.menu_block_user);
+            }
+            if (menu.findItem(R.id.menu_report_user) != null) {
+                menu.removeItem(R.id.menu_report_user);
+            }
+            if (menu.findItem(R.id.menu_sign_out) == null) {
+                menu.add(0, R.id.menu_sign_out, 1, getString(R.string.sign_out));
+            }
+        } else {
+            //if (menu.findItem(R.id.menu_sign_out) != null) {
+            //    menu.removeItem(R.id.menu_sign_out);
+            //}
+        }
+        return super.onMenuOpened(featureId, menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -441,37 +472,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
                 return false;
             }
         });
-    }
-
-    @Override
-    public boolean onMenuOpened(int featureId, Menu menu) {
-        if (menu == null)
-            return false;
-
-        if (!mIsPendingRequestsAvailable) {
-            if (menu.findItem(R.id.menu_pending_requests) != null)
-                menu.removeItem(R.id.menu_pending_requests);
-        } else {
-            if (menu.findItem(R.id.menu_pending_requests) == null)
-                menu.add(0, R.id.menu_pending_requests, 0, getString(R.string.menu_option_pending_requests));
-        }
-
-        if (sUserid == privateChatViewModel.myUserid()) {
-            if (menu.findItem(R.id.menu_block_user) != null) {
-                menu.removeItem(R.id.menu_block_user);
-            }
-            if (menu.findItem(R.id.menu_report_user) != null) {
-                menu.removeItem(R.id.menu_report_user);
-            }
-            if (menu.findItem(R.id.menu_sign_out) == null) {
-                menu.add(0, R.id.menu_sign_out, 1, getString(R.string.sign_out));
-            }
-        } else {
-            //if (menu.findItem(R.id.menu_sign_out) != null) {
-            //    menu.removeItem(R.id.menu_sign_out);
-            //}
-        }
-        return super.onMenuOpened(featureId, menu);
     }
 
     @Override

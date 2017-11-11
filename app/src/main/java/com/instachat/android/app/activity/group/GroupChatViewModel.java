@@ -56,11 +56,6 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
         super(dataManager, schedulerProvider, firebaseRemoteConfig, firebaseDatabase);
     }
 
-    @Override
-    public boolean isPrivateChat() {
-        return false;
-    }
-
     public long getGroupId() {
         return groupId;
     }

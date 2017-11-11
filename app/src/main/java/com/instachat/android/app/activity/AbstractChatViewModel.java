@@ -139,13 +139,10 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
                 FirebaseDatabase.getInstance().getReference(getDatabaseRoot()).
                         limitToLast((int) firebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)),
                 map);
-        messagesAdapter.setIsPrivateChat(isPrivateChat());
         messagesAdapter.setDatabaseRoot(getDatabaseRoot());
         messagesAdapter.setBlockedUserListener(blockedUserListener);
         return messagesAdapter;
     }
-
-    public abstract boolean isPrivateChat();
 
     public abstract void onMeTyping();
 

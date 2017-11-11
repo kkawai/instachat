@@ -18,7 +18,6 @@ import android.view.MenuItem;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.instachat.android.BR;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
@@ -172,6 +171,10 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         getViewModel().onFriendlyMessageSuccess(friendlyMessage);
     }
 
+    protected void onHomeClicked() {
+        binding.drawerLayout.openDrawer(GravityCompat.START);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -179,8 +182,26 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         return true;
     }
 
-    protected void onHomeClicked() {
-        binding.drawerLayout.openDrawer(GravityCompat.START);
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (menu == null)
+            return false;
+        if (!mIsPendingRequestsAvailable) {
+            if (menu.findItem(R.id.menu_pending_requests) != null)
+                menu.removeItem(R.id.menu_pending_requests);
+        } else {
+            if (menu.findItem(R.id.menu_pending_requests) == null)
+                menu.add(0, R.id.menu_pending_requests, 0, getString(R.string.menu_option_pending_requests));
+        }
+        if (messagesAdapter != null && messagesAdapter.getNumBlockedUsers() > 0) {
+            if (menu.findItem(R.id.menu_manage_blocks) == null) {
+                menu.add(0, R.id.menu_manage_blocks, 1, getString(R.string.manage_blocks));
+            }
+        } else {
+            if (menu.findItem(R.id.menu_manage_blocks) != null)
+                menu.removeItem(R.id.menu_manage_blocks);
+        }
+        return super.onMenuOpened(featureId, menu);
     }
 
     @Override
@@ -290,33 +311,6 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
                 finish();
             }
         });
-    }
-
-    @Override
-    public boolean onMenuOpened(int featureId, Menu menu) {
-        if (menu == null)
-            return false;
-        if (!mIsPendingRequestsAvailable) {
-            if (menu.findItem(R.id.menu_pending_requests) != null)
-                menu.removeItem(R.id.menu_pending_requests);
-        } else {
-            if (menu.findItem(R.id.menu_pending_requests) == null)
-                menu.add(0, R.id.menu_pending_requests, 0, getString(R.string.menu_option_pending_requests));
-        }
-        if (messagesAdapter != null && messagesAdapter.getNumBlockedUsers() > 0) {
-            if (menu.findItem(R.id.menu_manage_blocks) == null) {
-                menu.add(0, R.id.menu_manage_blocks, 1, getString(R.string.manage_blocks));
-            }
-        } else {
-            if (menu.findItem(R.id.menu_manage_blocks) != null)
-                menu.removeItem(R.id.menu_manage_blocks);
-        }
-        if (!groupChatViewModel.isPrivateChat()) {
-            //if (menu.findItem(R.id.menu_sign_out) != null) {
-            //    menu.removeItem(R.id.menu_sign_out);
-            //}
-        }
-        return super.onMenuOpened(featureId, menu);
     }
 
     private void showFirstMessageDialog(@NonNull final Context context) {
