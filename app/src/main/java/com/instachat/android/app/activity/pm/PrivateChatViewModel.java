@@ -313,4 +313,8 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
         return toUser;
     }
 
+    public void onPartnerLikesClicked() {
+        getNavigator().showPartnerLikes();
+    }
+
 }

@@ -124,6 +124,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         privateChatViewModel.smallProgressCheck();
         onNewIntent(getIntent());
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+
     }
 
     //@Override
@@ -198,21 +199,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         });
         presenceHelper.updateLastActiveTimestamp();
         privateChatViewModel.listenForUpdatedLikeCount(sUserid);
-        findViewById(R.id.likesParent)
-                .setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Fragment fragment = new UserLikedUserFragment();
-                        Bundle bundle = new Bundle();
-                        bundle.putInt(Constants.KEY_USERID, sUserid);
-                        bundle.putString(Constants.KEY_USERNAME, sUsername);
-                        fragment.setArguments(bundle);
-                        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim
-                                .slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment,
-                                UserLikedUserFragment.TAG).addToBackStack(null).commit();
-
-                    }
-                });
     }
 
     private void checkIfSeenToolbarProfileTooltip(View anchor) {
@@ -642,5 +628,11 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
 
     }
 
-
+    @Override
+    public void showPartnerLikes() {
+        Fragment fragment = UserLikedUserFragment.newInstance(sUserid,sUsername);
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim
+                .slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment,
+                UserLikedUserFragment.TAG).addToBackStack(null).commit();
+    }
 }
