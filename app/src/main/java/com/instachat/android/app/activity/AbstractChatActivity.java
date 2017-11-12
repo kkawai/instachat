@@ -56,6 +56,7 @@ import com.instachat.android.app.adapter.MessageTextClickedListener;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapter;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
 import com.instachat.android.app.adapter.UserClickedListener;
+import com.instachat.android.app.adapter.UserPresenceManager;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.fullscreen.FriendlyMessageContainer;
 import com.instachat.android.app.fullscreen.FullScreenTextFragment;
@@ -127,8 +128,10 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     @Inject
     protected LogoutDialogHelper logoutDialogHelper;
 
-    @Inject
     protected ChatSummariesRecyclerAdapter chatsRecyclerViewAdapter;
+
+    @Inject
+    protected UserPresenceManager userPresenceManager;
 
     @Inject
     protected AdsHelper adsHelper;
@@ -335,6 +338,8 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
         if (chatsRecyclerViewAdapter != null)
             chatsRecyclerViewAdapter.cleanup();
         mDotsHandler.removeCallbacks(mDotsHideRunner);
+        userPresenceManager.cleanup();
+        presenceHelper.cleanup();
         super.onDestroy();
     }
 
@@ -658,6 +663,7 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
         mLeftDrawerHelper.setup(leftDrawerLayoutBinding, leftNavHeaderBinding);
         mLeftDrawerHelper.setUserLikedUserListener(mUserLikedUserListener);
 
+        chatsRecyclerViewAdapter = new ChatSummariesRecyclerAdapter(userPresenceManager);
         chatsRecyclerViewAdapter.setup(this, this, true);
         leftDrawerLayoutBinding.drawerRecyclerView.setLayoutManager(new StickyLayoutManager(this, chatsRecyclerViewAdapter));
         leftDrawerLayoutBinding.drawerRecyclerView.setAdapter(chatsRecyclerViewAdapter);
@@ -919,16 +925,15 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
 
-                super.onItemRangeInserted(positionStart, itemCount);
-                int friendlyMessageCount = messagesAdapter.getItemCount();
-                int lastVisiblePosition = linearLayoutManager.findLastVisibleItemPosition();
-                MLog.d(TAG, "scroll debug: lastVisiblePosition: " + lastVisiblePosition + " text: " + messagesAdapter.peekLastMessage()
-                        + " positionStart: " + positionStart + " friendlyMessageCount: " + friendlyMessageCount);
-                if (lastVisiblePosition == -1 || ((lastVisiblePosition + 4) >= positionStart)) {
-                    MLog.d(TAG, "B kevin scroll: " + (positionStart) + " text: " + messagesAdapter.peekLastMessage());
+                int vis = linearLayoutManager.findLastVisibleItemPosition();
+//                MLog.d(TAG, "scroll debug: vis: " + vis + " text: " + messagesAdapter.peekLastMessage()
+//                        + " positionStart: " + positionStart);
+                if (vis == -1 || (vis+3) >= positionStart) {
+                    //MLog.d(TAG, "B kevin scroll: " + (positionStart) + " text: " + messagesAdapter.peekLastMessage());
                     messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
                 }
                 notifyPagerAdapterDataSetChanged();
+                getViewModel().checkMessageSortOrder();
             }
 
             @Override

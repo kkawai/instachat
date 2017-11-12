@@ -57,6 +57,9 @@ import com.tooltip.Tooltip;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -764,6 +767,9 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     protected void onRemoveItem(int index) {
         mItemWasRemoved = true;
         super.onRemoveItem(index);
+        MLog.d(TAG,"sort_tag: onRemoteItem() item was removed.  Check if needs sorting.");
+        if (needsSorting())
+            sort();
     }
 
     public static final long ONE_HOUR = 60*1000*60L;
@@ -772,7 +778,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     }
 
     private void removeMessages(FriendlyMessage friendlyMessage) {
-        ArrayList<FriendlyMessage> copy = new ArrayList<>(getSnapshots());
+        ArrayList<FriendlyMessage> copy = new ArrayList<>(getData());
         for (FriendlyMessage remove : copy) {
             try {
                 if (remove.getUserid() == friendlyMessage.getUserid()) {
@@ -781,6 +787,49 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             }catch(Exception e) {
                 MLog.e(TAG,"removeMessages() error: "+e.getMessage());
             }
+        }
+    }
+
+    public final void sort() {
+        //if (1==1) return;
+        int size=0;
+        synchronized (this) {
+            ArrayList<FriendlyMessage> list = getData();
+            //size = list.size();
+            Collections.sort(list, new Comparator<FriendlyMessage>() {
+                @Override
+                public int compare(FriendlyMessage m1, FriendlyMessage m2) {
+                    return m1.getTime() > m2.getTime() ? 1 : -1;
+                }
+            });
+        }
+        MLog.d(TAG,"sort_tag: list was just sorted. size(): "+size);
+        notifyDataSetChanged();
+    }
+
+    public final boolean needsSorting() {
+        synchronized (this) {
+            long prev = 0;
+            String prevMsg = "";
+            int prevIdx = 0;
+            ArrayList<FriendlyMessage> list = getData();
+            for (int i=list.size()-1;i >= 0; i--) {
+                FriendlyMessage next = list.get(i);
+                if (prev != 0 && next.getTime() > prev) {
+                    MLog.d(TAG,"sort_tag: needs to be sorted.  prev_msg: "+prevMsg + " msg: "+next.getText()
+                            + " prev idx: " + prevIdx + " "
+                            + " idx: "+i + " size: "+list.size()
+                            + " prev Time: " + new Date(prev).toString()
+                            + " time: "+ new Date(next.getTime()).toString());
+                    return true;
+                } else {
+                    prev = next.getTime();
+                    prevMsg = next.getText();
+                    prevIdx = i;
+                }
+            }
+            MLog.d(TAG,"sort_tag: No need to be sorted");
+            return false;
         }
     }
 }

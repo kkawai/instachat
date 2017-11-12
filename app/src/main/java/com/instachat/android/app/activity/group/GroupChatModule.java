@@ -36,8 +36,4 @@ public class GroupChatModule {
         return new LinearLayoutManager(activity);
     }
 
-    @Provides
-    PresenceHelper providePresenceHelper() {
-        return new PresenceHelper();
-    }
 }

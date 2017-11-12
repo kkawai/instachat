@@ -424,4 +424,28 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
         }
         return isBanned;
     }
+
+    /**
+     * After a room is loaded with messages, check if the messages
+     * are out of sort order.  If so, then sort them.
+     */
+    private boolean checkedSortOrder;
+    public void checkMessageSortOrder() {
+        if (checkedSortOrder) {
+            return;
+        }
+        checkedSortOrder = true;
+        add(Observable.timer(2000, TimeUnit.MILLISECONDS)
+                .subscribeOn(getSchedulerProvider().io())
+                .observeOn(getSchedulerProvider().ui())
+                .doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        if (messagesAdapter.needsSorting()) {
+                            messagesAdapter.sort();
+                        }
+                    }
+                })
+                .subscribe());
+    }
 }

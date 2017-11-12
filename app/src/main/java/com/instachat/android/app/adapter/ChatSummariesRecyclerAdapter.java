@@ -61,7 +61,6 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
     private UsersInGroupListener mUsersInGroupListener;
     private final UserPresenceManager userPresenceManager;
 
-    @Inject
     public ChatSummariesRecyclerAdapter(UserPresenceManager userPresenceManager) {
         this.userPresenceManager = userPresenceManager;
     }
