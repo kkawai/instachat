@@ -17,6 +17,8 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.instachat.android.R;
 import com.instachat.android.app.activity.pm.PrivateChatViewModel;
+import com.instachat.android.app.adapter.PrivateChatSummaryViewHolder;
+import com.instachat.android.data.model.PrivateChatSummary;
 
 /**
  * Custom bindings for XML attributes using data binding.
@@ -73,6 +75,19 @@ public class Bindings {
             textView.setText(R.string.left_drawer_pending_request_singular);
         } else if (pendingRequsts > 1) {
             textView.setText(textView.getContext().getString(R.string.left_drawer_pending_requests_plural, "" + pendingRequsts));
+        }
+    }
+
+    @BindingAdapter("partnerStatus")
+    public static void setPartnerStatus(ImageView imageView, int status) {
+        if (status == PrivateChatSummary.USER_ONLINE) {
+            imageView.setImageResource(R.drawable.presence_green);
+        } else if (status == PrivateChatSummary.USER_AWAY) {
+            imageView.setImageResource(R.drawable.presence_away);
+        } else if (status == PrivateChatSummary.USER_OFFLINE) {
+            imageView.setImageResource(R.drawable.presence_gone);
+        } else {
+            imageView.setImageResource(R.drawable.presence_green);
         }
     }
 

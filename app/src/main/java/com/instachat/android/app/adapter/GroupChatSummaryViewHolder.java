@@ -6,19 +6,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.instachat.android.R;
+import com.instachat.android.databinding.DrawerListItemBinding;
 
 /**
  * Created by kevin on 9/26/2016.
  */
 public class GroupChatSummaryViewHolder extends RecyclerView.ViewHolder {
 
-    public TextView name, unreadMessageCount;
-    public ImageView status;
+    DrawerListItemBinding binding;
 
-    public GroupChatSummaryViewHolder(View itemView) {
-        super(itemView);
-        name = (TextView) itemView.findViewById(R.id.name);
-        unreadMessageCount = (TextView) itemView.findViewById(R.id.unread_message_count);
-        status = (ImageView) itemView.findViewById(R.id.status);
+    public GroupChatSummaryViewHolder(DrawerListItemBinding binding) {
+        super(binding.getRoot());
+        this.binding = binding;
     }
 }
