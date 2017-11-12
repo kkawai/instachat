@@ -134,9 +134,6 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     protected AdsHelper adsHelper;
 
     @Inject
-    protected BanHelper banHelper;
-
-    @Inject
     protected PresenceHelper presenceHelper;
 
     @Inject
