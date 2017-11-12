@@ -206,6 +206,8 @@ public final class Constants {
 
    public static String GROUP_CHAT_ROOMS = "/public_group_summaries/";
 
+   public static final String BANS = "/bans/";
+
    /**
     * use-case: list of users that liked the given message
     * captures the like count in each user stored at this location
@@ -279,6 +281,7 @@ public final class Constants {
    public static final String CHILD_MESSAGE_CONSUMED_BY_PARTNER = "consumedByPartner";
    public static final String CHILD_ACCEPTED = "accepted";
    public static final String CHILD_LAST_ONLINE = "lastOnline";
+   public static final String CHILD_BAN_EXPIRATION = "banExpiration";
 
    /**
     * Any message received by a user whose last message

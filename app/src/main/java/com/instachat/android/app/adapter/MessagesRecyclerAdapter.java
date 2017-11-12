@@ -3,7 +3,6 @@ package com.instachat.android.app.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Handler;
@@ -37,6 +36,7 @@ import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.app.MessageOptionsDialogHelper;
 import com.instachat.android.app.activity.ActivityState;
+import com.instachat.android.app.activity.BanHelper;
 import com.instachat.android.app.blocks.BlockUserDialogHelper;
 import com.instachat.android.app.blocks.BlockedUser;
 import com.instachat.android.app.blocks.BlockedUserListener;
@@ -45,6 +45,9 @@ import com.instachat.android.app.likes.LikesHelper;
 import com.instachat.android.data.db.OneTimeMessageDb;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.databinding.ItemMessageBinding;
+import com.instachat.android.databinding.ItemMessageMeBinding;
+import com.instachat.android.databinding.ItemMessageMeWebClippingBinding;
+import com.instachat.android.databinding.ItemMessageWebClippingBinding;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.StringUtil;
@@ -93,14 +96,16 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private boolean mIsPrivateChat;
     private int mMyUserid;
     private final MessagesRecyclerAdapterHelper map;
+    private final BanHelper banHelper;
 
-    public MessagesRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref, MessagesRecyclerAdapterHelper map) {
+    public MessagesRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref, MessagesRecyclerAdapterHelper map, BanHelper banHelper) {
         super(modelClass, modelLayout, viewHolderClass, ref);
         mMessagesRef = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mMaxPeriscopesPerItem = (int) FirebaseRemoteConfig.getInstance().getLong(Constants.KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM);
         mMyUserid = UserPreferences.getInstance().getUserId();
         this.map = map;
+        this.banHelper = banHelper;
     }
 
     public void setIsPrivateChat(boolean isPrivateChat) {
@@ -183,13 +188,13 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             ItemMessageBinding binding = ItemMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new MessageViewHolder(binding.getRoot());
         } else if (viewType == ITEM_VIEW_TYPE_STANDARD_MESSAGE_ME) {
-            ItemMessageBinding binding = ItemMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            ItemMessageMeBinding binding = ItemMessageMeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new MessageViewHolder(binding.getRoot());
         } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
-            ItemMessageBinding binding = ItemMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            ItemMessageWebClippingBinding binding = ItemMessageWebClippingBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new MessageViewHolder(binding.getRoot());
         } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK_ME) {
-            ItemMessageBinding binding = ItemMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            ItemMessageMeWebClippingBinding binding = ItemMessageMeWebClippingBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new MessageViewHolder(binding.getRoot());
         }
         throw new IllegalArgumentException("unknown viewType");
@@ -672,17 +677,18 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
             @Override
             public void onBan5Minutes(FriendlyMessage friendlyMessage) {
-                //todo
+                banHelper.ban(friendlyMessage,5);
             }
 
             @Override
             public void onBan15Minutes(FriendlyMessage friendlyMessage) {
-//todo
+
+                banHelper.ban(friendlyMessage,15);
             }
 
             @Override
             public void onBan2Days(FriendlyMessage friendlyMessage) {
-//todo
+                banHelper.ban(friendlyMessage,60*24*2);
             }
         });
     }

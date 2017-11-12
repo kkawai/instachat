@@ -15,6 +15,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.app.activity.AbstractChatViewModel;
+import com.instachat.android.app.activity.BanHelper;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.data.DataManager;
 import com.instachat.android.data.api.UserResponse;
@@ -57,8 +58,9 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
     public PrivateChatViewModel(DataManager dataManager,
                                 SchedulerProvider schedulerProvider,
                                 FirebaseRemoteConfig firebaseRemoteConfig,
-                                FirebaseDatabase firebaseDatabase) {
-        super(dataManager, schedulerProvider, firebaseRemoteConfig, firebaseDatabase);
+                                FirebaseDatabase firebaseDatabase,
+                                BanHelper banHelper) {
+        super(dataManager, schedulerProvider, firebaseRemoteConfig, firebaseDatabase, banHelper);
     }
 
     public void collapseAppbarAfterDelay() {

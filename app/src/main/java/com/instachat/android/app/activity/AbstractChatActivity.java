@@ -134,6 +134,9 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     protected AdsHelper adsHelper;
 
     @Inject
+    protected BanHelper banHelper;
+
+    @Inject
     protected PresenceHelper presenceHelper;
 
     @Inject
@@ -484,6 +487,10 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     }
 
     private void showFileOptions() {
+
+        if (getViewModel().isBanned()) {
+            return;
+        }
 
         /**
          * if the keyboard is open, close it first before showing

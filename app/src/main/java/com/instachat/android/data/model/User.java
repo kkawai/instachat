@@ -37,7 +37,6 @@ public class User {
     private int likes;
 
     public User() {
-        super();
     }
 
     /**
@@ -46,7 +45,7 @@ public class User {
      *
      * @return
      */
-    public Map<String, Object> toMap(boolean includeTimestamp) {
+    public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>(10);
         map.put("username", username);
         if (profilePicUrl != null)
@@ -54,8 +53,7 @@ public class User {
         map.put("id", id);
         if (bio != null)
             map.put("bio", bio);
-        if (includeTimestamp)
-            map.put(Constants.CHILD_LAST_ONLINE, ServerValue.TIMESTAMP);
+        map.put(Constants.CHILD_LAST_ONLINE, ServerValue.TIMESTAMP);
         if (currentGroupName != null) {
             map.put(Constants.FIELD_CURRENT_GROUP_NAME, currentGroupName);
             map.put(Constants.FIELD_CURRENT_GROUP_ID, currentGroupId);

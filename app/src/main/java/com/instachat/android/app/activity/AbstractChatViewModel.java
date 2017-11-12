@@ -55,6 +55,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
 
     protected final FirebaseRemoteConfig firebaseRemoteConfig;
     protected final FirebaseDatabase firebaseDatabase;
+    protected final BanHelper banHelper;
     protected FirebaseAnalytics firebaseAnalytics;
 
     private String databaseRoot;
@@ -64,10 +65,12 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     public AbstractChatViewModel(DataManager dataManager,
                                  SchedulerProvider schedulerProvider,
                                  FirebaseRemoteConfig firebaseRemoteConfig,
-                                 FirebaseDatabase firebaseDatabase) {
+                                 FirebaseDatabase firebaseDatabase,
+                                 BanHelper banHelper) {
         super(dataManager, schedulerProvider);
         this.firebaseRemoteConfig = firebaseRemoteConfig;
         this.firebaseDatabase = firebaseDatabase;
+        this.banHelper = banHelper;
     }
 
     public void setFirebaseAnalytics(FirebaseAnalytics firebaseAnalytics) {
@@ -146,7 +149,8 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
                 MessageViewHolder.class,
                 FirebaseDatabase.getInstance().getReference(getDatabaseRoot()).
                         limitToLast((int) firebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)),
-                map);
+                map,
+                banHelper);
         messagesAdapter.setDatabaseRoot(getDatabaseRoot());
         messagesAdapter.setBlockedUserListener(blockedUserListener);
         return messagesAdapter;
@@ -223,7 +227,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     };
 
     public boolean validateMessage(final String text, boolean showOptions) {
-        if (StringUtil.isEmpty(text)) {
+        if (StringUtil.isEmpty(text) || isBanned()) {
             return false;
         }
         if (StringUtil.isEmpty(myDpid())) {
@@ -413,4 +417,11 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
         return firebaseRemoteConfig.getString(Constants.KEY_ADMIN_USERS).contains(adminId);
     }
 
+    public boolean isBanned() {
+        boolean isBanned = banHelper.isBanned();
+        if (isBanned) {
+            MLog.w(TAG, "You are banned. Cannot post anything.");
+        }
+        return isBanned;
+    }
 }

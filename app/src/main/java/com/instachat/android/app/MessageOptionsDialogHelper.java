@@ -140,10 +140,10 @@ public class MessageOptionsDialogHelper {
                         listener.onBan2Days(friendlyMessage);
                         break;
                     case R.id.admin_menu_ban_5:
-                        listener.onBan2Days(friendlyMessage);
+                        listener.onBan5Minutes(friendlyMessage);
                         break;
                     case R.id.admin_menu_ban_15:
-                        listener.onBan2Days(friendlyMessage);
+                        listener.onBan15Minutes(friendlyMessage);
                         break;
                     default:
                         break;

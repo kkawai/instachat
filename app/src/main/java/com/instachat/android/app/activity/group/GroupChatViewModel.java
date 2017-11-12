@@ -16,6 +16,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.storage.FirebaseStorage;
 import com.instachat.android.Constants;
 import com.instachat.android.app.activity.AbstractChatViewModel;
+import com.instachat.android.app.activity.BanHelper;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.data.DataManager;
 import com.instachat.android.data.model.FriendlyMessage;
@@ -53,8 +54,9 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
     public GroupChatViewModel(DataManager dataManager,
                               SchedulerProvider schedulerProvider,
                               FirebaseRemoteConfig firebaseRemoteConfig,
-                              FirebaseDatabase firebaseDatabase) {
-        super(dataManager, schedulerProvider, firebaseRemoteConfig, firebaseDatabase);
+                              FirebaseDatabase firebaseDatabase,
+                              BanHelper banHelper) {
+        super(dataManager, schedulerProvider, firebaseRemoteConfig, firebaseDatabase, banHelper);
     }
 
     public long getGroupId() {
@@ -162,7 +164,6 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
                 if (dataSnapshot.hasChildren()) {
                     final GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
                     getNavigator().showSubtitle();
-
                     /**
                      * run this delayed, if the user re-enters
                      * the same room (for a variety of reasons)
@@ -180,7 +181,7 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
                                     final DatabaseReference ref = firebaseDatabase.getReference(Constants
                                             .GROUP_CHAT_USERS_REF(getGroupId())).
                                             child(myUserid() + "");
-                                    ref.updateChildren(me.toMap(true)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    ref.updateChildren(me.toMap()).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             getNavigator().removeUserFromAllGroups(myUserid(), getGroupId());
@@ -189,7 +190,7 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
                                     me.setCurrentGroupId(groupChatSummary.getId());
                                     me.setCurrentGroupName(groupChatSummary.getName());
                                     firebaseDatabase.getReference(Constants.USER_INFO_REF(myUserid()))
-                                            .updateChildren(me.toMap(true));
+                                            .updateChildren(me.toMap());
                                 }
                             }).subscribe());
 
