@@ -183,6 +183,15 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
         sendButton.setEnabled(mMessageEditText.getText().toString().trim().length() > 0);
         if (mExternalSendIntentConsumer != null)
             mExternalSendIntentConsumer.consumeIntent(getIntent());
+        if (chatsRecyclerViewAdapter != null)
+            chatsRecyclerViewAdapter.resume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (chatsRecyclerViewAdapter != null)
+            chatsRecyclerViewAdapter.pause();
     }
 
     protected void showProgressDialog() {

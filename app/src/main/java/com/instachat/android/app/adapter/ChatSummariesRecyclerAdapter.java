@@ -220,6 +220,9 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
 
     private void insertPrivateChatSummary(PrivateChatSummary privateChatSummary) {
         synchronized (this) {
+            if (data.contains(privateChatSummary)) {
+                return;
+            }
             for (int i = 0; i < data.size(); i++) {
                 Object o = data.get(i);
                 if (o instanceof PrivateChatHeader) {
@@ -322,6 +325,9 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
     private void insertGroupChatSummary(GroupChatSummary groupChatSummary) {
         int groupHeaderIndex = -1;
         synchronized (this) {
+            if (data.contains(groupChatSummary)) {
+                return;
+            }
             for (int i = 0; i < data.size(); i++) {
                 Object o = data.get(i);
                 if (o instanceof GroupChatHeader) {
@@ -449,6 +455,29 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
         return data.size();
     }
 
+    private boolean wasPaused;
+    public void pause() {
+        cleanup();
+        wasPaused = true;
+    }
+
+    public void resume() {
+        if (wasPaused) {
+            wasPaused = false;
+            if (privateChatsSummaryReference != null)
+                privateChatsSummaryReference.addChildEventListener(privateChatsSummaryListener);
+            if (publicGroupChatsSummaryReference != null)
+                publicGroupChatsSummaryReference.addChildEventListener(publicGroupChatsSummaryListener);
+            for (long groupid : publicGroupChatPresenceReferences.keySet()) {
+                Map.Entry<DatabaseReference, ChildEventListener> entry = publicGroupChatPresenceReferences.get(groupid);
+                entry.getKey().addChildEventListener(entry.getValue());
+            }
+            for (Map.Entry<DatabaseReference, ValueEventListener> entry : userInfoRefs) {
+                entry.getKey().addValueEventListener(entry.getValue());
+            }
+        }
+    }
+
     public void cleanup() {
         if (userPresenceManager != null)
             userPresenceManager.cleanup();
@@ -460,12 +489,9 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
             Map.Entry<DatabaseReference, ChildEventListener> entry = publicGroupChatPresenceReferences.get(groupid);
             entry.getKey().removeEventListener(entry.getValue());
         }
-        publicGroupChatPresenceReferences = null;
-        activityState = null;
         for (Map.Entry<DatabaseReference, ValueEventListener> entry : userInfoRefs) {
             entry.getKey().removeEventListener(entry.getValue());
         }
-        userInfoRefs = null;
     }
 
     private synchronized void addPublicGroupChatPresenceReference(final long groupid) {
