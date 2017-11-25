@@ -2,6 +2,16 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+
+        <import type="android.view.View"/>
+
+        <variable
+            name="viewModel"
+            type="com.instachat.android.app.activity.AbstractChatViewModel" />
+
+    </data>
+
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="@dimen/left_drawer_header_height"
                   android:focusableInTouchMode="true"
@@ -22,7 +32,8 @@
             android:textSize="21sp"
             android:textStyle="bold"
             android:visibility="invisible"
-            />
+            android:fontFamily="@font/lato_bold"
+            android:text="@{viewModel.username}"/>
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -35,7 +46,8 @@
                 android:layout_gravity="center_horizontal"
                 app:civ_border_color="@android:color/white"
                 app:civ_border_overlay="true"
-                app:civ_border_width="2px"/>
+                app:civ_border_width="2px"
+                app:imageUrlWithCrossFade="@{viewModel.profilePicUrl}"/>
 
             <Button
                 android:id="@+id/save_username"
@@ -73,7 +85,7 @@
             android:orientation="horizontal"
             android:paddingBottom="3dp"
             android:paddingTop="3dp"
-            android:visibility="invisible">
+            android:visibility="@{viewModel.likes > 0 ? View.VISIBLE : View.INVISIBLE}">
 
             <ImageView
                 android:id="@+id/drawerLikesIcon"
@@ -90,11 +102,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text=""
+                app:likes="@{viewModel.likes}"
                 android:textSize="13sp"
                 android:textStyle="bold"
                 android:visibility="invisible"
-                />
+                android:fontFamily="@font/lato_bold"/>
         </LinearLayout>
 
         <EditText
@@ -113,7 +125,9 @@
             android:textColor="@android:color/white"
             android:textSize="13sp"
             android:visibility="invisible"
-            />
+            android:fontFamily="@font/lato_regular"
+            android:text="@{viewModel.bio}"
+            android:hint="@string/hint_write_something_about_yourself"/>
 
     </LinearLayout>
 </layout>

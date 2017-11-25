@@ -1,7 +1,8 @@
 package com.instachat.android.app.activity.group;
 
+import android.databinding.ObservableField;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -12,10 +13,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.storage.FirebaseStorage;
 import com.instachat.android.Constants;
-import com.instachat.android.R;
 import com.instachat.android.app.activity.AbstractChatViewModel;
+import com.instachat.android.app.activity.BanHelper;
+import com.instachat.android.app.analytics.Events;
 import com.instachat.android.data.DataManager;
+import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.data.model.User;
 import com.instachat.android.util.MLog;
@@ -34,8 +38,10 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
     private static final String TAG = "GroupChatViewModel";
 
     //public ObservableArrayList<ItemViewModel> list = new ObservableArrayList<>();
+    public ObservableField<String> usernameTyping = new ObservableField<>("");
     private long groupId;
     private long mLastTypingTime;
+    private int roomCommentCount;
     private DatabaseReference mTypingInRoomReference;
     private ChildEventListener mTypingInRoomEventListener;
     private DatabaseReference mMeTypingRef;
@@ -48,13 +54,9 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
     public GroupChatViewModel(DataManager dataManager,
                               SchedulerProvider schedulerProvider,
                               FirebaseRemoteConfig firebaseRemoteConfig,
-                              FirebaseDatabase firebaseDatabase) {
-        super(dataManager, schedulerProvider, firebaseRemoteConfig, firebaseDatabase);
-    }
-
-    @Override
-    public boolean isPrivateChat() {
-        return false;
+                              FirebaseDatabase firebaseDatabase,
+                              BanHelper banHelper) {
+        super(dataManager, schedulerProvider, firebaseRemoteConfig, firebaseDatabase, banHelper);
     }
 
     public long getGroupId() {
@@ -143,6 +145,7 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
             mTypingInRoomReference.removeEventListener(mTypingInRoomEventListener);
         if (mRightRef != null && mRightListener != null)
             mRightRef.removeEventListener(mRightListener);
+        getDatabaseReference().removeEventListener(roomCommentCountValueEventListener);
     }
 
     public void removeGroupInfoListener() {
@@ -161,7 +164,6 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
                 if (dataSnapshot.hasChildren()) {
                     final GroupChatSummary groupChatSummary = dataSnapshot.getValue(GroupChatSummary.class);
                     getNavigator().showSubtitle();
-
                     /**
                      * run this delayed, if the user re-enters
                      * the same room (for a variety of reasons)
@@ -179,7 +181,7 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
                                     final DatabaseReference ref = firebaseDatabase.getReference(Constants
                                             .GROUP_CHAT_USERS_REF(getGroupId())).
                                             child(myUserid() + "");
-                                    ref.updateChildren(me.toMap(true)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    ref.updateChildren(me.toMap()).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             getNavigator().removeUserFromAllGroups(myUserid(), getGroupId());
@@ -188,7 +190,7 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
                                     me.setCurrentGroupId(groupChatSummary.getId());
                                     me.setCurrentGroupName(groupChatSummary.getName());
                                     firebaseDatabase.getReference(Constants.USER_INFO_REF(myUserid()))
-                                            .updateChildren(me.toMap(true));
+                                            .updateChildren(me.toMap());
                                 }
                             }).subscribe());
 
@@ -215,72 +217,6 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
                 .removeValue();
     }
 
-    /*public void fetchHomeData(List<Item> cache) {
-
-        if (cache != null) {
-            getNavigator().updateItems(cache);
-            return;
-        }
-        setIsLoading(true);
-        getCompositeDisposable()
-                .add(getDataManager()
-                        .getHomeData()
-                        .subscribeOn(getSchedulerProvider().io())
-                        .observeOn(getSchedulerProvider().ui())
-                        .doFinally(new Action() {
-                            @Override
-                            public void run() throws Exception {
-                                setIsLoading(false);
-                            }
-                        })
-                        .subscribe(new Consumer<HomeResponse>() {
-                            @Override
-                            public void accept(@NonNull HomeResponse homeResponse)
-                                    throws Exception {
-                                getNavigator().updateItems(homeResponse.getItems());
-                            }
-                        }, new Consumer<Throwable>() {
-                            @Override
-                            public void accept(@NonNull Throwable throwable)
-                                    throws Exception {
-                                getNavigator().handleError(throwable);
-                            }
-                        }));
-    }*/
-
-    /*public void populateViewModel(List<Item> items) {
-
-        if (Build.VERSION.SDK_INT >= 24) {
-            list.addAll(items.stream().map(item -> new ItemViewModel(item)).collect(Collectors.toList()));
-        } else {
-            for (Item item : items) {
-                list.add(new ItemViewModel(item));
-            }
-        }
-    }*/
-
-    /**
-     * For caching purposes.  Returns a new array list of Item backed by
-     * the original list of ItemViewModel.  Could use java8 for this later.
-     * Useful for saving the array list into saved instance state when
-     * screen is rotated.
-     *
-     * @return ArrayList<Item>
-     */
-    /*public ArrayList<Item> convert() {
-
-        if (Build.VERSION.SDK_INT >= 24) {
-            return new ArrayList<>(list.stream().map(ItemViewModel::getItem).collect(Collectors.toList()));
-        } else {
-            ArrayList<Item> arrayList = new ArrayList<>(list.size());
-            int size = list.size();
-            for (int i = 0; i < size; i++) {
-                arrayList.add(list.get(i).getItem());
-            }
-            return arrayList;
-        }
-    }*/
-
     public void fetchGroupName() {
         mRightRef = firebaseDatabase.getReference(Constants.GROUP_CHAT_ROOMS).child
                 (getGroupId() + "");
@@ -297,7 +233,6 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
                             null);
                     return;
                 }
-                getNavigator().showGroupName(groupChatSummary.getName());
             }
 
             @Override
@@ -306,6 +241,53 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
             }
         };
         mRightRef.addValueEventListener(mRightListener);
+
+        if (isAdmin())
+            fetchRoomCommentsCount();
+    }
+
+    public void onToggleGroupChatAppbar() {
+        getNavigator().toggleGroupChatAppBar();
+    }
+
+    /**
+     * For analytics purposes.
+     *
+     * @param friendlyMessage
+     */
+    public void onFriendlyMessageSuccess(FriendlyMessage friendlyMessage) {
+        Bundle payload = new Bundle();
+        payload.putString("from", myUsername());
+        payload.putString("type", friendlyMessage.getImageUrl() != null ? "photo" : "text");
+        payload.putLong("group", getGroupId());
+        payload.putBoolean("one-time", friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
+        firebaseAnalytics.logEvent(Events.MESSAGE_GROUP_SENT_EVENT, payload);
+    }
+
+    public void clearRoomComments() {
+        firebaseDatabase.getReference(getDatabaseRoot()).removeValue();
+        FirebaseStorage.getInstance().getReference(getDatabaseRoot()).delete();
+    }
+
+    private ValueEventListener roomCommentCountValueEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            roomCommentCount = (int)dataSnapshot.getChildrenCount();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
+    private void fetchRoomCommentsCount() {
+        getDatabaseReference().removeEventListener(roomCommentCountValueEventListener);
+        getDatabaseReference().addListenerForSingleValueEvent(roomCommentCountValueEventListener);
+    }
+
+    public int getRoomCommentCount() {
+        return roomCommentCount;
     }
 
 }

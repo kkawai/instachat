@@ -1,7 +1,11 @@
 package com.instachat.android.app.activity.pm;
 
+import android.databinding.ObservableField;
+import android.os.Bundle;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -11,13 +15,18 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.app.activity.AbstractChatViewModel;
+import com.instachat.android.app.activity.BanHelper;
+import com.instachat.android.app.analytics.Events;
 import com.instachat.android.data.DataManager;
 import com.instachat.android.data.api.UserResponse;
+import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.data.model.User;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.rx.SchedulerProvider;
+
+import org.json.JSONException;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +40,13 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
 
     private static final String TAG = "PrivateChatViewModel";
 
+    public ObservableField<String> partnerProfilePicUrl = new ObservableField<>("");
+    public ObservableField<String> partnerUsername = new ObservableField<>("");
+    public ObservableField<String> partnerBio = new ObservableField<>("");
+    public ObservableField<String> partnerCurrentGroup = new ObservableField<>("");
+    public ObservableField<String> partnerLastActive = new ObservableField<>("");
+    public ObservableField<Integer> partnerLikesCount = new ObservableField<>(0);
+
     private DatabaseReference mTypingReference;
     private ValueEventListener mTypingValueEventListener;
     private ValueEventListener mUserInfoValueEventListener;
@@ -42,13 +58,9 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
     public PrivateChatViewModel(DataManager dataManager,
                                 SchedulerProvider schedulerProvider,
                                 FirebaseRemoteConfig firebaseRemoteConfig,
-                                FirebaseDatabase firebaseDatabase) {
-        super(dataManager, schedulerProvider, firebaseRemoteConfig, firebaseDatabase);
-    }
-
-    @Override
-    public boolean isPrivateChat() {
-        return true;
+                                FirebaseDatabase firebaseDatabase,
+                                BanHelper banHelper) {
+        super(dataManager, schedulerProvider, firebaseRemoteConfig, firebaseDatabase, banHelper);
     }
 
     public void collapseAppbarAfterDelay() {
@@ -126,6 +138,7 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
                             throws Exception {
 
                         toUser = userResponse.user;
+                        partnerProfilePicUrl.set(toUser.getProfilePicUrl());
                         MLog.d(TAG, "after grab from server: toUser: ", toUser.getId(), " ", toUser.getUsername(), " ",
                                 toUser.getProfilePicUrl());
                         getNavigator().showUserProfile(toUser);
@@ -143,27 +156,26 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
 
                                         //check if only the last active time changed
                                         boolean onlyUpdateLastActiveTime = true;
-                                        if (!toUser.getUsername().equals(user.getUsername())) {
+                                        if (!strEq(toUser.getUsername(), user.getUsername())) {
                                             onlyUpdateLastActiveTime = false;
                                             toUser.setUsername(user.getUsername());
                                         }
-                                        if (!toUser.getProfilePicUrl().equals(user.getProfilePicUrl())) {
+                                        if (!strEq(toUser.getProfilePicUrl(),user.getProfilePicUrl())) {
                                             onlyUpdateLastActiveTime = false;
                                             toUser.setProfilePicUrl(user.getProfilePicUrl());
                                         }
-                                        String existingBio = toUser.getBio();
-                                        String newBio = user.getBio();
-                                        if (!existingBio.equals(newBio)) {
+                                        if (!strEq(toUser.getBio(), user.getBio())) {
                                             onlyUpdateLastActiveTime = false;
                                             toUser.setBio(user.getBio());
                                         }
-
                                         if (toUser.getCurrentGroupId() != user.getCurrentGroupId()) {
                                             onlyUpdateLastActiveTime = false;
                                             toUser.setCurrentGroupName(user.getCurrentGroupName());
                                             toUser.setCurrentGroupId(user.getCurrentGroupId());
                                         }
+
                                         getNavigator().showCustomTitles(user.getUsername(), user.getLastOnline());
+
                                         if (!onlyUpdateLastActiveTime) {
                                             getNavigator().showUserProfile(toUser);
                                         }
@@ -192,6 +204,13 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
                         getNavigator().showErrorToast("getUser()");
                     }
                 }));
+    }
+
+    private boolean strEq(String s1, String s2) {
+        if ((s1 == null && s2 == null) || (s1 == "" && s2 == "")) {
+            return true;
+        }
+        return s1 != null && s2 != null && s1.equals(s2);
     }
 
     private void listenForPartnerTyping(final User user) {
@@ -291,6 +310,33 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
         } catch (Exception e) {
             MLog.e(TAG, "onMeTyping() failed", e);
         }
+    }
+
+    public User getPartner() {
+        return toUser;
+    }
+
+    public void onPartnerLikesClicked() {
+        getNavigator().showPartnerLikes();
+    }
+
+    public void onTogglePrivateChatAppbar() {
+        getNavigator().togglePrivateChatAppBar();
+    }
+
+    /**
+     * For analytics purposes.
+     *
+     * @param friendlyMessage
+     * @param toUsername
+     */
+    public void onFriendlyMessageSuccess(final @NonNull FriendlyMessage friendlyMessage, final @NonNull String toUsername) {
+        Bundle payload = new Bundle();
+        payload.putString("to", toUsername);
+        payload.putString("from", myUsername());
+        payload.putString("type", friendlyMessage.getImageUrl() != null ? "photo" : "text");
+        payload.putBoolean("one-time", friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
+        firebaseAnalytics.logEvent(Events.MESSAGE_PRIVATE_SENT_EVENT, payload);
     }
 
 }

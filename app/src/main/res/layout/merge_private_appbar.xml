@@ -4,6 +4,7 @@
     <data>
 
         <import type="android.view.View"/>
+        <import type="android.text.TextUtils"/>
 
         <variable
             name="viewModel"
@@ -13,7 +14,7 @@
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
-
+        android:onClick="@{() -> viewModel.onTogglePrivateChatAppbar()}"
         android:layout_width="match_parent"
         android:layout_height="@dimen/profile_header_height"
         android:fitsSystemWindows="true"
@@ -52,10 +53,10 @@
                         android:layout_gravity="center_horizontal"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text=""
+                        android:text="@{viewModel.partnerUsername}"
                         android:textSize="21sp"
                         android:textStyle="bold"
-
+                        android:fontFamily="@font/lato_bold"
                         />
 
                     <TextView
@@ -65,10 +66,10 @@
                         android:layout_gravity="center_horizontal"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text=""
+                        android:text="@{viewModel.partnerLastActive}"
                         android:textSize="14sp"
                         android:textStyle="bold"
-
+                        android:fontFamily="@font/lato_semibolditalic"
                         />
                 </LinearLayout>
 
@@ -96,7 +97,9 @@
                     android:orientation="horizontal"
                     android:paddingBottom="3dp"
                     android:paddingTop="3dp"
-                    android:visibility="gone">
+                    android:visibility="@{viewModel.partnerLikesCount > 0 ? View.VISIBLE : View.GONE}"
+                    android:onClick="@{() -> viewModel.onPartnerLikesClicked() }"
+                    >
 
                     <ImageView
                         android:id="@+id/likesIcon"
@@ -113,11 +116,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:text="36"
+                        app:likes="@{viewModel.partnerLikesCount}"
                         android:textSize="13sp"
                         android:textStyle="bold"
                         android:visibility="visible"
-                        />
+                        android:fontFamily="@font/lato_bold"/>
                 </LinearLayout>
 
                 <TextView
@@ -135,7 +138,9 @@
                     android:textAlignment="center"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                     android:textSize="15sp"
-
+                    android:fontFamily="@font/lato_regular"
+                    android:text="@{viewModel.partnerBio}"
+                    android:visibility="@{TextUtils.isEmpty(viewModel.partnerBio) ? View.GONE : View.VISIBLE}"
                     />
 
                 <LinearLayout
@@ -154,12 +159,13 @@
                         android:ellipsize="end"
                         android:gravity="center_horizontal"
                         android:maxLines="1"
-                        android:text=""
+                        android:text="@{viewModel.partnerCurrentGroup}"
                         android:textColor="@color/light_turquoise"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:visibility="gone"
-                        />
+                        android:visibility="@{TextUtils.isEmpty(viewModel.partnerCurrentGroup) ? View.GONE : View.VISIBLE}"
+                        android:fontFamily="@font/lato_bold"
+                        android:onClick="@{() -> viewModel.onGroupChatClicked(viewModel.partner.currentGroupId,viewModel.partner.currentGroupName)}"/>
 
                 </LinearLayout>
 
@@ -170,7 +176,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                android:onClick="@{() -> viewModel.onTogglePrivateChatAppbar()}">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/topCornerUserThumb"
@@ -181,6 +188,7 @@
                     app:civ_border_color="@color/colorPrimaryDark"
                     app:civ_border_overlay="true"
                     app:civ_border_width="2px"
+                    app:imageUrlWithCrossFade="@{viewModel.partnerProfilePicUrl}"
                     />
 
                 <LinearLayout
@@ -197,10 +205,10 @@
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text=""
+                        android:text="@{viewModel.partnerUsername}"
                         android:textSize="21sp"
                         android:textStyle="bold"
-
+                        android:fontFamily="@font/lato_bold"
                         />
 
                     <TextView
@@ -209,10 +217,10 @@
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:maxLines="1"
-                        android:text=""
+                        android:text="@{viewModel.partnerLastActive}"
                         android:textSize="14sp"
                         android:textStyle="bold"
-
+                        android:fontFamily="@font/lato_semibolditalic"
                         />
                 </LinearLayout>
 

@@ -13,7 +13,6 @@ import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,10 +23,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -51,8 +46,10 @@ import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.data.model.User;
 import com.instachat.android.databinding.ActivityPrivateChatBinding;
 import com.instachat.android.util.AnimationUtil;
+import com.instachat.android.util.Bindings;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.ScreenUtil;
+import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.TimeUtil;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.view.FlingGestureListener;
@@ -112,10 +109,11 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         gcmHelper.onCreate(this);
 
         initFirebaseAdapter(binding.fragmentContent, binding.messageRecyclerView,this, linearLayoutManager);
+        messagesAdapter.setIsPrivateChat(true);
         binding.messageRecyclerView.setLayoutManager(linearLayoutManager);
         binding.messageRecyclerView.setAdapter(messagesAdapter);
 
-        adsHelper.loadAd(this);
+        adsHelper.loadAd(this, firebaseRemoteConfig);
 
         initMessageEditText(binding.sendButton, binding.messageEditTextParent);
         privateChatViewModel.fetchConfig(firebaseRemoteConfig);
@@ -126,6 +124,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         privateChatViewModel.smallProgressCheck();
         onNewIntent(getIntent());
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+
     }
 
     //@Override
@@ -184,13 +183,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
             }
         });
 
-        final View.OnClickListener appBarOnClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleAppbar();
-            }
-        };
-        mAppBarLayout.setOnClickListener(appBarOnClickListener);
         mGestureDetector = initializeGestureDetector();
         getToolbar().setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -200,21 +192,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         });
         presenceHelper.updateLastActiveTimestamp();
         privateChatViewModel.listenForUpdatedLikeCount(sUserid);
-        findViewById(R.id.likesParent)
-                .setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Fragment fragment = new UserLikedUserFragment();
-                        Bundle bundle = new Bundle();
-                        bundle.putInt(Constants.KEY_USERID, sUserid);
-                        bundle.putString(Constants.KEY_USERNAME, sUsername);
-                        fragment.setArguments(bundle);
-                        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim
-                                .slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment,
-                                UserLikedUserFragment.TAG).addToBackStack(null).commit();
-
-                    }
-                });
     }
 
     private void checkIfSeenToolbarProfileTooltip(View anchor) {
@@ -233,14 +210,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
                             tooltip.dismiss();
                     }
                 }).subscribe());
-    }
-
-    private void toggleAppbar() {
-        if (!mIsAppBarExpanded) {
-            mAppBarLayout.setExpanded(true, true);
-            ScreenUtil.hideKeyboard(this);
-        } else
-            mAppBarLayout.setExpanded(false, true);
     }
 
     private boolean mIsAppBarExpanded = true; //initially it's expanded
@@ -280,14 +249,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
             mAppBarLayout.setExpanded(false, true);
         }
         privateChatViewModel.initializePrivateChatSummary(sUsername, sUserid, sProfilePicUrl);
-        if (isPrivateChat()) {
-            Bundle payload = new Bundle();
-            payload.putString("to", sUsername);
-            payload.putString("from", privateChatViewModel.myUsername());
-            payload.putString("type", friendlyMessage.getImageUrl() != null ? "photo" : "text");
-            payload.putBoolean("one-time", friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
-            FirebaseAnalytics.getInstance(this).logEvent(Events.MESSAGE_PRIVATE_SENT_EVENT, payload);
-        }
+        privateChatViewModel.onFriendlyMessageSuccess(friendlyMessage, sUsername);
     }
 
     public static void startPrivateChatActivity(Activity activity, int userid, String username, String profilePicUrl,
@@ -320,8 +282,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
 
     private void setPartnerInfo(Intent intent) {
 
-        ((TextView) findViewById(R.id.customTitleInToolbar)).setText(sUsername);
-        ((TextView) findViewById(R.id.customTitleInParallax)).setText(sUsername);
+        getViewModel().partnerUsername.set(sUsername);
 
         if (intent.getBooleanExtra(Constants.KEY_AUTO_ADD_PERSON, false)) {
             //add this person to my left drawer and remove them from pending requests
@@ -336,76 +297,18 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
             return;
         sUsername = toUser.getUsername(); //username might have changed at the server
         sProfilePicUrl = toUser.getProfilePicUrl(); //profile pic might have changed at server
-        final ImageView toolbarProfileImageView = (ImageView) findViewById(R.id.topCornerUserThumb);
-        final ImageView miniPic = (ImageView) findViewById(R.id.superSmallProfileImage);
-        final TextView bio = (TextView) findViewById(R.id.bio);
-
-        if (TextUtils.isEmpty(toUser.getProfilePicUrl())) {
-            toolbarProfileImageView.setImageResource(R.drawable.ic_anon_person_36dp);
-            miniPic.setImageResource(R.drawable.ic_anon_person_36dp);
-            mProfilePic.setImageResource(R.drawable.ic_anon_person_36dp);
-            privateChatViewModel.collapseAppbarAfterDelay();
-        } else {
-            try {
-                Glide.with(PrivateChatActivity.this).load(toUser.getProfilePicUrl()).error(R.drawable
-                        .ic_anon_person_36dp)
-                        //.crossFade()
-                        .listener(new RequestListener<String, GlideDrawable>() {
-                            @Override
-                            public boolean onException(Exception e, String model, Target<GlideDrawable> target,
-                                                       boolean isFirstResource) {
-                                if (isActivityDestroyed())
-                                    return false;
-                                privateChatViewModel.collapseAppbarAfterDelay();
-                                return false;
-                            }
-
-                            @Override
-                            public boolean onResourceReady(GlideDrawable resource, String model,
-                                                           Target<GlideDrawable> target, boolean isFromMemoryCache,
-                                                           boolean isFirstResource) {
-                                if (isActivityDestroyed())
-                                    return false;
-                                privateChatViewModel.collapseAppbarAfterDelay();
-                                return false;
-                            }
-                        }).into(mProfilePic);
-                Glide.with(PrivateChatActivity.this).load(toUser.getProfilePicUrl()).error(R.drawable
-                        .ic_anon_person_36dp).crossFade().into(miniPic);
-                Glide.with(PrivateChatActivity.this).load(toUser.getProfilePicUrl()).error(R.drawable
-                        .ic_anon_person_36dp).crossFade().into(toolbarProfileImageView);
-
-            } catch (Exception e) {
-                MLog.e(TAG, "onDrawerOpened() could not find user photo in google cloud storage", e);
-                miniPic.setImageResource(R.drawable.ic_anon_person_36dp);
-                privateChatViewModel.collapseAppbarAfterDelay();
-            }
-        }
-        bio.setVisibility(TextUtils.isEmpty(toUser.getBio()) ? View.GONE : View.VISIBLE);
+        Bindings.setPartnerProfilePic(mProfilePic, getViewModel());
         String bioStr = toUser.getBio() + "";
         bioStr = bioStr.equals("null") ? "" : bioStr;
-        bio.setText(bioStr);
-        TextView activeGroup = (TextView) findViewById(R.id.activeGroup);
-        if (toUser.getCurrentGroupId() != 0 && !TextUtils.isEmpty(toUser.getCurrentGroupName())) {
-            activeGroup.setVisibility(View.VISIBLE);
-            try {
-                activeGroup.setText(getString(R.string.user_active_in_group, toUser.getCurrentGroupName()));
-            } catch (Exception e) {
-                activeGroup.setText(toUser.getCurrentGroupName());
+        getViewModel().partnerBio.set(bioStr);
+        getViewModel().partnerBio.set(bioStr);
+        try {
+            if (StringUtil.isNotEmpty(toUser.getCurrentGroupName()) && !toUser.getCurrentGroupName().equals("null")) {
+                getViewModel().partnerCurrentGroup.set(getString(R.string.user_active_in_group, toUser.getCurrentGroupName()+""));
             }
-            activeGroup.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    GroupChatSummary groupChatSummary = new GroupChatSummary();
-                    groupChatSummary.setId(toUser.getCurrentGroupId());
-                    groupChatSummary.setName(toUser.getCurrentGroupName());
-                    onGroupChatClicked(groupChatSummary);
-                }
-            });
-        } else {
-            activeGroup.setVisibility(View.GONE);
+        } catch (Exception e) {
+            getViewModel().partnerCurrentGroup.set("");
         }
-
     }
 
     public void collapseAppBar() {
@@ -425,6 +328,37 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
     }
 
     @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (menu == null)
+            return false;
+
+        if (!mIsPendingRequestsAvailable) {
+            if (menu.findItem(R.id.menu_pending_requests) != null)
+                menu.removeItem(R.id.menu_pending_requests);
+        } else {
+            if (menu.findItem(R.id.menu_pending_requests) == null)
+                menu.add(0, R.id.menu_pending_requests, 0, getString(R.string.menu_option_pending_requests));
+        }
+
+        if (sUserid == privateChatViewModel.myUserid()) {
+            if (menu.findItem(R.id.menu_block_user) != null) {
+                menu.removeItem(R.id.menu_block_user);
+            }
+            if (menu.findItem(R.id.menu_report_user) != null) {
+                menu.removeItem(R.id.menu_report_user);
+            }
+            if (menu.findItem(R.id.menu_sign_out) == null) {
+                menu.add(0, R.id.menu_sign_out, 1, getString(R.string.sign_out));
+            }
+        } else {
+            //if (menu.findItem(R.id.menu_sign_out) != null) {
+            //    menu.removeItem(R.id.menu_sign_out);
+            //}
+        }
+        return super.onMenuOpened(featureId, menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -432,7 +366,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
                 return true;
             case R.id.menu_view_profile:
                 if (!mIsAppBarExpanded)
-                    toggleAppbar();
+                    togglePrivateChatAppBar();
                 return true;
             case R.id.menu_block_user:
                 new BlockUserDialogHelper(firebaseDatabase).showBlockUserQuestionDialog(this, sUserid, sUsername, sProfilePicUrl, mBlockedUserListener);
@@ -458,16 +392,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    @Override
-    protected void setToolbarOnClickListener(Toolbar toolbar) {
-        toolbar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleAppbar();
-            }
-        });
     }
 
     //@Override
@@ -496,13 +420,11 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
                 if (lastActive.equals(getString(R.string.just_now))) {
                     lastActive = getString(R.string.online_now);
                 }
-                ((TextView) findViewById(R.id.customSubtitleInParallax)).setText(lastActive);
-                ((TextView) findViewById(R.id.customSubtitleInToolbar)).setText(lastActive);
+                getViewModel().partnerLastActive.set(lastActive);
             }
         }
 
-        ((TextView) findViewById(R.id.customTitleInToolbar)).setText(username);
-        ((TextView) findViewById(R.id.customTitleInParallax)).setText(username);
+        getViewModel().partnerUsername.set(username);
     }
 
     @Override
@@ -511,11 +433,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
             finish();
         }
         super.onGroupChatClicked(groupChatSummary);
-    }
-
-    //@Override
-    protected boolean isPrivateChat() {
-        return true;
     }
 
     @Override
@@ -527,7 +444,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         }
 
         if (mIsAppBarExpanded) {
-            toggleAppbar();
+            togglePrivateChatAppBar();
             return;
         }
         super.onBackPressed();
@@ -548,44 +465,13 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
             public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
                 if (velocityY > 20) {
                     if (!mIsAppBarExpanded) {
-                        toggleAppbar();
+                        togglePrivateChatAppBar();
                         return true;
                     }
                 }
                 return false;
             }
         });
-    }
-
-    @Override
-    public boolean onMenuOpened(int featureId, Menu menu) {
-        if (menu == null)
-            return false;
-
-        if (!mIsPendingRequestsAvailable) {
-            if (menu.findItem(R.id.menu_pending_requests) != null)
-                menu.removeItem(R.id.menu_pending_requests);
-        } else {
-            if (menu.findItem(R.id.menu_pending_requests) == null)
-                menu.add(0, R.id.menu_pending_requests, 0, getString(R.string.menu_option_pending_requests));
-        }
-
-        if (isPrivateChat() && sUserid == privateChatViewModel.myUserid()) {
-            if (menu.findItem(R.id.menu_block_user) != null) {
-                menu.removeItem(R.id.menu_block_user);
-            }
-            if (menu.findItem(R.id.menu_report_user) != null) {
-                menu.removeItem(R.id.menu_report_user);
-            }
-            if (menu.findItem(R.id.menu_sign_out) == null) {
-                menu.add(0, R.id.menu_sign_out, 1, getString(R.string.sign_out));
-            }
-        } else {
-            if (menu.findItem(R.id.menu_sign_out) != null) {
-                menu.removeItem(R.id.menu_sign_out);
-            }
-        }
-        return super.onMenuOpened(featureId, menu);
     }
 
     @Override
@@ -611,10 +497,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
     @Override
     public void onReceiveAd(AdDownloaderInterface adDownloaderInterface, ReceivedBannerInterface receivedBanner) throws AdReceiveFailed {
         if (receivedBanner.getErrorCode() != ErrorCode.NO_ERROR) {
-            getViewModel().isAdReady.set(true);
-            adsHelper.loadAd(this);
-        } else {
-            getViewModel().isAdReady.set(false);
+            adsHelper.loadAd(this, firebaseRemoteConfig);
         }
     }
 
@@ -697,25 +580,28 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
 
     @Override
     public void showLikesCount(int count) {
-        final View likesParent = findViewById(R.id.likesParent);
-        final TextView likesCount = findViewById(R.id.likesCount);
-
-        if (likesParent.getVisibility() != View.VISIBLE) {
-            likesParent.setVisibility(View.VISIBLE);
-            likesCount.setVisibility(View.VISIBLE);
-        }
-
-        if (count == 1) {
-            likesCount.setText(getString(R.string.like_singular));
-        } else {
-            likesCount.setText(getString(R.string.likes_plural, count + ""));
-        }
+        getViewModel().partnerLikesCount.set(count);
     }
 
     @Override
-    protected void toggleRightDrawer() {
-
+    public void showPartnerLikes() {
+        Fragment fragment = UserLikedUserFragment.newInstance(sUserid,sUsername);
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim
+                .slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment,
+                UserLikedUserFragment.TAG).addToBackStack(null).commit();
     }
 
+    @Override
+    public void togglePrivateChatAppBar() {
+        if (!mIsAppBarExpanded) {
+            mAppBarLayout.setExpanded(true, true);
+            ScreenUtil.hideKeyboard(this);
+        } else
+            mAppBarLayout.setExpanded(false, true);
+    }
 
+    @Override
+    public void listenForUsersInGroup() {
+        //not applicable to private chat
+    }
 }

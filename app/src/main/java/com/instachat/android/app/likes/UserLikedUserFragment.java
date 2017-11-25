@@ -3,6 +3,7 @@ package com.instachat.android.app.likes;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,6 +26,15 @@ import com.instachat.android.databinding.FragmentGenericUsersBinding;
  */
 
 public class UserLikedUserFragment extends BaseFragment {
+
+   public static Fragment newInstance(int userId, String username) {
+      Fragment fragment = new UserLikedUserFragment();
+      Bundle bundle = new Bundle();
+      bundle.putInt(Constants.KEY_USERID, userId);
+      bundle.putString(Constants.KEY_USERNAME, username);
+      fragment.setArguments(bundle);
+      return fragment;
+   }
 
    public static final String TAG = "UserLikedUserFragment";
    private RecyclerView recyclerView;

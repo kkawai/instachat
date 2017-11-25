@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -16,11 +15,9 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.instachat.android.BR;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
@@ -38,7 +35,6 @@ import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.databinding.ActivityMainBinding;
 import com.instachat.android.databinding.DialogInputCommentBinding;
 import com.instachat.android.databinding.RightDrawerLayoutBinding;
-import com.instachat.android.databinding.RightNavHeaderBinding;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.view.ThemedAlertDialog;
@@ -82,7 +78,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         binding.messageRecyclerView.setLayoutManager(linearLayoutManager);
         binding.messageRecyclerView.setAdapter(messagesAdapter);
 
-        adsHelper.loadAd(this);
+        adsHelper.loadAd(this, firebaseRemoteConfig);
 
         initMessageEditText(binding.sendButton, binding.messageEditTextParent);
         groupChatViewModel.fetchConfig(firebaseRemoteConfig);
@@ -162,7 +158,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
      * @param friendlyMessage
      */
     @Override
-    public void onFriendlyMessageSuccess(FriendlyMessage friendlyMessage) {
+    public void onFriendlyMessageSuccess(final @NonNull FriendlyMessage friendlyMessage) {
         try {
             if (isActivityDestroyed())
                 return;
@@ -172,12 +168,11 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         } catch (final Exception e) {
             MLog.e(TAG, "", e);
         }
-        Bundle payload = new Bundle();
-        payload.putString("from", groupChatViewModel.myUsername());
-        payload.putString("type", friendlyMessage.getImageUrl() != null ? "photo" : "text");
-        payload.putLong("group", groupChatViewModel.getGroupId());
-        payload.putBoolean("one-time", friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
-        FirebaseAnalytics.getInstance(this).logEvent(Events.MESSAGE_GROUP_SENT_EVENT, payload);
+        getViewModel().onFriendlyMessageSuccess(friendlyMessage);
+    }
+
+    protected void onHomeClicked() {
+        binding.drawerLayout.openDrawer(GravityCompat.START);
     }
 
     @Override
@@ -187,8 +182,34 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         return true;
     }
 
-    protected void onHomeClicked() {
-        binding.drawerLayout.openDrawer(GravityCompat.START);
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (menu == null)
+            return false;
+        if (!mIsPendingRequestsAvailable) {
+            if (menu.findItem(R.id.menu_pending_requests) != null)
+                menu.removeItem(R.id.menu_pending_requests);
+        } else {
+            if (menu.findItem(R.id.menu_pending_requests) == null)
+                menu.add(0, R.id.menu_pending_requests, 0, getString(R.string.menu_option_pending_requests));
+        }
+        if (messagesAdapter != null && messagesAdapter.getNumBlockedUsers() > 0) {
+            if (menu.findItem(R.id.menu_manage_blocks) == null) {
+                menu.add(0, R.id.menu_manage_blocks, 1, getString(R.string.manage_blocks));
+            }
+        } else {
+            if (menu.findItem(R.id.menu_manage_blocks) != null)
+                menu.removeItem(R.id.menu_manage_blocks);
+        }
+        if (!getViewModel().isAdmin()) {
+            if (menu.findItem(R.id.menu_clear_room) != null)
+                menu.removeItem(R.id.menu_clear_room);
+        } else {
+            if (menu.findItem(R.id.menu_clear_room) != null) {
+                menu.findItem(R.id.menu_clear_room).setTitle("Clear comments: "+getViewModel().getRoomCommentCount());
+            }
+        }
+        return super.onMenuOpened(featureId, menu);
     }
 
     @Override
@@ -214,14 +235,11 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
             case R.id.menu_sign_out:
                 signout();
                 return true;
-            case R.id.fresh_config_menu:
-                groupChatViewModel.fetchConfig(firebaseRemoteConfig);
-                return true;
-            case R.id.full_screen_texts_menu:
-                showFullScreenTextView(-1);
-                return true;
             case R.id.menu_pending_requests:
                 showPendingRequests();
+                return true;
+            case R.id.menu_clear_room:
+                getViewModel().clearRoomComments();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -234,8 +252,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     }
 
     @Override
-    public void setupLeftDrawerContent(NavigationView navigationView) {
-        super.setupLeftDrawerContent(navigationView);
+    public void listenForUsersInGroup() {
         UsersInGroupListener usersInGroupListener = new UsersInGroupListener() {
             @Override
             public void onNumUsersUpdated(long groupId, String groupName, int numUsers) {
@@ -243,19 +260,16 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
                     getSupportActionBar().setTitle(groupName + getCount(numUsers));
             }
         };
-        chatsRecyclerViewAdapter.setUsersInGroupListener(usersInGroupListener);
+        chatSummariesRecyclerAdapter.setUsersInGroupListener(usersInGroupListener);
     }
 
     private RightDrawerLayoutBinding rightDrawerLayoutBinding;
-    private RightNavHeaderBinding rightNavHeaderBinding;
     @Override
     public void setupRightDrawerContent() {
 
         rightDrawerLayoutBinding = RightDrawerLayoutBinding.inflate(getLayoutInflater(), binding.rightNavView, false);
-        rightNavHeaderBinding = RightNavHeaderBinding.inflate(getLayoutInflater(), binding.rightNavView, false);
 
         binding.rightNavView.addView(rightDrawerLayoutBinding.getRoot());
-        binding.rightNavView.addHeaderView(rightNavHeaderBinding.getRoot());
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -285,7 +299,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         if (isActivityDestroyed()) {
             return;
         }
-        binding.usernameTyping.setText(username);
+        getViewModel().usernameTyping.set(username);
         showTypingDots();
     }
 
@@ -309,28 +323,6 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         });
     }
 
-    @Override
-    public boolean onMenuOpened(int featureId, Menu menu) {
-        if (menu == null)
-            return false;
-        if (!mIsPendingRequestsAvailable) {
-            if (menu.findItem(R.id.menu_pending_requests) != null)
-                menu.removeItem(R.id.menu_pending_requests);
-        } else {
-            if (menu.findItem(R.id.menu_pending_requests) == null)
-                menu.add(0, R.id.menu_pending_requests, 0, getString(R.string.menu_option_pending_requests));
-        }
-        if (messagesAdapter != null && messagesAdapter.getNumBlockedUsers() > 0) {
-            if (menu.findItem(R.id.menu_manage_blocks) == null) {
-                menu.add(0, R.id.menu_manage_blocks, 1, getString(R.string.manage_blocks));
-            }
-        } else {
-            if (menu.findItem(R.id.menu_manage_blocks) != null)
-                menu.removeItem(R.id.menu_manage_blocks);
-        }
-        return super.onMenuOpened(featureId, menu);
-    }
-
     private void showFirstMessageDialog(@NonNull final Context context) {
         if (UserPreferences.getInstance().hasShownSendFirstMessageDialog()) {
             return;
@@ -351,7 +343,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
                                     groupChatViewModel.myUserid(),
                                     groupChatViewModel.myDpid(), null, false, false, null, System.currentTimeMillis());
                             sendText(friendlyMessage);
-                            FirebaseAnalytics.getInstance(GroupChatActivity.this).logEvent(Events
+                            firebaseAnalytics.logEvent(Events
                                     .WELCOME_MESSAGE_SENT, null);
                         }
                     }
@@ -368,10 +360,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     @Override
     public void onReceiveAd(AdDownloaderInterface adDownloaderInterface, ReceivedBannerInterface receivedBanner) throws AdReceiveFailed {
         if (receivedBanner.getErrorCode() != ErrorCode.NO_ERROR) {
-            getViewModel().isAdReady.set(true);
-            adsHelper.loadAd(this);
-        } else {
-            getViewModel().isAdReady.set(false);
+            adsHelper.loadAd(this, firebaseRemoteConfig);
         }
     }
 
@@ -392,8 +381,8 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
 
     @Override
     public void removeUserFromAllGroups(int userid, long exceptionGroupId) {
-        if (chatsRecyclerViewAdapter != null)
-            chatsRecyclerViewAdapter.removeUserFromAllGroups(userid, exceptionGroupId);
+        if (chatSummariesRecyclerAdapter != null)
+            chatSummariesRecyclerAdapter.removeUserFromAllGroups(userid, exceptionGroupId);
     }
 
     public void showSendOptions(FriendlyMessage friendlyMessage) {
@@ -418,7 +407,13 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     }
 
     @Override
-    public void showGroupName(String groupName) {
-        rightNavHeaderBinding.groupname.setText(groupName);
+    public void toggleGroupChatAppBar() {
+        if (isRightDrawerOpen()) {
+            closeRightDrawer();
+            return;
+        } else if (isLeftDrawerOpen()) {
+            closeLeftDrawer();
+        }
+        openRightDrawer();
     }
 }

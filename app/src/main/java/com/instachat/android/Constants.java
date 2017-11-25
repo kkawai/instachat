@@ -29,7 +29,7 @@ public final class Constants {
    public static final int DEFAULT_MAX_MESSAGE_LENGTH = 256;
    public static final int DEFAULT_MAX_PERISCOPABLE_LIKES_PER_ITEM = 25;
    public static final boolean DEFAULT_DO_SHOW_ADS = true;
-   public static final String DEFAULT_ADMINS = "7,8"; //me and jon li
+   public static final String DEFAULT_ADMIN_USERS = "[7] [8] [133165] [136869]";
    public static final String KEY_MAX_MESSAGE_HISTORY = "MAX_MESSAGE_HISTORY";
    public static final String KEY_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS = "MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS";
    public static final String KEY_MAX_TYPING_DOTS_DISPLAY_TIME = "MAX_TYPING_DOTS_DISPLAY_TIME";
@@ -41,7 +41,7 @@ public final class Constants {
    public static final String KEY_DO_SHORTEN_IMAGE_URLS = "DO_SHORTEN_IMAGE_URLS";
    public static final String KEY_DO_SHOW_SIGNOUT_BUTTON = "DO_SHOW_SIGNOUT_BUTTON";
    public static final String KEY_DO_SHOW_ADS = "DO_SHOW_ADS";
-   public static final String KEY_ADMINS = "ADMINS";
+   public static final String KEY_ADMIN_USERS = "ADMIN_USERS";
 
    /*
     * CHANGE THESE WHEN MAKING PRODUCTION BUILDS
@@ -206,6 +206,8 @@ public final class Constants {
 
    public static String GROUP_CHAT_ROOMS = "/public_group_summaries/";
 
+   public static final String BANS = "/bans/";
+
    /**
     * use-case: list of users that liked the given message
     * captures the like count in each user stored at this location
@@ -279,6 +281,7 @@ public final class Constants {
    public static final String CHILD_MESSAGE_CONSUMED_BY_PARTNER = "consumedByPartner";
    public static final String CHILD_ACCEPTED = "accepted";
    public static final String CHILD_LAST_ONLINE = "lastOnline";
+   public static final String CHILD_BAN_EXPIRATION = "banExpiration";
 
    /**
     * Any message received by a user whose last message

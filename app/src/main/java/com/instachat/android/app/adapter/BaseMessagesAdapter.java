@@ -20,6 +20,7 @@ import com.instachat.android.Constants;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -106,7 +107,7 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 T t = parseSnapshot(dataSnapshot);
-                synchronized (BaseMessagesAdapter.this) {
+                synchronized (this) {
                     int index = mSnapshots.indexOf(t);
                     if (index != -1) {
                         checkItemBeforeChanging(index, t);
@@ -117,7 +118,7 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 T t = parseSnapshot(dataSnapshot);
-                synchronized (BaseMessagesAdapter.this) {
+                synchronized (this) {
                     int index = mSnapshots.indexOf(t);
                     if (index != -1) {
                         onRemoveItem(index);
@@ -138,17 +139,23 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
     }
 
     protected void onAddItem(T item) {
-        mSnapshots.add(item);
-        notifyItemInserted(mSnapshots.size() - 1);
+        synchronized (this) {
+            mSnapshots.add(item);
+            notifyItemInserted(mSnapshots.size() - 1);
+        }
     }
 
     protected void onRemoveItem(int index) {
-        mSnapshots.remove(index);
-        notifyItemRemoved(index);
+        synchronized (this) {
+            mSnapshots.remove(index);
+            notifyItemRemoved(index);
+        }
     }
 
     protected final void replaceItem(int index, T item) {
-        mSnapshots.set(index, item);
+        synchronized (this) {
+            mSnapshots.set(index, item);
+        }
     }
 
     /**
@@ -174,7 +181,6 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
     }
 
     public void cleanup() {
-        //mSnapshots.cleanup();
         mQuery.removeEventListener(mChildEventListener);
     }
 
@@ -259,7 +265,7 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
 
     abstract protected boolean isNewItemAllowed(T model);
 
-    protected List<T> getData() {
+    public ArrayList<T> getData() {
         return mSnapshots;
     }
 

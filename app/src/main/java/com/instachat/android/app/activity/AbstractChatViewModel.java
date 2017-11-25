@@ -6,13 +6,18 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v13.view.inputmethod.InputConnectionCompat;
 import android.support.v13.view.inputmethod.InputContentInfoCompat;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.TheApp;
@@ -23,39 +28,57 @@ import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.blocks.BlockedUserListener;
 import com.instachat.android.app.ui.base.BaseViewModel;
 import com.instachat.android.data.DataManager;
+import com.instachat.android.data.api.BasicExistenceResult;
+import com.instachat.android.data.api.NetworkApi;
+import com.instachat.android.data.api.UserResponse;
 import com.instachat.android.data.model.FriendlyMessage;
+import com.instachat.android.data.model.User;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.rx.SchedulerProvider;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
 
 public abstract class AbstractChatViewModel<Navigator extends AbstractChatNavigator> extends BaseViewModel<Navigator> {
 
     private static final String TAG = "AbstractChatViewModel";
 
-    public ObservableField<Boolean> isAdReady = new ObservableField<>(true);
-
-    private String databaseRoot;
-
-    private MessagesRecyclerAdapter messagesAdapter;
+    public ObservableField<String> profilePicUrl = new ObservableField<>("");
+    public ObservableField<String> username = new ObservableField<>("");
+    public ObservableField<String> bio = new ObservableField<>("");
+    public ObservableField<Integer> likes = new ObservableField<>(0);
+    public ObservableField<Integer> pendingRequests = new ObservableField<>(0);
 
     protected final FirebaseRemoteConfig firebaseRemoteConfig;
     protected final FirebaseDatabase firebaseDatabase;
+    protected final BanHelper banHelper;
+    protected FirebaseAnalytics firebaseAnalytics;
+
+    private String databaseRoot;
+    private DatabaseReference databaseReference;
+    private MessagesRecyclerAdapter messagesAdapter;
 
     public AbstractChatViewModel(DataManager dataManager,
                                  SchedulerProvider schedulerProvider,
                                  FirebaseRemoteConfig firebaseRemoteConfig,
-                                 FirebaseDatabase firebaseDatabase) {
+                                 FirebaseDatabase firebaseDatabase,
+                                 BanHelper banHelper) {
         super(dataManager, schedulerProvider);
         this.firebaseRemoteConfig = firebaseRemoteConfig;
         this.firebaseDatabase = firebaseDatabase;
+        this.banHelper = banHelper;
+    }
+
+    public void setFirebaseAnalytics(FirebaseAnalytics firebaseAnalytics) {
+        this.firebaseAnalytics = firebaseAnalytics;
     }
 
     @Override
@@ -72,7 +95,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
             return;
         }
         try {
-            firebaseDatabase.setPersistenceEnabled(true);
+            //firebaseDatabase.setPersistenceEnabled(true);
             MLog.w(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) succeeded");
         } catch (Exception e) {
             //MLog.e(TAG, "FirebaseDatabase.getInstance().setPersistenceEnabled(true) failed: " + e);
@@ -111,26 +134,29 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
         return databaseRoot;
     }
 
+    public DatabaseReference getDatabaseReference() {
+        if (databaseReference == null) {
+            databaseReference = firebaseDatabase.getReference(getDatabaseRoot());
+        }
+        return databaseReference;
+    }
+
     private void applyRetrievedLengthLimit(FirebaseRemoteConfig firebaseRemoteConfig) {
         long maxMessageLength = firebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_LENGTH);
         getNavigator().setMaxMessageLength((int) maxMessageLength);
     }
 
-    public MessagesRecyclerAdapter getMessagesAdapter(FirebaseRemoteConfig firebaseRemoteConfig,
-                                                      MessagesRecyclerAdapterHelper map) {
+    public MessagesRecyclerAdapter createMessagesAdapter(FirebaseRemoteConfig firebaseRemoteConfig,
+                                                         MessagesRecyclerAdapterHelper map) {
         messagesAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class,
                 R.layout.item_message,
                 MessageViewHolder.class,
                 FirebaseDatabase.getInstance().getReference(getDatabaseRoot()).
                         limitToLast((int) firebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)),
                 map);
-        messagesAdapter.setIsPrivateChat(isPrivateChat());
         messagesAdapter.setDatabaseRoot(getDatabaseRoot());
-        messagesAdapter.setBlockedUserListener(blockedUserListener);
         return messagesAdapter;
     }
-
-    public abstract boolean isPrivateChat();
 
     public abstract void onMeTyping();
 
@@ -150,7 +176,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
         //for up to 5 seconds.  close the smallProgressCircle as soon as
         //messages are detected or 5 seconds has elapsed, whichever comes
         //first.
-        add(Observable.interval(500,500, TimeUnit.MILLISECONDS)
+        add(Observable.interval(500, 500, TimeUnit.MILLISECONDS)
                 .subscribeOn(getSchedulerProvider().io())
                 .observeOn(getSchedulerProvider().ui())
                 .take(10).takeUntil(new Predicate<Long>() {
@@ -194,7 +220,8 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
             Bundle payload = new Bundle();
             payload.putString("by", myUsername());
             payload.putInt("userid", userid);
-            FirebaseAnalytics.getInstance(TheApp.getInstance()).logEvent(Events.USER_BLOCKED, payload);
+            firebaseAnalytics.logEvent(Events.USER_BLOCKED, payload);
+            messagesAdapter.blockUser(userid);
         }
 
         @Override
@@ -202,12 +229,12 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
             Bundle payload = new Bundle();
             payload.putString("by", myUsername());
             payload.putInt("userid", userid);
-            FirebaseAnalytics.getInstance(TheApp.getInstance()).logEvent(Events.USER_UNBLOCKED, payload);
+            firebaseAnalytics.logEvent(Events.USER_UNBLOCKED, payload);
         }
     };
 
     public boolean validateMessage(final String text, boolean showOptions) {
-        if (StringUtil.isEmpty(text)) {
+        if (StringUtil.isEmpty(text) || isBanned()) {
             return false;
         }
         if (StringUtil.isEmpty(myDpid())) {
@@ -228,7 +255,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     }
 
     public boolean onCommitContent(InputContentInfoCompat inputContentInfo, int flags,
-                                    Bundle opts, String[] contentMimeTypes) {
+                                   Bundle opts, String[] contentMimeTypes) {
 
         boolean supported = false;
         for (final String mimeType : contentMimeTypes) {
@@ -254,8 +281,6 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
             }
         }
         Uri linkUri = inputContentInfo.getLinkUri();
-        //MLog.d(TAG, "linkUri: " + linkUri.toString() + ": " + inputContentInfo.getDescription().toString(), " : ",
-        // inputContentInfo);
         if (inputContentInfo != null && inputContentInfo.getDescription() != null) {
             if (inputContentInfo.getDescription().toString().contains("image/gif")) {
                 final FriendlyMessage friendlyMessage = new FriendlyMessage("",
@@ -270,4 +295,196 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
         return true;
     }
 
+    public void saveUserPhoto(@NonNull String photoUrl) {
+        final User user = UserPreferences.getInstance().getUser();
+        user.setProfilePicUrl(photoUrl);
+        UserPreferences.getInstance().saveUser(user);
+        add(getDataManager().saveUser3((long) user.getId(), user.getUsername(), user.getPassword(),
+                user.getEmail(), user.getProfilePicUrl(), user.getBio())
+                .subscribe());
+        profilePicUrl.set(photoUrl);
+    }
+
+    public void checkForRemoteUpdatesToMyDP() {
+        add(getDataManager().getUserById(myUserid())
+                .subscribe(new Consumer<UserResponse>() {
+                    @Override
+                    public void accept(UserResponse userResponse) throws Exception {
+                        if (userResponse.status.equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
+                            final User remote = userResponse.user;
+                            if (!TextUtils.isEmpty(remote.getProfilePicUrl())) {
+                                String localProfilePic = UserPreferences.getInstance().getUser().getProfilePicUrl() + "";
+                                String remoteProfilePic = remote.getProfilePicUrl() + "";
+                                if (StringUtil.isNotEmpty(remoteProfilePic) && !localProfilePic.equals(remoteProfilePic)) {
+                                    User user = UserPreferences.getInstance().getUser();
+                                    user.setProfilePicUrl(remoteProfilePic);
+                                    UserPreferences.getInstance().saveUser(user);
+                                    profilePicUrl.set(remote.getProfilePicUrl());
+                                    MLog.i(TAG, "checkForRemoteUpdatesToMyDP() my pic changed remotely. attempt to update");
+                                } else {
+                                    MLog.i(TAG, "checkForRemoteUpdatesToMyDP() my pic did not change remotely. do not update.");
+                                }
+                            }
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        MLog.e(TAG, "checkForRemoteUpdatesToMyDP() failed", throwable);
+                    }
+                }));
+    }
+
+    public void saveUser(final User user, final String newUsername, final String newBio, final boolean needToSaveBio, final boolean needToSaveUsername) {
+        if (needToSaveBio && !needToSaveUsername) {
+            user.setBio(newBio);
+            add(getDataManager().saveUser3((long) user.getId(),
+                    user.getUsername(),
+                    user.getPassword(),
+                    user.getEmail(),
+                    user.getProfilePicUrl(),
+                    user.getBio())
+                    .subscribe(new Consumer<UserResponse>() {
+                        @Override
+                        public void accept(UserResponse userResponse) throws Exception {
+                            if (userResponse.status.equals(NetworkApi.RESPONSE_OK)) {
+                                UserPreferences.getInstance().saveUser(user);
+                                getNavigator().showProfileUpdatedDialog();
+                            }
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            getNavigator().showErrorToast("");
+                            Bundle payload = new Bundle();
+                            payload.putString("why", throwable.toString());
+                            payload.putString("username", UserPreferences.getInstance().getUsername() + "");
+                            firebaseAnalytics.logEvent(Events.SAVED_PROFILE_FAILED, payload);
+                        }
+                    }));
+
+        } else if (needToSaveUsername) {
+            if (needToSaveBio)
+                user.setBio(newBio);
+
+            add(getDataManager().userNameExists(newUsername)
+                    .subscribe(new Consumer<BasicExistenceResult>() {
+                        @Override
+                        public void accept(BasicExistenceResult basicExistenceResult) throws Exception {
+                            if (basicExistenceResult.data.exists) {
+                                getNavigator().showUsernameExistsDialog(newUsername);
+                                username.set(UserPreferences.getInstance().getUsername());
+                            } else {
+                                user.setUsername(newUsername);
+                                saveUser(user);
+                            }
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            getNavigator().showErrorToast("");
+                            username.set(UserPreferences.getInstance().getUsername());
+                            Bundle payload = new Bundle();
+                            payload.putString("why", throwable.toString());
+                            payload.putString("username", UserPreferences.getInstance().getUsername() + "");
+                            firebaseAnalytics.getInstance(TheApp.getInstance()).logEvent(Events.SAVED_PROFILE_FAILED, payload);
+                        }
+                    }));
+
+        }
+
+    }
+
+    private void saveUser(@NonNull final User user) {
+        getDataManager().saveUser3((long) user.getId(), user.getUsername(), user.getPassword(), user.getEmail(), user.getProfilePicUrl(), user.getBio())
+                .subscribe(new Consumer<UserResponse>() {
+                    @Override
+                    public void accept(UserResponse userResponse) throws Exception {
+                        UserPreferences.getInstance().saveUser(user);
+                        UserPreferences.getInstance().saveLastSignIn(user.getUsername());
+                        Bundle payload = new Bundle();
+                        payload.putString("username", UserPreferences.getInstance().getUsername() + "");
+                        firebaseAnalytics.logEvent(Events.SAVED_PROFILE, payload);
+                    }
+                });
+    }
+
+    public void onGroupChatClicked(long groupId, String groupName) {
+        if (groupId == 0 || StringUtil.isEmpty(groupName)) {
+            return;
+        }
+        getNavigator().showGroupChatActivity(groupId, groupName, null, null);
+    }
+
+    private String adminId;
+    public boolean isAdmin() {
+        if (adminId == null) {
+            adminId = "["+myUserid()+"]";
+        }
+        return firebaseRemoteConfig.getString(Constants.KEY_ADMIN_USERS).contains(adminId);
+    }
+
+    public boolean isBanned() {
+        boolean isBanned = banHelper.isBanned();
+        if (isBanned) {
+            MLog.w(TAG, "You are banned. Cannot post anything.");
+        }
+        return isBanned;
+    }
+
+    /**
+     * Check if the messages are out of sort order.  If so, then sort them.
+     * Delay some time before doing the actual check.
+     *
+     */
+    public void checkMessageSortOrder() {
+        add(Observable.timer(2000, TimeUnit.MILLISECONDS)
+                .subscribeOn(getSchedulerProvider().io())
+                .observeOn(getSchedulerProvider().ui())
+                .doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        if (messagesAdapter.needsSorting()) {
+                            messagesAdapter.sort();
+                        }
+                    }
+                })
+                .subscribe());
+    }
+
+    /**
+     * Remove all messages sent by the user of the given message.
+     *
+     * @param friendlyMessage
+     */
+    public void removeMessages(FriendlyMessage friendlyMessage) {
+        final ArrayList<FriendlyMessage> copy = new ArrayList<>(messagesAdapter.getData());
+        for (final FriendlyMessage removeMessage : copy) {
+            try {
+                if (removeMessage.getUserid() == friendlyMessage.getUserid()) {
+                    removeMessage(friendlyMessage);
+                }
+            }catch(Exception e) {
+                MLog.e(TAG,"removeMessages() error: "+e.getMessage());
+            }
+        }
+        checkMessageSortOrder();
+    }
+
+    /**
+     * Remove a single message.
+     *
+     * @param friendlyMessage
+     * @return - the Task associated to the database remove operation
+     */
+    public Task<Void> removeMessage(final FriendlyMessage friendlyMessage) {
+
+        //check if there is also a physical photo that needs to be deleted
+        if (friendlyMessage.getImageUrl() != null && friendlyMessage.getImageId() != null) {
+            final StorageReference photoRef = FirebaseStorage.getInstance().getReference().child(getDatabaseRoot()).child(friendlyMessage.getImageId());
+            photoRef.delete();
+            MLog.d(TAG, "deleted photo " + friendlyMessage.getImageId());
+        }
+        return getDatabaseReference().child(friendlyMessage.getId()).removeValue();
+    }
 }

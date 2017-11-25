@@ -39,7 +39,7 @@
                         android:textColor="@color/chat_likes_count"
                         android:textSize="@dimen/message_likes_counter_size"
                         android:textStyle="bold"
-                        />
+                        android:fontFamily="@font/lato_bold"/>
                 </FrameLayout>
 
                 <FrameLayout
@@ -114,7 +114,7 @@
                             android:textAlignment="textEnd"
                             android:textColor="@color/chat_time_message_sent"
                             android:textSize="@dimen/message_sent_time_ago_size"
-                            />
+                            android:fontFamily="@font/lato_regular"/>
 
                         <TextView
                             android:id="@+id/messengerTextView"
@@ -126,7 +126,7 @@
                             android:textAlignment="textEnd"
                             android:textColor="@color/chat_sender_username"
                             android:textSize="@dimen/message_sender_name_size"
-                            />
+                            android:fontFamily="@font/lato_bold"/>
 
                     </LinearLayout>
 
@@ -168,7 +168,7 @@
                                         android:maxLines="2"
                                         android:textColor="@color/chat_web_clipping_article_title"
                                         android:textSize="@dimen/web_clipping_article_title_size"
-                                        />
+                                        android:fontFamily="@font/lato_bold"/>
 
                                     <TextView
                                         android:id="@+id/description"
@@ -178,7 +178,7 @@
                                         android:ellipsize="end"
                                         android:maxLines="3"
                                         android:textSize="@dimen/web_clipping_short_description_size"
-                                        />
+                                        android:fontFamily="@font/lato_regular"/>
 
                                     <TextView
                                         android:id="@+id/url"
@@ -189,7 +189,7 @@
                                         android:maxLines="1"
                                         android:textColor="@color/chat_web_cliping_url"
                                         android:textSize="@dimen/web_clipping_short_url_size"
-                                        />
+                                        android:fontFamily="@font/lato_regular"/>
 
                                 </LinearLayout>
 

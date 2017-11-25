@@ -8,6 +8,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.StorageReference;
 import com.instachat.android.R;
+import com.instachat.android.app.activity.AbstractChatViewModel;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.util.MLog;
 
@@ -22,8 +23,7 @@ public class MessagesDialogHelper {
 
     public void showDeleteMessageDialog(@NonNull final Context context,
                                         @NonNull final FriendlyMessage friendlyMessage,
-                                        @NonNull final StorageReference storageRef,
-                                        @NonNull final String dbRef) {
+                                        @NonNull final AbstractChatViewModel abstractChatViewModel) {
         new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText(context.getString(R.string.message_delete_title))
                 .setContentText(context.getString(R.string.message_delete_question))
@@ -40,36 +40,35 @@ public class MessagesDialogHelper {
             public void onClick(SweetAlertDialog sweetAlertDialog) {
 
                 sweetAlertDialog.dismiss();
-                if (friendlyMessage.getImageUrl() != null && friendlyMessage.getImageId() != null) {
-                    final StorageReference photoRef = storageRef.child(dbRef).child(friendlyMessage.getImageId());
-                    photoRef.delete();
-                    MLog.d(TAG, "deleted photo " + friendlyMessage.getImageId());
-                }
+                abstractChatViewModel
+                        .removeMessage(friendlyMessage)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    try {
+                                        new SweetAlertDialog(context, SweetAlertDialog.SUCCESS_TYPE)
+                                                .setTitleText(context.getString(R.string.success_exclamation))
+                                                .setContentText(context.getString(R.string.message_delete_success))
+                                                .show();
+                                        abstractChatViewModel.checkMessageSortOrder();
+                                    } catch (Exception e) {
+                                        MLog.e(TAG, "", e);
+                                    }
 
-                FirebaseDatabase.getInstance().getReference(dbRef + "/" + friendlyMessage.getId()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            try {
-                                new SweetAlertDialog(context, SweetAlertDialog.SUCCESS_TYPE)
-                                        .setTitleText(context.getString(R.string.success_exclamation))
-                                        .setContentText(context.getString(R.string.message_delete_success))
-                                        .show();
-                            } catch (Exception e) {
-                                MLog.e(TAG, "", e);
+                                } else {
+                                    try {
+                                        new SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
+                                                .setTitleText(context.getString(R.string.oops_exclamation))
+                                                .setContentText(context.getString(R.string.message_delete_failed))
+                                                .show();
+                                    } catch (Exception e) {
+                                        MLog.e(TAG, "", e);
+                                    }
+                                }
                             }
-                        } else {
-                            try {
-                                new SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
-                                        .setTitleText(context.getString(R.string.oops_exclamation))
-                                        .setContentText(context.getString(R.string.message_delete_failed))
-                                        .show();
-                            } catch (Exception e) {
-                                MLog.e(TAG, "", e);
-                            }
-                        }
-                    }
-                });
+                        });
+
             }
         }).show();
     }

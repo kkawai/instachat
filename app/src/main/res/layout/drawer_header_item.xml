@@ -3,6 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+
+        <variable
+            name="name"
+            type="String"/>
+
+    </data>
+
+
     <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -17,12 +26,11 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:ellipsize="marquee"
-            android:maxLines="1"
+            android:singleLine="true"
             android:paddingLeft="13dp"
-            android:text="# Channels"
+            android:text="@{name, default=PLACEHOLDER}"
             android:textSize="18sp"
-
+            android:fontFamily="@font/lato_heavy"
             />
 
         <!--

@@ -61,7 +61,6 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
     private UsersInGroupListener mUsersInGroupListener;
     private final UserPresenceManager userPresenceManager;
 
-    @Inject
     public ChatSummariesRecyclerAdapter(UserPresenceManager userPresenceManager) {
         this.userPresenceManager = userPresenceManager;
     }
@@ -221,6 +220,9 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
 
     private void insertPrivateChatSummary(PrivateChatSummary privateChatSummary) {
         synchronized (this) {
+            if (data.contains(privateChatSummary)) {
+                return;
+            }
             for (int i = 0; i < data.size(); i++) {
                 Object o = data.get(i);
                 if (o instanceof PrivateChatHeader) {
@@ -323,6 +325,9 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
     private void insertGroupChatSummary(GroupChatSummary groupChatSummary) {
         int groupHeaderIndex = -1;
         synchronized (this) {
+            if (data.contains(groupChatSummary)) {
+                return;
+            }
             for (int i = 0; i < data.size(); i++) {
                 Object o = data.get(i);
                 if (o instanceof GroupChatHeader) {
@@ -378,16 +383,16 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_GROUP_HEADER) {
             DrawerHeaderItemBinding binding = DrawerHeaderItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-            ChatHeaderViewHolder holder = new ChatHeaderViewHolder(binding.getRoot());
+            ChatHeaderViewHolder holder = new ChatHeaderViewHolder(binding);
             return holder;
         } else if (viewType == TYPE_PRIVATE_HEADER) {
             DrawerHeaderItemBinding binding = DrawerHeaderItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-            ChatHeaderViewHolder holder = new ChatHeaderViewHolder(binding.getRoot());
+            ChatHeaderViewHolder holder = new ChatHeaderViewHolder(binding);
             return holder;
         } else if (viewType == TYPE_GROUP_SUMMARY) {
             DrawerListItemBinding binding = DrawerListItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-            final GroupChatSummaryViewHolder holder = new GroupChatSummaryViewHolder(binding.getRoot());
-            holder.name.setOnClickListener(new View.OnClickListener() {
+            final GroupChatSummaryViewHolder holder = new GroupChatSummaryViewHolder(binding);
+            holder.binding.name.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     GroupChatSummary groupChatSummary = (GroupChatSummary) data.get(holder.getAdapterPosition());
@@ -397,8 +402,8 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
             return holder;
         } else if (viewType == TYPE_PRIVATE_SUMMARY) {
             DrawerListItemBinding binding = DrawerListItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-            final PrivateChatSummaryViewHolder holder = new PrivateChatSummaryViewHolder(binding.getRoot());
-            holder.name.setOnClickListener(new View.OnClickListener() {
+            final PrivateChatSummaryViewHolder holder = new PrivateChatSummaryViewHolder(binding);
+            holder.binding.name.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     PrivateChatSummary privateChatSummary = (PrivateChatSummary) data.get(holder.getAdapterPosition());
@@ -418,55 +423,59 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
         if (viewType == TYPE_GROUP_HEADER) {
 
             GroupChatHeader groupChatHeader = (GroupChatHeader) data.get(position);
-            ((ChatHeaderViewHolder) holder).name.setText(groupChatHeader.name);
-            ((ChatHeaderViewHolder) holder).name.setTextColor(res.getColor(R.color.left_drawer_groups_label_text_color));
+            ((ChatHeaderViewHolder) holder).binding.setName(groupChatHeader.name);
+            ((ChatHeaderViewHolder) holder).binding.name.setTextColor(res.getColor(R.color.left_drawer_groups_label_text_color));
 
         } else if (viewType == TYPE_PRIVATE_HEADER) {
 
             PrivateChatHeader privateChatHeader = (PrivateChatHeader) data.get(position);
-            ((ChatHeaderViewHolder) holder).name.setText(privateChatHeader.name);
-            ((ChatHeaderViewHolder) holder).name.setTextColor(res.getColor(R.color.left_drawer_privates_label_text_color));
+            ((ChatHeaderViewHolder) holder).binding.setName(privateChatHeader.name);
+            ((ChatHeaderViewHolder) holder).binding.name.setTextColor(res.getColor(R.color.left_drawer_privates_label_text_color));
 
         } else if (viewType == TYPE_GROUP_SUMMARY) {
             GroupChatSummary groupChatSummary = (GroupChatSummary) data.get(position);
-            ((GroupChatSummaryViewHolder) holder).name.setText(groupChatSummary.getName());
-            ((GroupChatSummaryViewHolder) holder).name.setTextColor(res.getColor(R.color.left_drawer_list_room_name_text_color));
-            ((GroupChatSummaryViewHolder) holder).status.setVisibility(View.INVISIBLE);
-
-            if (groupChatSummary.getUsersInRoomCount() > 0) {
-                ((GroupChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.VISIBLE);
-                ((GroupChatSummaryViewHolder) holder).unreadMessageCount.setText("  " + groupChatSummary.getUsersInRoomCount() + "  ");
-            } else
-                ((GroupChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.INVISIBLE);
+            ((GroupChatSummaryViewHolder) holder).binding.setName(groupChatSummary.getName());
+            ((GroupChatSummaryViewHolder) holder).binding.name.setTextColor(res.getColor(R.color.left_drawer_list_room_name_text_color));
+            ((GroupChatSummaryViewHolder) holder).binding.setStatusVisible(false);
+            ((GroupChatSummaryViewHolder) holder).binding.setUnreadMessageCount(groupChatSummary.getUsersInRoomCount());
 
         } else if (viewType == TYPE_PRIVATE_SUMMARY) {
 
             PrivateChatSummary privateChatSummary = (PrivateChatSummary) data.get(position);
-            ((PrivateChatSummaryViewHolder) holder).name.setText(privateChatSummary.getName());
-            ((PrivateChatSummaryViewHolder) holder).status.setVisibility(View.VISIBLE);
-            if (privateChatSummary.getUnreadMessageCount() > 0) {
-                ((PrivateChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.VISIBLE);
-                ((PrivateChatSummaryViewHolder) holder).unreadMessageCount.setText("  " + privateChatSummary.getUnreadMessageCount() + "  ");
-                ((PrivateChatSummaryViewHolder) holder).name.setTextColor(res.getColor(R.color.left_drawer_list_name_new_messages_text_color));
-            } else {
-                ((PrivateChatSummaryViewHolder) holder).unreadMessageCount.setVisibility(View.INVISIBLE);
-                ((PrivateChatSummaryViewHolder) holder).name.setTextColor(res.getColor(R.color.left_drawer_list_name_text_color));
-            }
-            if (privateChatSummary.getOnlineStatus() == PrivateChatSummary.USER_ONLINE) {
-                ((PrivateChatSummaryViewHolder) holder).status.setImageResource(R.drawable.presence_green);
-            } else if (privateChatSummary.getOnlineStatus() == PrivateChatSummary.USER_AWAY) {
-                ((PrivateChatSummaryViewHolder) holder).status.setImageResource(R.drawable.presence_away);
-            } else if (privateChatSummary.getOnlineStatus() == PrivateChatSummary.USER_OFFLINE) {
-                ((PrivateChatSummaryViewHolder) holder).status.setImageResource(R.drawable.presence_gone);
-            } else {
-                ((PrivateChatSummaryViewHolder) holder).status.setImageResource(R.drawable.presence_green);
-            }
+            ((PrivateChatSummaryViewHolder) holder).binding.setName(privateChatSummary.getName());
+            ((PrivateChatSummaryViewHolder) holder).binding.name.setTextColor(res.getColor(R.color.left_drawer_list_name_new_messages_text_color));
+            ((PrivateChatSummaryViewHolder) holder).binding.setStatusVisible(true);
+            ((PrivateChatSummaryViewHolder) holder).binding.setUnreadMessageCount(privateChatSummary.getUnreadMessageCount());
+            ((PrivateChatSummaryViewHolder) holder).binding.setPartnerStatus(privateChatSummary.getOnlineStatus());
         }
     }
 
     @Override
     public int getItemCount() {
         return data.size();
+    }
+
+    private boolean wasPaused;
+    public void pause() {
+        cleanup();
+        wasPaused = true;
+    }
+
+    public void resume() {
+        if (wasPaused) {
+            wasPaused = false;
+            if (privateChatsSummaryReference != null)
+                privateChatsSummaryReference.addChildEventListener(privateChatsSummaryListener);
+            if (publicGroupChatsSummaryReference != null)
+                publicGroupChatsSummaryReference.addChildEventListener(publicGroupChatsSummaryListener);
+            for (long groupid : publicGroupChatPresenceReferences.keySet()) {
+                Map.Entry<DatabaseReference, ChildEventListener> entry = publicGroupChatPresenceReferences.get(groupid);
+                entry.getKey().addChildEventListener(entry.getValue());
+            }
+            for (Map.Entry<DatabaseReference, ValueEventListener> entry : userInfoRefs) {
+                entry.getKey().addValueEventListener(entry.getValue());
+            }
+        }
     }
 
     public void cleanup() {
@@ -480,12 +489,9 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
             Map.Entry<DatabaseReference, ChildEventListener> entry = publicGroupChatPresenceReferences.get(groupid);
             entry.getKey().removeEventListener(entry.getValue());
         }
-        publicGroupChatPresenceReferences = null;
-        activityState = null;
         for (Map.Entry<DatabaseReference, ValueEventListener> entry : userInfoRefs) {
             entry.getKey().removeEventListener(entry.getValue());
         }
-        userInfoRefs = null;
     }
 
     private synchronized void addPublicGroupChatPresenceReference(final long groupid) {

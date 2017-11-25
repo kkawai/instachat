@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 public class RemoteSettingsResponse {
 
     @SerializedName("status")
-    public String status;
+    public String status="";
 
     @SerializedName("data")
     public Setting data;

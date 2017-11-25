@@ -35,7 +35,7 @@
                     android:textColor="@color/chat_likes_count"
                     android:textSize="@dimen/message_likes_counter_size"
                     android:textStyle="bold"
-                    />
+                    android:fontFamily="@font/lato_bold"/>
 
             </FrameLayout>
 
@@ -111,7 +111,7 @@
                         android:textAlignment="textEnd"
                         android:textColor="@color/chat_time_message_sent"
                         android:textSize="@dimen/message_sent_time_ago_size"
-                        />
+                        android:fontFamily="@font/lato_regular"/>
 
                     <TextView
                         android:id="@+id/messengerTextView"
@@ -123,7 +123,7 @@
                         android:textAlignment="textEnd"
                         android:textColor="@color/chat_sender_username"
                         android:textSize="@dimen/message_sender_name_size"
-                        />
+                        android:fontFamily="@font/lato_bold"/>
 
                 </LinearLayout>
 
@@ -161,7 +161,7 @@
                             android:textAlignment="center"
                             android:textColor="@color/chat_message_color"
                             android:textSize="@dimen/message_text_size"
-                            />
+                            android:fontFamily="@font/lato_regular"/>
 
                     </LinearLayout>
 
@@ -177,7 +177,7 @@
                     android:maxWidth="240dp"
                     android:textColor="@color/chat_message_color"
                     android:textSize="@dimen/message_text_size"
-                    />
+                    android:fontFamily="@font/lato_regular"/>
 
             </LinearLayout>
 

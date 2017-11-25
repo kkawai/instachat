@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:bind="http://schemas.android.com/apk/res-auto"
         xmlns:fab="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
     <data>
@@ -12,7 +13,6 @@
             type="com.instachat.android.app.activity.group.GroupChatViewModel" />
 
     </data>
-
 
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"
@@ -49,7 +49,8 @@
                 android:layout_height="match_parent"
                 android:layout_above="@+id/linearLayout">
 
-                <include layout="@layout/merge_main_appbar"/>
+                <include layout="@layout/merge_main_appbar"
+                         bind:viewModel="@{viewModel}" />
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/messageRecyclerView"
@@ -88,7 +89,8 @@
                         android:layout_marginLeft="4dp"
                         android:textColor="@color/chat_time_message_sent"
                         android:textSize="@dimen/message_sent_time_ago_size"
-                        />
+                        android:fontFamily="@font/lato_heavyitalic"
+                        android:text="@{viewModel.usernameTyping}"/>
 
                 </LinearLayout>
 
@@ -107,12 +109,11 @@
                 android:paddingRight="8dp">
 
                 <RelativeLayout
-                    android:id="@+id/ad_container"
+                    android:id="@+id/ads_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:gravity="center"
-                    android:visibility="@{viewModel.isAdReady ? View.VISIBLE : View.GONE}"/>
+                    android:gravity="center"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"

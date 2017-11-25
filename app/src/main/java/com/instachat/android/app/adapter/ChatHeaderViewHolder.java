@@ -5,16 +5,17 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.instachat.android.R;
+import com.instachat.android.databinding.DrawerHeaderItemBinding;
 
 /**
  * Created by kevin on 9/26/2016.
  */
 public class ChatHeaderViewHolder extends RecyclerView.ViewHolder {
 
-    public TextView name;
+    DrawerHeaderItemBinding binding;
 
-    public ChatHeaderViewHolder(View view) {
-        super(view);
-        name = (TextView) view.findViewById(R.id.name);
+    public ChatHeaderViewHolder(DrawerHeaderItemBinding binding) {
+        super(binding.getRoot());
+        this.binding = binding;
     }
 }

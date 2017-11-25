@@ -1,22 +1,16 @@
 package com.instachat.android.app.adapter;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -35,16 +29,16 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
-import com.instachat.android.app.MessageOptionsDialogHelper;
 import com.instachat.android.app.activity.ActivityState;
-import com.instachat.android.app.blocks.BlockUserDialogHelper;
 import com.instachat.android.app.blocks.BlockedUser;
 import com.instachat.android.app.blocks.BlockedUserListener;
-import com.instachat.android.app.blocks.ReportUserDialogHelper;
 import com.instachat.android.app.likes.LikesHelper;
 import com.instachat.android.data.db.OneTimeMessageDb;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.databinding.ItemMessageBinding;
+import com.instachat.android.databinding.ItemMessageMeBinding;
+import com.instachat.android.databinding.ItemMessageMeWebClippingBinding;
+import com.instachat.android.databinding.ItemMessageWebClippingBinding;
 import com.instachat.android.util.AnimationUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.StringUtil;
@@ -53,6 +47,10 @@ import com.instachat.android.util.UserPreferences;
 import com.tooltip.Tooltip;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +76,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private static final int PAYLOAD_PERISCOPE_CHANGE = 0;
     private static final int PAYLOAD_IMAGE_REVEAL = 1;
 
-    private StorageReference mStorageRef;
     private DatabaseReference mMessagesRef;
     private WeakReference<Activity> mActivity;
     private ActivityState mActivityState;
@@ -87,7 +84,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     private FriendlyMessageListener mFriendlyMessageListener;
     private BlockedUserListener mBlockedUserListener;
     private String mDatabaseRef;
-    private FrameLayout mEntireScreenFrameLayout;
     private int mMaxPeriscopesPerItem;
     private boolean mIsPrivateChat;
     private int mMyUserid;
@@ -96,7 +92,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     public MessagesRecyclerAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref, MessagesRecyclerAdapterHelper map) {
         super(modelClass, modelLayout, viewHolderClass, ref);
         mMessagesRef = FirebaseDatabase.getInstance().getReference();
-        mStorageRef = FirebaseStorage.getInstance().getReference();
         mMaxPeriscopesPerItem = (int) FirebaseRemoteConfig.getInstance().getLong(Constants.KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM);
         mMyUserid = UserPreferences.getInstance().getUserId();
         this.map = map;
@@ -111,12 +106,9 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     }
 
     public void setActivity(@NonNull Activity activity,
-                            @NonNull ActivityState activityState,
-                            @NonNull FrameLayout entireScreenLayout) {
+                            @NonNull ActivityState activityState) {
         mActivity = new WeakReference<>(activity);
         mActivityState = activityState;
-        mEntireScreenFrameLayout = entireScreenLayout;
-        mEntireScreenFrameLayout.setOnTouchListener(mOnTouchListener);
     }
 
     public void setMessageTextClickedListener(MessageTextClickedListener listener) {
@@ -130,23 +122,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     public void setFriendlyMessageListener(FriendlyMessageListener listener) {
         mFriendlyMessageListener = listener;
     }
-
-    public void setBlockedUserListener(BlockedUserListener listener) {
-        mBlockedUserListener = listener;
-    }
-
-    private BlockedUserListener mInternalBlockedUserListener = new BlockedUserListener() {
-        @Override
-        public void onUserBlocked(int userid) {
-            blockUser(userid);
-            mBlockedUserListener.onUserBlocked(userid);
-        }
-
-        @Override
-        public void onUserUnblocked(int userid) {
-
-        }
-    };
 
     @Override
     public int getItemViewType(int position) {
@@ -165,7 +140,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             return ITEM_VIEW_TYPE_STANDARD_MESSAGE;
     }
 
-    private void blockUser(int userid) {
+    public void blockUser(int userid) {
         synchronized (this) {
             int count = getData().size() - 1;
             for (int i = count; i >= 0; i--) {
@@ -182,13 +157,13 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             ItemMessageBinding binding = ItemMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new MessageViewHolder(binding.getRoot());
         } else if (viewType == ITEM_VIEW_TYPE_STANDARD_MESSAGE_ME) {
-            ItemMessageBinding binding = ItemMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            ItemMessageMeBinding binding = ItemMessageMeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new MessageViewHolder(binding.getRoot());
         } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK) {
-            ItemMessageBinding binding = ItemMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            ItemMessageWebClippingBinding binding = ItemMessageWebClippingBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new MessageViewHolder(binding.getRoot());
         } else if (viewType == ITEM_VIEW_TYPE_WEB_LINK_ME) {
-            ItemMessageBinding binding = ItemMessageBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            ItemMessageMeWebClippingBinding binding = ItemMessageMeWebClippingBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             return new MessageViewHolder(binding.getRoot());
         }
         throw new IllegalArgumentException("unknown viewType");
@@ -202,21 +177,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             @Override
             public boolean onLongClick(View view) {
                 final FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
-                if (TextUtils.isEmpty(friendlyMessage.getName())) {
-                    return true;
-                }
-                final View tempAnchorView = new View(mActivity.get());
-                tempAnchorView.setBackgroundColor(Color.TRANSPARENT);
-                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(10, 10);
-                params.leftMargin = (int) x;
-                params.topMargin = (int) y;
-                mEntireScreenFrameLayout.addView(tempAnchorView, params);
-                mEntireScreenFrameLayout.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        showMessageOptions(tempAnchorView, friendlyMessage);
-                    }
-                });
+                mMessageTextClickedListener.onMessageLongClicked(friendlyMessage);
                 return true;
             }
         };
@@ -516,7 +477,8 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                         mMessagesRef.child(mDatabaseRef).child(lastFriendlyMessage.getId()).updateChildren(lastFriendlyMessage.toMap()).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                if (mActivityState == null || mActivityState.isActivityDestroyed()) return;
+                                if (mActivityState == null || mActivityState.isActivityDestroyed())
+                                    return;
                                 if (task.isSuccessful()) {
                                     /**
                                      * since we are appending to an existing friendly message, we need
@@ -625,58 +587,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         }, 2000);
     }
 
-    private void showMessageOptions(final View tempAnchorView, FriendlyMessage friendlyMessage) {
-        new MessageOptionsDialogHelper().showMessageOptions(mActivity.get(), tempAnchorView, friendlyMessage, new MessageOptionsDialogHelper.MessageOptionsListener() {
-
-            @Override
-            public void onMessageOptionsDismissed() {
-                mEntireScreenFrameLayout.removeView(tempAnchorView);
-            }
-
-            @Override
-            public void onCopyTextRequested(FriendlyMessage friendlyMessage) {
-                final ClipboardManager cm = (ClipboardManager) mActivity.get()
-                        .getSystemService(Context.CLIPBOARD_SERVICE);
-                cm.setText(friendlyMessage.getText());
-                Toast.makeText(mActivity.get(), R.string.message_copied_to_clipboard, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onDeleteMessageRequested(final FriendlyMessage friendlyMessage) {
-                MLog.d(TAG, " msg.getImageUrl(): " + friendlyMessage.getImageUrl() + " " + friendlyMessage.getImageId());
-                new MessagesDialogHelper().showDeleteMessageDialog(mActivity.get(), friendlyMessage, mStorageRef, mDatabaseRef);
-            }
-
-            @Override
-            public void onBlockPersonRequested(final FriendlyMessage friendlyMessage) {
-                new BlockUserDialogHelper(FirebaseDatabase.getInstance()).showBlockUserQuestionDialog(mActivity.get(),
-                        friendlyMessage.getUserid(),
-                        friendlyMessage.getName(),
-                        friendlyMessage.getDpid(),
-                        mInternalBlockedUserListener);
-
-            }
-
-            @Override
-            public void onReportPersonRequested(FriendlyMessage friendlyMessage) {
-                new ReportUserDialogHelper().showReportUserQuestionDialog(mActivity.get(),
-                        friendlyMessage.getUserid(),
-                        friendlyMessage.getName(),
-                        friendlyMessage.getDpid());
-            }
-        });
-    }
-
-    private View.OnTouchListener mOnTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            x = motionEvent.getX();
-            y = motionEvent.getY();
-            return false;
-        }
-    };
-    private float x, y;
-
     /**
      * Check the data at the index to see if the
      * only thing that changed was the like count
@@ -725,12 +635,11 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         if (mItemWasRemoved && getItemCount() > 0) {
             mItemWasRemoved = false;
             FriendlyMessage lastFriendlyMessage = getItem(getItemCount() - 1);
-            if (newFriendlyMessage.getTime() > lastFriendlyMessage.getTime() || isSmallDifferenceInTime(newFriendlyMessage.getTime(),lastFriendlyMessage.getTime()))
+            if (newFriendlyMessage.getTime() > lastFriendlyMessage.getTime() || isSmallDifferenceInTime(newFriendlyMessage.getTime(), lastFriendlyMessage.getTime()))
                 super.onAddItem(newFriendlyMessage);
         } else {
             super.onAddItem(newFriendlyMessage);
         }
-
     }
 
     private boolean mItemWasRemoved;
@@ -739,10 +648,73 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     protected void onRemoveItem(int index) {
         mItemWasRemoved = true;
         super.onRemoveItem(index);
+        MLog.d(TAG, "sort_tag: onRemoteItem() item was removed.  Check if needs sorting.");
+        if (needsSorting())
+            sort();
     }
 
-    public static final long ONE_HOUR = 60*1000*60L;
+    public static final long ONE_HOUR = 60 * 1000 * 60L;
+
     private boolean isSmallDifferenceInTime(long t1, long t2) {
         return Math.abs(t1 - t2) < ONE_HOUR;
+    }
+
+    public void removeMessages(FriendlyMessage friendlyMessage) {
+
+        ArrayList<FriendlyMessage> copy = new ArrayList<>(getData());
+        for (FriendlyMessage remove : copy) {
+            try {
+                if (remove.getUserid() == friendlyMessage.getUserid()) {
+                    mMessagesRef.child(mDatabaseRef).child(remove.getId()).removeValue();
+                    if (friendlyMessage.getImageUrl() != null && friendlyMessage.getImageId() != null) {
+                        final StorageReference photoRef = FirebaseStorage.getInstance().getReference().child(mDatabaseRef).child(friendlyMessage.getImageId());
+                        photoRef.delete();
+                        MLog.d(TAG, "deleted photo " + friendlyMessage.getImageId());
+                    }
+                }
+            } catch (Exception e) {
+                MLog.e(TAG, "removeMessages() error: " + e.getMessage());
+            }
+        }
+    }
+
+    public final void sort() {
+        synchronized (this) {
+            ArrayList<FriendlyMessage> list = getData();
+            //size = list.size();
+            Collections.sort(list, new Comparator<FriendlyMessage>() {
+                @Override
+                public int compare(FriendlyMessage m1, FriendlyMessage m2) {
+                    //return m1.getTime() > m2.getTime() ? 1 : -1;
+                    return m1.getId().compareTo(m2.getId());
+                }
+            });
+        }
+        MLog.d(TAG, "sort_tag: list was just sorted. size(): " + getData().size());
+        notifyDataSetChanged();
+    }
+
+    public final boolean needsSorting() {
+        FriendlyMessage prev = null;
+        String prevMsg = "";
+        int prevIdx = 0;
+        ArrayList<FriendlyMessage> copy = new ArrayList(getData());
+        for (int i = copy.size() - 1; i >= 0; i--) {
+            FriendlyMessage next = copy.get(i);
+            if (prev != null && next.getId().compareTo(prev.getId()) > 0) {
+                MLog.d(TAG, "sort_tag: needs to be sorted.  prev_msg: " + prevMsg + " msg: " + next.getText()
+                        + " prev idx: " + prevIdx + " "
+                        + " idx: " + i + " size: " + copy.size()
+                        + " prev Time: " + new Date(prev.getTime()).toString()
+                        + " time: " + new Date(next.getTime()).toString());
+                return true;
+            } else {
+                prev = next;
+                prevMsg = next.getText();
+                prevIdx = i;
+            }
+        }
+        MLog.d(TAG, "sort_tag: No need to be sorted");
+        return false;
     }
 }

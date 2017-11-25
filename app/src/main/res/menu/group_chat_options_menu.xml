@@ -23,4 +23,8 @@
         android:title="@string/sign_out"
         app:showAsAction="never"/>
 
+    <item
+        android:id="@+id/menu_clear_room"
+        android:title="clear room comments"/>
+
 </menu>

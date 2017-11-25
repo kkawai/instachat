@@ -21,21 +21,24 @@ public class PresenceHelper {
 
     private static final String TAG = "PresenceHelper";
 
+    private DatabaseReference connectedRef;
+    private ValueEventListener listener;
+    private final FirebaseDatabase firebaseDatabase;
+
     @Inject
-    public PresenceHelper() {
+    public PresenceHelper(FirebaseDatabase firebaseDatabase) {
+        this.firebaseDatabase = firebaseDatabase;
     }
 
     public void updateLastActiveTimestamp() {
         // since I can connect from multiple devices, we store each connection instance separately
         // any time that connectionsRef's value is null (i.e. has no children) I am offline
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-
         // stores the timestamp of my last disconnect (the last time I was seen online)
         final User me = UserPreferences.getInstance().getUser();
-        final DatabaseReference userInfoRef = database.getReference(Constants.USER_INFO_REF(me.getId()));
+        final DatabaseReference userInfoRef = firebaseDatabase.getReference(Constants.USER_INFO_REF(me.getId()));
 
-        final DatabaseReference connectedRef = database.getReference(".info/connected");
-        connectedRef.addValueEventListener(new ValueEventListener() {
+        connectedRef = firebaseDatabase.getReference(".info/connected");
+        connectedRef.addValueEventListener(listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 MLog.d(TAG, "onDataChange() snapshot: ", snapshot);
@@ -57,5 +60,11 @@ public class PresenceHelper {
                 MLog.d(TAG, "onCancelled() error: ", error);
             }
         });
+    }
+
+    public void cleanup() {
+        if (connectedRef != null && listener != null) {
+            connectedRef.removeEventListener(listener);
+        }
     }
 }
