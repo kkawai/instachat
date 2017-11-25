@@ -252,8 +252,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     }
 
     @Override
-    public void setupLeftDrawerContent(NavigationView navigationView) {
-        super.setupLeftDrawerContent(navigationView);
+    public void listenForUsersInGroup() {
         UsersInGroupListener usersInGroupListener = new UsersInGroupListener() {
             @Override
             public void onNumUsersUpdated(long groupId, String groupName, int numUsers) {
@@ -261,7 +260,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
                     getSupportActionBar().setTitle(groupName + getCount(numUsers));
             }
         };
-        chatsRecyclerViewAdapter.setUsersInGroupListener(usersInGroupListener);
+        chatSummariesRecyclerAdapter.setUsersInGroupListener(usersInGroupListener);
     }
 
     private RightDrawerLayoutBinding rightDrawerLayoutBinding;
@@ -382,8 +381,8 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
 
     @Override
     public void removeUserFromAllGroups(int userid, long exceptionGroupId) {
-        if (chatsRecyclerViewAdapter != null)
-            chatsRecyclerViewAdapter.removeUserFromAllGroups(userid, exceptionGroupId);
+        if (chatSummariesRecyclerAdapter != null)
+            chatSummariesRecyclerAdapter.removeUserFromAllGroups(userid, exceptionGroupId);
     }
 
     public void showSendOptions(FriendlyMessage friendlyMessage) {

@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.ViewDataBinding;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,9 +23,12 @@ import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.ClipboardManager;
 import android.text.Editable;
 import android.text.InputFilter;
+import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -43,6 +47,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.storage.FirebaseStorage;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.app.MessageOptionsDialogHelper;
@@ -53,11 +58,14 @@ import com.instachat.android.app.adapter.ChatSummariesRecyclerAdapter;
 import com.instachat.android.app.adapter.ChatsItemClickedListener;
 import com.instachat.android.app.adapter.FriendlyMessageListener;
 import com.instachat.android.app.adapter.MessageTextClickedListener;
+import com.instachat.android.app.adapter.MessagesDialogHelper;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapter;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.app.adapter.UserPresenceManager;
 import com.instachat.android.app.analytics.Events;
+import com.instachat.android.app.blocks.BlockUserDialogHelper;
+import com.instachat.android.app.blocks.ReportUserDialogHelper;
 import com.instachat.android.app.fullscreen.FriendlyMessageContainer;
 import com.instachat.android.app.fullscreen.FullScreenTextFragment;
 import com.instachat.android.app.likes.UserLikedUserFragment;
@@ -97,7 +105,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends AbstractChatViewModel> extends BaseActivity<T, V>
         implements UploadListener, AttachPhotoOptionsDialogHelper.PhotoOptionsListener, AbstractChatNavigator,
-        ChatsItemClickedListener, FriendlyMessageListener, FriendlyMessageContainer, EasyPermissions.PermissionCallbacks,
+        ChatsItemClickedListener, FriendlyMessageListener, FriendlyMessageContainer, MessageTextClickedListener, EasyPermissions.PermissionCallbacks,
         UserClickedListener {
 
     private static final String TAG = "ChatActivity";
@@ -123,12 +131,15 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     protected GCMHelper gcmHelper;
 
     @Inject
+    protected BanHelper banHelper;
+
+    @Inject
     protected NetworkApi networkApi;
 
     @Inject
     protected LogoutDialogHelper logoutDialogHelper;
 
-    protected ChatSummariesRecyclerAdapter chatsRecyclerViewAdapter;
+    protected ChatSummariesRecyclerAdapter chatSummariesRecyclerAdapter;
 
     @Inject
     protected UserPresenceManager userPresenceManager;
@@ -155,6 +166,7 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     protected boolean mIsPendingRequestsAvailable;
     protected DrawerLayout drawerLayout;
     protected RecyclerView messageRecyclerView;
+    private FrameLayout entireScreenView;
     protected View dotsLayout;
     protected View sendButton;
     protected LeftNavHeaderBinding leftNavHeaderBinding;
@@ -183,15 +195,15 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
         sendButton.setEnabled(mMessageEditText.getText().toString().trim().length() > 0);
         if (mExternalSendIntentConsumer != null)
             mExternalSendIntentConsumer.consumeIntent(getIntent());
-        if (chatsRecyclerViewAdapter != null)
-            chatsRecyclerViewAdapter.resume();
+        if (chatSummariesRecyclerAdapter != null)
+            chatSummariesRecyclerAdapter.resume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (chatsRecyclerViewAdapter != null)
-            chatsRecyclerViewAdapter.pause();
+        if (chatSummariesRecyclerAdapter != null)
+            chatSummariesRecyclerAdapter.pause();
     }
 
     protected void showProgressDialog() {
@@ -344,8 +356,8 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
             messagesAdapter.cleanup();
         if (mLeftDrawerHelper != null)
             mLeftDrawerHelper.cleanup();
-        if (chatsRecyclerViewAdapter != null)
-            chatsRecyclerViewAdapter.cleanup();
+        if (chatSummariesRecyclerAdapter != null)
+            chatSummariesRecyclerAdapter.cleanup();
         mDotsHandler.removeCallbacks(mDotsHideRunner);
         userPresenceManager.cleanup();
         presenceHelper.cleanup();
@@ -671,13 +683,25 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
         mLeftDrawerHelper = new LeftDrawerHelper(this, getViewModel(),this, this, drawerLayout, mLeftDrawerEventListener);
         mLeftDrawerHelper.setup(leftDrawerLayoutBinding, leftNavHeaderBinding);
         mLeftDrawerHelper.setUserLikedUserListener(mUserLikedUserListener);
+        chatSummariesRecyclerAdapter = new ChatSummariesRecyclerAdapter(userPresenceManager);
+        chatSummariesRecyclerAdapter.setup(AbstractChatActivity.this, AbstractChatActivity.this, true);
+        leftDrawerLayoutBinding.drawerRecyclerView.setLayoutManager(new StickyLayoutManager(AbstractChatActivity.this, chatSummariesRecyclerAdapter));
+        leftDrawerLayoutBinding.drawerRecyclerView.setAdapter(chatSummariesRecyclerAdapter);
 
-        chatsRecyclerViewAdapter = new ChatSummariesRecyclerAdapter(userPresenceManager);
-        chatsRecyclerViewAdapter.setup(this, this, true);
-        leftDrawerLayoutBinding.drawerRecyclerView.setLayoutManager(new StickyLayoutManager(this, chatsRecyclerViewAdapter));
-        leftDrawerLayoutBinding.drawerRecyclerView.setAdapter(chatsRecyclerViewAdapter);
-        chatsRecyclerViewAdapter.populateData();
+        add(Observable.timer(2000, TimeUnit.MILLISECONDS)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Exception {
+
+                        chatSummariesRecyclerAdapter.populateData();
+                        listenForUsersInGroup();
+                    }
+                }).subscribe());
     }
+
+    public abstract void listenForUsersInGroup();
 
     public void setupRightDrawerContent() {
 
@@ -918,16 +942,110 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
         ((FullScreenTextFragment) fragment).notifyDataSetChanged();
     }
 
-    protected void initFirebaseAdapter(FrameLayout frameLayout, final RecyclerView messageRecyclerView, UserClickedListener userClickedListener,
-                                       final LinearLayoutManager linearLayoutManager) {
-        messagesAdapter = getViewModel().getMessagesAdapter(firebaseRemoteConfig, map);
-        messagesAdapter.setActivity(this, this, frameLayout);
-        messagesAdapter.setMessageTextClickedListener(new MessageTextClickedListener() {
+    @Override
+    public void onMessageClicked(int position) {
+        showFullScreenTextView(position);
+    }
+
+    private View.OnTouchListener mOnTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            x = motionEvent.getX();
+            y = motionEvent.getY();
+            return false;
+        }
+    };
+    private float x, y;
+
+    @Override
+    public void onMessageLongClicked(final FriendlyMessage friendlyMessage) {
+        if (TextUtils.isEmpty(friendlyMessage.getName())) {
+            return;
+        }
+        final View tempAnchorView = new View(this);
+        tempAnchorView.setBackgroundColor(Color.TRANSPARENT);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(10, 10);
+        params.leftMargin = (int) x;
+        params.topMargin = (int) y;
+        entireScreenView.addView(tempAnchorView, params);
+        entireScreenView.post(new Runnable() {
             @Override
-            public void onMessageClicked(final int position) {
-                showFullScreenTextView(position);
+            public void run() {
+                showMessageOptions(tempAnchorView, friendlyMessage);
             }
         });
+    }
+
+    private void showMessageOptions(final View tempAnchorView, FriendlyMessage friendlyMessage) {
+        new MessageOptionsDialogHelper().showMessageOptions(this, tempAnchorView, friendlyMessage, new MessageOptionsDialogHelper.MessageOptionsListener() {
+
+            @Override
+            public void onMessageOptionsDismissed() {
+                entireScreenView.removeView(tempAnchorView);
+            }
+
+            @Override
+            public void onCopyTextRequested(FriendlyMessage friendlyMessage) {
+                final ClipboardManager cm = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+                cm.setText(friendlyMessage.getText());
+                Toast.makeText(AbstractChatActivity.this, R.string.message_copied_to_clipboard, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onDeleteMessageRequested(final FriendlyMessage friendlyMessage) {
+                MLog.d(TAG, " msg.getImageUrl(): " + friendlyMessage.getImageUrl() + " " + friendlyMessage.getImageId());
+                new MessagesDialogHelper().showDeleteMessageDialog(AbstractChatActivity.this,
+                        friendlyMessage, getViewModel());
+            }
+
+            @Override
+            public void onBlockPersonRequested(final FriendlyMessage friendlyMessage) {
+                new BlockUserDialogHelper(FirebaseDatabase.getInstance()).showBlockUserQuestionDialog(AbstractChatActivity.this,
+                        friendlyMessage.getUserid(),
+                        friendlyMessage.getName(),
+                        friendlyMessage.getDpid(),
+                        getViewModel().getBlockedUserListener());
+            }
+
+            @Override
+            public void onReportPersonRequested(FriendlyMessage friendlyMessage) {
+                new ReportUserDialogHelper().showReportUserQuestionDialog(AbstractChatActivity.this,
+                        friendlyMessage.getUserid(),
+                        friendlyMessage.getName(),
+                        friendlyMessage.getDpid());
+            }
+
+            @Override
+            public void onRemoveCommentsClicked(FriendlyMessage friendlyMessage) {
+                getViewModel().removeMessages(friendlyMessage);
+            }
+
+            @Override
+            public void onBan5Minutes(FriendlyMessage friendlyMessage) {
+                banHelper.ban(friendlyMessage,5);
+            }
+
+            @Override
+            public void onBan15Minutes(FriendlyMessage friendlyMessage) {
+
+                banHelper.ban(friendlyMessage,15);
+            }
+
+            @Override
+            public void onBan2Days(FriendlyMessage friendlyMessage) {
+                banHelper.ban(friendlyMessage,60*24*2);
+            }
+        });
+    }
+
+    private boolean isMessagesLoaded;
+    protected void initFirebaseAdapter(FrameLayout frameLayout, final RecyclerView messageRecyclerView, UserClickedListener userClickedListener,
+                                       final LinearLayoutManager linearLayoutManager) {
+        entireScreenView = frameLayout;
+        entireScreenView.setOnTouchListener(mOnTouchListener);
+        messagesAdapter = getViewModel().createMessagesAdapter(firebaseRemoteConfig, map);
+        messagesAdapter.setActivity(this, this);
+        messagesAdapter.setMessageTextClickedListener(this);
         messagesAdapter.setFriendlyMessageListener(this);
         messagesAdapter.setUserThumbClickedListener(userClickedListener);
         messagesAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
@@ -942,7 +1060,13 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
                     messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
                 }
                 notifyPagerAdapterDataSetChanged();
-                getViewModel().checkMessageSortOrder();
+                if (itemCount > 0) {
+                    if (!isMessagesLoaded) {
+                        getViewModel().checkMessageSortOrder();
+                    } else {
+                        isMessagesLoaded = true;
+                    }
+                }
             }
 
             @Override

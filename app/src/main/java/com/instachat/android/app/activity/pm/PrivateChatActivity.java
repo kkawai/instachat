@@ -599,4 +599,9 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         } else
             mAppBarLayout.setExpanded(false, true);
     }
+
+    @Override
+    public void listenForUsersInGroup() {
+        //not applicable to private chat
+    }
 }

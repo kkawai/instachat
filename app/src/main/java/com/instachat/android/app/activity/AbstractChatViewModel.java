@@ -11,10 +11,13 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.TheApp;
@@ -35,6 +38,7 @@ import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.rx.SchedulerProvider;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -142,17 +146,15 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
         getNavigator().setMaxMessageLength((int) maxMessageLength);
     }
 
-    public MessagesRecyclerAdapter getMessagesAdapter(FirebaseRemoteConfig firebaseRemoteConfig,
-                                                      MessagesRecyclerAdapterHelper map) {
+    public MessagesRecyclerAdapter createMessagesAdapter(FirebaseRemoteConfig firebaseRemoteConfig,
+                                                         MessagesRecyclerAdapterHelper map) {
         messagesAdapter = new MessagesRecyclerAdapter<>(FriendlyMessage.class,
                 R.layout.item_message,
                 MessageViewHolder.class,
                 FirebaseDatabase.getInstance().getReference(getDatabaseRoot()).
                         limitToLast((int) firebaseRemoteConfig.getLong(Constants.KEY_MAX_MESSAGE_HISTORY)),
-                map,
-                banHelper);
+                map);
         messagesAdapter.setDatabaseRoot(getDatabaseRoot());
-        messagesAdapter.setBlockedUserListener(blockedUserListener);
         return messagesAdapter;
     }
 
@@ -208,6 +210,10 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
 
     public abstract void cleanup();
 
+    public BlockedUserListener getBlockedUserListener() {
+        return blockedUserListener;
+    }
+
     private BlockedUserListener blockedUserListener = new BlockedUserListener() {
         @Override
         public void onUserBlocked(int userid) {
@@ -215,6 +221,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
             payload.putString("by", myUsername());
             payload.putInt("userid", userid);
             firebaseAnalytics.logEvent(Events.USER_BLOCKED, payload);
+            messagesAdapter.blockUser(userid);
         }
 
         @Override
@@ -426,15 +433,11 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     }
 
     /**
-     * After a room is loaded with messages, check if the messages
-     * are out of sort order.  If so, then sort them.
+     * Check if the messages are out of sort order.  If so, then sort them.
+     * Delay some time before doing the actual check.
+     *
      */
-    private boolean checkedSortOrder;
     public void checkMessageSortOrder() {
-        if (checkedSortOrder) {
-            return;
-        }
-        checkedSortOrder = true;
         add(Observable.timer(2000, TimeUnit.MILLISECONDS)
                 .subscribeOn(getSchedulerProvider().io())
                 .observeOn(getSchedulerProvider().ui())
@@ -447,5 +450,41 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
                     }
                 })
                 .subscribe());
+    }
+
+    /**
+     * Remove all messages sent by the user of the given message.
+     *
+     * @param friendlyMessage
+     */
+    public void removeMessages(FriendlyMessage friendlyMessage) {
+        final ArrayList<FriendlyMessage> copy = new ArrayList<>(messagesAdapter.getData());
+        for (final FriendlyMessage removeMessage : copy) {
+            try {
+                if (removeMessage.getUserid() == friendlyMessage.getUserid()) {
+                    removeMessage(friendlyMessage);
+                }
+            }catch(Exception e) {
+                MLog.e(TAG,"removeMessages() error: "+e.getMessage());
+            }
+        }
+        checkMessageSortOrder();
+    }
+
+    /**
+     * Remove a single message.
+     *
+     * @param friendlyMessage
+     * @return - the Task associated to the database remove operation
+     */
+    public Task<Void> removeMessage(final FriendlyMessage friendlyMessage) {
+
+        //check if there is also a physical photo that needs to be deleted
+        if (friendlyMessage.getImageUrl() != null && friendlyMessage.getImageId() != null) {
+            final StorageReference photoRef = FirebaseStorage.getInstance().getReference().child(getDatabaseRoot()).child(friendlyMessage.getImageId());
+            photoRef.delete();
+            MLog.d(TAG, "deleted photo " + friendlyMessage.getImageId());
+        }
+        return getDatabaseReference().child(friendlyMessage.getId()).removeValue();
     }
 }

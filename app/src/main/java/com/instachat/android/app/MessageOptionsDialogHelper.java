@@ -35,7 +35,7 @@ public class MessageOptionsDialogHelper {
         void onBan5Minutes(FriendlyMessage friendlyMessage);
         void onBan15Minutes(FriendlyMessage friendlyMessage);
         void onBan2Days(FriendlyMessage friendlyMessage);
-        void onRemoveComments(FriendlyMessage friendlyMessage);
+        void onRemoveCommentsClicked(FriendlyMessage friendlyMessage);
     }
 
     public interface SendOptionsListener {
@@ -134,7 +134,7 @@ public class MessageOptionsDialogHelper {
                         listener.onReportPersonRequested(friendlyMessage);
                         break;
                     case R.id.admin_menu_remove_comments:
-                        listener.onRemoveComments(friendlyMessage);
+                        listener.onRemoveCommentsClicked(friendlyMessage);
                         break;
                     case R.id.admin_menu_ban_2_days:
                         listener.onBan2Days(friendlyMessage);

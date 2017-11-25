@@ -265,7 +265,7 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
 
     abstract protected boolean isNewItemAllowed(T model);
 
-    protected ArrayList<T> getData() {
+    public ArrayList<T> getData() {
         return mSnapshots;
     }
 
