@@ -618,63 +618,18 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         }
     }
 
-    private String lastMessage;
-
-    /**
-     * For debugging those hard bugs
-     *
-     * @return
-     */
-    public String peekLastMessage() {
-        return lastMessage;
-    }
-
-    @Override
-    protected void onAddItem(FriendlyMessage newFriendlyMessage) {
-        lastMessage = newFriendlyMessage.getText();
-        if (mItemWasRemoved && getItemCount() > 0) {
-            mItemWasRemoved = false;
-            FriendlyMessage lastFriendlyMessage = getItem(getItemCount() - 1);
-            if (newFriendlyMessage.getTime() > lastFriendlyMessage.getTime() || isSmallDifferenceInTime(newFriendlyMessage.getTime(), lastFriendlyMessage.getTime()))
-                super.onAddItem(newFriendlyMessage);
-        } else {
-            super.onAddItem(newFriendlyMessage);
-        }
-    }
-
-    private boolean mItemWasRemoved;
-
     @Override
     protected void onRemoveItem(int index) {
-        mItemWasRemoved = true;
         super.onRemoveItem(index);
         MLog.d(TAG, "sort_tag: onRemoteItem() item was removed.  Check if needs sorting.");
-        if (needsSorting())
+
+        /*
+         * If somebody called removeMessages(..), then let the caller
+         * check if needs sorting after it's done.  Otherwise onRemoveItem
+         * could be called many times and that would not be efficient.
+         */
+        if (!isRemovingAllUsersMessages && needsSorting()) {
             sort();
-    }
-
-    public static final long ONE_HOUR = 60 * 1000 * 60L;
-
-    private boolean isSmallDifferenceInTime(long t1, long t2) {
-        return Math.abs(t1 - t2) < ONE_HOUR;
-    }
-
-    public void removeMessages(FriendlyMessage friendlyMessage) {
-
-        ArrayList<FriendlyMessage> copy = new ArrayList<>(getData());
-        for (FriendlyMessage remove : copy) {
-            try {
-                if (remove.getUserid() == friendlyMessage.getUserid()) {
-                    mMessagesRef.child(mDatabaseRef).child(remove.getId()).removeValue();
-                    if (friendlyMessage.getImageUrl() != null && friendlyMessage.getImageId() != null) {
-                        final StorageReference photoRef = FirebaseStorage.getInstance().getReference().child(mDatabaseRef).child(friendlyMessage.getImageId());
-                        photoRef.delete();
-                        MLog.d(TAG, "deleted photo " + friendlyMessage.getImageId());
-                    }
-                }
-            } catch (Exception e) {
-                MLog.e(TAG, "removeMessages() error: " + e.getMessage());
-            }
         }
     }
 
@@ -717,4 +672,48 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         MLog.d(TAG, "sort_tag: No need to be sorted");
         return false;
     }
+
+    /**
+     * Remove all messages sent by the user of the given message.
+     *
+     * @param friendlyMessage
+     */
+    private boolean isRemovingAllUsersMessages;
+    public void removeMessages(FriendlyMessage friendlyMessage) {
+        isRemovingAllUsersMessages = true;
+        try {
+            final ArrayList<FriendlyMessage> copy = new ArrayList<>(getData());
+            for (final FriendlyMessage removeMessage : copy) {
+                try {
+                    if (removeMessage.getUserid() == friendlyMessage.getUserid()) {
+                        removeMessage(removeMessage);
+                    }
+                } catch (Exception e) {
+                    MLog.e(TAG, "removeMessages(inner) error: " + e.getMessage());
+                }
+            }
+        }catch (Exception e) {
+            MLog.e(TAG, "removeMessages(outer) error: " + e.getMessage());
+        }
+        isRemovingAllUsersMessages = false;
+
+    }
+
+    /**
+     * Remove a single message.
+     *
+     * @param friendlyMessage
+     * @return - the Task associated to the database remove operation
+     */
+    public Task<Void> removeMessage(final FriendlyMessage friendlyMessage) {
+
+        //check if there is also a physical photo that needs to be deleted
+        if (friendlyMessage.getImageUrl() != null && friendlyMessage.getImageId() != null) {
+            final StorageReference photoRef = FirebaseStorage.getInstance().getReference().child(mDatabaseRef).child(friendlyMessage.getImageId());
+            photoRef.delete();
+            MLog.d(TAG, "deleted photo " + friendlyMessage.getImageId());
+        }
+        return mMessagesRef.child(mDatabaseRef).child(friendlyMessage.getId()).removeValue();
+    }
+
 }

@@ -458,16 +458,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
      * @param friendlyMessage
      */
     public void removeMessages(FriendlyMessage friendlyMessage) {
-        final ArrayList<FriendlyMessage> copy = new ArrayList<>(messagesAdapter.getData());
-        for (final FriendlyMessage removeMessage : copy) {
-            try {
-                if (removeMessage.getUserid() == friendlyMessage.getUserid()) {
-                    removeMessage(friendlyMessage);
-                }
-            }catch(Exception e) {
-                MLog.e(TAG,"removeMessages() error: "+e.getMessage());
-            }
-        }
+        messagesAdapter.removeMessages(friendlyMessage);
         checkMessageSortOrder();
     }
 
@@ -478,13 +469,6 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
      * @return - the Task associated to the database remove operation
      */
     public Task<Void> removeMessage(final FriendlyMessage friendlyMessage) {
-
-        //check if there is also a physical photo that needs to be deleted
-        if (friendlyMessage.getImageUrl() != null && friendlyMessage.getImageId() != null) {
-            final StorageReference photoRef = FirebaseStorage.getInstance().getReference().child(getDatabaseRoot()).child(friendlyMessage.getImageId());
-            photoRef.delete();
-            MLog.d(TAG, "deleted photo " + friendlyMessage.getImageId());
-        }
-        return getDatabaseReference().child(friendlyMessage.getId()).removeValue();
+        return messagesAdapter.removeMessage(friendlyMessage);
     }
 }

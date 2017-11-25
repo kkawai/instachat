@@ -162,7 +162,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         try {
             if (isActivityDestroyed())
                 return;
-            MLog.d(TAG, "C kevin scroll: " + (messagesAdapter.getItemCount() - 1) + " text: " + messagesAdapter.peekLastMessage());
+            MLog.d(TAG, "C kevin scroll: " + (messagesAdapter.getItemCount() - 1));
             binding.messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
             presenceHelper.updateLastActiveTimestamp();
         } catch (final Exception e) {
