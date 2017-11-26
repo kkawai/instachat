@@ -458,6 +458,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
      * @param friendlyMessage
      */
     public void removeMessages(FriendlyMessage friendlyMessage) {
+        MLog.d(TAG,"sort_tag removeMessages check sort order");
         messagesAdapter.removeMessages(friendlyMessage);
         checkMessageSortOrder();
     }

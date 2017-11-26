@@ -106,8 +106,11 @@ public class AppModule {
 
     @Provides
     @Singleton
-    GCMRegistrationManager provideGCMRegistrationManager(Context context, NetworkApi networkApi) {
-        return new GCMRegistrationManager(context, networkApi);
+    GCMRegistrationManager provideGCMRegistrationManager(Context context,
+                                                         DataManager dataManager,
+                                                         SchedulerProvider schedulerProvider
+                                                         ) {
+        return new GCMRegistrationManager(context, dataManager, schedulerProvider);
     }
 
     @Provides

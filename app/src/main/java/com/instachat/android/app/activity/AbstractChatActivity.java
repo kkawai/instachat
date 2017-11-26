@@ -1062,9 +1062,9 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
                 notifyPagerAdapterDataSetChanged();
                 if (itemCount > 0) {
                     if (!isMessagesLoaded) {
-                        getViewModel().checkMessageSortOrder();
-                    } else {
                         isMessagesLoaded = true;
+                        MLog.d(TAG,"sort_tag check sort order");
+                        getViewModel().checkMessageSortOrder();
                     }
                 }
             }

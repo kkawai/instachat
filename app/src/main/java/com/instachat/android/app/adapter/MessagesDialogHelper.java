@@ -51,6 +51,7 @@ public class MessagesDialogHelper {
                                                 .setTitleText(context.getString(R.string.success_exclamation))
                                                 .setContentText(context.getString(R.string.message_delete_success))
                                                 .show();
+                                        MLog.d(TAG,"sort_tag remove single message check sort order");
                                         abstractChatViewModel.checkMessageSortOrder();
                                     } catch (Exception e) {
                                         MLog.e(TAG, "", e);

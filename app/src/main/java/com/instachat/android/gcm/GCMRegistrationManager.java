@@ -9,11 +9,18 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.instachat.android.Constants;
+import com.instachat.android.data.DataManager;
+import com.instachat.android.data.api.BasicResponse;
 import com.instachat.android.data.api.NetworkApi;
+import com.instachat.android.util.DeviceUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.SimpleRxWrapper;
+import com.instachat.android.util.UserPreferences;
+import com.instachat.android.util.rx.SchedulerProvider;
 
 import javax.inject.Inject;
+
+import io.reactivex.functions.Consumer;
 
 /**
  * The important assumption is that GCM is already supported on this device
@@ -30,12 +37,16 @@ public final class GCMRegistrationManager {
     private GoogleCloudMessaging gcm;
     private String regId;
     private final Context context;
-    private final NetworkApi networkApi;
+    private final DataManager dataManager;
+    private final SchedulerProvider schedulerProvider;
 
     @Inject
-    public GCMRegistrationManager(@NonNull Context context, @NonNull NetworkApi networkApi) {
+    public GCMRegistrationManager(@NonNull Context context,
+                                  @NonNull DataManager dataManager,
+                                  @NonNull SchedulerProvider schedulerProvider) {
         this.context = context;
-        this.networkApi = networkApi;
+        this.dataManager = dataManager;
+        this.schedulerProvider = schedulerProvider;
     }
 
     public void registerGCM() {
@@ -75,7 +86,19 @@ public final class GCMRegistrationManager {
                     // The request to your server should be authenticated if
                     // your app
                     // is using accounts.
-                    networkApi.gcmreg(context, regId);
+                    dataManager.registerGCM(UserPreferences.getInstance().getUserId().toString(),
+                                            DeviceUtil.getAndroidId(context),
+                                            regId).subscribe(new Consumer<BasicResponse>() {
+                        @Override
+                        public void accept(BasicResponse basicResponse) throws Exception {
+                            MLog.d(TAG,"registerInBackground() response.status: "+basicResponse.status);
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            MLog.d(TAG,"registerInBackground() failed: "+throwable);
+                        }
+                    });
 
                     // For this demo: we don't need to send it because the
                     // device
