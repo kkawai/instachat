@@ -844,6 +844,11 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     }
 
     @Override
+    public void onFriendlyMessageRemoved() {
+        getViewModel().checkMessageSortOrder();
+    }
+
+    @Override
     public void onPhotoGallery() {
         mPhotoUploadHelper.setStorageRefString(getViewModel().getDatabaseRoot());
         mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.chatRoomPhoto);
@@ -1061,11 +1066,8 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
                 }
                 notifyPagerAdapterDataSetChanged();
                 if (itemCount > 0) {
-                    if (!isMessagesLoaded) {
-                        isMessagesLoaded = true;
-                        MLog.d(TAG,"sort_tag check sort order");
-                        getViewModel().checkMessageSortOrder();
-                    }
+                    MLog.d(TAG,"sort_tag check sort order");
+                    getViewModel().checkMessageSortOrder();
                 }
             }
 

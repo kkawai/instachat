@@ -8,6 +8,6 @@ import com.instachat.android.data.model.FriendlyMessage;
 public interface FriendlyMessageListener {
 
     void onFriendlyMessageSuccess(FriendlyMessage friendlyMessage);
-
     void onFriendlyMessageFail(FriendlyMessage friendlyMessage);
+    void onFriendlyMessageRemoved();
 }

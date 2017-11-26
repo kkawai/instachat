@@ -435,10 +435,19 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     /**
      * Check if the messages are out of sort order.  If so, then sort them.
      * Delay some time before doing the actual check.
+     * Do not do simultaneous checks within 2 seconds.
      *
      */
+    private long lastCheckTime;
     public void checkMessageSortOrder() {
-        add(Observable.timer(2000, TimeUnit.MILLISECONDS)
+        synchronized (this) {
+            if ((lastCheckTime + 2100) > System.currentTimeMillis()) {
+                MLog.d(TAG, "sort_tag check already in progress...");
+                return;
+            }
+            lastCheckTime = System.currentTimeMillis();
+        }
+        add(Observable.timer(2100, TimeUnit.MILLISECONDS)
                 .subscribeOn(getSchedulerProvider().io())
                 .observeOn(getSchedulerProvider().ui())
                 .doOnComplete(new Action() {

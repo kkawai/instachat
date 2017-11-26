@@ -622,15 +622,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     protected void onRemoveItem(int index) {
         super.onRemoveItem(index);
         MLog.d(TAG, "sort_tag: onRemoteItem() item was removed.  Check if needs sorting.");
-
-        /*
-         * If somebody called removeMessages(..), then let the caller
-         * check if needs sorting after it's done.  Otherwise onRemoveItem
-         * could be called many times and that would not be efficient.
-         */
-        if (!isRemovingAllUsersMessages && needsSorting()) {
-            sort();
-        }
+        mFriendlyMessageListener.onFriendlyMessageRemoved();
     }
 
     public final void sort() {
@@ -678,9 +670,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
      *
      * @param friendlyMessage
      */
-    private boolean isRemovingAllUsersMessages;
     public void removeMessages(FriendlyMessage friendlyMessage) {
-        isRemovingAllUsersMessages = true;
         try {
             final ArrayList<FriendlyMessage> copy = new ArrayList<>(getData());
             for (final FriendlyMessage removeMessage : copy) {
@@ -695,8 +685,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         }catch (Exception e) {
             MLog.e(TAG, "removeMessages(outer) error: " + e.getMessage());
         }
-        isRemovingAllUsersMessages = false;
-
     }
 
     /**
