@@ -54,8 +54,11 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.functions.Action;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
@@ -144,9 +147,13 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         synchronized (this) {
             int count = getData().size() - 1;
             for (int i = count; i >= 0; i--) {
-                FriendlyMessage m = getItem(i);
-                if (m.getUserid() == userid) {
-                    removeItemLocally(i);
+                try {
+                    FriendlyMessage m = getItem(i);
+                    if (m.getUserid() == userid) {
+                        removeItemLocally(i);
+                    }
+                }catch (Exception e) {
+                    MLog.e(TAG,"",e);
                 }
             }
         }
@@ -528,8 +535,11 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
     }
 
     @Override
-    protected boolean isNewItemAllowed(FriendlyMessage model) {
-        return !mBlockedUsers.containsKey(model.getUserid());
+    protected boolean isNewItemAllowed(FriendlyMessage message) {
+        if (message == null || message.getId() == null) {
+            return false;
+        }
+        return !mBlockedUsers.containsKey(message.getUserid());
     }
 
     private ChildEventListener mBlockedUsersListener;
@@ -545,6 +555,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         if (mIsListeningForBlockedUsers)
             return;
         mIsListeningForBlockedUsers = true;
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -552,10 +563,14 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 mBlockedUsersListener = new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        BlockedUser blockedUser = dataSnapshot.getValue(BlockedUser.class);
-                        blockedUser.id = Integer.parseInt(dataSnapshot.getKey());
-                        mBlockedUsers.put(blockedUser.id, false);
-                        blockUser(blockedUser.id);
+                        try {
+                            BlockedUser blockedUser = dataSnapshot.getValue(BlockedUser.class);
+                            blockedUser.id = Integer.parseInt(dataSnapshot.getKey());
+                            mBlockedUsers.put(blockedUser.id, false);
+                            blockUser(blockedUser.id);
+                        }catch(Exception e) {
+                            MLog.e(TAG,"",e);
+                        }
                     }
 
                     @Override
@@ -565,10 +580,14 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
                     @Override
                     public void onChildRemoved(DataSnapshot dataSnapshot) {
-                        BlockedUser blockedUser = dataSnapshot.getValue(BlockedUser.class);
-                        blockedUser.id = Integer.parseInt(dataSnapshot.getKey());
-                        mBlockedUsers.remove(blockedUser.id);
-                        mBlockedUserListener.onUserUnblocked(blockedUser.id);
+                        try {
+                            BlockedUser blockedUser = dataSnapshot.getValue(BlockedUser.class);
+                            blockedUser.id = Integer.parseInt(dataSnapshot.getKey());
+                            mBlockedUsers.remove(blockedUser.id);
+                            mBlockedUserListener.onUserUnblocked(blockedUser.id);
+                        }catch(Exception e) {
+                            MLog.e(TAG,"",e);
+                        }
                     }
 
                     @Override
@@ -632,7 +651,10 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             Collections.sort(list, new Comparator<FriendlyMessage>() {
                 @Override
                 public int compare(FriendlyMessage m1, FriendlyMessage m2) {
-                    //return m1.getTime() > m2.getTime() ? 1 : -1;
+                    if (m1 == null || m1.getId() == null)
+                        return -1;
+                    if (m2 == null || m2.getId() == null)
+                        return 1;
                     return m1.getId().compareTo(m2.getId());
                 }
             });
@@ -648,7 +670,10 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         ArrayList<FriendlyMessage> copy = new ArrayList(getData());
         for (int i = copy.size() - 1; i >= 0; i--) {
             FriendlyMessage next = copy.get(i);
-            if (prev != null && next.getId().compareTo(prev.getId()) > 0) {
+            if (prev != null && prev.getId() != null
+                && next != null
+                && next.getId() != null
+                && next.getId().compareTo(prev.getId()) > 0) {
                 MLog.d(TAG, "sort_tag: needs to be sorted.  prev_msg: " + prevMsg + " msg: " + next.getText()
                         + " prev idx: " + prevIdx + " "
                         + " idx: " + i + " size: " + copy.size()

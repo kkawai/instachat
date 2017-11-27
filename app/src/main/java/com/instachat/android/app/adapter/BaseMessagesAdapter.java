@@ -16,6 +16,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
+import com.instachat.android.util.MLog;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -65,6 +66,8 @@ import java.util.List;
  * @param <VH> The ViewHolder class that contains the Views in the layout that is shown for each object.
  */
 public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+
+    private static final String TAG = "BaseMessagesAdapter";
 
     private Class<T> mModelClass;
     private int mModelLayout;
@@ -241,13 +244,21 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
     @Override
     public void onBindViewHolder(VH viewHolder, int position, List<Object> payloads) {
         T model = getItem(position);
-        populateViewHolder(viewHolder, model, position, payloads);
+        try {
+            populateViewHolder(viewHolder, model, position, payloads);
+        }catch (Throwable t) {
+            MLog.e(TAG,"",t);
+        }
     }
 
     @Override
     public void onBindViewHolder(VH viewHolder, int position) {
         T model = getItem(position);
-        populateViewHolder(viewHolder, model, position, null);
+        try {
+            populateViewHolder(viewHolder, model, position, null);
+        }catch(Throwable t) {
+            MLog.e(TAG,"",t);
+        }
     }
 
     /**

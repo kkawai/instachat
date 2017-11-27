@@ -4,52 +4,42 @@ import android.util.Log;
 
 import com.instachat.android.Constants;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-public class MLog {
+public final class MLog {
 
     private MLog() {
     }
 
-    private static boolean isEnabled(String tag) {
+    private static boolean isEnabled() {
         return Constants.IS_LOGGING_ENABLED;
     }
 
     public static void i(String tag, Object... vals) {
-        if (isEnabled(tag)) {
-            Logger.getLogger(tag).log(Level.INFO, buildString(vals));
+        if (isEnabled()) {
+            Log.i(tag, buildString(vals));
         }
     }
 
     public static void w(String tag, Object... vals) {
-        if (isEnabled(tag)) {
-            Logger.getLogger(tag).log(Level.WARNING, buildString(vals));
+        if (isEnabled()) {
+            Log.w(tag, buildString(vals));
         }
     }
 
     public static void d(String tag, Object... vals) {
-        if (isEnabled(tag)) {
-            //Logger.getLogger(tag).log(Level.FINE, buildString(vals));
+        if (isEnabled()) {
             Log.d(tag, buildString(vals));
         }
     }
 
     public static void e(String tag, Object... vals) {
-        if (isEnabled(tag)) {
-            Logger.getLogger(tag).log(Level.SEVERE, buildString(vals));
+        if (isEnabled()) {
+            Log.e(tag, buildString(vals));
         }
     }
 
     public static void e(String tag, String log, Throwable t) {
-        if (isEnabled(tag)) {
-            Logger logger = Logger.getLogger(tag);
-            logger.log(Level.SEVERE, log);
-            logger.log(Level.SEVERE, t.toString());
-            StackTraceElement[] eles = t.getStackTrace();
-            for (StackTraceElement ele : eles) {
-                logger.log(Level.SEVERE, ele.toString());
-            }
+        if (isEnabled()) {
+            Log.e(tag,log, t);
         }
     }
 
