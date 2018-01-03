@@ -16,8 +16,8 @@ android {
         applicationId "com.instachat.android"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.compileSdkVersion
-        versionCode 88
-        versionName "2.1.7"
+        versionCode 89
+        versionName "2.1.8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -112,7 +112,7 @@ dependencies {
     compile 'com.pnikosis:materialish-progress:1.7'
     compile 'com.github.vihtarb:tooltip:0.1.9'
     compile 'com.android.support:multidex:1.0.2'
-    compile 'com.brandongogetap:stickyheaders:0.3.5'
+    compile 'com.brandongogetap:stickyheaders:0.4.9'
     compile 'com.sackcentury:shinebutton:0.1.6'
 
     //CloudVisionApi
