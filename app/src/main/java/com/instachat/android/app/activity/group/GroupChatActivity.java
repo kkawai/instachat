@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,6 +26,7 @@ import com.instachat.android.app.activity.UsersInGroupListener;
 import com.instachat.android.app.adapter.FriendlyMessageListener;
 import com.instachat.android.app.adapter.GroupChatUsersRecyclerAdapter;
 import com.instachat.android.app.analytics.Events;
+import com.instachat.android.app.bans.BannedUsersFragment;
 import com.instachat.android.app.blocks.BlocksFragment;
 import com.instachat.android.app.login.SignInActivity;
 import com.instachat.android.data.api.UploadListener;
@@ -220,6 +220,9 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
                 return true;
             case R.id.menu_manage_blocks:
                 showManageBlocks();
+                return true;
+            case R.id.menu_banned_users:
+                showBannedUsers();
                 return true;
             case R.id.menu_who_is_online:
                 if (isLeftDrawerOpen()) {
@@ -415,5 +418,16 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
             closeLeftDrawer();
         }
         openRightDrawer();
+    }
+
+    @Override
+    public void showBannedUsers() {
+        if (isLeftDrawerOpen()) {
+            closeLeftDrawer();
+        }
+        Fragment fragment = new BannedUsersFragment();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim
+                .slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment,
+                BannedUsersFragment.TAG).addToBackStack(null).commit();
     }
 }

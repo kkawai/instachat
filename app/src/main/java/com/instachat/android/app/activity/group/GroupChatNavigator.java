@@ -8,4 +8,5 @@ public interface GroupChatNavigator extends AbstractChatNavigator {
     void removeUserFromAllGroups(int userid, long exceptionGroupId);
     void showManageBlocks();
     void toggleGroupChatAppBar();
+    void showBannedUsers();
 }

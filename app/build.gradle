@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 
 repositories {
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    mavenCentral()
     mavenLocal()
     jcenter()
     flatDir {
@@ -16,8 +18,8 @@ android {
         applicationId "com.instachat.android"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.compileSdkVersion
-        versionCode 89
-        versionName "2.1.8"
+        versionCode 90
+        versionName "2.2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -51,7 +53,7 @@ android {
     packagingOptions {
         exclude 'META-INF/rxjava.properties'
     }
-    buildToolsVersion '26.0.2'
+    buildToolsVersion '26.0.3'
 }
 
 dependencies {

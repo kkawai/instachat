@@ -5,8 +5,7 @@ import android.support.v7.widget.LinearLayoutManager;
 
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.instachat.android.app.activity.BanHelper;
-import com.instachat.android.app.activity.PresenceHelper;
+import com.instachat.android.app.bans.BanHelper;
 import com.instachat.android.data.DataManager;
 import com.instachat.android.di.ViewModelProviderFactory;
 import com.instachat.android.util.rx.SchedulerProvider;

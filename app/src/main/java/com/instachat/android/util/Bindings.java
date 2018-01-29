@@ -18,6 +18,7 @@ import com.bumptech.glide.request.target.Target;
 import com.instachat.android.R;
 import com.instachat.android.app.activity.pm.PrivateChatViewModel;
 import com.instachat.android.app.adapter.PrivateChatSummaryViewHolder;
+import com.instachat.android.app.bans.BannedUser;
 import com.instachat.android.data.model.PrivateChatSummary;
 
 /**
@@ -111,6 +112,16 @@ public class Bindings {
                         return false;
                     }
                 }).into(imageView);
+    }
+
+    @BindingAdapter("bannedUser")
+    public static void setBannedUser(TextView textView, BannedUser bannedUser) {
+        textView.setText(bannedUser.username + " " + TimeUtil.timeLeft(bannedUser.banExpiration));
+    }
+
+    @BindingAdapter("bannedByAdmin")
+    public static void setBannedByAdmin(TextView textView, BannedUser bannedUser) {
+        textView.setText("Ban issued by "+bannedUser.admin + " (id:"+bannedUser.adminId+")");
     }
 
 }

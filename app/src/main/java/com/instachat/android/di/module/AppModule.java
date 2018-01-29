@@ -11,7 +11,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.gson.Gson;
 import com.instachat.android.app.activity.AdsHelper;
-import com.instachat.android.app.activity.BanHelper;
+import com.instachat.android.app.bans.BanHelper;
 import com.instachat.android.app.activity.PresenceHelper;
 import com.instachat.android.app.activity.RemoteConfigHelper;
 import com.instachat.android.app.activity.group.LogoutDialogHelper;

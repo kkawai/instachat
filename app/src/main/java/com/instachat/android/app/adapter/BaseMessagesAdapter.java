@@ -122,9 +122,13 @@ public abstract class BaseMessagesAdapter<T, VH extends RecyclerView.ViewHolder>
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 T t = parseSnapshot(dataSnapshot);
                 synchronized (this) {
-                    int index = mSnapshots.indexOf(t);
-                    if (index != -1) {
-                        onRemoveItem(index);
+                    try {
+                        int index = mSnapshots.indexOf(t);
+                        if (index != -1) {
+                            onRemoveItem(index);
+                        }
+                    }catch(Exception e) {
+                        MLog.e(TAG,"BaseMessagesAdapter.onChildRemoved(): "+e.getMessage());
                     }
                 }
             }

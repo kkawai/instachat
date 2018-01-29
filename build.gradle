@@ -35,8 +35,8 @@ task clean(type: Delete) {
 ext {
     compileSdkVersion = 26
     minSdkVersion = 16
-    buildToolsVersion = '25.0.2'
-    supportLibraryVersion = '26.1.0'
+    buildToolsVersion = '26.0.3'
+    supportLibraryVersion = '27.0.2'
     googlePlayServicesVersion = '11.6.0'
     firebaseVersion = '11.6.0'
     dexMakerVersion = '1.2'

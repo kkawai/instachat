@@ -203,4 +203,7 @@
     <string name="channel_new_messages">New messages</string>
     <string name="channel_activity">Activity</string>
     <string name="said">%s said:</string>
+    <string name="you_have_been_banned">You have been temporarily banned</string>
+    <string name="title_banned_users">Banned Users</string>
+    <string name="title_bans">Bans</string>
 </resources>

@@ -47,7 +47,6 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.google.firebase.storage.FirebaseStorage;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.app.MessageOptionsDialogHelper;
@@ -64,6 +63,7 @@ import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.app.adapter.UserPresenceManager;
 import com.instachat.android.app.analytics.Events;
+import com.instachat.android.app.bans.BanHelper;
 import com.instachat.android.app.blocks.BlockUserDialogHelper;
 import com.instachat.android.app.blocks.ReportUserDialogHelper;
 import com.instachat.android.app.fullscreen.FriendlyMessageContainer;
@@ -512,6 +512,7 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     private void showFileOptions() {
 
         if (getViewModel().isBanned()) {
+            showYouHaveBeenBanned();
             return;
         }
 
@@ -1027,23 +1028,36 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
 
             @Override
             public void onBan5Minutes(FriendlyMessage friendlyMessage) {
-                banHelper.ban(friendlyMessage,5);
+                ban(friendlyMessage,5);
             }
 
             @Override
             public void onBan15Minutes(FriendlyMessage friendlyMessage) {
-
-                banHelper.ban(friendlyMessage,15);
+                ban(friendlyMessage,15);
             }
 
             @Override
             public void onBan2Days(FriendlyMessage friendlyMessage) {
-                banHelper.ban(friendlyMessage,60*24*2);
+                ban(friendlyMessage,60*24*2);
             }
         });
     }
 
-    private boolean isMessagesLoaded;
+    private void ban(FriendlyMessage friendlyMessage, int durationMinutes) {
+        if (!canBan(friendlyMessage.getUserid())) {
+            return;
+        }
+        banHelper.ban(friendlyMessage, durationMinutes);
+    }
+
+    private boolean canBan(int userid) {
+        if (userid == Constants.SUPER_ADMIN_1 || userid == Constants.SUPER_ADMIN_2) {
+            Toast.makeText(this,"Sorry, you cannot ban this member.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+    }
+
     protected void initFirebaseAdapter(FrameLayout frameLayout, final RecyclerView messageRecyclerView, UserClickedListener userClickedListener,
                                        final LinearLayoutManager linearLayoutManager) {
         entireScreenView = frameLayout;
@@ -1159,4 +1173,10 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     public void showProfileUpdatedDialog() {
         new SweetAlertDialog(this, SweetAlertDialog.SUCCESS_TYPE).setTitleText(getString(R.string.your_profile_has_been_updated_title)).setContentText(getString(R.string.your_profile_has_been_updated_msg)).show();
         leftNavHeaderBinding.saveUsername.setVisibility(View.GONE);
-    }}
+    }
+
+    @Override
+    public void showYouHaveBeenBanned() {
+        Toast.makeText(this,R.string.you_have_been_banned, Toast.LENGTH_SHORT).show();
+    }
+}

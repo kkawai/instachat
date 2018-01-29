@@ -22,4 +22,5 @@ public interface AbstractChatNavigator {
                                String shareMessage);
     void showProfileUpdatedDialog();
     void showUsernameExistsDialog(String badUsername);
+    void showYouHaveBeenBanned();
 }

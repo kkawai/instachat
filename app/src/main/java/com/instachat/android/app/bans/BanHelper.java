@@ -1,5 +1,6 @@
-package com.instachat.android.app.activity;
+package com.instachat.android.app.bans;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,8 +32,10 @@ public class BanHelper {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.BANS+friendlyMessage.getUserid());
         Map<String, Object> map = new HashMap<>(10);
         map.put("username", friendlyMessage.getName());
+        map.put("dpid", friendlyMessage.getDpid());
         map.put("banExpiration", System.currentTimeMillis() + (1000L*60*minutes));
-        map.put("nice", new Date(System.currentTimeMillis() + (1000L*60*minutes)).toString());
+        map.put("admin", UserPreferences.getInstance().getUsername());
+        map.put("adminId", UserPreferences.getInstance().getUserId());
         ref.updateChildren(map);
     }
 

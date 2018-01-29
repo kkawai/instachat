@@ -11,6 +11,10 @@
         android:title="@string/people_in_group"/>
 
     <item
+        android:id="@+id/menu_banned_users"
+        android:title="@string/title_banned_users"/>
+
+    <item
         android:id="@+id/menu_invite"
         android:title="@string/invite_menu_label"/>
 

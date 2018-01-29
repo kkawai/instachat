@@ -46,7 +46,7 @@ public final class Constants {
    /*
     * CHANGE THESE WHEN MAKING PRODUCTION BUILDS
     */
-   public static final boolean IS_LOGGING_ENABLED = true;
+   public static final boolean IS_LOGGING_ENABLED = false;
    public static final boolean IS_FOR_AMAZON_ONLY = false;//CHANGE PER AMAZON BUILD!!!
    public static final boolean IS_AMAZON_ADS_ENABLED = false;//CHANGE PER AMAZON BUILD!!!
    public static final boolean IS_AMAZON_DEBUG_AD = false; //CHANGE PER AMAZON BUILD!!!
@@ -185,7 +185,7 @@ public final class Constants {
    }
 
    public static String GROUP_CHAT_REF(long groupid) {
-      return "/public_group_messages/" + groupid;
+      return "/public_group_messages_2/" + groupid;
    }
 
    public static String GROUP_CHAT_USERS_REF(long groupid) {
@@ -206,7 +206,7 @@ public final class Constants {
 
    public static String GROUP_CHAT_ROOMS = "/public_group_summaries/";
 
-   public static final String BANS = "/bans/";
+   public static final String BANS = "/bans_2/"; ///   /bans/
 
    /**
     * use-case: list of users that liked the given message
@@ -303,4 +303,7 @@ public final class Constants {
 
    public static final Long SMAATO_PUBLISHER_ID = 1100036676L;
    public static final Long SMAATO_BANNER_ADSPACE_ID = 130326310L;
+
+   public static final int SUPER_ADMIN_1 = 7;
+   public static final int SUPER_ADMIN_2 = 8;
 }

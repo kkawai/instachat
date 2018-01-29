@@ -117,10 +117,6 @@
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".app.login.ClaimRoomActivity"
-            android:screenOrientation="portrait"/>
-
-        <activity
             android:name=".app.login.recovery.ForgotPasswordActivity"
             android:screenOrientation="portrait"/>
 

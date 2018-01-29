@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Time calculations utilities based on the handy Joda-Time java library
@@ -44,6 +45,39 @@ public final class TimeUtil {
 
     static {
         NOW_POST_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
+
+    public static String timeLeft(final long timeMillis) {
+
+        if (System.currentTimeMillis() > timeMillis) {
+            return "Not banned anymore.";
+        }
+        long duration = timeMillis - System.currentTimeMillis();
+
+        int second = 1000;
+        int minute = second * 60;
+        int hour = minute * 60;
+        int day = hour * 24;
+
+        if (duration <= hour) {
+            long minutes = duration / minute;
+            if (minutes == 1) {
+                return "Banned for 1 more minute.";
+            } else {
+                return "Banned for " +minutes + " more minutes.";
+            }
+        }
+
+        if (duration <= day) {
+            long hours = duration / hour;
+            if (hours == 1) {
+                return "Banned for 1 more hour.";
+            } else {
+                return "Banned for " + hours + " more hours.";
+            }
+        }
+
+        return "Banned for 24+ hours.";
     }
 
     public static String getTimeAgo(final long timeMillis) {

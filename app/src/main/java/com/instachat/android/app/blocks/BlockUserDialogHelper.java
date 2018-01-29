@@ -32,11 +32,23 @@ public class BlockUserDialogHelper {
         this.firebaseDatabase = firebaseDatabase;
     }
 
+    private boolean canBlock(Activity activity, int userid) {
+        if (userid == Constants.SUPER_ADMIN_1 || userid == Constants.SUPER_ADMIN_2) {
+            Toast.makeText(activity,"Sorry, you cannot block this member.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+    }
+
     public void showBlockUserQuestionDialog(final Activity activity,
                                             final int userid,
                                             @NonNull final String username,
                                             final String dpid,
                                             @NonNull final BlockedUserListener listener) {
+
+        if (!canBlock(activity, userid)) {
+            return;
+        }
 
         if (UserPreferences.getInstance().getUserId() == userid) {
             return;

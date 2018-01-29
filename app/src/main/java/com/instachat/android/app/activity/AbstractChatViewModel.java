@@ -16,8 +16,6 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.TheApp;
@@ -25,6 +23,7 @@ import com.instachat.android.app.adapter.MessageViewHolder;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapter;
 import com.instachat.android.app.adapter.MessagesRecyclerAdapterHelper;
 import com.instachat.android.app.analytics.Events;
+import com.instachat.android.app.bans.BanHelper;
 import com.instachat.android.app.blocks.BlockedUserListener;
 import com.instachat.android.app.ui.base.BaseViewModel;
 import com.instachat.android.data.DataManager;
@@ -38,7 +37,6 @@ import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.rx.SchedulerProvider;
 
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -234,7 +232,11 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     };
 
     public boolean validateMessage(final String text, boolean showOptions) {
-        if (StringUtil.isEmpty(text) || isBanned()) {
+        if (StringUtil.isEmpty(text)) {
+            return false;
+        }
+        if (isBanned()) {
+            getNavigator().showYouHaveBeenBanned();
             return false;
         }
         if (StringUtil.isEmpty(myDpid())) {

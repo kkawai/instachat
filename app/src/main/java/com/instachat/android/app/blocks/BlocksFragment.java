@@ -21,6 +21,7 @@ import com.instachat.android.R;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.databinding.FragmentGenericUsersBinding;
+import com.instachat.android.util.MLog;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -69,17 +70,22 @@ public class BlocksFragment extends BaseFragment {
                         ref.child(userid + "").removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    createPrivateChatSummary(userid, username, dpid);
-                                    new SweetAlertDialog(getActivity(), SweetAlertDialog.SUCCESS_TYPE)
-                                            .setTitleText(getActivity().getString(R.string.success_exclamation))
-                                            .setContentText(getActivity().getString(R.string.unblock_person_success, username))
-                                            .show();
-                                } else {
-                                    new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
-                                            .setTitleText(getActivity().getString(R.string.oops_exclamation))
-                                            .setContentText(getActivity().getString(R.string.unblock_person_failed, username))
-                                            .show();
+
+                                try {
+                                    if (task.isSuccessful()) {
+                                        createPrivateChatSummary(userid, username, dpid);
+                                        new SweetAlertDialog(getActivity(), SweetAlertDialog.SUCCESS_TYPE)
+                                                .setTitleText(getActivity().getString(R.string.success_exclamation))
+                                                .setContentText(getActivity().getString(R.string.unblock_person_success, username))
+                                                .show();
+                                    } else {
+                                        new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
+                                                .setTitleText(getActivity().getString(R.string.oops_exclamation))
+                                                .setContentText(getActivity().getString(R.string.unblock_person_failed, username))
+                                                .show();
+                                    }
+                                }catch (Exception e) {
+                                    MLog.e(TAG,"",e);
                                 }
                             }
                         });

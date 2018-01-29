@@ -16,7 +16,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.storage.FirebaseStorage;
 import com.instachat.android.Constants;
 import com.instachat.android.app.activity.AbstractChatViewModel;
-import com.instachat.android.app.activity.BanHelper;
+import com.instachat.android.app.bans.BanHelper;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.data.DataManager;
 import com.instachat.android.data.model.FriendlyMessage;
