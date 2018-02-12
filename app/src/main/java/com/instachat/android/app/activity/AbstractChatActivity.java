@@ -436,7 +436,13 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
 
                 if (length > 0) {
                     setEnableSendButton(true, sendButton);
-                    getViewModel().onMeTyping();
+                    /**
+                     * Don't show other users when super admin is typing
+                     * for admin secret mode! haha
+                     */
+                    if (Constants.SUPER_ADMIN_1 != getViewModel().myUserid()) {
+                        getViewModel().onMeTyping();
+                    }
                     showSendOptionsTooltip(sendButton);
                 } else {
                     setEnableSendButton(false, sendButton);

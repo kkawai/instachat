@@ -37,8 +37,8 @@ ext {
     minSdkVersion = 16
     buildToolsVersion = '26.0.3'
     supportLibraryVersion = '27.0.2'
-    googlePlayServicesVersion = '11.6.0'
-    firebaseVersion = '11.6.0'
+    googlePlayServicesVersion = '11.8.0'
+    firebaseVersion = '11.8.0'
     dexMakerVersion = '1.2'
     dagger2Version = '2.11'
     retrofitVersion = '2.3.0'
