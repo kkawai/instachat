@@ -17,6 +17,14 @@ import android.view.MenuItem;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StreamDownloadTask;
 import com.instachat.android.BR;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
@@ -45,6 +53,8 @@ import com.smaato.soma.ReceivedBannerInterface;
 import com.smaato.soma.exception.AdReceiveFailed;
 
 import javax.inject.Inject;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding, GroupChatViewModel>
         implements GoogleApiClient.OnConnectionFailedListener,
@@ -93,6 +103,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         groupChatViewModel.listenForTyping();
         cancelNotificationsDueToEntry();
         groupChatViewModel.smallProgressCheck();
+        //groupChatViewModel.checkEmailVerified();
     }
 
     private String getCount(int count) {
@@ -316,14 +327,18 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         logoutDialogHelper.showLogoutDialog(this, new LogoutDialogHelper.LogoutListener() {
             @Override
             public void onConfirmLogout() {
-                firebaseAuth.signOut();
-                groupChatViewModel.removeUserPresenceFromGroup();
-                gcmHelper.unregister(UserPreferences.getInstance().getUserId() + "");
-                UserPreferences.getInstance().clearUser();
-                startActivity(new Intent(GroupChatActivity.this, SignInActivity.class));
-                finish();
+                _signout();
             }
         });
+    }
+
+    private void _signout() {
+        firebaseAuth.signOut();
+        groupChatViewModel.removeUserPresenceFromGroup();
+        gcmHelper.unregister(UserPreferences.getInstance().getUserId() + "");
+        UserPreferences.getInstance().clearUser();
+        startActivity(new Intent(GroupChatActivity.this, SignInActivity.class));
+        finish();
     }
 
     private void showFirstMessageDialog(@NonNull final Context context) {
@@ -429,5 +444,21 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim
                 .slide_down, R.anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment,
                 BannedUsersFragment.TAG).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void showVerificationEmailSent() {
+        SweetAlertDialog dialog = new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE).setContentText(getString(R.string.email_verification_sent));
+        dialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                _signout();
+            }
+        });
+    }
+
+    @Override
+    public void enterChat() {
+        _signout();
     }
 }

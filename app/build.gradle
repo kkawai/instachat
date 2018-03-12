@@ -18,14 +18,15 @@ android {
         applicationId "com.instachat.android"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.compileSdkVersion
-        versionCode 90
-        versionName "2.2.0"
+        versionCode 92
+        versionName "2.2.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            useProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -114,7 +115,7 @@ dependencies {
     compile 'com.pnikosis:materialish-progress:1.7'
     compile 'com.github.vihtarb:tooltip:0.1.9'
     compile 'com.android.support:multidex:1.0.2'
-    compile 'com.brandongogetap:stickyheaders:0.4.9'
+    compile 'com.brandongogetap:stickyheaders:0.5.0'
     compile 'com.sackcentury:shinebutton:0.1.6'
 
     //CloudVisionApi

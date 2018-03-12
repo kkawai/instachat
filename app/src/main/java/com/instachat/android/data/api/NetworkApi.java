@@ -31,6 +31,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.StringTokenizer;
 
 import javax.inject.Inject;
@@ -86,25 +87,20 @@ public class NetworkApi {
         requestQueue.add(request);
     }
 
-    public void getUserById(final Object cancelTag, final int userid, final Response.Listener<JSONObject>
-            listener, final Response.ErrorListener errorListener) {
-
-        final String url = Constants.API_BASE_URL + "/ih/getubid?i=" + userid;
-        final Request request = new ApiGetRequest(url, listener, errorListener);
-        request.setShouldCache(false).setRetryPolicy(DEFAULT_RETRY_POLICY).setTag(cancelTag);
-        requestQueue.add(request);
-    }
-
     public void getUserByEmailOrUsernamePassword(final Object cancelTag, final String email, final String pw,
-                                                        String ltuEmail, final Response.Listener<JSONObject>
+                                                        String ltuEmail, final Response.Listener<String>
                                                                 listener, final Response.ErrorListener errorListener) {
 
-        String url = Constants.API_BASE_URL + "/ih/getu?em=" + email + "&pd=" + Base64.encodeWebSafe(pw.getBytes(),
-                false);
+        final HashMap<String, String> params = new HashMap<>(3);
+        params.put("em", email+"");
+        params.put("pd", Base64.encodeWebSafe(pw.getBytes(),false));
         if (ltuEmail != null)
-            url = url + "&nem=" + ltuEmail;
-        final Request request = new ApiGetRequest(url, listener, errorListener);
-        request.setShouldCache(false).setRetryPolicy(DEFAULT_RETRY_POLICY).setTag(cancelTag);
+            params.put("nem", ltuEmail);
+        params.put("z","asdf");
+        final ApiPostRequest request = new ApiPostRequest(params,
+                Constants.API_BASE_URL + "/ih/getu",
+                listener, errorListener);
+        request.setTag(cancelTag);
         requestQueue.add(request);
     }
 
@@ -134,7 +130,7 @@ public class NetworkApi {
             user.setBio(TheApp.getInstance().getString(R.string.default_bio, appName));
         }
 
-        final HashMap<String, String> params = new HashMap<>(1);
+        final HashMap<String, String> params = new HashMap<>();
         params.put("user", user.toJSON().toString());
         final ApiPostRequest request = new ApiPostRequest(params, Constants.API_BASE_URL + "/ih/saveuser2",
                 responder, errorListener);
@@ -149,7 +145,7 @@ public class NetworkApi {
 
     public void forgotPassword(final Object tag, final String usernameOrEmail, final Response.Listener<String>
             responder, Response.ErrorListener errorListener) {
-        final HashMap<String, String> params = new HashMap<>(1);
+        final HashMap<String, String> params = new HashMap<>();
         params.put("emun", usernameOrEmail);
         final ApiPostRequest request = new ApiPostRequest(params, Constants.API_BASE_URL + "/ih/fgp", responder,
                 errorListener);

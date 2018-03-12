@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -71,14 +72,17 @@ public class BannedUsersFragment extends BaseFragment {
                         }).setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
-
+                        sweetAlertDialog.dismiss();
                         if (UserPreferences.getInstance().getUserId() != Constants.SUPER_ADMIN_1
                             && UserPreferences.getInstance().getUserId() != Constants.SUPER_ADMIN_2) {
                             Toast.makeText(getActivity(),"Not authorized to perform action", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
-                        sweetAlertDialog.dismiss();
+                        if (!FirebaseAuth.getInstance().getCurrentUser().getEmail().equals(UserPreferences.getInstance().getEmail())) {
+                            return;
+                        }
+
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.BANS);
                         ref.child(userid + "").removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override

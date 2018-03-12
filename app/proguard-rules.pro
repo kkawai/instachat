@@ -76,7 +76,7 @@
 -keep class com.pnikosis.** { *; }
 -keep class com.brandongogetap.stickyheaders.** { *; }
 -keep class com.cocosw.** { *; }
--keep class com.sackcentury:shinebutton.** { *; }
+-keep class com.sackcentury.shinebutton.** { *; }
 -keep class hanks.xyz.** { *; }
 -keep class me.himanshusoni.chatmessageview.** { *; }
 -keep class com.github.silvestrpredko.** { *; }
@@ -159,7 +159,12 @@
 -dontwarn com.instachat.android.app.activity.group.GroupChatActivity
 -dontwarn com.instachat.android.app.activity.pm.PrivateChatActivity
 
--dontwarn
-
 -dontwarn okio.**
 -dontwarn javax.annotation.**
+
+-keepattributes Signature
+-keepattributes *Annotation*
+
+-dontwarn com.smaato.**
+-dontwarn android.net.**
+-dontwarn retrofit2.**

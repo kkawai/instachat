@@ -511,7 +511,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 if (mActivityState == null || mActivityState.isActivityDestroyed()) return;
                 friendlyMessage.setId(dataSnapshot.getKey());
                 MLog.d(TAG, "pushed message. debug possibleAdult content ", friendlyMessage.isPossibleAdultImage());
-                mMessagesRef.child(mDatabaseRef).child(friendlyMessage.getId()).setValue(friendlyMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
+                mMessagesRef.child(mDatabaseRef).child(friendlyMessage.getId()).setValue(friendlyMessage.toMap()).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
@@ -676,9 +676,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 && next.getId().compareTo(prev.getId()) > 0) {
                 MLog.d(TAG, "sort_tag: needs to be sorted.  prev_msg: " + prevMsg + " msg: " + next.getText()
                         + " prev idx: " + prevIdx + " "
-                        + " idx: " + i + " size: " + copy.size()
-                        + " prev Time: " + new Date(prev.getTime()).toString()
-                        + " time: " + new Date(next.getTime()).toString());
+                        + " idx: " + i + " size: " + copy.size());
                 return true;
             } else {
                 prev = next;

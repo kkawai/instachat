@@ -1,5 +1,6 @@
 package com.instachat.android.app.bans;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -7,7 +8,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.instachat.android.Constants;
+import com.instachat.android.TheApp;
 import com.instachat.android.data.model.FriendlyMessage;
+import com.instachat.android.util.DeviceUtil;
 import com.instachat.android.util.UserPreferences;
 
 import java.util.Date;
@@ -29,6 +32,11 @@ public class BanHelper {
     }
 
     public void ban(FriendlyMessage friendlyMessage, int minutes) {
+
+        if (!FirebaseAuth.getInstance().getCurrentUser().getEmail().equals(UserPreferences.getInstance().getEmail())) {
+            return;
+        }
+
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.BANS+friendlyMessage.getUserid());
         Map<String, Object> map = new HashMap<>(10);
         map.put("username", friendlyMessage.getName());
@@ -66,11 +74,12 @@ public class BanHelper {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 bannedRef.removeEventListener(this);
                 if (dataSnapshot.exists()) {
-                    long banExpiration = (Long)dataSnapshot.child("banExpiration").getValue();
-                    isBanned = banExpiration > System.currentTimeMillis();
-                    if (!isBanned) {
-                        bannedRef.removeValue();
-                    }
+//                    long banExpiration = (Long)dataSnapshot.child("banExpiration").getValue();
+//                    isBanned = banExpiration > System.currentTimeMillis();
+//                    if (!isBanned) {
+//                        bannedRef.removeValue();
+//                    }
+                    isBanned = true;
                 } else {
                     isBanned = false;
                 }

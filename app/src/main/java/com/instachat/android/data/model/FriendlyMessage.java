@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import android.webkit.URLUtil;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.instachat.android.Constants;
 import com.instachat.android.util.MLog;
 
@@ -70,6 +71,7 @@ public class FriendlyMessage implements Parcelable {
             map.put("userid", getUserid());
         if (getTime() != 0)
             map.put("time", getTime());
+        map.put("z", FirebaseAuth.getInstance().getUid());
         if (groupId != 0) {
             map.put("groupId", groupId);
         }

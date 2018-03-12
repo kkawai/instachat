@@ -7,9 +7,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
+import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;
 
 import java.util.HashMap;
@@ -70,8 +72,14 @@ public class BlockUserDialogHelper {
             public void onClick(SweetAlertDialog sweetAlertDialog) {
 
                 sweetAlertDialog.dismiss();
+
+                if (!FirebaseAuth.getInstance().getCurrentUser().getEmail().equals(UserPreferences.getInstance().getEmail())) {
+                    return;
+                }
+
                 Map<String, Object> map = new HashMap<>(2);
                 map.put("name", username);
+                map.put("z","z");
                 if (!TextUtils.isEmpty(dpid))
                     map.put("dpid", dpid);
                 firebaseDatabase.getReference(Constants.MY_BLOCKS_REF()).

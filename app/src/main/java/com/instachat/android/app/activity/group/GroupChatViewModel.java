@@ -6,6 +6,8 @@ import android.support.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -37,7 +39,6 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
 
     private static final String TAG = "GroupChatViewModel";
 
-    //public ObservableArrayList<ItemViewModel> list = new ObservableArrayList<>();
     public ObservableField<String> usernameTyping = new ObservableField<>("");
     private long groupId;
     private long mLastTypingTime;
@@ -118,6 +119,8 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
 
     public void onMeTyping() {
         try {
+            if (Constants.SUPER_ADMIN_1 == UserPreferences.getInstance().getUserId())
+                return;
             if (System.currentTimeMillis() - mLastTypingTime < 3000)
                 return;
             mLastTypingTime = System.currentTimeMillis();
@@ -156,6 +159,10 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
 
     public void addUserPresenceToGroup() {
 
+        if (Constants.SUPER_ADMIN_1 == UserPreferences.getInstance().getUserId()) {
+            return;
+        }
+
         mGroupSummaryRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_ROOMS).
                 child(getGroupId() + "");
         mGroupSummaryListener = mGroupSummaryRef.addValueEventListener(new ValueEventListener() {
@@ -177,6 +184,10 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
                                 @Override
                                 public void run() throws Exception {
                                     MLog.d(TAG, "addUserPresenceToGroup() groupChatViewModel.getGroupId(): ", getGroupId(), " username: ", myUsername());
+                                    if (!FirebaseAuth.getInstance().getCurrentUser().getEmail().equals(UserPreferences.getInstance().getEmail())) {
+                                        getNavigator().enterChat();
+                                        return;
+                                    }
                                     User me = UserPreferences.getInstance().getUser();
                                     final DatabaseReference ref = firebaseDatabase.getReference(Constants
                                             .GROUP_CHAT_USERS_REF(getGroupId())).
@@ -288,6 +299,24 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
 
     public int getRoomCommentCount() {
         return roomCommentCount;
+    }
+
+    public void checkEmailVerified() {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser user = auth.getCurrentUser();
+
+        if (!user.isEmailVerified()) {
+            user.sendEmailVerification()
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                MLog.d(TAG, "Email sent.");
+                            }
+                        }
+                    });
+            getNavigator().showVerificationEmailSent();
+        }
     }
 
 }

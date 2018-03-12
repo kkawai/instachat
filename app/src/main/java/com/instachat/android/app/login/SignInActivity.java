@@ -42,6 +42,7 @@ import com.instachat.android.data.model.User;
 import com.instachat.android.databinding.ActivitySignInBinding;
 import com.instachat.android.databinding.DialogInputEmailBinding;
 import com.instachat.android.util.ActivityUtil;
+import com.instachat.android.util.Base64;
 import com.instachat.android.util.FontUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.ScreenUtil;
@@ -130,24 +131,13 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
 
    private void signInWithEmailOrUsernamePassword(final String emailOrUsername, final String password, final String ltuEmail) {
       showProgressDialog();
-      networkApi.getUserByEmailOrUsernamePassword(this, emailOrUsername, password, ltuEmail, new Response.Listener<JSONObject>() {
+      networkApi.getUserByEmailOrUsernamePassword(this, emailOrUsername, password, ltuEmail, new Response.Listener<String>() {
          @Override
-         public void onResponse(final JSONObject response) {
+         public void onResponse(final String stringResponse) {
             try {
+               final JSONObject response = new JSONObject(stringResponse);
                final String status = response.getString(NetworkApi.KEY_RESPONSE_STATUS);
                if (status.equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
-                  final JSONObject data = response.getJSONObject(NetworkApi.RESPONSE_DATA);
-                  if (data.has("needsNewEmail")) {
-                     /**
-                      * Welcome the user back and prompt him to enter an email address
-                      * If he enters an email address make sure it's unique.
-                      * If the email is valid and unique, save the user and signIntoFirebase
-                      *
-                      */
-                     hideProgressDialog();
-                     showNewEmailDialog(SignInActivity.this, emailOrUsername, password);
-                     return;
-                  }
                   final User user = User.fromResponse(response);
                   UserPreferences.getInstance().saveUser(user);
                   UserPreferences.getInstance().saveLastSignIn(emailOrUsername);
@@ -168,6 +158,10 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
             showErrorToast("network 1");
          }
       });
+   }
+
+   private String decode(String encoded) throws Exception {
+      return new String(Base64.decodeWebSafe(encoded.getBytes()));
    }
 
    private void signIntoFirebase(final String email, final String password) {
