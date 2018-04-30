@@ -71,7 +71,6 @@ public class FriendlyMessage implements Parcelable {
             map.put("userid", getUserid());
         if (getTime() != 0)
             map.put("time", getTime());
-        map.put("z", FirebaseAuth.getInstance().getUid());
         if (groupId != 0) {
             map.put("groupId", groupId);
         }

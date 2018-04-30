@@ -54,7 +54,7 @@ android {
     packagingOptions {
         exclude 'META-INF/rxjava.properties'
     }
-    buildToolsVersion '26.0.3'
+    buildToolsVersion rootProject.ext.buildToolsVersion
 }
 
 dependencies {
@@ -114,7 +114,7 @@ dependencies {
 
     compile 'com.pnikosis:materialish-progress:1.7'
     compile 'com.github.vihtarb:tooltip:0.1.9'
-    compile 'com.android.support:multidex:1.0.2'
+    compile 'com.android.support:multidex:1.0.3'
     compile 'com.brandongogetap:stickyheaders:0.5.0'
     compile 'com.sackcentury:shinebutton:0.1.6'
 

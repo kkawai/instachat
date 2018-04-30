@@ -96,7 +96,6 @@ public class NetworkApi {
         params.put("pd", Base64.encodeWebSafe(pw.getBytes(),false));
         if (ltuEmail != null)
             params.put("nem", ltuEmail);
-        params.put("z","asdf");
         final ApiPostRequest request = new ApiPostRequest(params,
                 Constants.API_BASE_URL + "/ih/getu",
                 listener, errorListener);
