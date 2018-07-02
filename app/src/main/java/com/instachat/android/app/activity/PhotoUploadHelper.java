@@ -353,7 +353,7 @@ public class PhotoUploadHelper {
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 if (mActivityState == null || mActivityState.isActivityDestroyed())
                     return;
-                postProcessPhoto(taskSnapshot.getDownloadUrl().toString(), isPossibleAdult, isPossibleViolence);
+                postProcessPhoto(taskSnapshot.getStorage().getDownloadUrl().toString(), isPossibleAdult, isPossibleViolence);
             }
         }).addOnFailureListener(mActivity, new OnFailureListener() {
             @Override
