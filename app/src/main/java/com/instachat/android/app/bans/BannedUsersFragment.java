@@ -137,7 +137,7 @@ public class BannedUsersFragment extends BaseFragment {
                 bannedUser.id = Integer.parseInt(dataSnapshot.getKey());
                 MLog.i(TAG, "Found banned user.  Check if expired.");
                 if (System.currentTimeMillis() > bannedUser.banExpiration) {
-                    removeBan(bannedUser.id);
+                    //removeBan(bannedUser.id);
                     MLog.i(TAG, bannedUser.username + " is no longer banned. Remove from bans");
                 }
             }

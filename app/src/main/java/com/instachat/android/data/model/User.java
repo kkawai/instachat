@@ -137,7 +137,7 @@ public class User {
 
     @Override
     public String toString() {
-        return id + ", " + username + ", " + email;
+        return id + ", " + username + ", "+profilePicUrl;
     }
 
     public JSONObject toJSON() {

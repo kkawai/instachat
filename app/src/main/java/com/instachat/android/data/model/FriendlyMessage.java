@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.webkit.URLUtil;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.Constants;
 import com.instachat.android.util.MLog;
 
@@ -132,6 +133,7 @@ public class FriendlyMessage implements Parcelable {
             o.put("possibleViolentImage", possibleViolentImage);
         if (consumedByPartner)
             o.put(Constants.CHILD_MESSAGE_CONSUMED_BY_PARTNER, consumedByPartner);
+        FirebaseAuth.getInstance().getUid();
         return o;
     }
 

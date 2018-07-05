@@ -528,7 +528,6 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             public void onCancelled(DatabaseError databaseError) {
                 if (mActivityState == null || mActivityState.isActivityDestroyed()) return;
                 mFriendlyMessageListener.onFriendlyMessageFail(friendlyMessage);
-                MLog.e(TAG, "could not send message. ", databaseError);
             }
         });
 
