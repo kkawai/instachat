@@ -15,8 +15,10 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.services.urlshortener.Urlshortener;
@@ -353,7 +355,13 @@ public class PhotoUploadHelper {
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 if (mActivityState == null || mActivityState.isActivityDestroyed())
                     return;
-                postProcessPhoto(taskSnapshot.getStorage().getDownloadUrl().toString(), isPossibleAdult, isPossibleViolence);
+                Task<Uri> task = taskSnapshot.getStorage().getDownloadUrl();
+                task.addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        postProcessPhoto(task.getResult().toString(), isPossibleAdult, isPossibleViolence);
+                    }
+                });
             }
         }).addOnFailureListener(mActivity, new OnFailureListener() {
             @Override

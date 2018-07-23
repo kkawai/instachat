@@ -11,7 +11,6 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 import com.instachat.android.TheApp;
-import com.instachat.android.data.model.Rss;
 import com.instachat.android.data.model.User;
 import com.instachat.android.util.MLog;
 
@@ -23,7 +22,7 @@ import java.util.ArrayList;
 public final class DmDb {
 
     private static final String TAG = "DmDb";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
     private static DmDb instance;
     private static final String TABLE_NAME = "dm";
     private static final int MAX = 100;
@@ -58,6 +57,7 @@ public final class DmDb {
         public static final String COL_USERID = "userid";
         public static final String COL_NAME = "username";
         public static final String COL_DP = "dp";
+        public static final String COL_UNREAD_MSG_COUNT = "unread_count";
         public static final String COL_TIMESTAMP = "ts";
 
         /**
@@ -84,21 +84,23 @@ public final class DmDb {
                         + DmColumns.COL_NAME + " TEXT, "
                         + DmColumns.COL_USERID + " TEXT, "
                         + DmColumns.COL_DP + " TEXT, "
+                        + DmColumns.COL_UNREAD_MSG_COUNT + " INTEGER DEFAULT 0,"
                         + DmColumns.COL_TIMESTAMP + " INTEGER DEFAULT 0); ");
             } catch (final Throwable t) {
                 MLog.e(TAG, "Error creating database.  Very bad: ", t);
             }
 
-         try {
-            db.execSQL(String.format("CREATE INDEX %s ON %s(%s);", TABLE_NAME + "_userid_index", TABLE_NAME, DmColumns.COL_USERID));
-         } catch (final Throwable t) {
-            MLog.e(TAG, "Error creating database index: ", t);
-         }
+            try {
+                db.execSQL(String.format("CREATE INDEX %s ON %s(%s);", TABLE_NAME + "_userid_index", TABLE_NAME, DmColumns.COL_USERID));
+            } catch (final Throwable t) {
+                MLog.e(TAG, "Error creating database index: ", t);
+            }
         }
 
         @Override
         public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
-            //db.execSQL("DROP TABLE IF EXISTS "+TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+            onCreate(db);
 //            if (newVersion == DB_VERSION) {
 //                try {
 //                    db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD "
@@ -114,7 +116,7 @@ public final class DmDb {
 
     public void insertUser(User user) {
 
-        User existing = getUserBy(user.getId()+"");
+        User existing = getUserBy(user.getId() + "");
         if (existing != null) {
             updateUser(user);
             return;
@@ -122,8 +124,8 @@ public final class DmDb {
 
         try {
             final SQLiteDatabase db = sqlHelper.getWritableDatabase();
-            final long rowId = db.replace(TABLE_NAME, null, getContentValues(user));
-            MLog.i(TAG, "inserted dm: rowId: "+rowId);
+            final long rowId = db.replace(TABLE_NAME, null, contentValuesForInsert(user));
+            MLog.i(TAG, "inserted dm: rowId: " + rowId);
             deleteMax();
         } catch (Throwable t) {
             Log.e(TAG, "Error in storing dm: ", t);
@@ -133,13 +135,14 @@ public final class DmDb {
     public void updateUser(User user) {
         try {
             final SQLiteDatabase db = sqlHelper.getWritableDatabase();
-            String args[] = {user.getId()+""};
+            String args[] = {user.getId() + ""};
             final ContentValues values = new ContentValues();
-            values.put(DmColumns.COL_NAME, user.getUsername()+"");
-            values.put(DmColumns.COL_DP, user.getProfilePicUrl()+"");
+            values.put(DmColumns.COL_NAME, user.getUsername() + "");
+            values.put(DmColumns.COL_DP, user.getProfilePicUrl() + "");
             values.put(DmColumns.COL_TIMESTAMP, System.currentTimeMillis());
+            values.put(DmColumns.COL_UNREAD_MSG_COUNT, user.getUnreadMessageCount());
             int count = db.update(TABLE_NAME, values, DmColumns.COL_USERID + " = ?", args);
-            MLog.d(TAG,"updated user count: "+count + " userId: "+user.getUsername());
+            MLog.d(TAG, "updated user count: " + count + " userId: " + user.getUsername());
         } catch (final Throwable t) {
             MLog.e(TAG, "updateUser: ", t);
         }
@@ -165,11 +168,11 @@ public final class DmDb {
         return user;
     }
 
-    private ContentValues getContentValues(User user) {
+    private ContentValues contentValuesForInsert(User user) {
         final ContentValues values = new ContentValues();
-        values.put(DmColumns.COL_NAME, user.getUsername()+"");
-        values.put(DmColumns.COL_USERID, user.getId()+"");
-        values.put(DmColumns.COL_DP, user.getProfilePicUrl()+"");
+        values.put(DmColumns.COL_NAME, user.getUsername() + "");
+        values.put(DmColumns.COL_USERID, user.getId() + "");
+        values.put(DmColumns.COL_DP, user.getProfilePicUrl() + "");
         values.put(DmColumns.COL_TIMESTAMP, System.currentTimeMillis());
         return values;
     }
@@ -183,6 +186,7 @@ public final class DmDb {
         user.setUsername(contentValues.getAsString(DmColumns.COL_NAME));
         user.setProfilePicUrl(contentValues.getAsString(DmColumns.COL_DP));
         user.setUsername(contentValues.getAsString(DmColumns.COL_NAME));
+        user.setUnreadMessageCount(contentValues.getAsInteger(DmColumns.COL_UNREAD_MSG_COUNT));
         return user;
     }
 
@@ -224,8 +228,8 @@ public final class DmDb {
         int deleteCount = 0;
         try {
             final SQLiteDatabase db = sqlHelper.getWritableDatabase();
-            int count = db.delete(TABLE_NAME, DmColumns.COL_USERID + " = ?",new String[] {userId});
-            MLog.d(TAG,"deleted user count: "+count + " userId: "+userId);
+            int count = db.delete(TABLE_NAME, DmColumns.COL_USERID + " = ?", new String[]{userId});
+            MLog.d(TAG, "deleted user count: " + count + " userId: " + userId);
         } catch (final Throwable t) {
             MLog.e(TAG, "Error deleting rss: ", t);
         }
@@ -246,7 +250,7 @@ public final class DmDb {
         } catch (Throwable t) {
             MLog.e(TAG, "deleteMax(1): ", t);
         }
-        MLog.d(TAG,"current count: "+count + " MAX: "+MAX);
+        MLog.d(TAG, "current count: " + count + " MAX: " + MAX);
         if (count > MAX) {
             try {
                 long minTimestamp = 0;
@@ -258,8 +262,8 @@ public final class DmDb {
                 }
                 c.close();
                 final SQLiteDatabase writeDb = sqlHelper.getWritableDatabase();
-                int delCount = writeDb.delete(TABLE_NAME, DmColumns.COL_TIMESTAMP + " = ?", new String[]{minTimestamp+""});
-                MLog.d(TAG,"deleteMax delete count: "+delCount);
+                int delCount = writeDb.delete(TABLE_NAME, DmColumns.COL_TIMESTAMP + " = ?", new String[]{minTimestamp + ""});
+                MLog.d(TAG, "deleteMax delete count: " + delCount);
             } catch (Throwable t) {
                 MLog.e(TAG, "deleteMax(1): ", t);
             }

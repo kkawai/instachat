@@ -11,6 +11,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.instachat.android.data.model.PrivateChatSummary.USER_ONLINE;
+
 public class User {
 
     @SerializedName("id")
@@ -35,6 +37,9 @@ public class User {
     private String currentGroupName;
     private long currentGroupId;
     private int likes;
+    private boolean accepted;
+    private int unreadMessageCount = -1;
+    private int onlineStatus = USER_ONLINE;
 
     public User() {
     }
@@ -221,4 +226,27 @@ public class User {
         likes++;
     }
 
+    public boolean isAccepted() {
+        return accepted;
+    }
+
+    public void setAccepted(boolean accepted) {
+        this.accepted = accepted;
+    }
+
+    public int getUnreadMessageCount() {
+        return unreadMessageCount;
+    }
+
+    public void setUnreadMessageCount(int unreadMessageCount) {
+        this.unreadMessageCount = unreadMessageCount;
+    }
+
+    public int getOnlineStatus() {
+        return onlineStatus;
+    }
+
+    public void setOnlineStatus(int onlineStatus) {
+        this.onlineStatus = onlineStatus;
+    }
 }
