@@ -47,11 +47,13 @@
                 android:fontFamily="@font/lato_bold"
                 app:bannedUser="@{bannedUser}"/>
 
+            <!-- let's not display the admin who did the ban -->
             <TextView
                 android:id="@+id/admin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="6dp"
+                android:visibility="invisible"
                 android:text=""
                 android:textColor="@android:color/black"
                 android:textSize="15sp"

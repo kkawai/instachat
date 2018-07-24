@@ -111,6 +111,7 @@ public class BannedUsersFragment extends BaseFragment {
         binding.recyclerView.setLayoutManager(linearLayoutManager);
         binding.recyclerView.setAdapter(bannedUsersAdapter);
 
+        /* kkawai, let's not remove bans in the client anymore!
         disposable = Observable.timer(350, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -121,6 +122,7 @@ public class BannedUsersFragment extends BaseFragment {
                     }
                 })
                 .subscribe();
+                */
 
     }
 
@@ -137,7 +139,7 @@ public class BannedUsersFragment extends BaseFragment {
                 bannedUser.id = Integer.parseInt(dataSnapshot.getKey());
                 MLog.i(TAG, "Found banned user.  Check if expired.");
                 if (System.currentTimeMillis() > bannedUser.banExpiration) {
-                    //removeBan(bannedUser.id);
+                    removeBan(bannedUser.id);
                     MLog.i(TAG, bannedUser.username + " is no longer banned. Remove from bans");
                 }
             }

@@ -185,7 +185,7 @@ public final class Constants {
    }
 
    public static String GROUP_CHAT_REF(long groupid) {
-      return "/public_group_messages_4/" + groupid;
+      return "/public_group_messages_5/" + groupid;
    }
 
    public static String GROUP_CHAT_USERS_REF(long groupid) {
@@ -206,7 +206,7 @@ public final class Constants {
 
    public static String GROUP_CHAT_ROOMS = "/public_group_summaries/";
 
-   public static final String BANS = "/bans_4/"; ///   /bans/
+   public static final String BANS = "/bans_5/"; ///   /bans/
 
    /**
     * use-case: list of users that liked the given message

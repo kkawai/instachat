@@ -21,7 +21,6 @@ import javax.inject.Inject;
 
 public class BanHelper {
 
-    private int inquiries;
     private boolean isBanned;
     private final FirebaseDatabase firebaseDatabase;
     private DatabaseReference bannedRef;
@@ -53,11 +52,8 @@ public class BanHelper {
      * @return
      */
     public boolean isBanned() {
-        if (inquiries % 6 == 0) {
-            inquiries = 1;
+        if (!isBanned) {
             checkBan();
-        } else {
-            inquiries++;
         }
         return isBanned;
     }

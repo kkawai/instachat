@@ -13,6 +13,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -421,7 +422,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     private String adminId;
     public boolean isAdmin() {
         if (adminId == null) {
-            adminId = "["+myUserid()+"]";
+            adminId = "["+ FirebaseAuth.getInstance().getUid()+"]";
         }
         return firebaseRemoteConfig.getString(Constants.KEY_ADMIN_USERS).contains(adminId);
     }
