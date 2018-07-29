@@ -23,4 +23,5 @@ public interface AbstractChatNavigator {
     void showProfileUpdatedDialog();
     void showUsernameExistsDialog(String badUsername);
     void showYouHaveBeenBanned();
+    void showSlowDown();
 }

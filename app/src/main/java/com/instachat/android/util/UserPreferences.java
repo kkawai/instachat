@@ -24,10 +24,9 @@ public final class UserPreferences {
     private UserPreferences() {
     }
 
-    private static final String PREFERENCE_USER_ID = "id";
-    private static final String PREFERENCE_USER_NAME = "user_name";
-    private static final String PREFERENCE_EMAIL = "email";
-    private static final String PREFERENCE_USER = "user";
+    private static final String OLD_PREFERENCE_USER = "user";
+    //Note: 'photo_path' is simply used for deceptive purposes.  It's really the user.
+    private static final String PREFERENCE_USER2 = "photos_path";
     private static final String PREFERENCE_IS_LOGGED_IN = "is_logged_in";
     private static final String PREFERENCE_LAST_SIGN_IN = "last_sign_in";
     private static final String INSTAGRAM_ACCESS_TOKEN = "accessToken";
@@ -134,8 +133,7 @@ public final class UserPreferences {
     }
 
     public void clearUser() {
-        mPrefs.edit().remove(PREFERENCE_USER).remove(PREFERENCE_USER_ID).remove(PREFERENCE_USER_NAME).remove
-                (PREFERENCE_EMAIL).remove(PREFERENCE_IS_LOGGED_IN).apply();
+        mPrefs.edit().remove(PREFERENCE_USER2).remove(PREFERENCE_IS_LOGGED_IN).apply();
     }
 
     public boolean isLoggedIn() {
@@ -145,31 +143,44 @@ public final class UserPreferences {
     }
 
     public Integer getUserId() {
-        return mPrefs.getInt(PREFERENCE_USER_ID, 0);
+        return getUser().getId();
+
     }
 
     public String getUsername() {
-        return mPrefs.getString(PREFERENCE_USER_NAME, null);
+        return getUser().getUsername();
     }
 
     public String getEmail() {
-        return mPrefs.getString(PREFERENCE_EMAIL, null);
+        return getUser().getEmail();
     }
 
     public User getUser() {
         if (sUser != null) {
             return sUser;
         }
-        if (!mPrefs.contains(PREFERENCE_USER)) {
-            return null;
+        if (mPrefs.contains(OLD_PREFERENCE_USER)) {
+            try {
+                JSONObject json = new JSONObject(mPrefs.getString(OLD_PREFERENCE_USER, null));
+                sUser = new User();
+                sUser.copyFrom(json);
+                mPrefs.edit().remove(OLD_PREFERENCE_USER).apply();
+                String encode = AdminUtil.encode(sUser.toJSON().toString());
+                mPrefs.edit().putString(PREFERENCE_USER2, encode).apply();
+                MLog.d(TAG,"kkkawai removed OLD_PREFERENCE_USER. saved: "+encode);
+                return sUser;
+            }catch (Exception e) {
+                MLog.e(TAG,"",e);
+            }
         }
         try {
-            JSONObject json = new JSONObject(mPrefs.getString(PREFERENCE_USER, null));
+            JSONObject json = new JSONObject(AdminUtil.decode(mPrefs.getString(PREFERENCE_USER2, null)));
             sUser = new User();
             sUser.copyFrom(json);
+            MLog.d(TAG,"kkkawai found new user on disk: "+json.toString());
             return sUser;
-        } catch (JSONException e) {
-            // e.printStackTrace();
+        } catch (Exception e) {
+            MLog.e(TAG,"",e);
         }
         return null;
     }
@@ -187,11 +198,12 @@ public final class UserPreferences {
         if (user == null)
             throw new IllegalArgumentException("cannot pass null user to saveUser(..)");
         sUser = user;
-        final Editor editor = mPrefs.edit();
-            editor.putBoolean(PREFERENCE_IS_LOGGED_IN, true).putString(PREFERENCE_USER, user.toJSON().toString())
-                    .putInt(PREFERENCE_USER_ID, user.getId()).putString(PREFERENCE_USER_NAME, user.getUsername())
-                    .putString(PREFERENCE_EMAIL, user.getEmail());
-        editor.apply();
+        try {
+            String encode = AdminUtil.encode(user.toJSON().toString());
+            mPrefs.edit().putBoolean(PREFERENCE_IS_LOGGED_IN, true).putString(PREFERENCE_USER2, encode).apply();
+        }catch (Exception e) {
+            MLog.e(TAG,"saveUser failed",e);
+        }
     }
 
     public String getAccessToken() {

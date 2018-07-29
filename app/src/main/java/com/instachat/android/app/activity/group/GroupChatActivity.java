@@ -17,14 +17,6 @@ import android.view.MenuItem;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
-import com.google.firebase.storage.StreamDownloadTask;
 import com.instachat.android.BR;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
@@ -212,7 +204,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
             if (menu.findItem(R.id.menu_manage_blocks) != null)
                 menu.removeItem(R.id.menu_manage_blocks);
         }
-        if (!getViewModel().isAdmin()) {
+        if (!getViewModel().isMeAdmin()) {
             if (menu.findItem(R.id.menu_clear_room) != null)
                 menu.removeItem(R.id.menu_clear_room);
         } else {

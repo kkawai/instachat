@@ -7,6 +7,10 @@
         android:title="@string/menu_option_pending_requests"/>
 
     <item
+        android:id="@+id/menu_add_friend"
+        android:title="@string/add_friend"/>
+
+    <item
         android:id="@+id/menu_view_profile"
         android:title="@string/view_profile"/>
 

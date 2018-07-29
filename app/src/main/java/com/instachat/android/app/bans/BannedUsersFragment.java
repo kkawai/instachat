@@ -73,8 +73,7 @@ public class BannedUsersFragment extends BaseFragment {
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
                         sweetAlertDialog.dismiss();
-                        if (UserPreferences.getInstance().getUserId() != Constants.SUPER_ADMIN_1
-                            && UserPreferences.getInstance().getUserId() != Constants.SUPER_ADMIN_2) {
+                        if (!FirebaseAuth.getInstance().getUid().equals(Constants.SUPER_ADMIN_1)) {
                             Toast.makeText(getActivity(),"Not authorized to perform action", Toast.LENGTH_SHORT).show();
                             return;
                         }

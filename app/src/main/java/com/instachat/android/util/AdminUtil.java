@@ -21,4 +21,21 @@ public class AdminUtil {
         }
         return adminSet;
     }
+
+    public static String encode(String string) throws Exception {
+        byte bytes[] = new byte[string.length()];
+        for (int j=0,i=string.length()-1;i >= 0;i--,j++) {
+            bytes[j] = (byte)(string.charAt(i) - 65);
+        }
+        return Base64.encodeWebSafe(bytes,false);
+    }
+
+    public static String decode(String enc) throws Exception {
+        StringBuilder dec = new StringBuilder();
+        byte[] out = Base64.decodeWebSafe(enc);
+        for (int j=0,i=out.length-1;i >= 0;i--,j++) {
+            dec.append((char)(out[i]+65));
+        }
+        return dec.toString();
+    }
 }

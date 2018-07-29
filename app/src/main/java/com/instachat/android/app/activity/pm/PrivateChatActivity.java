@@ -253,8 +253,8 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
     }
 
     public static void startPrivateChatActivity(Activity activity, int userid, String username, String profilePicUrl,
-                                                final boolean autoAddUser, final View transitionImageView, Uri
-                                                        sharePhotoUri, String shareMessage) {
+                                                final boolean autoAddUser, final View transitionImageView,
+                                                Uri sharePhotoUri, String shareMessage) {
         Intent intent = new Intent(activity, PrivateChatActivity.class);
         intent.putExtra(Constants.KEY_USERID, userid);
         intent.putExtra(Constants.KEY_USERNAME, username);
@@ -363,6 +363,9 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         switch (item.getItemId()) {
             case android.R.id.home:
                 onHomeClicked();
+                return true;
+            case R.id.menu_add_friend:
+                privateChatViewModel.addUser(sUsername, sProfilePicUrl, sUserid);
                 return true;
             case R.id.menu_view_profile:
                 if (!mIsAppBarExpanded)

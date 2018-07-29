@@ -232,7 +232,25 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
         }
     };
 
-    public boolean validateMessage(final String text, boolean showOptions) {
+
+    private boolean canSendText(final String text) {
+
+        if (System.currentTimeMillis() - lastMessageSentTime < Constants.SPAM_BURST_DURATION) {
+            if (messageCount >= Constants.SPAM_MAX_BURST_COMMENTS) {
+                getNavigator().showSlowDown();
+                if (stupidSpamAttempts > 2) {
+                    lastMessageSentTime = System.currentTimeMillis();
+                } else {
+                    stupidSpamAttempts++;
+                }
+                return false;
+            }
+        } else {
+            //reset counter since it's been more than SPAM_BURST_DURATION since last sent
+            messageCount = 0;
+            stupidSpamAttempts = 0;
+        }
+
         if (StringUtil.isEmpty(text)) {
             return false;
         }
@@ -244,11 +262,25 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
             getNavigator().showNeedPhotoDialog();
             return false;
         }
+        return true;
+    }
+
+    private long lastMessageSentTime;
+    private int messageCount;
+    private int stupidSpamAttempts;
+    public boolean sendText(final String text, boolean showOptions) {
+
+        if (!canSendText(text)) {
+            return false;
+        }
+        lastMessageSentTime = System.currentTimeMillis();
+        messageCount++;
         final FriendlyMessage friendlyMessage = new FriendlyMessage(text,
                 myUsername(),
                 myUserid(),
                 myDpid(), null,
                 false, false, null, System.currentTimeMillis());
+
         if (!showOptions) {
             getNavigator().sendText(friendlyMessage);
             return true;
@@ -420,11 +452,13 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     }
 
     private String adminId;
-    public boolean isAdmin() {
+    public boolean isMeAdmin() {
         if (adminId == null) {
             adminId = "["+ FirebaseAuth.getInstance().getUid()+"]";
         }
-        return firebaseRemoteConfig.getString(Constants.KEY_ADMIN_USERS).contains(adminId);
+        boolean isMeAdmin = firebaseRemoteConfig.getString(Constants.KEY_ADMIN_USERS).contains(adminId);
+        MLog.d(TAG,"kkkawai "+FirebaseAuth.getInstance().getUid() + " isMeAdmin: "+isMeAdmin +" "+firebaseRemoteConfig.getString(Constants.KEY_ADMIN_USERS));
+        return isMeAdmin;
     }
 
     public boolean isBanned() {

@@ -7,6 +7,24 @@ public final class Constants {
    private Constants() {
    }
 
+   /*
+    * CHANGE THESE WHEN MAKING PRODUCTION BUILDS
+    */
+   public static final boolean IS_LOGGING_ENABLED = false;
+   public static final boolean IS_FOR_AMAZON_ONLY = false;//CHANGE PER AMAZON BUILD!!!
+   public static final boolean IS_AMAZON_ADS_ENABLED = false;//CHANGE PER AMAZON BUILD!!!
+   public static final boolean IS_AMAZON_DEBUG_AD = false; //CHANGE PER AMAZON BUILD!!!
+
+   /*
+    * SPAM constants control how many comments
+    * can be posted within a certain time span.
+    *
+    * E.g. you can't post more than 2 comments
+    * within 5 seconds.
+    */
+   public static final int SPAM_MAX_BURST_COMMENTS = 3;
+   public static final int SPAM_BURST_DURATION = 6000;
+
    public static final int MAX_USERNAME_LENGTH = 30;//also see dimens
    public static final int MIN_USERNAME_LENGTH = 2;
    public static final int MAX_EMAIL_LENGTH = 128; //also see dimens
@@ -29,7 +47,7 @@ public final class Constants {
    public static final int DEFAULT_MAX_MESSAGE_LENGTH = 256;
    public static final int DEFAULT_MAX_PERISCOPABLE_LIKES_PER_ITEM = 25;
    public static final boolean DEFAULT_DO_SHOW_ADS = true;
-   public static final String DEFAULT_ADMIN_USERS = "[7] [8] [133165] [136869]";
+   public static final String DEFAULT_ADMIN_USERS = "[7OpnUneNiXMAK27rRLB3ok6y3Fr2][RGd8d3G6VeS2JIhJ2UYcBWLNnTz1]";
    public static final String KEY_MAX_MESSAGE_HISTORY = "MAX_MESSAGE_HISTORY";
    public static final String KEY_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS = "MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS";
    public static final String KEY_MAX_TYPING_DOTS_DISPLAY_TIME = "MAX_TYPING_DOTS_DISPLAY_TIME";
@@ -42,24 +60,6 @@ public final class Constants {
    public static final String KEY_DO_SHOW_SIGNOUT_BUTTON = "DO_SHOW_SIGNOUT_BUTTON";
    public static final String KEY_DO_SHOW_ADS = "DO_SHOW_ADS";
    public static final String KEY_ADMIN_USERS = "ADMIN_USERS";
-
-   /*
-    * CHANGE THESE WHEN MAKING PRODUCTION BUILDS
-    */
-   public static final boolean IS_LOGGING_ENABLED = true;
-   public static final boolean IS_FOR_AMAZON_ONLY = false;//CHANGE PER AMAZON BUILD!!!
-   public static final boolean IS_AMAZON_ADS_ENABLED = false;//CHANGE PER AMAZON BUILD!!!
-   public static final boolean IS_AMAZON_DEBUG_AD = false; //CHANGE PER AMAZON BUILD!!!
-
-   /*
-    * SPAM constants control how many comments
-    * can be posted within a certain time span.
-    *
-    * E.g. you can't post more than 2 comments
-    * within 5 seconds.
-    */
-   public static final int SPAM_MAX_BURST_COMMENTS = 2;
-   public static final int SPAM_BURST_DURATION = 5000;
 
    public static final String GC_SERVICE_NAME = "conference.xmpp.instachat.us";
    public static final String GC_SETTINGS = "group_chat_settings";
@@ -304,6 +304,5 @@ public final class Constants {
    public static final Long SMAATO_PUBLISHER_ID = 1100036676L;
    public static final Long SMAATO_BANNER_ADSPACE_ID = 130326310L;
 
-   public static final int SUPER_ADMIN_1 = 7;
-   public static final int SUPER_ADMIN_2 = 8;
+   public static final String SUPER_ADMIN_1 = "7OpnUneNiXMAK27rRLB3ok6y3Fr2";
 }

@@ -570,14 +570,14 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
             @Override
             public void onClick(View view) {
                 final String text = mMessageEditText.getText().toString();
-                getViewModel().validateMessage(text, false);
+                getViewModel().sendText(text, false);
             }
         });
         sendButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
                 final String text = mMessageEditText.getText().toString();
-                getViewModel().validateMessage(text, false);
+                getViewModel().sendText(text, true);
                 return true;
             }
         });
@@ -1054,10 +1054,10 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     }
 
     private boolean canBan(int userid) {
-        if (userid == Constants.SUPER_ADMIN_1 || userid == Constants.SUPER_ADMIN_2) {
-            Toast.makeText(this,"Sorry, you cannot ban this member.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
+//        if (userid == Constants.SUPER_ADMIN_1 || userid == Constants.SUPER_ADMIN_2) {
+//            Toast.makeText(this,"Sorry, you cannot ban this member.", Toast.LENGTH_SHORT).show();
+//            return false;
+//        }
         return true;
     }
 
@@ -1181,5 +1181,15 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     @Override
     public void showYouHaveBeenBanned() {
         Toast.makeText(this,R.string.you_have_been_banned, Toast.LENGTH_SHORT).show();
+    }
+
+    private Toast slowDownToast;
+    @Override
+    public void showSlowDown() {
+        if (slowDownToast != null) {
+            slowDownToast.cancel();
+        }
+        slowDownToast = Toast.makeText(this,R.string.slow_down, Toast.LENGTH_SHORT);
+        slowDownToast.show();
     }
 }

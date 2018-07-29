@@ -35,11 +35,7 @@ public class BlockUserDialogHelper {
     }
 
     private boolean canBlock(Activity activity, int userid) {
-        if (userid == Constants.SUPER_ADMIN_1 || userid == Constants.SUPER_ADMIN_2) {
-            Toast.makeText(activity,"Sorry, you cannot block this member.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        return true;
+        return true; //fix this on the firebase console
     }
 
     public void showBlockUserQuestionDialog(final Activity activity,

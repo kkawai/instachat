@@ -42,7 +42,6 @@ import com.instachat.android.data.model.User;
 import com.instachat.android.databinding.ActivitySignInBinding;
 import com.instachat.android.databinding.DialogInputEmailBinding;
 import com.instachat.android.util.ActivityUtil;
-import com.instachat.android.util.Base64;
 import com.instachat.android.util.FontUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.ScreenUtil;
@@ -158,10 +157,6 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
             showErrorToast("network 1");
          }
       });
-   }
-
-   private String decode(String encoded) throws Exception {
-      return new String(Base64.decodeWebSafe(encoded.getBytes()));
    }
 
    private void signIntoFirebase(final String email, final String password) {

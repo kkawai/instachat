@@ -119,8 +119,6 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
 
     public void onMeTyping() {
         try {
-            if (Constants.SUPER_ADMIN_1 == UserPreferences.getInstance().getUserId())
-                return;
             if (System.currentTimeMillis() - mLastTypingTime < 3000)
                 return;
             mLastTypingTime = System.currentTimeMillis();
@@ -158,10 +156,6 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
     }
 
     public void addUserPresenceToGroup() {
-
-        if (Constants.SUPER_ADMIN_1 == UserPreferences.getInstance().getUserId()) {
-            return;
-        }
 
         mGroupSummaryRef = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_ROOMS).
                 child(getGroupId() + "");
@@ -253,7 +247,7 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
         };
         mRightRef.addValueEventListener(mRightListener);
 
-        if (isAdmin())
+        if (isMeAdmin())
             fetchRoomCommentsCount();
     }
 
