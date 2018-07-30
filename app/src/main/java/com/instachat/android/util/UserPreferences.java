@@ -167,7 +167,6 @@ public final class UserPreferences {
                 mPrefs.edit().remove(OLD_PREFERENCE_USER).apply();
                 String encode = AdminUtil.encode(sUser.toJSON().toString());
                 mPrefs.edit().putString(PREFERENCE_USER2, encode).apply();
-                MLog.d(TAG,"kkkawai removed OLD_PREFERENCE_USER. saved: "+encode);
                 return sUser;
             }catch (Exception e) {
                 MLog.e(TAG,"",e);
@@ -177,7 +176,6 @@ public final class UserPreferences {
             JSONObject json = new JSONObject(AdminUtil.decode(mPrefs.getString(PREFERENCE_USER2, null)));
             sUser = new User();
             sUser.copyFrom(json);
-            MLog.d(TAG,"kkkawai found new user on disk: "+json.toString());
             return sUser;
         } catch (Exception e) {
             MLog.e(TAG,"",e);
