@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
@@ -89,7 +88,7 @@ public class MessageOptionsDialogHelper {
         PopupMenu popupMenu = new PopupMenu(context, anchor);
         popupMenu.inflate(R.menu.message_options);
         if (TextUtils.isEmpty(friendlyMessage.getText()) ||
-                friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
+                friendlyMessage.getMT() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
             popupMenu.getMenu().removeItem(R.id.menu_copy_text);
         }
         if (!TextUtils.isEmpty(friendlyMessage.getImageUrl()) && TextUtils.isEmpty(friendlyMessage.getText())) {

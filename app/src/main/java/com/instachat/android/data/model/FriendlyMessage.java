@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import android.webkit.URLUtil;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.Constants;
 import com.instachat.android.util.MLog;
 
@@ -33,7 +32,7 @@ public class FriendlyMessage implements Parcelable {
     private String imageUrl;
     private String imageId;
     private long time;
-    private int messageType;
+    private int mT;
     private long groupId;
     private String groupName;
     private int likes;
@@ -82,7 +81,7 @@ public class FriendlyMessage implements Parcelable {
         if (likes != 0) {
             map.put(Constants.CHILD_LIKES, likes);
         }
-        map.put("mT", getMessageType());
+        map.put("mT", getMT());
         if (possibleAdultImage)
             map.put("possibleAdultImage", possibleAdultImage);
         if (possibleViolentImage)
@@ -128,7 +127,7 @@ public class FriendlyMessage implements Parcelable {
             o.put("groupName", groupName);
         if (likes != 0)
             o.put(Constants.CHILD_LIKES, likes);
-        o.put("mT", messageType);
+        o.put("mT", mT);
         if (possibleAdultImage)
             o.put("possibleAdultImage", possibleAdultImage);
         if (possibleViolentImage)
@@ -157,7 +156,7 @@ public class FriendlyMessage implements Parcelable {
         if (dpid != null) {
             o.put("dpid", dpid);
         }
-        o.put("mT", messageType);
+        o.put("mT", mT);
         return o;
     }
 
@@ -183,7 +182,7 @@ public class FriendlyMessage implements Parcelable {
             return false;
         }
 
-        if (messageType != MESSAGE_TYPE_NORMAL || friendlyMessage.messageType != MESSAGE_TYPE_NORMAL)
+        if (mT != MESSAGE_TYPE_NORMAL || friendlyMessage.mT != MESSAGE_TYPE_NORMAL)
             return false;
         if (this.imageUrl != null && friendlyMessage.imageUrl != null)
             return false;
@@ -240,7 +239,7 @@ public class FriendlyMessage implements Parcelable {
             friendlyMessage.text = o.optString("text");
             friendlyMessage.id = o.optString("id");
             friendlyMessage.dpid = o.optString("dpid");
-            friendlyMessage.messageType = o.optInt("mT");
+            friendlyMessage.mT = o.optInt("mT");
             friendlyMessage.groupName = o.optString("groupName");
             friendlyMessage.groupId = o.optLong("groupId");
             friendlyMessage.possibleAdultImage = o.optBoolean("possibleAdultImage");
@@ -278,7 +277,7 @@ public class FriendlyMessage implements Parcelable {
             dpid = friendlyMessage.dpid;
             groupName = friendlyMessage.groupName;
             groupId = friendlyMessage.groupId;
-            messageType = friendlyMessage.messageType;
+            mT = friendlyMessage.mT;
             possibleAdultImage = friendlyMessage.possibleAdultImage;
             possibleViolentImage = friendlyMessage.possibleViolentImage;
             consumedByPartner = friendlyMessage.consumedByPartner;
@@ -367,12 +366,12 @@ public class FriendlyMessage implements Parcelable {
         this.isBlocked = isBlocked;
     }
 
-    public int getMessageType() {
-        return messageType;
+    public int getMT() {
+        return mT;
     }
 
-    public void setMessageType(int messageType) {
-        this.messageType = messageType;
+    public void setMT(int mT) {
+        this.mT = mT;
     }
 
     public String getGroupName() {

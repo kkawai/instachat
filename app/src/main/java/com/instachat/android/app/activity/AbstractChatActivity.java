@@ -264,7 +264,7 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
 
             final FriendlyMessage friendlyMessage = new FriendlyMessage("", getViewModel().myUsername(), getViewModel().myUserid(), getViewModel().myDpid(),
                     photoUrl, isPossiblyAdultImage, isPossiblyViolentImage, null, System.currentTimeMillis());
-            friendlyMessage.setMessageType(mAttachPhotoMessageType);
+            friendlyMessage.setMT(mAttachPhotoMessageType);
             MLog.d(TAG, "uploadFromUri:onSuccess photoUrl: " + photoUrl, " debug possibleAdult: ", friendlyMessage
                     .isPossibleAdultImage(), " parameter: ", isPossiblyAdultImage);
             try {
@@ -488,13 +488,13 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
                 MessageOptionsDialogHelper.SendOptionsListener() {
                     @Override
                     public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
-                        friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
+                        friendlyMessage.setMT(FriendlyMessage.MESSAGE_TYPE_NORMAL);
                         getViewModel().sendText(friendlyMessage);
                     }
 
                     @Override
                     public void onSendOneTimeRequested(FriendlyMessage friendlyMessage) {
-                        friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
+                        friendlyMessage.setMT(FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
                         getViewModel().sendText(friendlyMessage);
                     }
                 });

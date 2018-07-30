@@ -266,7 +266,7 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
         payload.putString("from", myUsername());
         payload.putString("type", friendlyMessage.getImageUrl() != null ? "photo" : "text");
         payload.putLong("group", getGroupId());
-        payload.putBoolean("one-time", friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
+        payload.putBoolean("one-time", friendlyMessage.getMT() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
         firebaseAnalytics.logEvent(Events.MESSAGE_GROUP_SENT_EVENT, payload);
     }
 

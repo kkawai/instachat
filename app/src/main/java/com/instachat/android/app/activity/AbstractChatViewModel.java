@@ -13,7 +13,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -327,7 +326,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
                         myUserid(),
                         myDpid(),
                         linkUri.toString(), false, false, null, System.currentTimeMillis());
-                friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
+                friendlyMessage.setMT(FriendlyMessage.MESSAGE_TYPE_NORMAL);
                 sendText(friendlyMessage);
             }
         }

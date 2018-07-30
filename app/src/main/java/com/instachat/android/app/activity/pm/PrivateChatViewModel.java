@@ -332,7 +332,7 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
         payload.putString("to", toUsername);
         payload.putString("from", myUsername());
         payload.putString("type", friendlyMessage.getImageUrl() != null ? "photo" : "text");
-        payload.putBoolean("one-time", friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
+        payload.putBoolean("one-time", friendlyMessage.getMT() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
         firebaseAnalytics.logEvent(Events.MESSAGE_PRIVATE_SENT_EVENT, payload);
     }
 

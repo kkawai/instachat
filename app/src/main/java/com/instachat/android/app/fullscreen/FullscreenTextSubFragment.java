@@ -1,6 +1,5 @@
 package com.instachat.android.app.fullscreen;
 
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -45,7 +44,7 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mFriendlyMessage = getArguments().getParcelable(Constants.KEY_FRIENDLY_MESSAGE);
-        if (mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
+        if (mFriendlyMessage.getMT() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
             setCustomFragmentToolbarTitle("");
             if (mFriendlyMessage.getUserid() != UserPreferences.getInstance().getUserId()) {
                 FirebaseDatabase.getInstance().getReference(getArguments().getString(Constants.KEY_FRIENDLY_MESSAGE_DATABASE)).
@@ -68,7 +67,7 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
 
         MLog.d(TAG, "onActivityCreated() friendlyMessage: " + mFriendlyMessage.toString());
 
-        if (mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
+        if (mFriendlyMessage.getMT() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
             if (OneTimeMessageDb.getInstance().messageExists(mFriendlyMessage.getId())) {
                 if (!TextUtils.isEmpty(mFriendlyMessage.getImageUrl())) {
                     mFriendlyMessage.setImageUrl(null);
@@ -100,7 +99,7 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
             binding.messageTextView.setText(mFriendlyMessage.getText());
         }
 
-        if (mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
+        if (mFriendlyMessage.getMT() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
             if (OneTimeMessageDb.getInstance().messageExists(mFriendlyMessage.getId())) {
                 if (!mFriendlyMessage.getText().equals(photoNotAvailable)) {
                     binding.autoResizeTextView.post(new Runnable() {
@@ -172,7 +171,7 @@ public class FullscreenTextSubFragment extends BaseFragment implements ZoomImage
     @Override
     public void onDestroy() {
         if (mFriendlyMessage != null &&
-                mFriendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
+                mFriendlyMessage.getMT() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
             if (mFriendlyMessage.getUserid() != UserPreferences.getInstance().getUserId()) {
                 OneTimeMessageDb.getInstance().insertMessageId(mFriendlyMessage.getId());
             }

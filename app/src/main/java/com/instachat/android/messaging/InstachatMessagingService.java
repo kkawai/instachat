@@ -171,10 +171,10 @@ public class InstachatMessagingService extends FirebaseMessagingService {
                         .build();
 
         String contentText = "";
-        if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME && TextUtils.isEmpty
+        if (friendlyMessage.getMT() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME && TextUtils.isEmpty
                 (friendlyMessage.getText()))
             contentText = getString(R.string.one_time_photo_notification_title);
-        else if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME && !TextUtils.isEmpty
+        else if (friendlyMessage.getMT() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME && !TextUtils.isEmpty
                 (friendlyMessage.getText()))
             contentText = getString(R.string.one_time_message_notification_title);
         else if (TextUtils.isEmpty(friendlyMessage.getText()))

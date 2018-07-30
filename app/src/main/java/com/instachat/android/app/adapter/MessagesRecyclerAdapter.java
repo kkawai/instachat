@@ -50,15 +50,11 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
-import io.reactivex.functions.Action;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
@@ -208,7 +204,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 public void onClick(View view) {
                     final FriendlyMessage friendlyMessage = getItem(holder.getAdapterPosition());
 
-                    if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
+                    if (friendlyMessage.getMT() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
                         if (!OneTimeMessageDb.getInstance().messageExists(friendlyMessage.getId())) {
                             mMessageTextClickedListener.onMessageClicked(holder.getAdapterPosition());
                         } else {
@@ -337,7 +333,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
         if (viewHolder.messagePhotoViewParent != null) {
             if (friendlyMessage.getImageUrl() != null) {
                 viewHolder.messagePhotoViewParent.setVisibility(View.VISIBLE);
-                if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
+                if (friendlyMessage.getMT() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
                     Glide.with(mActivity.get()).
                             load(friendlyMessage.getImageUrl()).
                             bitmapTransform(
@@ -362,7 +358,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                     viewHolder.messagePhotoWarningView.setVisibility(View.GONE);
                     AnimationUtil.scaleInFromCenter(viewHolder.messagePhotoViewParent);
                 } else if (friendlyMessage.isPossibleAdultImage() || friendlyMessage.isPossibleViolentImage() &&
-                        (friendlyMessage.getMessageType() != FriendlyMessage.MESSAGE_TYPE_ONE_TIME)) {
+                        (friendlyMessage.getMT() != FriendlyMessage.MESSAGE_TYPE_ONE_TIME)) {
                     MLog.d(TAG, "populate messagePhotoViewParent did not get reveal payload");
                     viewHolder.messagePhotoView.setVisibility(View.INVISIBLE);
                     viewHolder.messagePhotoWarningView.setVisibility(View.VISIBLE);
@@ -390,7 +386,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             if (viewHolder.messageTextView != null) {
                 if (StringUtil.isNotEmpty(friendlyMessage.getText())) {
                     viewHolder.messageTextView.setText(friendlyMessage.getText());
-                    if (friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
+                    if (friendlyMessage.getMT() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
                         blurText(viewHolder.messageTextView, true);
                     } else {
                         blurText(viewHolder.messageTextView, false);
@@ -413,7 +409,7 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             if (friendlyMessage.isConsumedByPartner()) {
                 viewHolder.messageReadConfirmationView.setImageResource(R.drawable.ic_done_all_black_18dp);
             } else {
-                if (mMyUserid != friendlyMessage.getUserid() && friendlyMessage.getMessageType() == FriendlyMessage.MESSAGE_TYPE_NORMAL) {
+                if (mMyUserid != friendlyMessage.getUserid() && friendlyMessage.getMT() == FriendlyMessage.MESSAGE_TYPE_NORMAL) {
                     //my partner reading the message for the first time
                     friendlyMessage.setConsumedByPartner(true);//set locally for optimization purposes
                     mMessagesRef.child(mDatabaseRef).child(friendlyMessage.getId()).child(Constants.CHILD_MESSAGE_CONSUMED_BY_PARTNER).setValue(true); //save remotely
