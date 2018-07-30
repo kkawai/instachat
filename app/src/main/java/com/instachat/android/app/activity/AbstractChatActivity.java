@@ -268,7 +268,7 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
             MLog.d(TAG, "uploadFromUri:onSuccess photoUrl: " + photoUrl, " debug possibleAdult: ", friendlyMessage
                     .isPossibleAdultImage(), " parameter: ", isPossiblyAdultImage);
             try {
-                messagesAdapter.sendFriendlyMessage(friendlyMessage);
+                getViewModel().sendText(friendlyMessage);
             } catch (final Exception e) {
                 MLog.e(TAG, "", e);
             }
@@ -489,20 +489,20 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
                     @Override
                     public void onSendNormalRequested(FriendlyMessage friendlyMessage) {
                         friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
-                        sendText(friendlyMessage);
+                        getViewModel().sendText(friendlyMessage);
                     }
 
                     @Override
                     public void onSendOneTimeRequested(FriendlyMessage friendlyMessage) {
                         friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_ONE_TIME);
-                        sendText(friendlyMessage);
+                        getViewModel().sendText(friendlyMessage);
                     }
                 });
     }
 
-    public void sendText(FriendlyMessage friendlyMessage) {
+    @Override
+    public void clearTextField() {
         try {
-            messagesAdapter.sendFriendlyMessage(friendlyMessage);
             mMessageEditText.setText("");//fast double taps on send can cause 2x sends!
         } catch (Exception e) {
             MLog.e(TAG, "", e);

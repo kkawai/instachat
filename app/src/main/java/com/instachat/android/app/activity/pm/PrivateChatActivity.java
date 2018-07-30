@@ -560,16 +560,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
     }
 
     @Override
-    public void sendText(FriendlyMessage friendlyMessage) {
-        try {
-            messagesAdapter.sendFriendlyMessage(friendlyMessage);
-            mMessageEditText.setText("");//fast double taps on send can cause 2x sends!
-        } catch (Exception e) {
-            MLog.e(TAG, "", e);
-        }
-    }
-
-    @Override
     public void showCannotChatWithBlockedUser(String username) {
         Toast.makeText(PrivateChatActivity.this,
                 getString(R.string.cannot_chat_you_blocked_them,

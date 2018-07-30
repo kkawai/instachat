@@ -1,25 +1,14 @@
 package com.instachat.android.util;
 
-import android.support.annotation.NonNull;
-
-import java.util.HashSet;
-import java.util.Set;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.instachat.android.Constants;
 
 public class AdminUtil {
     private AdminUtil(){}
 
-    /**
-     *
-     * @param admins - comma separated list of user ids that are admins
-     * @return
-     */
-    public static Set<String> getAdmins(@NonNull String admins) {
-        String[] list = admins.split(", ");
-        Set<String> adminSet = new HashSet<>();
-        for (String s : list) {
-            adminSet.add(s);
-        }
-        return adminSet;
+    public static boolean isMeAdmin() {
+        return FirebaseRemoteConfig.getInstance().getString(Constants.KEY_ADMIN_USERS).contains(FirebaseAuth.getInstance().getUid());
     }
 
     public static String encode(String string) throws Exception {

@@ -39,6 +39,7 @@ public class FriendlyMessage implements Parcelable {
     private int likes;
     private boolean consumedByPartner;
     private boolean isBlocked; //NOT persisted, volatile
+    private boolean isPrivate; //for optimization
 
     public FriendlyMessage() {
     }
@@ -427,5 +428,9 @@ public class FriendlyMessage implements Parcelable {
     @Override
     public int hashCode() {
         return this.getId().hashCode();
+    }
+
+    public void setPrivate(boolean isPrivate) {
+        this.isPrivate = isPrivate;
     }
 }

@@ -233,7 +233,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     };
 
 
-    private boolean canSendText(final String text) {
+    private boolean canSendText(final String text, final String imageUrl) {
 
         if (System.currentTimeMillis() - lastMessageSentTime < Constants.SPAM_BURST_DURATION) {
             if (messageCount >= Constants.SPAM_MAX_BURST_COMMENTS) {
@@ -251,7 +251,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
             stupidSpamAttempts = 0;
         }
 
-        if (StringUtil.isEmpty(text)) {
+        if (imageUrl == null && StringUtil.isEmpty(text)) {
             return false;
         }
         if (isBanned()) {
@@ -265,16 +265,21 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
         return true;
     }
 
-    private long lastMessageSentTime;
-    private int messageCount;
-    private int stupidSpamAttempts;
-    public boolean sendText(final String text, boolean showOptions) {
+    public void sendText(FriendlyMessage friendlyMessage) {
 
-        if (!canSendText(text)) {
-            return false;
+        if (!canSendText(friendlyMessage.getText(), friendlyMessage.getImageUrl())) {
+            return;
         }
         lastMessageSentTime = System.currentTimeMillis();
         messageCount++;
+        messagesAdapter.sendFriendlyMessage(friendlyMessage);
+        getNavigator().clearTextField();
+    }
+
+    private long lastMessageSentTime;
+    private int messageCount;
+    private int stupidSpamAttempts;
+    public void sendText(final String text, boolean showOptions) {
         final FriendlyMessage friendlyMessage = new FriendlyMessage(text,
                 myUsername(),
                 myUserid(),
@@ -282,11 +287,10 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
                 false, false, null, System.currentTimeMillis());
 
         if (!showOptions) {
-            getNavigator().sendText(friendlyMessage);
-            return true;
+            sendText(friendlyMessage);
+            return;
         }
         getNavigator().showSendOptions(friendlyMessage);
-        return true;
     }
 
     public boolean onCommitContent(InputContentInfoCompat inputContentInfo, int flags,
@@ -324,7 +328,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
                         myDpid(),
                         linkUri.toString(), false, false, null, System.currentTimeMillis());
                 friendlyMessage.setMessageType(FriendlyMessage.MESSAGE_TYPE_NORMAL);
-                messagesAdapter.sendFriendlyMessage(friendlyMessage);
+                sendText(friendlyMessage);
             }
         }
         return true;
@@ -449,16 +453,6 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
             return;
         }
         getNavigator().showGroupChatActivity(groupId, groupName, null, null);
-    }
-
-    private String adminId;
-    public boolean isMeAdmin() {
-        if (adminId == null) {
-            adminId = "["+ FirebaseAuth.getInstance().getUid()+"]";
-        }
-        boolean isMeAdmin = firebaseRemoteConfig.getString(Constants.KEY_ADMIN_USERS).contains(adminId);
-        MLog.d(TAG,"kkkawai "+FirebaseAuth.getInstance().getUid() + " isMeAdmin: "+isMeAdmin +" "+firebaseRemoteConfig.getString(Constants.KEY_ADMIN_USERS));
-        return isMeAdmin;
     }
 
     public boolean isBanned() {

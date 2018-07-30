@@ -303,6 +303,4 @@ public final class Constants {
 
    public static final Long SMAATO_PUBLISHER_ID = 1100036676L;
    public static final Long SMAATO_BANNER_ADSPACE_ID = 130326310L;
-
-   public static final String SUPER_ADMIN_1 = "7OpnUneNiXMAK27rRLB3ok6y3Fr2";
 }

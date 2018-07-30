@@ -35,6 +35,7 @@ import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.databinding.ActivityMainBinding;
 import com.instachat.android.databinding.DialogInputCommentBinding;
 import com.instachat.android.databinding.RightDrawerLayoutBinding;
+import com.instachat.android.util.AdminUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.view.ThemedAlertDialog;
@@ -204,7 +205,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
             if (menu.findItem(R.id.menu_manage_blocks) != null)
                 menu.removeItem(R.id.menu_manage_blocks);
         }
-        if (!getViewModel().isMeAdmin()) {
+        if (!AdminUtil.isMeAdmin()) {
             if (menu.findItem(R.id.menu_clear_room) != null)
                 menu.removeItem(R.id.menu_clear_room);
         } else {
@@ -352,7 +353,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
                                     groupChatViewModel.myUsername(),
                                     groupChatViewModel.myUserid(),
                                     groupChatViewModel.myDpid(), null, false, false, null, System.currentTimeMillis());
-                            sendText(friendlyMessage);
+                            getViewModel().sendText(friendlyMessage);
                             firebaseAnalytics.logEvent(Events
                                     .WELCOME_MESSAGE_SENT, null);
                         }

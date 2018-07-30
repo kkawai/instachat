@@ -24,6 +24,7 @@ import com.instachat.android.data.DataManager;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.data.model.User;
+import com.instachat.android.util.AdminUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.rx.SchedulerProvider;
@@ -247,7 +248,7 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
         };
         mRightRef.addValueEventListener(mRightListener);
 
-        if (isMeAdmin())
+        if (AdminUtil.isMeAdmin())
             fetchRoomCommentsCount();
     }
 

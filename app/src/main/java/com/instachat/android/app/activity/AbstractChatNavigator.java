@@ -14,7 +14,7 @@ public interface AbstractChatNavigator {
     void setMaxMessageLength(int maxMessageLength);
     void hideSmallProgressCircle();
     void showSendOptions(FriendlyMessage friendlyMessage);
-    void sendText(FriendlyMessage friendlyMessage);
+    void clearTextField();
     void showNeedPhotoDialog();
     void showTypingDots();
     void showErrorToast(String message);

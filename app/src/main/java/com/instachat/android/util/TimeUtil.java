@@ -50,7 +50,7 @@ public final class TimeUtil {
     public static String timeLeft(final long timeMillis) {
 
         if (System.currentTimeMillis() > timeMillis) {
-            return "Not banned anymore.";
+            return "not banned anymore";
         }
         long duration = timeMillis - System.currentTimeMillis();
 

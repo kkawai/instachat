@@ -22,6 +22,7 @@ import com.instachat.android.R;
 import com.instachat.android.app.BaseFragment;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.databinding.FragmentGenericUsersBinding;
+import com.instachat.android.util.AdminUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;
 
@@ -73,12 +74,8 @@ public class BannedUsersFragment extends BaseFragment {
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
                         sweetAlertDialog.dismiss();
-                        if (!FirebaseAuth.getInstance().getUid().equals(Constants.SUPER_ADMIN_1)) {
-                            Toast.makeText(getActivity(),"Not authorized to perform action", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        if (!FirebaseAuth.getInstance().getCurrentUser().getEmail().equals(UserPreferences.getInstance().getEmail())) {
+                        if (!AdminUtil.isMeAdmin()) {
+                            Toast.makeText(getActivity(),"Not authorized", Toast.LENGTH_SHORT).show();
                             return;
                         }
 

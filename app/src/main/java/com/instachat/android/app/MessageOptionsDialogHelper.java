@@ -12,6 +12,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.data.model.FriendlyMessage;
+import com.instachat.android.util.AdminUtil;
 import com.instachat.android.util.UserPreferences;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -79,10 +80,6 @@ public class MessageOptionsDialogHelper {
         popupMenu.show();
     }
 
-    private boolean isAdmin() {
-        return FirebaseRemoteConfig.getInstance().getString(Constants.KEY_ADMIN_USERS).contains("["+ FirebaseAuth.getInstance().getUid()+"]");
-    }
-
     public void showMessageOptions(
             @NonNull final Context context,
             @NonNull final View anchor,
@@ -100,7 +97,7 @@ public class MessageOptionsDialogHelper {
         }
         if (!FirebaseRemoteConfig.getInstance().getBoolean(Constants.KEY_ALLOW_DELETE_OTHER_MESSAGES)) {
             if (UserPreferences.getInstance().getUserId() != friendlyMessage.getUserid()) {
-                if (!isAdmin()) {
+                if (!AdminUtil.isMeAdmin()) {
                     popupMenu.getMenu().removeItem(R.id.menu_delete_message);
                 }
             }
@@ -112,7 +109,7 @@ public class MessageOptionsDialogHelper {
             popupMenu.getMenu().findItem(R.id.menu_block_user).setTitle(context.getString(R.string.block) + " " + friendlyMessage.getName());
             popupMenu.getMenu().findItem(R.id.menu_report_user).setTitle(context.getString(R.string.report) + " " + friendlyMessage.getName());
         }
-        if (!isAdmin()) {
+        if (!AdminUtil.isMeAdmin()) {
             popupMenu.getMenu().removeItem(R.id.admin_menu_remove_comments);
             popupMenu.getMenu().removeItem(R.id.admin_menu_ban_5);
             popupMenu.getMenu().removeItem(R.id.admin_menu_ban_15);
