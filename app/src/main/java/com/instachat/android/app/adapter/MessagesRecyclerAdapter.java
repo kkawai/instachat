@@ -459,6 +459,9 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
     public void sendFriendlyMessage(final FriendlyMessage friendlyMessage) {
 
+        if (mIsPrivateChat)
+            friendlyMessage.setPrivate(true);
+
         if (Constants.IS_SUPPORT_MESSAGE_APPENDING) {
             final int itemCount = getItemCount();
             if (itemCount > 0) {

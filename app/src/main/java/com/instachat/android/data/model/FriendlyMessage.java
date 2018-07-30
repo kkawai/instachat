@@ -82,12 +82,13 @@ public class FriendlyMessage implements Parcelable {
         if (likes != 0) {
             map.put(Constants.CHILD_LIKES, likes);
         }
-        map.put("messageType", getMessageType());
+        map.put("mT", getMessageType());
         if (possibleAdultImage)
             map.put("possibleAdultImage", possibleAdultImage);
         if (possibleViolentImage)
             map.put("possibleViolentImage", possibleViolentImage);
-        map.put(Constants.CHILD_MESSAGE_CONSUMED_BY_PARTNER, consumedByPartner);
+        if (isPrivate)
+            map.put(Constants.CHILD_MESSAGE_CONSUMED_BY_PARTNER, consumedByPartner);
         return map;
     }
 
@@ -127,7 +128,7 @@ public class FriendlyMessage implements Parcelable {
             o.put("groupName", groupName);
         if (likes != 0)
             o.put(Constants.CHILD_LIKES, likes);
-        o.put("messageType", messageType);
+        o.put("mT", messageType);
         if (possibleAdultImage)
             o.put("possibleAdultImage", possibleAdultImage);
         if (possibleViolentImage)
@@ -156,7 +157,7 @@ public class FriendlyMessage implements Parcelable {
         if (dpid != null) {
             o.put("dpid", dpid);
         }
-        o.put("messageType", messageType);
+        o.put("mT", messageType);
         return o;
     }
 
@@ -239,7 +240,7 @@ public class FriendlyMessage implements Parcelable {
             friendlyMessage.text = o.optString("text");
             friendlyMessage.id = o.optString("id");
             friendlyMessage.dpid = o.optString("dpid");
-            friendlyMessage.messageType = o.optInt("messageType");
+            friendlyMessage.messageType = o.optInt("mT");
             friendlyMessage.groupName = o.optString("groupName");
             friendlyMessage.groupId = o.optLong("groupId");
             friendlyMessage.possibleAdultImage = o.optBoolean("possibleAdultImage");
