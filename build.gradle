@@ -7,8 +7,8 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.3'
-        classpath 'com.google.gms:google-services:4.0.1'
+        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.google.gms:google-services:4.2.0'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -32,22 +32,23 @@ task clean(type: Delete) {
 }
 
 ext {
-    compileSdkVersion = 27
+    compileSdkVersion = 28
     minSdkVersion = 19
-    buildToolsVersion = '27.0.3'
-    supportLibraryVersion = '27.1.1'
-    googlePlayServicesVersion = '15.0.1'
+    buildToolsVersion = '28.0.3'
+    supportLibraryVersion = '28.0.0'
+    googlePlayServicesAuthVersion = '16.0.1'
+    googlePlayServicesGcmVersion = '16.0.0'
+    googlePlayServicesPlusVersion = '16.0.0'
 
-
-    firebaseCoreVersion = '16.0.1'
-    firebaseDatabaseVersion = '16.0.1'
-    firebaseAuthVersion = '16.0.2'
-    firebaseStorageVersion = '16.0.1'
-    firebaseConfigVersion = '16.0.0'
-    firebaseMessagingVersion = '17.1.0'
-    firebaseCrashVersion = '16.0.1'
-    firebaseAnalyticsVersion = '16.0.1'
-    firebaseInvitesVersion = '16.0.1'
+    firebaseCoreVersion = '16.0.6'
+    firebaseDatabaseVersion = '16.0.5'
+    firebaseAuthVersion = '16.1.0'
+    firebaseStorageVersion = '16.0.5'
+    firebaseConfigVersion = '16.1.2'
+    firebaseMessagingVersion = '17.3.4'
+    firebaseCrashVersion = '16.2.1'
+    firebaseAnalyticsVersion = '16.0.6'
+    firebaseInvitesVersion = '16.0.6'
 
 
     dexMakerVersion = '1.2'

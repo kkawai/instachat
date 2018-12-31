@@ -52,4 +52,7 @@
 
     <!-- 320 x 50 banner ad -->
     <dimen name="standard_banner_ad_height">50dp</dimen>
+
+    <!-- fix -->
+    <item name="header_view" type="id"/>
 </resources>
