@@ -17,6 +17,7 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
 import com.google.api.services.vision.v1.model.SafeSearchAnnotation;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.util.MLog;
 
@@ -51,6 +52,15 @@ public class CloudVisionApi {
         new AsyncTask<Object, Void, String>() {
             @Override
             protected String doInBackground(Object... params) {
+
+                try {
+                    if (!FirebaseRemoteConfig.getInstance().getBoolean(Constants.KEY_DO_SCAN_PHOTOS_BEFORE_POST)) {
+                        return "SKIP_SCAN";
+                    }
+                }catch (Throwable t) {
+                    MLog.e(TAG,"",t);
+                }
+
                 try {
                     HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
                     JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
@@ -123,6 +133,10 @@ public class CloudVisionApi {
             protected void onPostExecute(String result) {
                 if (result == null) {
                     mListener.onImageInspectionCompleted(true, true, true); //error on side of caution
+                    return;
+                }
+                if (result.equals("SKIP_SCAN")) {
+                    mListener.onImageInspectionCompleted(false, false, false);
                     return;
                 }
                 boolean possibleAdult = result.startsWith("POSSIBLE ") || result.startsWith("VERY_LIKELY ");

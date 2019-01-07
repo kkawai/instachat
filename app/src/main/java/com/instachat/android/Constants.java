@@ -10,7 +10,7 @@ public final class Constants {
    /*
     * CHANGE THESE WHEN MAKING PRODUCTION BUILDS
     */
-   public static final boolean IS_LOGGING_ENABLED = false;
+   public static final boolean IS_LOGGING_ENABLED = true;
    public static final boolean IS_FOR_AMAZON_ONLY = false;//CHANGE PER AMAZON BUILD!!!
    public static final boolean IS_AMAZON_ADS_ENABLED = false;//CHANGE PER AMAZON BUILD!!!
    public static final boolean IS_AMAZON_DEBUG_AD = false; //CHANGE PER AMAZON BUILD!!!
@@ -36,6 +36,7 @@ public final class Constants {
    public static final int MAX_USERS_IN_ROOM = 100;
 
    //remote configuration with default values
+   public static final boolean DEFAULT_DO_SCAN_PHOTOS_BEFORE_POST = true;
    public static final boolean DEFAULT_DO_SHOW_SIGNOUT_BUTTON = false;
    public static final boolean DEFAULT_DO_SHORTEN_IMAGE_URLS = true;
    public static final boolean DEFAULT_ALLOW_DELETE_OTHER_MESSAGES = false;
@@ -48,6 +49,7 @@ public final class Constants {
    public static final int DEFAULT_MAX_PERISCOPABLE_LIKES_PER_ITEM = 25;
    public static final boolean DEFAULT_DO_SHOW_ADS = true;
    public static final String DEFAULT_ADMIN_USERS = "[7OpnUneNiXMAK27rRLB3ok6y3Fr2][RGd8d3G6VeS2JIhJ2UYcBWLNnTz1]";
+
    public static final String KEY_MAX_MESSAGE_HISTORY = "MAX_MESSAGE_HISTORY";
    public static final String KEY_MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS = "MAX_INDETERMINATE_MESSAGE_FETCH_PROGRESS";
    public static final String KEY_MAX_TYPING_DOTS_DISPLAY_TIME = "MAX_TYPING_DOTS_DISPLAY_TIME";
@@ -60,6 +62,7 @@ public final class Constants {
    public static final String KEY_DO_SHOW_SIGNOUT_BUTTON = "DO_SHOW_SIGNOUT_BUTTON";
    public static final String KEY_DO_SHOW_ADS = "DO_SHOW_ADS";
    public static final String KEY_ADMIN_USERS = "ADMIN_USERS";
+   public static final String KEY_DO_SCAN_PHOTOS_BEFORE_POST = "DO_SCAN_PHOTOS_BEFORE_POST";
 
    public static final String GC_SERVICE_NAME = "conference.xmpp.instachat.us";
    public static final String GC_SETTINGS = "group_chat_settings";
