@@ -3,6 +3,7 @@ package com.instachat.android.app.ui.base;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
@@ -106,4 +107,10 @@ public abstract class BaseFragment<T extends ViewDataBinding, V extends BaseView
     public abstract
     @LayoutRes
     int getLayoutId();
+
+    public boolean isActivityDestroyed() {
+        if (getBaseActivity() == null)
+            return true;
+        return getBaseActivity().isActivityDestroyed();
+    }
 }
