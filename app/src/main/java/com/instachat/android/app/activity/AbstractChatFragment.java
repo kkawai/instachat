@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.NavigationView;
 import android.support.v13.view.inputmethod.EditorInfoCompat;
 import android.support.v13.view.inputmethod.InputConnectionCompat;
 import android.support.v13.view.inputmethod.InputContentInfoCompat;
@@ -42,7 +41,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.brandongogetap.stickyheaders.StickyLayoutManager;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
@@ -72,15 +70,12 @@ import com.instachat.android.app.fullscreen.FullScreenTextFragment;
 import com.instachat.android.app.likes.UserLikedUserFragment;
 import com.instachat.android.app.likes.UserLikedUserListener;
 import com.instachat.android.app.login.SignInActivity;
-import com.instachat.android.app.requests.RequestsFragment;
 import com.instachat.android.app.ui.base.BaseFragment;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.api.UploadListener;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.data.model.PrivateChatSummary;
-import com.instachat.android.databinding.LeftDrawerLayoutBinding;
-import com.instachat.android.databinding.LeftNavHeaderBinding;
 import com.instachat.android.gcm.GCMHelper;
 import com.instachat.android.messaging.InstachatMessagingService;
 import com.instachat.android.messaging.NotificationHelper;
@@ -646,25 +641,7 @@ public abstract class AbstractChatFragment<T extends ViewDataBinding, V extends 
         return getMainActivity().closeBothDrawers();
     }
 
-    private UserLikedUserListener mUserLikedUserListener = new UserLikedUserListener() {
-        @Override
-        public void onMyLikersClicked() {
-            Fragment fragment = new UserLikedUserFragment();
-            Bundle bundle = new Bundle();
-            bundle.putInt(Constants.KEY_USERID, getViewModel().myUserid());
-            bundle.putString(Constants.KEY_USERNAME, getViewModel().myUsername());
-            fragment.setArguments(bundle);
-            getFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R
-                    .anim.slide_up, R.anim.slide_down).replace(R.id.fragment_content, fragment, UserLikedUserFragment
-                    .TAG).addToBackStack(null).commit();
-        }
-    };
-
     public abstract void listenForUsersInGroup();
-
-    public void setupRightDrawerContent() {
-
-    }
 
     @Override
     public void onGroupChatClicked(GroupChatSummary groupChatSummary) {
@@ -1104,7 +1081,7 @@ public abstract class AbstractChatFragment<T extends ViewDataBinding, V extends 
         if (slowDownToast != null) {
             slowDownToast.cancel();
         }
-        slowDownToast = Toast.makeText(this,R.string.slow_down, Toast.LENGTH_SHORT);
+        slowDownToast = Toast.makeText(getActivity(),R.string.slow_down, Toast.LENGTH_SHORT);
         slowDownToast.show();
     }
 }
