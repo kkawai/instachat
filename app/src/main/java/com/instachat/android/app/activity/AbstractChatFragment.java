@@ -16,8 +16,6 @@ import android.support.v13.view.inputmethod.EditorInfoCompat;
 import android.support.v13.view.inputmethod.InputConnectionCompat;
 import android.support.v13.view.inputmethod.InputContentInfoCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.LinearLayoutManager;
@@ -67,8 +65,6 @@ import com.instachat.android.app.blocks.BlockUserDialogHelper;
 import com.instachat.android.app.blocks.ReportUserDialogHelper;
 import com.instachat.android.app.fullscreen.FriendlyMessageContainer;
 import com.instachat.android.app.fullscreen.FullScreenTextFragment;
-import com.instachat.android.app.likes.UserLikedUserFragment;
-import com.instachat.android.app.likes.UserLikedUserListener;
 import com.instachat.android.app.login.SignInActivity;
 import com.instachat.android.app.ui.base.BaseFragment;
 import com.instachat.android.data.api.NetworkApi;
@@ -106,7 +102,7 @@ public abstract class AbstractChatFragment<T extends ViewDataBinding, V extends 
         ChatsItemClickedListener, FriendlyMessageListener, FriendlyMessageContainer, MessageTextClickedListener, EasyPermissions.PermissionCallbacks,
         UserClickedListener {
 
-    private static final String TAG = "ChatActivity";
+    private static final String TAG = "ChatFragment";
 
     protected final int REQUEST_INVITE = 1;
 
@@ -318,18 +314,18 @@ public abstract class AbstractChatFragment<T extends ViewDataBinding, V extends 
         }
     }
 
-    protected void initExternalSendIntentConsumer(final DrawerLayout drawerLayout) {
+    protected void sinitExternalSendIntentConsumer() {
         mExternalSendIntentConsumer = new ExternalSendIntentConsumer(getActivity());
         mExternalSendIntentConsumer.setListener(new ExternalSendIntentConsumer.ExternalSendIntentListener() {
             @Override
             public void onHandleSendImage(final Uri imageUri) {
-                drawerLayout.openDrawer(GravityCompat.START);
+                //drawerLayout.openDrawer(GravityCompat.START);
                 mSharePhotoUri = imageUri;
             }
 
             @Override
             public void onHandleSendText(final String text) {
-                drawerLayout.openDrawer(GravityCompat.START);
+                //drawerLayout.openDrawer(GravityCompat.START);
                 mShareText = text;
             }
         });
@@ -388,6 +384,7 @@ public abstract class AbstractChatFragment<T extends ViewDataBinding, V extends 
     }
 
     private boolean mShownSendOptionsProtips;
+
     private void showSendOptionsTooltip(View anchor) {
         //        if (UserPreferences.getInstance().hasShownToolbarProfileTooltip())
         //            return;
@@ -610,7 +607,7 @@ public abstract class AbstractChatFragment<T extends ViewDataBinding, V extends 
     }
 
     private AbstractChatActivity getMainActivity() {
-        return (AbstractChatActivity)getBaseActivity();
+        return (AbstractChatActivity) getBaseActivity();
     }
 
     public boolean isLeftDrawerOpen() {
@@ -662,7 +659,7 @@ public abstract class AbstractChatFragment<T extends ViewDataBinding, V extends 
 
     @Override
     public void showGroupChatActivity(long groupId, String groupName, Uri sharePhotoUri,
-                                              String shareMessage) {
+                                      String shareMessage) {
         Intent intent = newIntent(getActivity(), groupId, groupName);
         if (sharePhotoUri != null)
             intent.putExtra(Constants.KEY_SHARE_PHOTO_URI, sharePhotoUri);
@@ -888,7 +885,7 @@ public abstract class AbstractChatFragment<T extends ViewDataBinding, V extends 
 
             @Override
             public void onCopyTextRequested(FriendlyMessage friendlyMessage) {
-                final ClipboardManager cm = (ClipboardManager)getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                final ClipboardManager cm = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
                 cm.setText(friendlyMessage.getText());
                 Toast.makeText(getActivity(), R.string.message_copied_to_clipboard, Toast.LENGTH_SHORT).show();
             }
@@ -924,17 +921,17 @@ public abstract class AbstractChatFragment<T extends ViewDataBinding, V extends 
 
             @Override
             public void onBan5Minutes(FriendlyMessage friendlyMessage) {
-                ban(friendlyMessage,5);
+                ban(friendlyMessage, 5);
             }
 
             @Override
             public void onBan15Minutes(FriendlyMessage friendlyMessage) {
-                ban(friendlyMessage,15);
+                ban(friendlyMessage, 15);
             }
 
             @Override
             public void onBan2Days(FriendlyMessage friendlyMessage) {
-                ban(friendlyMessage,60*24*2);
+                ban(friendlyMessage, 60 * 24 * 2);
             }
         });
     }
@@ -970,13 +967,13 @@ public abstract class AbstractChatFragment<T extends ViewDataBinding, V extends 
                 int vis = linearLayoutManager.findLastVisibleItemPosition();
 //                MLog.d(TAG, "scroll debug: vis: " + vis + " text: " + messagesAdapter.peekLastMessage()
 //                        + " positionStart: " + positionStart);
-                if (vis == -1 || (vis+3) >= positionStart) {
+                if (vis == -1 || (vis + 3) >= positionStart) {
                     //MLog.d(TAG, "B kevin scroll: " + (positionStart) + " text: " + messagesAdapter.peekLastMessage());
                     messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
                 }
                 notifyPagerAdapterDataSetChanged();
                 if (itemCount > 0) {
-                    MLog.d(TAG,"sort_tag check sort order");
+                    MLog.d(TAG, "sort_tag check sort order");
                     getViewModel().checkMessageSortOrder();
                 }
             }
@@ -1016,7 +1013,7 @@ public abstract class AbstractChatFragment<T extends ViewDataBinding, V extends 
         if (position >= 0 && position < messagesAdapter.getItemCount()) {
             messageRecyclerView.scrollToPosition(position);
         } else {
-            messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount()-1);
+            messageRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
         }
     }
 
@@ -1067,21 +1064,22 @@ public abstract class AbstractChatFragment<T extends ViewDataBinding, V extends 
 
     @Override
     public void showProfileUpdatedDialog() {
-        ((AbstractChatActivity)getBaseActivity()).showProfileUpdatedDialog();
+        ((AbstractChatActivity) getBaseActivity()).showProfileUpdatedDialog();
     }
 
     @Override
     public void showYouHaveBeenBanned() {
-        Toast.makeText(getActivity(),R.string.you_have_been_banned, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.you_have_been_banned, Toast.LENGTH_SHORT).show();
     }
 
     private Toast slowDownToast;
+
     @Override
     public void showSlowDown() {
         if (slowDownToast != null) {
             slowDownToast.cancel();
         }
-        slowDownToast = Toast.makeText(getActivity(),R.string.slow_down, Toast.LENGTH_SHORT);
+        slowDownToast = Toast.makeText(getActivity(), R.string.slow_down, Toast.LENGTH_SHORT);
         slowDownToast.show();
     }
 }
