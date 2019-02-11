@@ -87,7 +87,6 @@ public class GroupChatFragment extends AbstractChatFragment<FragmentGroupChatBin
             getSupportActionBar().setTitle(getIntent().getStringExtra(Constants.KEY_GROUP_NAME));
         }
 
-        initExternalSendIntentConsumer();
         checkIncomingShareIntent();
         groupChatViewModel.listenForTyping();
         cancelNotificationsDueToEntry();
