@@ -20,37 +20,27 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.instachat.android.BR;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
-import com.instachat.android.app.activity.AbstractChatActivity;
-import com.instachat.android.app.activity.AttachPhotoOptionsDialogHelper;
+import com.instachat.android.app.activity.AbstractChatActivity2;
 import com.instachat.android.app.activity.UsersInGroupListener;
-import com.instachat.android.app.adapter.FriendlyMessageListener;
-import com.instachat.android.app.adapter.GroupChatUsersRecyclerAdapter;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.bans.BannedUsersFragment;
 import com.instachat.android.app.blocks.BlocksFragment;
 import com.instachat.android.app.login.SignInActivity;
-import com.instachat.android.data.api.UploadListener;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.databinding.ActivityMain2Binding;
-import com.instachat.android.databinding.ActivityMainBinding;
 import com.instachat.android.databinding.DialogInputCommentBinding;
 import com.instachat.android.databinding.RightDrawerLayoutBinding;
 import com.instachat.android.util.AdminUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.view.ThemedAlertDialog;
-import com.smaato.soma.AdDownloaderInterface;
-import com.smaato.soma.AdListenerInterface;
-import com.smaato.soma.ErrorCode;
-import com.smaato.soma.ReceivedBannerInterface;
-import com.smaato.soma.exception.AdReceiveFailed;
 
 import javax.inject.Inject;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class GroupChatActivity2 extends AbstractChatActivity<ActivityMain2Binding, GroupChatViewModel>
+public class GroupChatActivity2 extends AbstractChatActivity2<ActivityMain2Binding, GroupChatViewModel2>
         implements GoogleApiClient.OnConnectionFailedListener, GroupChatNavigator {
 
     private static final String TAG = "GroupChatActivity";
@@ -58,36 +48,39 @@ public class GroupChatActivity2 extends AbstractChatActivity<ActivityMain2Bindin
     @Inject
     ViewModelProvider.Factory viewModelFactory;
 
-    private GroupChatUsersRecyclerAdapter mGroupChatUsersRecyclerAdapter;
+    //private GroupChatUsersRecyclerAdapter mGroupChatUsersRecyclerAdapter;
 
     private ActivityMain2Binding binding;
-    private GroupChatViewModel groupChatViewModel;
+    private GroupChatViewModel2 groupChatViewModel2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        groupChatViewModel.setNavigator(this);
+        groupChatViewModel2.setNavigator(this);
         initDatabaseRef();
         binding = getViewDataBinding();
-        initPhotoHelper(savedInstanceState);
         setupDrawers(binding.navView);
-        setupToolbar();
+        //setupToolbar();
 
         gcmHelper.onCreate(this);
 
-        adsHelper.loadAd(this, firebaseRemoteConfig);
+        //initFirebaseAdapter(binding.fragmentContent, binding.messageRecyclerView,this, linearLayoutManager);
+        //binding.messageRecyclerView.setLayoutManager(linearLayoutManager);
+        //binding.messageRecyclerView.setAdapter(messagesAdapter);
 
-        groupChatViewModel.fetchConfig(firebaseRemoteConfig);
+        //adsHelper.loadAd(this, firebaseRemoteConfig);
 
-        if (getIntent() != null && getIntent().hasExtra(Constants.KEY_GROUP_NAME)) {
-            getSupportActionBar().setTitle(getIntent().getStringExtra(Constants.KEY_GROUP_NAME));
-        }
+        groupChatViewModel2.fetchConfig(firebaseRemoteConfig);
 
-        initExternalSendIntentConsumer(binding.drawerLayout);
-        checkIncomingShareIntent();
-        groupChatViewModel.listenForTyping();
-        cancelNotificationsDueToEntry();
-        groupChatViewModel.smallProgressCheck();
+        //if (getIntent() != null && getIntent().hasExtra(Constants.KEY_GROUP_NAME)) {
+        //    getSupportActionBar().setTitle(getIntent().getStringExtra(Constants.KEY_GROUP_NAME));
+        //}
+
+        //initExternalSendIntentConsumer(binding.drawerLayout);
+        //checkIncomingShareIntent();
+        //groupChatViewModel2.listenForTyping();
+        //cancelNotificationsDueToEntry();
+        //groupChatViewModel2.smallProgressCheck();
     }
 
     private String getCount(int count) {
@@ -98,9 +91,7 @@ public class GroupChatActivity2 extends AbstractChatActivity<ActivityMain2Bindin
 
     @Override
     public void onDestroy() {
-        if (mGroupChatUsersRecyclerAdapter != null)
-            mGroupChatUsersRecyclerAdapter.cleanup();
-        groupChatViewModel.cleanup();
+        groupChatViewModel2.cleanup();
         super.onDestroy();
     }
 
@@ -207,7 +198,7 @@ public class GroupChatActivity2 extends AbstractChatActivity<ActivityMain2Bindin
         UsersInGroupListener usersInGroupListener = new UsersInGroupListener() {
             @Override
             public void onNumUsersUpdated(long groupId, String groupName, int numUsers) {
-                if (getSupportActionBar() != null && groupId == groupChatViewModel.getGroupId())
+                if (getSupportActionBar() != null && groupId == groupChatViewModel2.getGroupId())
                     getSupportActionBar().setTitle(groupName + getCount(numUsers));
             }
         };
@@ -226,11 +217,7 @@ public class GroupChatActivity2 extends AbstractChatActivity<ActivityMain2Bindin
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         rightDrawerLayoutBinding.drawerRecyclerView.setLayoutManager(linearLayoutManager);
 
-        mGroupChatUsersRecyclerAdapter = new GroupChatUsersRecyclerAdapter(this, groupChatViewModel.getGroupId());
-        rightDrawerLayoutBinding.drawerRecyclerView.setAdapter(mGroupChatUsersRecyclerAdapter);
-        mGroupChatUsersRecyclerAdapter.populateData();
-
-        groupChatViewModel.fetchGroupName();
+        groupChatViewModel2.fetchGroupName();
     }
 
     @Override
@@ -271,7 +258,7 @@ public class GroupChatActivity2 extends AbstractChatActivity<ActivityMain2Bindin
 
     private void _signout() {
         firebaseAuth.signOut();
-        groupChatViewModel.removeUserPresenceFromGroup();
+        groupChatViewModel2.removeUserPresenceFromGroup();
         gcmHelper.unregister(UserPreferences.getInstance().getUserId() + "");
         UserPreferences.getInstance().clearUser();
         startActivity(new Intent(GroupChatActivity2.this, SignInActivity.class));
@@ -294,9 +281,9 @@ public class GroupChatActivity2 extends AbstractChatActivity<ActivityMain2Bindin
                         if (!TextUtils.isEmpty(text)) {
                             UserPreferences.getInstance().setShownSendFirstMessageDialog(true);
                             final FriendlyMessage friendlyMessage = new FriendlyMessage(text,
-                                    groupChatViewModel.myUsername(),
-                                    groupChatViewModel.myUserid(),
-                                    groupChatViewModel.myDpid(), null, false, false, null, System.currentTimeMillis());
+                                    groupChatViewModel2.myUsername(),
+                                    groupChatViewModel2.myUserid(),
+                                    groupChatViewModel2.myDpid(), null, false, false, null, System.currentTimeMillis());
                             getViewModel().sendText(friendlyMessage);
                             firebaseAnalytics.logEvent(Events
                                     .WELCOME_MESSAGE_SENT, null);
@@ -313,8 +300,8 @@ public class GroupChatActivity2 extends AbstractChatActivity<ActivityMain2Bindin
     }
 
     @Override
-    public GroupChatViewModel getViewModel() {
-        return (groupChatViewModel = ViewModelProviders.of(this, viewModelFactory).get(GroupChatViewModel.class));
+    public GroupChatViewModel2 getViewModel() {
+        return (groupChatViewModel2 = ViewModelProviders.of(this, viewModelFactory).get(GroupChatViewModel2.class));
     }
 
     @Override
@@ -324,7 +311,7 @@ public class GroupChatActivity2 extends AbstractChatActivity<ActivityMain2Bindin
 
     @Override
     public int getLayoutId() {
-        return R.layout.activity_main;
+        return R.layout.activity_main2;
     }
 
     @Override
@@ -338,7 +325,7 @@ public class GroupChatActivity2 extends AbstractChatActivity<ActivityMain2Bindin
 
     @Override
     public void onGroupChatClicked(GroupChatSummary groupChatSummary) {
-        groupChatViewModel.removeUserPresenceFromGroup();
+        groupChatViewModel2.removeUserPresenceFromGroup();
         super.onGroupChatClicked(groupChatSummary);
     }
 

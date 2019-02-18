@@ -11,7 +11,7 @@
 
         <variable
             name="viewModel"
-            type="com.instachat.android.app.activity.group.GroupChatViewModel"/>
+            type="com.instachat.android.app.activity.group.GroupChatViewModel2"/>
 
     </data>
 
@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        tools:context="com.instachat.android.app.activity.group.GroupChatActivity">
+        tools:context="com.instachat.android.app.activity.group.GroupChatActivity2">
 
         <!-- group chat fragment or private chat fragment -->
         <FrameLayout

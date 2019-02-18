@@ -31,8 +31,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.instachat.android.BR;
+import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.app.activity.group.GroupChatActivity;
+import com.instachat.android.app.activity.group.GroupChatActivity2;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.login.recovery.ForgotPasswordActivity;
 import com.instachat.android.app.login.signup.SignUpActivity;
@@ -187,7 +189,13 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
             networkApi.saveThirdPartyPhoto(thirdPartyProfilePicUrl);
          }
       }
-      startActivity(new Intent(SignInActivity.this, GroupChatActivity.class));
+
+      if (Constants.DO_FRAGMENTS) {
+         startActivity(new Intent(SignInActivity.this, GroupChatActivity2.class));
+      } else {
+         startActivity(new Intent(SignInActivity.this, GroupChatActivity.class));
+      }
+
       FirebaseAnalytics.getInstance(this).logEvent(Events.LOGIN_SUCCESS, null);
       finish();
    }

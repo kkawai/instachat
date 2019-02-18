@@ -7,6 +7,8 @@ public final class Constants {
    private Constants() {
    }
 
+   public static boolean DO_FRAGMENTS = true;
+
    /*
     * CHANGE THESE WHEN MAKING PRODUCTION BUILDS
     */
