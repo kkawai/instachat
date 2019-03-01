@@ -265,40 +265,6 @@ public class GroupChatActivity2 extends AbstractChatActivity2<ActivityMain2Bindi
         finish();
     }
 
-    private void showFirstMessageDialog(@NonNull final Context context) {
-        if (UserPreferences.getInstance().hasShownSendFirstMessageDialog()) {
-            return;
-        }
-        final DialogInputCommentBinding binding = DialogInputCommentBinding.inflate(getLayoutInflater(), null, false);
-        binding.setName(getViewModel().myUsername());
-        new ThemedAlertDialog.Builder(context).
-                setView(binding.getRoot()).
-                setCancelable(false).
-                setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        final String text = binding.inputText.getText().toString();
-                        if (!TextUtils.isEmpty(text)) {
-                            UserPreferences.getInstance().setShownSendFirstMessageDialog(true);
-                            final FriendlyMessage friendlyMessage = new FriendlyMessage(text,
-                                    groupChatViewModel2.myUsername(),
-                                    groupChatViewModel2.myUserid(),
-                                    groupChatViewModel2.myDpid(), null, false, false, null, System.currentTimeMillis());
-                            getViewModel().sendText(friendlyMessage);
-                            firebaseAnalytics.logEvent(Events
-                                    .WELCOME_MESSAGE_SENT, null);
-                        }
-                    }
-                }).setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialogInterface) {
-                if (!UserPreferences.getInstance().hasShownSendFirstMessageDialog()) {
-                    showFirstMessageDialog(GroupChatActivity2.this);
-                }
-            }
-        }).show();
-    }
-
     @Override
     public GroupChatViewModel2 getViewModel() {
         return (groupChatViewModel2 = ViewModelProviders.of(this, viewModelFactory).get(GroupChatViewModel2.class));

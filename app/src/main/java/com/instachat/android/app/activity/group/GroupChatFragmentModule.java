@@ -14,20 +14,20 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class GroupChatModule2 {
+public class GroupChatFragmentModule {
 
     @Provides
-    GroupChatViewModel2 provideGroupChatViewModel(DataManager dataManager,
+    GroupChatFragmentViewModel provideGroupChatViewModel(DataManager dataManager,
                                                  SchedulerProvider schedulerProvider,
                                                  FirebaseRemoteConfig firebaseRemoteConfig,
                                                  FirebaseDatabase firebaseDatabase,
                                                  BanHelper banHelper) {
-        return new GroupChatViewModel2(dataManager, schedulerProvider, firebaseRemoteConfig, firebaseDatabase, banHelper);
+        return new GroupChatFragmentViewModel(dataManager, schedulerProvider, firebaseRemoteConfig, firebaseDatabase, banHelper);
     }
 
     @Provides
-    ViewModelProvider.Factory groupChatViewModelProvider(GroupChatViewModel2 groupChatViewModel2) {
-        return new ViewModelProviderFactory<>(groupChatViewModel2);
+    ViewModelProvider.Factory groupChatViewModelProvider(GroupChatFragmentViewModel groupChatFragmentViewModel) {
+        return new ViewModelProviderFactory<>(groupChatFragmentViewModel);
     }
 
     @Provides

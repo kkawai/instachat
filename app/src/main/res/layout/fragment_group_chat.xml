@@ -11,7 +11,7 @@
 
         <variable
             name="viewModel"
-            type="com.instachat.android.app.activity.group.GroupChatViewModel"/>
+            type="com.instachat.android.app.activity.group.GroupChatFragmentViewModel"/>
 
     </data>
 
@@ -30,7 +30,7 @@
             android:layout_above="@+id/linearLayout">
 
             <include
-                layout="@layout/merge_main_appbar"
+                layout="@layout/merge_gc_frag_appbar"
                 bind:viewModel="@{viewModel}"/>
 
             <android.support.v7.widget.RecyclerView

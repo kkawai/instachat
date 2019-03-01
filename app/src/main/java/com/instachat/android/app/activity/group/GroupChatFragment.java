@@ -22,7 +22,6 @@ import com.instachat.android.app.activity.AbstractChatFragment;
 import com.instachat.android.app.activity.AttachPhotoOptionsDialogHelper;
 import com.instachat.android.app.activity.UsersInGroupListener;
 import com.instachat.android.app.adapter.FriendlyMessageListener;
-import com.instachat.android.app.adapter.GroupChatUsersRecyclerAdapter;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.bans.BannedUsersFragment;
 import com.instachat.android.app.blocks.BlocksFragment;
@@ -46,32 +45,28 @@ import javax.inject.Inject;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class GroupChatFragment extends AbstractChatFragment<FragmentGroupChatBinding, GroupChatViewModel>
+public class GroupChatFragment extends AbstractChatFragment<FragmentGroupChatBinding, GroupChatFragmentViewModel>
         implements GoogleApiClient.OnConnectionFailedListener,
         UploadListener, FriendlyMessageListener,
         AttachPhotoOptionsDialogHelper.PhotoOptionsListener,
         AdListenerInterface, GroupChatNavigator {
 
-    private static final String TAG = "GroupChatActivity";
+    private static final String TAG = "GroupChatFragment";
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
 
-    private GroupChatUsersRecyclerAdapter mGroupChatUsersRecyclerAdapter;
-
     private FragmentGroupChatBinding binding;
-    private GroupChatViewModel groupChatViewModel;
+    private GroupChatFragmentViewModel groupChatFragmentViewModel;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        groupChatViewModel.setNavigator(this);
+        groupChatFragmentViewModel.setNavigator(this);
         initDatabaseRef();
         binding = getViewDataBinding();
         initPhotoHelper(savedInstanceState);
         setupToolbar();
-
-        gcmHelper.onCreate(getActivity());
 
         initFirebaseAdapter(binding.fragmentContent, binding.messageRecyclerView,this, linearLayoutManager);
         binding.messageRecyclerView.setLayoutManager(linearLayoutManager);
@@ -80,7 +75,7 @@ public class GroupChatFragment extends AbstractChatFragment<FragmentGroupChatBin
         adsHelper.loadAd(getActivity(), firebaseRemoteConfig);
 
         initMessageEditText(binding.sendButton, binding.messageEditTextParent);
-        groupChatViewModel.fetchConfig(firebaseRemoteConfig);
+        groupChatFragmentViewModel.fetchConfig(firebaseRemoteConfig);
         initButtons(binding.sendButton, binding.attachButton);
 
         if (getIntent() != null && getIntent().hasExtra(Constants.KEY_GROUP_NAME)) {
@@ -88,10 +83,10 @@ public class GroupChatFragment extends AbstractChatFragment<FragmentGroupChatBin
         }
 
         checkIncomingShareIntent();
-        groupChatViewModel.listenForTyping();
+        groupChatFragmentViewModel.listenForTyping();
         cancelNotificationsDueToEntry();
-        groupChatViewModel.smallProgressCheck();
-        //groupChatViewModel.checkEmailVerified();
+        groupChatFragmentViewModel.smallProgressCheck();
+        //groupChatFragmentViewModel.checkEmailVerified();
     }
 
     private String getCount(int count) {
@@ -106,7 +101,7 @@ public class GroupChatFragment extends AbstractChatFragment<FragmentGroupChatBin
         if (UserPreferences.getInstance().isLoggedIn()) {
             gcmHelper.onResume(getActivity());
             showFirstMessageDialog(getActivity());
-            groupChatViewModel.addUserPresenceToGroup();
+            groupChatFragmentViewModel.addUserPresenceToGroup();
         } else {
             getActivity().finish();
         }
@@ -116,7 +111,7 @@ public class GroupChatFragment extends AbstractChatFragment<FragmentGroupChatBin
     @Override
     public void onPause() {
         super.onPause();
-        groupChatViewModel.removeUserPresenceFromGroup();
+        groupChatFragmentViewModel.removeUserPresenceFromGroup();
     }
 
     @Override
@@ -130,9 +125,7 @@ public class GroupChatFragment extends AbstractChatFragment<FragmentGroupChatBin
 
     @Override
     public void onDestroy() {
-        if (mGroupChatUsersRecyclerAdapter != null)
-            mGroupChatUsersRecyclerAdapter.cleanup();
-        groupChatViewModel.cleanup();
+        groupChatFragmentViewModel.cleanup();
         super.onDestroy();
     }
 
@@ -228,7 +221,7 @@ public class GroupChatFragment extends AbstractChatFragment<FragmentGroupChatBin
         UsersInGroupListener usersInGroupListener = new UsersInGroupListener() {
             @Override
             public void onNumUsersUpdated(long groupId, String groupName, int numUsers) {
-                if (getSupportActionBar() != null && groupId == groupChatViewModel.getGroupId())
+                if (getSupportActionBar() != null && groupId == groupChatFragmentViewModel.getGroupId())
                     getSupportActionBar().setTitle(groupName + getCount(numUsers));
             }
         };
@@ -263,7 +256,7 @@ public class GroupChatFragment extends AbstractChatFragment<FragmentGroupChatBin
 
     private void _signout() {
         firebaseAuth.signOut();
-        groupChatViewModel.removeUserPresenceFromGroup();
+        groupChatFragmentViewModel.removeUserPresenceFromGroup();
         gcmHelper.unregister(UserPreferences.getInstance().getUserId() + "");
         UserPreferences.getInstance().clearUser();
         startActivity(new Intent(getActivity(), SignInActivity.class));
@@ -286,9 +279,9 @@ public class GroupChatFragment extends AbstractChatFragment<FragmentGroupChatBin
                         if (!TextUtils.isEmpty(text)) {
                             UserPreferences.getInstance().setShownSendFirstMessageDialog(true);
                             final FriendlyMessage friendlyMessage = new FriendlyMessage(text,
-                                    groupChatViewModel.myUsername(),
-                                    groupChatViewModel.myUserid(),
-                                    groupChatViewModel.myDpid(), null, false, false, null, System.currentTimeMillis());
+                                    groupChatFragmentViewModel.myUsername(),
+                                    groupChatFragmentViewModel.myUserid(),
+                                    groupChatFragmentViewModel.myDpid(), null, false, false, null, System.currentTimeMillis());
                             getViewModel().sendText(friendlyMessage);
                             firebaseAnalytics.logEvent(Events
                                     .WELCOME_MESSAGE_SENT, null);
@@ -312,8 +305,8 @@ public class GroupChatFragment extends AbstractChatFragment<FragmentGroupChatBin
     }
 
     @Override
-    public GroupChatViewModel getViewModel() {
-        return (groupChatViewModel = ViewModelProviders.of(this, viewModelFactory).get(GroupChatViewModel.class));
+    public GroupChatFragmentViewModel getViewModel() {
+        return (groupChatFragmentViewModel = ViewModelProviders.of(this, viewModelFactory).get(GroupChatFragmentViewModel.class));
     }
 
     @Override
@@ -323,7 +316,7 @@ public class GroupChatFragment extends AbstractChatFragment<FragmentGroupChatBin
 
     @Override
     public int getLayoutId() {
-        return R.layout.activity_main;
+        return R.layout.fragment_group_chat;
     }
 
     @Override
@@ -338,7 +331,7 @@ public class GroupChatFragment extends AbstractChatFragment<FragmentGroupChatBin
 
     @Override
     public void onGroupChatClicked(GroupChatSummary groupChatSummary) {
-        groupChatViewModel.removeUserPresenceFromGroup();
+        groupChatFragmentViewModel.removeUserPresenceFromGroup();
         super.onGroupChatClicked(groupChatSummary);
     }
 
