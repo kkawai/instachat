@@ -31,8 +31,8 @@ public class GroupChatFragmentModule {
     }
 
     @Provides
-    LinearLayoutManager provideGridLayoutManager(GroupChatActivity2 activity) {
-        return new LinearLayoutManager(activity);
+    LinearLayoutManager provideGridLayoutManager(GroupChatFragment groupChatFragment) {
+        return new LinearLayoutManager(groupChatFragment.getActivity());
     }
 
 }

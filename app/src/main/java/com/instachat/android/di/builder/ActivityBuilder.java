@@ -18,9 +18,6 @@ import dagger.android.ContributesAndroidInjector;
 @Module
 public abstract class ActivityBuilder {
 
-    //@ContributesAndroidInjector(modules = { GroupChatFragmentViewModel.class})
-    //abstract GroupChatFragment bindGroupChatFragment();
-
     @ContributesAndroidInjector(modules = { GroupChatModule2.class})
     abstract GroupChatActivity2 bindGroupChatActivity2();
 
