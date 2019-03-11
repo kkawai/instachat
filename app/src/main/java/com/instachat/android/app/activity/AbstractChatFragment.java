@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.databinding.ViewDataBinding;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -1081,5 +1082,16 @@ public abstract class AbstractChatFragment<T extends ViewDataBinding, V extends 
         }
         slowDownToast = Toast.makeText(getActivity(), R.string.slow_down, Toast.LENGTH_SHORT);
         slowDownToast.show();
+    }
+
+    public boolean isActivityDestroyed() {
+
+        if (getActivity() != null && getActivity() instanceof ActivityState) {
+            return ((ActivityState) getActivity()).isActivityDestroyed();
+        }
+
+        if (Build.VERSION.SDK_INT >= 17)
+            return getActivity() == null || getActivity().isDestroyed() || getActivity().isFinishing();
+        return getActivity() == null || getActivity().isFinishing();
     }
 }

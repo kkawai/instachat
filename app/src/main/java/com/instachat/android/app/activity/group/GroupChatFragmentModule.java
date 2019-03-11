@@ -24,15 +24,4 @@ public class GroupChatFragmentModule {
                                                  BanHelper banHelper) {
         return new GroupChatFragmentViewModel(dataManager, schedulerProvider, firebaseRemoteConfig, firebaseDatabase, banHelper);
     }
-
-    @Provides
-    ViewModelProvider.Factory groupChatViewModelProvider(GroupChatFragmentViewModel groupChatFragmentViewModel) {
-        return new ViewModelProviderFactory<>(groupChatFragmentViewModel);
-    }
-
-    @Provides
-    LinearLayoutManager provideGridLayoutManager(GroupChatFragment groupChatFragment) {
-        return new LinearLayoutManager(groupChatFragment.getActivity());
-    }
-
 }

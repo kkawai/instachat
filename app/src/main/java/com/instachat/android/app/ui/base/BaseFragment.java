@@ -17,82 +17,9 @@ import dagger.android.support.AndroidSupportInjection;
 public abstract class BaseFragment<T extends ViewDataBinding, V extends BaseViewModel> extends Fragment {
 
     private BaseActivity mActivity;
+    private View mRootView;
     private T mViewDataBinding;
     private V mViewModel;
-    private View mRootView;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        performDependencyInjection();
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(false);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        mViewDataBinding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false);
-        mRootView = mViewDataBinding.getRoot();
-        return mRootView;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        mViewModel = getViewModel();
-        mViewDataBinding.setVariable(getBindingVariable(), mViewModel);
-        mViewDataBinding.executePendingBindings();
-        mViewModel.onViewCreated();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof BaseActivity) {
-            BaseActivity activity = (BaseActivity) context;
-            this.mActivity = activity;
-            activity.onFragmentAttached();
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        mActivity = null;
-        super.onDetach();
-    }
-
-    public BaseActivity getBaseActivity() {
-        return mActivity;
-    }
-
-    public T getViewDataBinding() {
-        return mViewDataBinding;
-    }
-
-
-    @Override
-    public void onDestroyView() {
-        mViewModel.onDestroyView();
-        super.onDestroyView();
-    }
-
-    private void performDependencyInjection() {
-        AndroidSupportInjection.inject(this);
-    }
-
-    public interface Callback {
-
-        void onFragmentAttached();
-
-        void onFragmentDetached(String tag);
-    }
-
-    /**
-     * Override for set view model
-     *
-     * @return view model instance
-     */
-    public abstract V getViewModel();
 
     /**
      * Override for set binding variable
@@ -108,9 +35,74 @@ public abstract class BaseFragment<T extends ViewDataBinding, V extends BaseView
     @LayoutRes
     int getLayoutId();
 
-    public boolean isActivityDestroyed() {
-        if (getBaseActivity() == null)
-            return true;
-        return getBaseActivity().isActivityDestroyed();
+    /**
+     * Override for set view model
+     *
+     * @return view model instance
+     */
+    public abstract V getViewModel();
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof BaseActivity) {
+            BaseActivity activity = (BaseActivity) context;
+            this.mActivity = activity;
+            activity.onFragmentAttached();
+        }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        performDependencyInjection();
+        super.onCreate(savedInstanceState);
+        mViewModel = getViewModel();
+        setHasOptionsMenu(false);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mViewDataBinding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false);
+        mRootView = mViewDataBinding.getRoot();
+        return mRootView;
+    }
+
+    @Override
+    public void onDetach() {
+        mActivity = null;
+        super.onDetach();
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mViewDataBinding.setVariable(getBindingVariable(), mViewModel);
+        mViewDataBinding.setLifecycleOwner(this);
+        mViewDataBinding.executePendingBindings();
+    }
+
+    public BaseActivity getBaseActivity() {
+        return mActivity;
+    }
+
+    public T getViewDataBinding() {
+        return mViewDataBinding;
+    }
+
+    public void hideKeyboard() {
+        if (mActivity != null) {
+            mActivity.hideKeyboard();
+        }
+    }
+
+    private void performDependencyInjection() {
+        AndroidSupportInjection.inject(this);
+    }
+
+    public interface Callback {
+
+        void onFragmentAttached();
+
+        void onFragmentDetached(String tag);
     }
 }

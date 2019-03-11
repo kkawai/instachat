@@ -51,7 +51,7 @@ public class GroupChatFragment extends AbstractChatFragment<FragmentGroupChatBin
         AttachPhotoOptionsDialogHelper.PhotoOptionsListener,
         AdListenerInterface, GroupChatNavigator {
 
-    private static final String TAG = "GroupChatFragment";
+    static final String TAG = "GroupChatFragment";
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;

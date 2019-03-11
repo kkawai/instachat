@@ -2,15 +2,11 @@ package com.instachat.android.app.activity.group;
 
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.widget.LinearLayoutManager;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,31 +18,34 @@ import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.app.activity.AbstractChatActivity2;
 import com.instachat.android.app.activity.UsersInGroupListener;
-import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.bans.BannedUsersFragment;
 import com.instachat.android.app.blocks.BlocksFragment;
 import com.instachat.android.app.login.SignInActivity;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.databinding.ActivityMain2Binding;
-import com.instachat.android.databinding.DialogInputCommentBinding;
 import com.instachat.android.databinding.RightDrawerLayoutBinding;
 import com.instachat.android.util.AdminUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;
-import com.instachat.android.view.ThemedAlertDialog;
 
 import javax.inject.Inject;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.support.HasSupportFragmentInjector;
 
 public class GroupChatActivity2 extends AbstractChatActivity2<ActivityMain2Binding, GroupChatViewModel2>
-        implements GoogleApiClient.OnConnectionFailedListener, GroupChatNavigator {
+        implements GoogleApiClient.OnConnectionFailedListener, GroupChatNavigator, HasSupportFragmentInjector {
 
-    private static final String TAG = "GroupChatActivity";
+    @Inject
+    DispatchingAndroidInjector<Fragment> fragmentDispatchingAndroidInjector;
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
+
+    private static final String TAG = "GroupChatActivity";
 
     //private GroupChatUsersRecyclerAdapter mGroupChatUsersRecyclerAdapter;
 
@@ -61,6 +60,7 @@ public class GroupChatActivity2 extends AbstractChatActivity2<ActivityMain2Bindi
         binding = getViewDataBinding();
         setupDrawers(binding.navView);
         //setupToolbar();
+        initPhotoHelper(savedInstanceState);
 
         gcmHelper.onCreate(this);
 
@@ -81,6 +81,13 @@ public class GroupChatActivity2 extends AbstractChatActivity2<ActivityMain2Bindi
         //groupChatViewModel2.listenForTyping();
         //cancelNotificationsDueToEntry();
         //groupChatViewModel2.smallProgressCheck();
+        showGroupChatFragment();
+    }
+
+    private void showGroupChatFragment() {
+        Fragment fragment = new GroupChatFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_content, fragment,
+                GroupChatFragment.TAG).addToBackStack(null).commit();
     }
 
     private String getCount(int count) {
@@ -145,7 +152,7 @@ public class GroupChatActivity2 extends AbstractChatActivity2<ActivityMain2Bindi
                 menu.removeItem(R.id.menu_clear_room);
         } else {
             if (menu.findItem(R.id.menu_clear_room) != null) {
-                menu.findItem(R.id.menu_clear_room).setTitle("Clear comments: "+getViewModel().getRoomCommentCount());
+                menu.findItem(R.id.menu_clear_room).setTitle("Clear comments: " + getViewModel().getRoomCommentCount());
             }
         }
         return super.onMenuOpened(featureId, menu);
@@ -206,6 +213,7 @@ public class GroupChatActivity2 extends AbstractChatActivity2<ActivityMain2Bindi
     }
 
     private RightDrawerLayoutBinding rightDrawerLayoutBinding;
+
     @Override
     public void setupRightDrawerContent() {
 
@@ -352,5 +360,10 @@ public class GroupChatActivity2 extends AbstractChatActivity2<ActivityMain2Bindi
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
 
+    }
+
+    @Override
+    public AndroidInjector<Fragment> supportFragmentInjector() {
+        return fragmentDispatchingAndroidInjector;
     }
 }
