@@ -102,7 +102,7 @@ dependencies {
 
     implementation 'com.android.volley:volley:1.1.0'
 
-    implementation 'com.github.AndroidDeveloperLB:AutoFitTextView:3'
+    implementation 'com.github.AndroidDeveloperLB:AutoFitTextView:8'
     implementation 'pub.devrel:easypermissions:0.1.9'
     implementation 'com.github.clans:fab:1.6.4'
     implementation 'com.github.bhargavms:DotLoader:1.0.0'
