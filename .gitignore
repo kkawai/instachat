@@ -3,4 +3,5 @@
 .gradle
 local.properties
 build
+backup
 app/google-services.json
