@@ -13,6 +13,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.TheApp;
@@ -183,7 +184,10 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
             }
         };
         publicGroupChatsSummaryReference.addChildEventListener(publicGroupChatsSummaryListener);
-        privateChatsSummaryReference.addChildEventListener(privateChatsSummaryListener);
+        privateChatsSummaryReference
+                .orderByChild(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP)
+                .limitToLast((int)FirebaseRemoteConfig.getInstance().getLong(Constants.KEY_MAX_PRIVATE_CHATS))
+                .addChildEventListener(privateChatsSummaryListener);
     }
 
     private PrivateChatSummary privateChatSummaryFrom(DataSnapshot dataSnapshot) {

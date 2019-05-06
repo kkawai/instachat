@@ -30,6 +30,7 @@ public class RemoteConfigHelper {
         defaultConfigMap.put(Constants.KEY_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME, Constants
                 .DEFAULT_MAX_SHOW_PROFILE_TOOLBAR_TOOL_TIP_TIME);
         defaultConfigMap.put(Constants.KEY_MAX_MESSAGE_LENGTH, Constants.DEFAULT_MAX_MESSAGE_LENGTH);
+        defaultConfigMap.put(Constants.KEY_MAX_PRIVATE_CHATS, Constants.DEFAULT_MAX_PRIVATE_CHATS);
         defaultConfigMap.put(Constants.KEY_MAX_PERISCOPABLE_LIKES_PER_ITEM, Constants
                 .DEFAULT_MAX_PERISCOPABLE_LIKES_PER_ITEM);
         defaultConfigMap.put(Constants.KEY_ALLOW_DELETE_OTHER_MESSAGES, Constants.DEFAULT_ALLOW_DELETE_OTHER_MESSAGES);
