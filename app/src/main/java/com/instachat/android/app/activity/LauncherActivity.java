@@ -8,7 +8,6 @@ import android.view.View;
 import com.instachat.android.Constants;
 import com.instachat.android.app.activity.group.GroupChatActivity;
 import com.instachat.android.R;
-import com.instachat.android.app.activity.group.GroupChatActivity2;
 import com.instachat.android.app.login.SignInActivity;
 import com.instachat.android.app.login.signup.SignUpActivity;
 import com.instachat.android.util.ActivityUtil;
@@ -25,7 +24,7 @@ public final class LauncherActivity extends AppCompatActivity {
       super.onCreate(savedInstanceState);
       if (UserPreferences.getInstance().getUser() != null) {
          if (Constants.DO_FRAGMENTS) {
-            startActivity(new Intent(this, GroupChatActivity2.class));
+            //startActivity(new Intent(this, GroupChatActivity2.class));
          } else {
             startActivity(new Intent(this, GroupChatActivity.class));
          }
