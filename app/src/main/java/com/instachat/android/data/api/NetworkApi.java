@@ -137,9 +137,9 @@ public class NetworkApi {
         request.setTag(tag);
         requestQueue.add(request);
 
-        if (user.getId() != 0)
-            FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(user.getId())).updateChildren(user
-                    .toMap());
+        if (user.getId() != 0) {
+            FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(user.getId())).updateChildren(user.toMap());
+        }
     }
 
     public void forgotPassword(final Object tag, final String usernameOrEmail, final Response.Listener<String>

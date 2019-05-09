@@ -23,6 +23,7 @@ public class TheApp extends MultiDexApplication implements HasActivityInjector {
     private static TheApp sInstance;
     public static boolean isGcmSupported;
     public static boolean isAdmSupported;
+    public static boolean isSavedDeviceId;
 
     @Override
     public void onCreate() {

@@ -24,7 +24,6 @@ public final class UserPreferences {
     private UserPreferences() {
     }
 
-    private static final String OLD_PREFERENCE_USER = "user";
     //Note: 'photo_path' is simply used for deceptive purposes.  It's really the user.
     private static final String PREFERENCE_USER2 = "photos_path";
     private static final String PREFERENCE_IS_LOGGED_IN = "is_logged_in";
@@ -158,19 +157,6 @@ public final class UserPreferences {
     public User getUser() {
         if (sUser != null) {
             return sUser;
-        }
-        if (mPrefs.contains(OLD_PREFERENCE_USER)) {
-            try {
-                JSONObject json = new JSONObject(mPrefs.getString(OLD_PREFERENCE_USER, null));
-                sUser = new User();
-                sUser.copyFrom(json);
-                mPrefs.edit().remove(OLD_PREFERENCE_USER).apply();
-                String encode = AdminUtil.encode(sUser.toJSON().toString());
-                mPrefs.edit().putString(PREFERENCE_USER2, encode).apply();
-                return sUser;
-            }catch (Exception e) {
-                MLog.e(TAG,"",e);
-            }
         }
         try {
             JSONObject json = new JSONObject(AdminUtil.decode(mPrefs.getString(PREFERENCE_USER2, null)));

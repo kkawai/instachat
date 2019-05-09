@@ -17,9 +17,11 @@ import android.view.MenuItem;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.BR;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
+import com.instachat.android.TheApp;
 import com.instachat.android.app.activity.AbstractChatActivity;
 import com.instachat.android.app.activity.AttachPhotoOptionsDialogHelper;
 import com.instachat.android.app.activity.UsersInGroupListener;
@@ -36,6 +38,7 @@ import com.instachat.android.databinding.ActivityMainBinding;
 import com.instachat.android.databinding.DialogInputCommentBinding;
 import com.instachat.android.databinding.RightDrawerLayoutBinding;
 import com.instachat.android.util.AdminUtil;
+import com.instachat.android.util.DeviceUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.view.ThemedAlertDialog;
@@ -96,7 +99,13 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         groupChatViewModel.listenForTyping();
         cancelNotificationsDueToEntry();
         groupChatViewModel.smallProgressCheck();
-        //groupChatViewModel.checkEmailVerified();
+        if (TheApp.isSavedDeviceId == false) {
+            TheApp.isSavedDeviceId = true;
+            FirebaseDatabase.getInstance()
+                    .getReference(Constants.USER_INFO_REF(UserPreferences.getInstance().getUserId()))
+                    .updateChildren(DeviceUtil.getAndroidIdMap(this));
+        }
+
     }
 
     private String getCount(int count) {

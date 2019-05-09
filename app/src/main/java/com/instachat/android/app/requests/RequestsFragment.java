@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.app.BaseFragment;
@@ -49,7 +50,9 @@ public class RequestsFragment extends BaseFragment {
                 acceptUserPrompt(userid, username, dpid, transitionImageView);
             }
         };
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_REQUESTS_REF());
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_REQUESTS_REF())
+                .orderByChild(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP)
+                .limitToLast((int) FirebaseRemoteConfig.getInstance().getLong(Constants.KEY_MAX_PRIVATE_CHATS)).getRef();
         mRequestsAdapter = new RequestsAdapter(PrivateChatSummary.class, ref);
         mRequestsAdapter.setUserClickedListener(mUserClickedListener);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());

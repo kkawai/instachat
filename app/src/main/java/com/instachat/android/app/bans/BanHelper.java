@@ -1,5 +1,7 @@
 package com.instachat.android.app.bans;
 
+import android.support.annotation.NonNull;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -11,6 +13,7 @@ import com.instachat.android.Constants;
 import com.instachat.android.TheApp;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.util.DeviceUtil;
+import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;
 
 import java.util.Date;
@@ -21,6 +24,8 @@ import javax.inject.Inject;
 
 public class BanHelper {
 
+    public static final String TAG = "BanHelper";
+
     private boolean isBanned;
     private final FirebaseDatabase firebaseDatabase;
     private DatabaseReference bannedRef;
@@ -28,23 +33,58 @@ public class BanHelper {
     @Inject
     public BanHelper(FirebaseDatabase firebaseDatabase) {
         this.firebaseDatabase = firebaseDatabase;
+        MLog.d(TAG,"Created BanHelper");
     }
 
-    public void ban(FriendlyMessage friendlyMessage, int minutes) {
+    public void ban(final FriendlyMessage friendlyMessage, int minutes) {
 
         if (!FirebaseAuth.getInstance().getCurrentUser().getEmail().equals(UserPreferences.getInstance().getEmail())) {
             return;
         }
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.BANS+friendlyMessage.getUserid());
-        Map<String, Object> map = new HashMap<>(10);
-        map.put("username", friendlyMessage.getName());
-        map.put("dpid", friendlyMessage.getDpid());
-        map.put("banExpiration", System.currentTimeMillis() + (1000L*60*minutes));
-        map.put("admin", UserPreferences.getInstance().getUsername());
-        map.put("adminId", UserPreferences.getInstance().getUserId());
-        ref.updateChildren(map);
+        firebaseDatabase
+                .getReference(Constants.USER_INFO_REF(friendlyMessage.getUserid())+"/d")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    String deviceId = (String)dataSnapshot.getValue();
+                    DatabaseReference ref = firebaseDatabase.getReference(Constants.BANS+deviceId);
+                    Map<String, Object> map = new HashMap<>(10);
+                    map.put("username", friendlyMessage.getName());
+                    map.put("id", friendlyMessage.getUserid());
+                    map.put("dpid", friendlyMessage.getDpid());
+                    //map.put("banExpiration", System.currentTimeMillis() + (1000L*60*minutes));
+                    map.put("admin", UserPreferences.getInstance().getUsername());
+                    map.put("adminId", UserPreferences.getInstance().getUserId());
+                    ref.updateChildren(map);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
+
+    /*private void getDeviceId(int userId) {
+        FirebaseDatabase.getInstance()
+                .getReference(Constants.USER_INFO_REF(userId)+"/d").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    MLog.d(TAG, "getDeviceId() " + dataSnapshot.getValue());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }*/
 
     /**
      * Return if user is banned.  To conserve resources
@@ -52,40 +92,42 @@ public class BanHelper {
      * @return
      */
     public boolean isBanned() {
-        if (!isBanned) {
-            checkBan();
+        if (isBanned == false) {
+            checkBan(); //check every time because I can get banned at any time
         }
         return isBanned;
     }
 
-    /**
-     * Check if I am banned
-     */
-    private void checkBan() {
-        if (bannedRef == null) {
-            bannedRef = firebaseDatabase.getReference(Constants.BANS + UserPreferences.getInstance().getUserId());
-        }
-        bannedRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                bannedRef.removeEventListener(this);
-                if (dataSnapshot.exists()) {
+    private ValueEventListener singleValueEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            bannedRef.removeEventListener(this);
+            if (dataSnapshot.exists()) {
 //                    long banExpiration = (Long)dataSnapshot.child("banExpiration").getValue();
 //                    isBanned = banExpiration > System.currentTimeMillis();
 //                    if (!isBanned) {
 //                        bannedRef.removeValue();
 //                    }
-                    isBanned = true;
-                } else {
-                    isBanned = false;
-                }
+                isBanned = true;
+            } else {
+                isBanned = false;
             }
+        }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                bannedRef.removeEventListener(this);
-            }
-        });
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+            bannedRef.removeEventListener(this);
+        }
+    };
 
+    /**
+     * Check if I am banned
+     */
+    private void checkBan() {
+        //getDeviceId(UserPreferences.getInstance().getUserId());
+        if (bannedRef == null) {
+            bannedRef = firebaseDatabase.getReference(Constants.BANS + DeviceUtil.getAndroidId(TheApp.getInstance()));
+        }
+        bannedRef.addListenerForSingleValueEvent(singleValueEventListener);
     }
 }
