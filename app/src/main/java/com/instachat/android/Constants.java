@@ -50,7 +50,8 @@ public final class Constants {
    public static final int DEFAULT_MAX_MESSAGE_LENGTH = 256;
    public static final int DEFAULT_MAX_PERISCOPABLE_LIKES_PER_ITEM = 25;
    public static final boolean DEFAULT_DO_SHOW_ADS = true;
-   public static final String DEFAULT_ADMIN_USERS = "[7OpnUneNiXMAK27rRLB3ok6y3Fr2][RGd8d3G6VeS2JIhJ2UYcBWLNnTz1]";
+   public static final String DEFAULT_ADMIN_USERS = "[7]";
+   public static final String DEFAULT_USERS_ALLOWED_TO_SCREENSHOT = "[7]";
    public static final int DEFAULT_MAX_PRIVATE_CHATS = 80;
 
    public static final String KEY_MAX_MESSAGE_HISTORY = "MAX_MESSAGE_HISTORY";
@@ -65,6 +66,7 @@ public final class Constants {
    public static final String KEY_DO_SHOW_SIGNOUT_BUTTON = "DO_SHOW_SIGNOUT_BUTTON";
    public static final String KEY_DO_SHOW_ADS = "DO_SHOW_ADS";
    public static final String KEY_ADMIN_USERS = "ADMIN_USERS";
+   public static final String KEY_USERS_ALLOWED_TO_SCREENSHOT = "USERS_ALLOWED_TO_SCREENSHOT";
    public static final String KEY_DO_SCAN_PHOTOS_BEFORE_POST = "DO_SCAN_PHOTOS_BEFORE_POST";
    public static final String KEY_MAX_PRIVATE_CHATS = "MAX_PRIVATE_CHATS";
 

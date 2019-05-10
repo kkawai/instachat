@@ -28,12 +28,14 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 
 import com.android.volley.RequestQueue;
 import com.instachat.android.R;
 import com.instachat.android.app.activity.ActivityState;
+import com.instachat.android.util.AdminUtil;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -58,6 +60,11 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+
+        //do not allow the user to take screenshots, unless you are theonetrevor
+        if (!AdminUtil.isMeAllowedToScreenShot()) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+        }
         super.onCreate(savedInstanceState);
         performDependencyInjection();
         performDataBinding();

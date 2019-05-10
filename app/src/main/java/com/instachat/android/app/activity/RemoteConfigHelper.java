@@ -38,6 +38,7 @@ public class RemoteConfigHelper {
         defaultConfigMap.put(Constants.KEY_DO_SHOW_SIGNOUT_BUTTON, Constants.DEFAULT_DO_SHOW_SIGNOUT_BUTTON);
         defaultConfigMap.put(Constants.KEY_DO_SHOW_ADS, Constants.DEFAULT_DO_SHOW_ADS);
         defaultConfigMap.put(Constants.KEY_ADMIN_USERS, Constants.DEFAULT_ADMIN_USERS);
+        defaultConfigMap.put(Constants.KEY_USERS_ALLOWED_TO_SCREENSHOT, Constants.DEFAULT_USERS_ALLOWED_TO_SCREENSHOT);
         defaultConfigMap.put(Constants.KEY_DO_SCAN_PHOTOS_BEFORE_POST, Constants.DEFAULT_DO_SCAN_PHOTOS_BEFORE_POST);
 
         // Apply config settings and default values.

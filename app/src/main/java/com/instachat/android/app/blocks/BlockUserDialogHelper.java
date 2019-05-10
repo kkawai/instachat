@@ -11,14 +11,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
-import com.instachat.android.util.MLog;
+import com.instachat.android.util.AdminUtil;
 import com.instachat.android.util.UserPreferences;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -34,8 +31,8 @@ public class BlockUserDialogHelper {
         this.firebaseDatabase = firebaseDatabase;
     }
 
-    private boolean canBlock(Activity activity, int userid) {
-        return true; //fix this on the firebase console
+    private boolean canBlock(int userid) {
+        return !AdminUtil.isUserAdmin(userid);
     }
 
     public void showBlockUserQuestionDialog(final Activity activity,
@@ -44,7 +41,7 @@ public class BlockUserDialogHelper {
                                             final String dpid,
                                             @NonNull final BlockedUserListener listener) {
 
-        if (!canBlock(activity, userid)) {
+        if (!canBlock(userid)) {
             return;
         }
 

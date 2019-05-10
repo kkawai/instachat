@@ -1,6 +1,5 @@
 package com.instachat.android.util;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 
@@ -8,7 +7,15 @@ public class AdminUtil {
     private AdminUtil(){}
 
     public static boolean isMeAdmin() {
-        return FirebaseRemoteConfig.getInstance().getString(Constants.KEY_ADMIN_USERS).contains(FirebaseAuth.getInstance().getUid());
+        return FirebaseRemoteConfig.getInstance().getString(Constants.KEY_ADMIN_USERS).contains("["+UserPreferences.getInstance().getUserId()+"]");
+    }
+
+    public static boolean isUserAdmin(int userid) {
+        return FirebaseRemoteConfig.getInstance().getString(Constants.KEY_ADMIN_USERS).contains(""+userid);
+    }
+
+    public static boolean isMeAllowedToScreenShot() {
+        return FirebaseRemoteConfig.getInstance().getString(Constants.KEY_USERS_ALLOWED_TO_SCREENSHOT).contains("["+UserPreferences.getInstance().getUserId()+"]");
     }
 
     public static String encode(String string) throws Exception {
