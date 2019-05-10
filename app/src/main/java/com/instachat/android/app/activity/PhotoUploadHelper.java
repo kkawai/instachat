@@ -252,11 +252,25 @@ public class PhotoUploadHelper {
                     }
                     final Bitmap bitmap = ImageUtils.getBitmap(mActivity, mTargetFileUri, maxSizeBytes);
                     ImageUtils.writeBitmapToFile(bitmap, mTargetFile);
-                    try {
-                        new CloudVisionApi(mCloudVisionApiListener).checkForAdultOrViolence(bitmap);
-                    } catch (final Exception e) {
-                        MLog.e(TAG, "cloud vision getApi failed ", e);
+                    if (mPhotoType == PhotoType.userProfilePhoto) {
+                        if (mActivityState == null || mActivityState.isActivityDestroyed())
+                            return;
+                        mActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (mActivityState == null || mActivityState.isActivityDestroyed())
+                                    return;
+                                uploadFromUri(mTargetFileUri, false, false);
+                            }
+                        });
+                    } else { //
+                        try {
+                            new CloudVisionApi(mCloudVisionApiListener).checkForAdultOrViolence(bitmap);
+                        } catch (final Exception e) {
+                            MLog.e(TAG, "cloud vision getApi failed ", e);
+                        }
                     }
+
                 } catch (final Exception e) {
                     MLog.e(TAG, "reducePhotoSize() failed", e);
                     mListener.onErrorReducingPhotoSize();
