@@ -31,6 +31,7 @@ import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.app.activity.AbstractChatActivity;
 import com.instachat.android.app.activity.AttachPhotoOptionsDialogHelper;
+import com.instachat.android.app.activity.PhotoUploadHelper;
 import com.instachat.android.app.adapter.FriendlyMessageListener;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.app.analytics.Events;
@@ -596,5 +597,10 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
     @Override
     public void listenForUsersInGroup() {
         //not applicable to private chat
+    }
+
+    @Override
+    protected PhotoUploadHelper.PhotoType getRoomPhotoType() {
+        return PhotoUploadHelper.PhotoType.privateChatRoomPhoto;
     }
 }

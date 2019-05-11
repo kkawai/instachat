@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
@@ -24,6 +26,7 @@ import com.instachat.android.R;
 import com.instachat.android.TheApp;
 import com.instachat.android.app.activity.AbstractChatActivity;
 import com.instachat.android.app.activity.AttachPhotoOptionsDialogHelper;
+import com.instachat.android.app.activity.PhotoUploadHelper;
 import com.instachat.android.app.activity.UsersInGroupListener;
 import com.instachat.android.app.adapter.FriendlyMessageListener;
 import com.instachat.android.app.adapter.GroupChatUsersRecyclerAdapter;
@@ -106,6 +109,14 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
                     .updateChildren(DeviceUtil.getAndroidIdMap(this));
         }
 
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isActivityDestroyed())
+                    return;
+                showWarningDialog();
+            }
+        }, 3000);
     }
 
     private String getCount(int count) {
@@ -463,4 +474,24 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     public void enterChat() {
         _signout();
     }
+
+    private void showWarningDialog() {
+        new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE).
+                setTitleText(this.getString(R.string.warning)).
+                setContentText(getString(R.string.terms_of_use)).
+                setConfirmText(getString(android.R.string.ok)).
+                showCancelButton(false).
+                setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        sweetAlertDialog.dismiss();
+                    }
+                }).show();
+    }
+
+    @Override
+    protected PhotoUploadHelper.PhotoType getRoomPhotoType() {
+        return PhotoUploadHelper.PhotoType.groupChatRoomPhoto;
+    }
+
 }

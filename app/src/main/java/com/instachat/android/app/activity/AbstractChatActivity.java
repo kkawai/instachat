@@ -260,7 +260,7 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
         }
         hideProgressDialog();
 
-        if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.chatRoomPhoto) {
+        if (mPhotoUploadHelper.getPhotoType() != PhotoUploadHelper.PhotoType.userProfilePhoto) {
 
             final FriendlyMessage friendlyMessage = new FriendlyMessage("", getViewModel().myUsername(), getViewModel().myUserid(), getViewModel().myDpid(),
                     photoUrl, isPossiblyAdultImage, isPossiblyViolentImage, null, System.currentTimeMillis());
@@ -273,7 +273,7 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
                 MLog.e(TAG, "", e);
             }
 
-        } else if (mPhotoUploadHelper.getPhotoType() == PhotoUploadHelper.PhotoType.userProfilePhoto) {
+        } else {
             getViewModel().saveUserPhoto(photoUrl);
         }
     }
@@ -855,16 +855,18 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     @Override
     public void onPhotoGallery() {
         mPhotoUploadHelper.setStorageRefString(getViewModel().getDatabaseRoot());
-        mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.chatRoomPhoto);
+        mPhotoUploadHelper.setPhotoType(getRoomPhotoType());
         mPhotoUploadHelper.launchCamera(false);
     }
 
     @Override
     public void onPhotoTake() {
         mPhotoUploadHelper.setStorageRefString(getViewModel().getDatabaseRoot());
-        mPhotoUploadHelper.setPhotoType(PhotoUploadHelper.PhotoType.chatRoomPhoto);
+        mPhotoUploadHelper.setPhotoType(getRoomPhotoType());
         mPhotoUploadHelper.launchCamera(true);
     }
+
+    protected abstract PhotoUploadHelper.PhotoType getRoomPhotoType();
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {

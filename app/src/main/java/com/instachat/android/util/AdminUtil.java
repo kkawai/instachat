@@ -15,7 +15,11 @@ public class AdminUtil {
     }
 
     public static boolean isMeAllowedToScreenShot() {
-        return FirebaseRemoteConfig.getInstance().getString(Constants.KEY_USERS_ALLOWED_TO_SCREENSHOT).contains("["+UserPreferences.getInstance().getUserId()+"]");
+        try {
+            return FirebaseRemoteConfig.getInstance().getString(Constants.KEY_USERS_ALLOWED_TO_SCREENSHOT).contains("[" + UserPreferences.getInstance().getUserId() + "]");
+        }catch (Exception e) {
+            return false;
+        }
     }
 
     public static String encode(String string) throws Exception {

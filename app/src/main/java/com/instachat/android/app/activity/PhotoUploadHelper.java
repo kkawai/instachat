@@ -65,7 +65,7 @@ public class PhotoUploadHelper {
     private File mTempPhotoUploadDir;
 
     public enum PhotoType {
-        chatRoomPhoto, userProfilePhoto
+        privateChatRoomPhoto, groupChatRoomPhoto, userProfilePhoto
     }
 
     public PhotoUploadHelper(@NonNull Activity activity, @NonNull ActivityState activityState) {
@@ -181,7 +181,7 @@ public class PhotoUploadHelper {
      */
     public void consumeExternallySharedPhoto(final Uri photoUri) {
         setupTargetFile();
-        mPhotoType = PhotoType.chatRoomPhoto;
+        mPhotoType = PhotoType.groupChatRoomPhoto;
         reducePhotoSize(photoUri);
 
     }
@@ -245,27 +245,22 @@ public class PhotoUploadHelper {
                     }
 
                     int maxSizeBytes = Constants.MAX_PIC_SIZE_BYTES;
-                    if (mPhotoType == PhotoType.chatRoomPhoto) {
+                    if (mPhotoType != PhotoType.userProfilePhoto) {
                         maxSizeBytes = Constants.MAX_PIC_SIZE_BYTES;
-                    } else if (mPhotoType == PhotoType.userProfilePhoto) {
+                    } else {
                         maxSizeBytes = Constants.MAX_PROFILE_PIC_SIZE_BYTES;
                     }
                     final Bitmap bitmap = ImageUtils.getBitmap(mActivity, mTargetFileUri, maxSizeBytes);
                     ImageUtils.writeBitmapToFile(bitmap, mTargetFile);
-                    if (mPhotoType == PhotoType.userProfilePhoto) {
-                        uploadUserPhoto();
+                    if (mPhotoType == PhotoType.userProfilePhoto || mPhotoType == PhotoType.privateChatRoomPhoto) {
+                        uploadPhotoImmediately();
                     } else {
-
-                        //todo if public room photo, then use cloud vision api
-                        //if private room photo, just upload it
-
                         try {
                             new CloudVisionApi(mCloudVisionApiListener).checkForAdultOrViolence(bitmap);
                         } catch (final Exception e) {
                             MLog.e(TAG, "cloud vision getApi failed ", e);
                         }
                     }
-
                 } catch (final Exception e) {
                     MLog.e(TAG, "reducePhotoSize() failed", e);
                     mListener.onErrorReducingPhotoSize();
@@ -274,7 +269,7 @@ public class PhotoUploadHelper {
         });
     }
 
-    private void uploadUserPhoto() {
+    private void uploadPhotoImmediately() {
         if (mActivityState == null || mActivityState.isActivityDestroyed())
             return;
         mActivity.runOnUiThread(new Runnable() {
@@ -352,11 +347,6 @@ public class PhotoUploadHelper {
 
     private void uploadFromUri(Uri fileUri, final boolean isPossibleAdult, final boolean isPossibleViolence) {
         MLog.d(TAG, "uploadFromUri:src:" + fileUri.toString());
-
-        if (mPhotoType == PhotoType.userProfilePhoto && (isPossibleAdult || isPossibleViolence)) {
-            showIllegalProfilePicDialog();
-            return;
-        }
 
         final StorageReference photoRef = mStorageRef.child(mStorageRefString).child(mTargetFileUri
                 .getLastPathSegment());

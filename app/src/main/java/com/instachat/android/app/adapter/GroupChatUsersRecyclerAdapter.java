@@ -46,7 +46,7 @@ public class GroupChatUsersRecyclerAdapter extends RecyclerView.Adapter<GroupCha
     }
 
     public void populateData() {
-        ref = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(groupid));
+        ref = FirebaseDatabase.getInstance().getReference(Constants.GROUP_CHAT_USERS_REF(groupid)).orderByChild("lastOnline").limitToLast(50).getRef();
         listener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
