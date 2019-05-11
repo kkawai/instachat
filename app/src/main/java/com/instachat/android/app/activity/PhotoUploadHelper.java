@@ -29,8 +29,8 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.instachat.android.Constants;
-import com.instachat.android.TheApp;
 import com.instachat.android.R;
+import com.instachat.android.TheApp;
 import com.instachat.android.data.api.CloudVisionApi;
 import com.instachat.android.data.api.UploadListener;
 import com.instachat.android.util.ImageUtils;
@@ -253,17 +253,12 @@ public class PhotoUploadHelper {
                     final Bitmap bitmap = ImageUtils.getBitmap(mActivity, mTargetFileUri, maxSizeBytes);
                     ImageUtils.writeBitmapToFile(bitmap, mTargetFile);
                     if (mPhotoType == PhotoType.userProfilePhoto) {
-                        if (mActivityState == null || mActivityState.isActivityDestroyed())
-                            return;
-                        mActivity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (mActivityState == null || mActivityState.isActivityDestroyed())
-                                    return;
-                                uploadFromUri(mTargetFileUri, false, false);
-                            }
-                        });
-                    } else { //
+                        uploadUserPhoto();
+                    } else {
+
+                        //todo if public room photo, then use cloud vision api
+                        //if private room photo, just upload it
+
                         try {
                             new CloudVisionApi(mCloudVisionApiListener).checkForAdultOrViolence(bitmap);
                         } catch (final Exception e) {
@@ -275,6 +270,19 @@ public class PhotoUploadHelper {
                     MLog.e(TAG, "reducePhotoSize() failed", e);
                     mListener.onErrorReducingPhotoSize();
                 }
+            }
+        });
+    }
+
+    private void uploadUserPhoto() {
+        if (mActivityState == null || mActivityState.isActivityDestroyed())
+            return;
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mActivityState == null || mActivityState.isActivityDestroyed())
+                    return;
+                uploadFromUri(mTargetFileUri, false, false);
             }
         });
     }
