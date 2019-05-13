@@ -50,7 +50,7 @@ public final class BannedUsersAdapter<T, VH extends RecyclerView.ViewHolder> ext
     protected BannedUser parseSnapshot(DataSnapshot snapshot) {
         MLog.d(TAG, "BannedUser: " + snapshot);
         BannedUser bannedUser = snapshot.getValue(BannedUser.class);
-        bannedUser.id = Integer.parseInt(snapshot.getKey());
+        //bannedUser.id = Integer.parseInt(snapshot.getKey());
         return bannedUser;
     }
 
