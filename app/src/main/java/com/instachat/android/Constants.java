@@ -12,7 +12,7 @@ public final class Constants {
    /*
     * CHANGE THESE WHEN MAKING PRODUCTION BUILDS
     */
-   public static final boolean IS_LOGGING_ENABLED = true;
+   public static final boolean IS_LOGGING_ENABLED = false;
    public static final boolean IS_FOR_AMAZON_ONLY = false;//CHANGE PER AMAZON BUILD!!!
    public static final boolean IS_AMAZON_ADS_ENABLED = false;//CHANGE PER AMAZON BUILD!!!
    public static final boolean IS_AMAZON_DEBUG_AD = false; //CHANGE PER AMAZON BUILD!!!
@@ -117,7 +117,7 @@ public final class Constants {
    public static final int MAX_IMPORTED_IG_FOLLOWS = 500;
 
    public static final String FLURRY_KEY = "HC7CVBW3RQ5XTN5RZK28";
-   public static final String CONTACT_EMAIL = "help@instachat.us";
+   public static final String CONTACT_EMAIL = "instachat.us@gmail.com";
    public static final String PROMOTE_IMAGE_NAME = "promote_me.jpg";
 
    public static final String KEVIN_ADMOB_BANNER_ID = "ca-app-pub-6966894572988765/6985884411";
@@ -194,7 +194,7 @@ public final class Constants {
    }
 
    public static String GROUP_CHAT_REF(long groupid) {
-      return "/public_group_messages_6/" + groupid;
+      return "/public_group_messages_7/" + groupid;
    }
 
    public static String GROUP_CHAT_USERS_REF(long groupid) {
