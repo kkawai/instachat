@@ -11,11 +11,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
@@ -23,17 +18,8 @@ import com.instachat.android.app.BaseFragment;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.databinding.FragmentGenericUsersBinding;
 import com.instachat.android.util.AdminUtil;
-import com.instachat.android.util.MLog;
-import com.instachat.android.util.UserPreferences;
-
-import java.util.concurrent.TimeUnit;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.schedulers.Schedulers;
 
 public class BannedUsersFragment extends BaseFragment {
 
@@ -41,9 +27,7 @@ public class BannedUsersFragment extends BaseFragment {
 
     private BannedUsersAdapter bannedUsersAdapter;
     private FragmentGenericUsersBinding binding;
-    private ChildEventListener childEventListener;
-    private DatabaseReference databaseReference;
-    private Disposable disposable;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -79,8 +63,7 @@ public class BannedUsersFragment extends BaseFragment {
                             return;
                         }
 
-                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.BANS);
-                        ref.child(userid + "").removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        BanHelper.unban(userid, new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
@@ -122,10 +105,7 @@ public class BannedUsersFragment extends BaseFragment {
 
     }
 
-    private void removeBan(int userId) {
-        FirebaseDatabase.getInstance().getReference(Constants.BANS + userId).removeValue();
-    }
-
+    /*
     private void removeExpiredBans() {
         databaseReference = FirebaseDatabase.getInstance().getReference(Constants.BANS);
         childEventListener = databaseReference.addChildEventListener(new ChildEventListener() {
@@ -161,17 +141,12 @@ public class BannedUsersFragment extends BaseFragment {
             }
         });
     }
+    */
 
     @Override
     public void onDestroy() {
         if (bannedUsersAdapter != null) {
             bannedUsersAdapter.cleanup();
-        }
-        if (databaseReference != null && childEventListener != null) {
-            databaseReference.removeEventListener(childEventListener);
-        }
-        if (disposable != null) {
-            disposable.dispose();
         }
         super.onDestroy();
     }

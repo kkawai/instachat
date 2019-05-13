@@ -2,8 +2,8 @@ package com.instachat.android.app.bans;
 
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -16,7 +16,6 @@ import com.instachat.android.util.DeviceUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.UserPreferences;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,6 +66,32 @@ public class BanHelper {
 
             }
         });
+    }
+
+    public static void unban(int userid, final OnCompleteListener onCompleteListener) {
+
+        if (!FirebaseAuth.getInstance().getCurrentUser().getEmail().equals(UserPreferences.getInstance().getEmail())) {
+            return;
+        }
+
+        FirebaseDatabase.getInstance()
+                .getReference(Constants.USER_INFO_REF(userid)+"/d")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            String deviceId = (String)dataSnapshot.getValue();
+                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.BANS+deviceId);
+                            ref.removeValue().addOnCompleteListener(onCompleteListener);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     /*private void getDeviceId(int userId) {
