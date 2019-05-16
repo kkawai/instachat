@@ -10,6 +10,7 @@ import android.view.View;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.firebase.auth.FirebaseAuth;
 import com.instachat.android.R;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.di.component.DaggerAppComponent;
@@ -70,6 +71,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
                     final JSONObject object = new JSONObject(response);
                     final String status = object.getString(NetworkApi.KEY_RESPONSE_STATUS);
                     if (status.equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
+                        FirebaseAuth.getInstance().sendPasswordResetEmail(emailOrUsername);
                         SweetAlertDialog sweetAlertDialog =
                                 new SweetAlertDialog(ForgotPasswordActivity.this, SweetAlertDialog.SUCCESS_TYPE)
                                 .setContentText(getString(R.string.information_emailed));

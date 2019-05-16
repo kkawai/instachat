@@ -206,7 +206,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             public void onResponse(final String string) {
                 try {
                     final JSONObject response = new JSONObject(string);
-                    MLog.i("test", "savedUser: " + string);
+                    MLog.i(TAG, "savedUser: " + string);
                     if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                         user.copyFrom(response.getJSONObject(NetworkApi.RESPONSE_DATA));
                         UserPreferences.getInstance().saveUser(user);
