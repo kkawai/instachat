@@ -33,6 +33,11 @@ public class BanHelper {
     public BanHelper(FirebaseDatabase firebaseDatabase) {
         this.firebaseDatabase = firebaseDatabase;
         MLog.d(TAG,"Created BanHelper");
+        try {
+            checkBan();
+        }catch (Exception e) {
+            MLog.e(TAG,"checkBan failed:",e);
+        }
     }
 
     public void ban(final FriendlyMessage friendlyMessage, int minutes) {
