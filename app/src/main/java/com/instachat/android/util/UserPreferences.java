@@ -132,6 +132,7 @@ public final class UserPreferences {
     }
 
     public void clearUser() {
+        sUser = null;
         mPrefs.edit().remove(PREFERENCE_USER2).remove(PREFERENCE_IS_LOGGED_IN).apply();
     }
 

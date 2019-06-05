@@ -1,12 +1,12 @@
 package com.instachat.android.app.login.signup;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
 
@@ -18,22 +18,23 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.instachat.android.app.analytics.Events;
-import com.instachat.android.app.activity.group.GroupChatActivity;
 import com.instachat.android.R;
+import com.instachat.android.app.analytics.Events;
+import com.instachat.android.app.login.SignInActivity;
 import com.instachat.android.data.api.NetworkApi;
-import com.instachat.android.util.FontUtil;
 import com.instachat.android.data.model.User;
 import com.instachat.android.util.ActivityUtil;
+import com.instachat.android.util.FontUtil;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
+import com.instachat.android.util.UserPreferences;
 
 import org.json.JSONObject;
 
 import javax.inject.Inject;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import dagger.android.AndroidInjection;
 
 /**
@@ -61,9 +62,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         ActivityUtil.hideStatusBar(getWindow());
         DataBindingUtil.setContentView(this, R.layout.activity_sign_up);
         findViewById(R.id.create_account_button).setOnClickListener(this);
-        emailLayout = (TextInputLayout) findViewById(R.id.input_email_layout);
-        passwordLayout = (TextInputLayout) findViewById(R.id.input_password_layout);
-        usernameLayout = (TextInputLayout) findViewById(R.id.input_username_layout);
+        emailLayout = findViewById(R.id.input_email_layout);
+        passwordLayout = findViewById(R.id.input_password_layout);
+        usernameLayout = findViewById(R.id.input_username_layout);
         mFirebaseAuth = FirebaseAuth.getInstance();
         thirdPartyProfilePicUrl = getIntent() != null ? getIntent().getStringExtra("photo") : null;
         final String emailFromGoogle = getIntent() != null ? getIntent().getStringExtra("email") : null;
@@ -209,9 +210,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     MLog.i(TAG, "savedUser: " + string);
                     if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                         user.copyFrom(response.getJSONObject(NetworkApi.RESPONSE_DATA));
-                        UserPreferences.getInstance().saveUser(user);
-                        UserPreferences.getInstance().saveLastSignIn(username);
-                        createFirebaseAccount();
+                        createFirebaseAccount(user);
                     } else {
                         Toast.makeText(SignUpActivity.this, "Error creating account (1): " + response.getString("status"), Toast.LENGTH_SHORT).show();
                     }
@@ -227,7 +226,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         });
     }
 
-    private void createFirebaseAccount() {
+    private void createFirebaseAccount(final User user) {
         mFirebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -238,13 +237,21 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 // signed in user can be handled in the listener.
                 if (!task.isSuccessful()) {
                     MLog.w(TAG, "createFirebaseAccount", task.getException());
-                    showErrorToast("Firebase Account Create Error");
+                    showErrorToast("Account Create Error");
                 } else {
-                    if (!TextUtils.isEmpty(thirdPartyProfilePicUrl))
-                        networkApi.saveThirdPartyPhoto(thirdPartyProfilePicUrl);
-                    startActivity(new Intent(SignUpActivity.this, GroupChatActivity.class));
-                    FirebaseAnalytics.getInstance(SignUpActivity.this).logEvent(Events.SIGNUP_SUCCESS, null);
-                    finish();
+
+                    mFirebaseAuth.getCurrentUser().sendEmailVerification();
+                    SweetAlertDialog dialog = new SweetAlertDialog(SignUpActivity.this, SweetAlertDialog.NORMAL_TYPE).setContentText(getString(R.string.email_verification_sent));
+                    dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            UserPreferences.getInstance().saveLastSignIn(user.getUsername());
+                            startActivity(new Intent(SignUpActivity.this, SignInActivity.class));
+                            FirebaseAnalytics.getInstance(SignUpActivity.this).logEvent(Events.SIGNUP_SUCCESS, null);
+                            finish();
+                        }
+                    });
+                    dialog.show();
                 }
             }
         });

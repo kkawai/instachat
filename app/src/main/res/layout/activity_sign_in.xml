@@ -81,7 +81,7 @@
                 />
 
             <Button
-                android:id="@+id/sign_in_with_email_button"
+                android:id="@+id/sign_in_username_email"
                 android:layout_width="280dp"
                 android:layout_height="75dp"
                 android:layout_gravity="center_horizontal"
@@ -91,15 +91,16 @@
                 android:textSize="24sp"
                 />
 
-            <TextView
-                android:id="@+id/sign_in_with_google_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="20dp"
-                android:text="@string/login_with_google"
-                android:textColor="#0095c4"
-                />
+            <!-- TODO: add a simple button for sign up -->
+            <!--<TextView-->
+                <!--android:id="@+id/sign_in_with_google_textview"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center_horizontal"-->
+                <!--android:layout_marginTop="20dp"-->
+                <!--android:text="@string/login_with_google"-->
+                <!--android:textColor="#0095c4"-->
+                <!--/>-->
 
         </LinearLayout>
 

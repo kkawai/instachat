@@ -5,9 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import com.instachat.android.Constants;
-import com.instachat.android.app.activity.group.GroupChatActivity;
 import com.instachat.android.R;
+import com.instachat.android.app.activity.group.GroupChatActivity;
 import com.instachat.android.app.login.SignInActivity;
 import com.instachat.android.app.login.signup.SignUpActivity;
 import com.instachat.android.util.ActivityUtil;
@@ -23,11 +22,7 @@ public final class LauncherActivity extends AppCompatActivity {
       setTheme(R.style.Theme_App);
       super.onCreate(savedInstanceState);
       if (UserPreferences.getInstance().getUser() != null) {
-         if (Constants.DO_FRAGMENTS) {
-            //startActivity(new Intent(this, GroupChatActivity2.class));
-         } else {
-            startActivity(new Intent(this, GroupChatActivity.class));
-         }
+         startActivity(new Intent(this, GroupChatActivity.class));
          finish();
          return;
       }

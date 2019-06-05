@@ -55,11 +55,12 @@ import org.json.JSONObject;
 
 import javax.inject.Inject;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInViewModel> implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, View.OnFocusChangeListener, SignInNavigator {
 
    private static final String TAG = "SignInActivity";
    private static final int RC_SIGN_IN = 9001;
-   private static final int RC_SIGN_UP = 9002;
    private TextInputLayout passwordLayout, emailLayout;
    private String email, password;
    private String thirdPartyProfilePicUrl;
@@ -86,19 +87,19 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
       ActivityUtil.hideStatusBar(getWindow());
       passwordLayout = (TextInputLayout) findViewById(R.id.input_password_layout);
       emailLayout = (TextInputLayout) findViewById(R.id.input_email_layout);
-      findViewById(R.id.sign_in_with_email_button).setOnClickListener(this);
+      findViewById(R.id.sign_in_username_email).setOnClickListener(this);
       findViewById(R.id.forgot_password).setOnClickListener(this);
       FontUtil.setTextViewFont(passwordLayout);
       FontUtil.setTextViewFont(emailLayout);
 
       // Assign fields
-      findViewById(R.id.sign_in_with_google_textview).setOnClickListener(this);
+      //findViewById(R.id.sign_in_with_google_textview).setOnClickListener(this);
 
       GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
       googleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */).addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
 
       String lastSignIn = UserPreferences.getInstance().getLastSignIn();
-      MLog.i(TAG, "lastSignIn ", lastSignIn);
+      MLog.i(TAG, "lastSignIn: " + lastSignIn);
       if (lastSignIn != null) {
          emailLayout.getEditText().setText(lastSignIn);
       }
@@ -127,22 +128,20 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
 
       emailLayout.setError("");
       passwordLayout.setError("");
-      signInWithEmailOrUsernamePassword(email, password, null);
+      signInWithEmailOrUsernamePassword(email, password);
    }
 
-   private void signInWithEmailOrUsernamePassword(final String emailOrUsername, final String password, final String ltuEmail) {
+   private void signInWithEmailOrUsernamePassword(final String emailOrUsername, final String password) {
       showProgressDialog();
-      networkApi.getUserByEmailOrUsernamePassword(this, emailOrUsername, password, ltuEmail, new Response.Listener<String>() {
+      networkApi.getUserByEmail(this, emailOrUsername, new Response.Listener<JSONObject>() {
          @Override
-         public void onResponse(final String stringResponse) {
+         public void onResponse(final JSONObject response) {
             try {
-               final JSONObject response = new JSONObject(stringResponse);
+               MLog.e(TAG, "getUserByEmail() : " + response);
                final String status = response.getString(NetworkApi.KEY_RESPONSE_STATUS);
                if (status.equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                   final User user = User.fromResponse(response);
-                  UserPreferences.getInstance().saveUser(user);
-                  UserPreferences.getInstance().saveLastSignIn(emailOrUsername);
-                  signIntoFirebase(user.getEmail(), password);
+                  signIntoFirebase(user, password);
                } else {
                   showErrorToast(R.string.email_password_not_found);
                }
@@ -161,21 +160,25 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
       });
    }
 
-   private void signIntoFirebase(final String email, final String password) {
+   private void signIntoFirebase(final User user, final String password) {
 
-      firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+      firebaseAuth.signInWithEmailAndPassword(user.getEmail(), password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
          @Override
          public void onComplete(@NonNull Task<AuthResult> task) {
             MLog.d(TAG, "firebaseAuth.signInWithEmailAndPassword(): " + task.isSuccessful(), " ", email, " ", password);
             if (!task.isSuccessful()) {
-               if (task.getException() instanceof FirebaseAuthInvalidUserException) {
-                  createFirebaseAccount(email, password);
-                  return;
-               }
                MLog.w(TAG, "firebaseAuth.signInWithEmailAndPassword(): ", task.getException());
-               showErrorToast("Sign In Error");
+               //showErrorToast("VERIFY EMAIL");
+               showErrorToast(R.string.email_password_not_found);
             } else {
-               finallyGoChat();
+               if (firebaseAuth.getCurrentUser().isEmailVerified()) {
+                  UserPreferences.getInstance().saveUser(user);
+                  UserPreferences.getInstance().saveLastSignIn(user.getUsername());
+                  finallyGoChat();
+               } else {
+                  firebaseAuth.getCurrentUser().sendEmailVerification();
+                  new SweetAlertDialog(SignInActivity.this, SweetAlertDialog.NORMAL_TYPE).setContentText(getString(R.string.email_verification_sent)).show();
+               }
             }
          }
       });
@@ -190,41 +193,21 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
          }
       }
 
-      if (Constants.DO_FRAGMENTS) {
-         //startActivity(new Intent(SignInActivity.this, GroupChatActivity2.class));
-      } else {
-         startActivity(new Intent(SignInActivity.this, GroupChatActivity.class));
-      }
+      startActivity(new Intent(SignInActivity.this, GroupChatActivity.class));
 
       FirebaseAnalytics.getInstance(this).logEvent(Events.LOGIN_SUCCESS, null);
       finish();
    }
 
-   private void createFirebaseAccount(final String email, final String password) {
-
-      firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-         @Override
-         public void onComplete(@NonNull Task<AuthResult> task) {
-            MLog.d(TAG, "firebaseAuth.createFirebaseAccount(): " + task.isSuccessful(), " ", email, " ", password);
-            if (!task.isSuccessful()) {
-               MLog.w(TAG, "firebaseAuth.createUserWithEmailAndPassword(): ", task.getException());
-               showErrorToast("Sign In Error");
-            } else {
-               finallyGoChat();
-            }
-         }
-      });
-   }
-
    @Override
    public void onClick(final View v) {
       switch (v.getId()) {
-         case R.id.sign_in_with_email_button:
+         case R.id.sign_in_username_email:
             validateAccount();
             break;
-         case R.id.sign_in_with_google_textview:
-            signInWithGoogle();
-            break;
+//         case R.id.sign_in_with_google_textview:
+//            signInWithGoogle();
+//            break;
          case R.id.forgot_password:
             startActivity(new Intent(this, ForgotPasswordActivity.class));
             break;
@@ -233,13 +216,13 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
       }
    }
 
-   private void signInWithGoogle() {
-      startActivityForResult(Auth.GoogleSignInApi.getSignInIntent(googleApiClient), RC_SIGN_IN);
-   }
+   //private void signInWithGoogle() {
+   //   startActivityForResult(Auth.GoogleSignInApi.getSignInIntent(googleApiClient), RC_SIGN_IN);
+   //}
 
-   private void signUp() {
-      startActivityForResult(new Intent(this, SignUpActivity.class), RC_SIGN_UP);
-   }
+   //private void signUp() {
+   //   startActivityForResult(new Intent(this, SignUpActivity.class), RC_SIGN_UP);
+   //}
 
    @Override
    public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -251,59 +234,13 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
          if (result.isSuccess()) {
             // Google Sign In was successful, authenticate with Firebase
             final GoogleSignInAccount account = result.getSignInAccount();
-            firebaseAuthWithGoogle(account);
+            //firebaseAuthWithGoogle(account);
          } else {
             // Google Sign In failed
             MLog.e(TAG, "Google Sign In failed: " + result.toString());
             showErrorToast("Google Sign In Failed");
          }
       }
-   }
-
-   /**
-    * Successfully signing in via google means that we must
-    * check if the user exists in our system.
-    * If exists already, then just enter GroupChatActivity.
-    * If not exists, we must complete registration,
-    * by asking user to enter password.
-    *
-    * @param acct
-    */
-   private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
-      if (acct.getPhotoUrl() != null && !TextUtils.isEmpty(acct.getPhotoUrl().toString())) {
-         thirdPartyProfilePicUrl = acct.getPhotoUrl().toString();
-      }
-      showProgressDialog();
-      networkApi.getUserByEmail(this, acct.getEmail(), new Response.Listener<JSONObject>() {
-         @Override
-         public void onResponse(final JSONObject response) {
-            try {
-               if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
-                  final User user = User.fromResponse(response);
-                  UserPreferences.getInstance().saveUser(user);
-                  UserPreferences.getInstance().saveLastSignIn(user.getUsername());
-                  signIntoFirebase(user.getEmail(), user.getPassword());
-               } else { //user does not exist go to sign up activity
-                  hideProgressDialog();
-                  final Intent intent = new Intent(SignInActivity.this, SignUpActivity.class);
-                  if (acct.getPhotoUrl() != null)
-                     intent.putExtra("photo", acct.getPhotoUrl().toString());
-                  intent.putExtra("email", acct.getEmail());
-                  MLog.i(TAG, "user photo: " + acct.getPhotoUrl() + " displayname " + acct.getDisplayName());
-                  startActivity(intent);
-               }
-            } catch (final Exception e) {
-               MLog.e(TAG, "checkUserExists() failed", e);
-               showErrorToast("1");
-            }
-         }
-      }, new Response.ErrorListener() {
-         @Override
-         public void onErrorResponse(final VolleyError error) {
-            MLog.e(TAG, "checkUserExists() error response: " + error);
-            showErrorToast("2");
-         }
-      });
    }
 
    @Override
@@ -324,10 +261,6 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
       }
    }
 
-   private String errorMessage(final int stringResId, final String str) {
-      return getString(stringResId, str);
-   }
-
    private void showErrorToast(final String distinctScreenCode) {
       hideProgressDialog();
       try {
@@ -340,61 +273,6 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
    private void showErrorToast(final int stringResId) {
       hideProgressDialog();
       Toast.makeText(this, stringResId, Toast.LENGTH_SHORT).show();
-   }
-
-   private AlertDialog showNewEmailDialog(@NonNull final Context context, final String username, final String password) {
-      final Object tag = new Object();
-      DialogInputEmailBinding binding = DialogInputEmailBinding.inflate(getLayoutInflater());
-      final View view = binding.getRoot();
-      final TextView textView = (TextView) view.findViewById(R.id.input_email);
-      final TextInputLayout textInputLayout = (TextInputLayout) view.findViewById(R.id.input_email_layout);
-      FontUtil.setTextViewFont(textView);
-      final AlertDialog dialog = new ThemedAlertDialog.Builder(context).
-            setView(view).
-            setCancelable(false).
-            setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-               @Override
-               public void onClick(DialogInterface dialogInterface, int i) {
-                  final String ltuEmail = textView.getText().toString();
-                  if (!StringUtil.isValidEmail(ltuEmail)) {
-                     textInputLayout.setError(getString(R.string.invalid_email));
-                     Toast.makeText(SignInActivity.this, getString(R.string.invalid_email), Toast.LENGTH_SHORT).show();
-                     return;
-                  }
-                  showProgressDialog();
-                  networkApi.isExistsEmail(tag, ltuEmail, new Response.Listener<JSONObject>() {
-                     @Override
-                     public void onResponse(JSONObject response) {
-                        if (isFinishing())
-                           return;
-                        try {
-                           if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK) && response.getJSONObject(NetworkApi.RESPONSE_DATA).getBoolean(NetworkApi.KEY_EXISTS)) {
-                              textInputLayout.setError(errorMessage(R.string.email_exists, ltuEmail));
-                              hideProgressDialog();
-                              Toast.makeText(SignInActivity.this, errorMessage(R.string.email_exists, ltuEmail), Toast.LENGTH_SHORT).show();
-                           } else {
-                              signInWithEmailOrUsernamePassword(username, password, ltuEmail);
-                           }
-                        } catch (Exception e) {
-                           showErrorToast("bad response");
-                           MLog.e(TAG, "response: ", response);
-                        }
-                     }
-                  }, new Response.ErrorListener() {
-                     @Override
-                     public void onErrorResponse(VolleyError error) {
-                        showErrorToast("bad network");
-                        MLog.e(TAG, "", error);
-                     }
-                  });
-               }
-            }).setOnCancelListener(new DialogInterface.OnCancelListener() {
-         @Override
-         public void onCancel(DialogInterface dialogInterface) {
-            requestQueue.cancelAll(tag);
-         }
-      }).show();
-      return dialog;
    }
 
    private void showProgressDialog() {

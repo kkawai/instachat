@@ -26,6 +26,7 @@ import com.instachat.android.R;
 import com.instachat.android.TheApp;
 import com.instachat.android.app.activity.AbstractChatActivity;
 import com.instachat.android.app.activity.AttachPhotoOptionsDialogHelper;
+import com.instachat.android.app.activity.LauncherActivity;
 import com.instachat.android.app.activity.PhotoUploadHelper;
 import com.instachat.android.app.activity.UsersInGroupListener;
 import com.instachat.android.app.adapter.FriendlyMessageListener;
@@ -350,7 +351,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         groupChatViewModel.removeUserPresenceFromGroup();
         gcmHelper.unregister(UserPreferences.getInstance().getUserId() + "");
         UserPreferences.getInstance().clearUser();
-        startActivity(new Intent(GroupChatActivity.this, SignInActivity.class));
+        startActivity(new Intent(GroupChatActivity.this, LauncherActivity.class));
         finish();
     }
 
