@@ -171,13 +171,14 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
                //showErrorToast("VERIFY EMAIL");
                showErrorToast(R.string.email_password_not_found);
             } else {
+               hideProgressDialog();
                if (firebaseAuth.getCurrentUser().isEmailVerified()) {
                   UserPreferences.getInstance().saveUser(user);
                   UserPreferences.getInstance().saveLastSignIn(user.getUsername());
                   finallyGoChat();
                } else {
                   firebaseAuth.getCurrentUser().sendEmailVerification();
-                  new SweetAlertDialog(SignInActivity.this, SweetAlertDialog.NORMAL_TYPE).setContentText(getString(R.string.email_verification_sent)).show();
+                  new SweetAlertDialog(SignInActivity.this, SweetAlertDialog.NORMAL_TYPE).setContentText(getString(R.string.email_verification_sent, user.getEmail())).show();
                }
             }
          }
@@ -196,6 +197,7 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
       startActivity(new Intent(SignInActivity.this, GroupChatActivity.class));
 
       FirebaseAnalytics.getInstance(this).logEvent(Events.LOGIN_SUCCESS, null);
+      setResult(RESULT_OK);
       finish();
    }
 

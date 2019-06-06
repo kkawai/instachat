@@ -205,9 +205,10 @@
     <string name="you_have_been_banned">You have been temporarily banned</string>
     <string name="title_banned_users">Banned Users</string>
     <string name="title_bans">Bans</string>
-    <string name="email_verification_sent">Please verify your email address before using Instachat.  Please check your email.</string>
+    <string name="email_verification_sent">Please verify your email address before using Instachat.  Please check your email: %s</string>
     <string name="add_friend">Add Friend</string>
     <string name="slow_down">Slow down</string>
+    <string name="password_reset_link_sent">Password reset link sent to email: %s</string>
 
     <string name="terms_of_use">TERMS OF USE: You agree to NOT post abusive, threatening, racist, bullying comments or photos or any objectionable content.  You also agree NOT to post sexually aggressive or degrading comments towards any other community member or participant regardless of their age, gender, race, or sexual orientation.  If you violate these terms, you will be permanently banned from using this app and any objectionable content you post can be used against you.</string>
 </resources>

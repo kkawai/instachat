@@ -461,17 +461,6 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     }
 
     @Override
-    public void showVerificationEmailSent() {
-        SweetAlertDialog dialog = new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE).setContentText(getString(R.string.email_verification_sent));
-        dialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-            @Override
-            public void onClick(SweetAlertDialog sweetAlertDialog) {
-                _signout();
-            }
-        });
-    }
-
-    @Override
     public void enterChat() {
         _signout();
     }

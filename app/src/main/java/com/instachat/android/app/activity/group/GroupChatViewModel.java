@@ -296,22 +296,4 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
         return roomCommentCount;
     }
 
-    public void checkEmailVerified() {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        FirebaseUser user = auth.getCurrentUser();
-
-        if (!user.isEmailVerified()) {
-            user.sendEmailVerification()
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                MLog.d(TAG, "Email sent.");
-                            }
-                        }
-                    });
-            getNavigator().showVerificationEmailSent();
-        }
-    }
-
 }

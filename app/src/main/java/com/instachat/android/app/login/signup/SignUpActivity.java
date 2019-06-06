@@ -241,13 +241,14 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
 
                     mFirebaseAuth.getCurrentUser().sendEmailVerification();
-                    SweetAlertDialog dialog = new SweetAlertDialog(SignUpActivity.this, SweetAlertDialog.NORMAL_TYPE).setContentText(getString(R.string.email_verification_sent));
+                    SweetAlertDialog dialog = new SweetAlertDialog(SignUpActivity.this, SweetAlertDialog.NORMAL_TYPE).setContentText(getString(R.string.email_verification_sent, user.getEmail()));
                     dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
                         public void onDismiss(DialogInterface dialog) {
                             UserPreferences.getInstance().saveLastSignIn(user.getUsername());
                             startActivity(new Intent(SignUpActivity.this, SignInActivity.class));
                             FirebaseAnalytics.getInstance(SignUpActivity.this).logEvent(Events.SIGNUP_SUCCESS, null);
+                            setResult(RESULT_OK);
                             finish();
                         }
                     });

@@ -13,6 +13,7 @@ import com.android.volley.VolleyError;
 import com.google.firebase.auth.FirebaseAuth;
 import com.instachat.android.R;
 import com.instachat.android.data.api.NetworkApi;
+import com.instachat.android.data.model.User;
 import com.instachat.android.di.component.DaggerAppComponent;
 import com.instachat.android.util.ActivityUtil;
 import com.instachat.android.util.MLog;
@@ -43,7 +44,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
         inject();
         ActivityUtil.hideStatusBar(getWindow());
         DataBindingUtil.setContentView(this, R.layout.activity_forgot_password);
-        emailLayout = (TextInputLayout) findViewById(R.id.input_email_layout);
+        emailLayout = findViewById(R.id.input_email_layout);
         findViewById(R.id.input_username_or_email).setOnClickListener(this);
 
         // Set click listeners
@@ -64,17 +65,19 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
                     .show();
             return;
         }
-        networkApi.forgotPassword(this, emailOrUsername, new Response.Listener<String>() {
+
+        networkApi.getUserByEmail(this, emailOrUsername, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(final String response) {
+            public void onResponse(final JSONObject response) {
                 try {
-                    final JSONObject object = new JSONObject(response);
-                    final String status = object.getString(NetworkApi.KEY_RESPONSE_STATUS);
+                    MLog.e(TAG, "getUserByEmail() : " + response);
+                    final String status = response.getString(NetworkApi.KEY_RESPONSE_STATUS);
                     if (status.equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
-                        FirebaseAuth.getInstance().sendPasswordResetEmail(emailOrUsername);
+                        final User user = User.fromResponse(response);
+                        FirebaseAuth.getInstance().sendPasswordResetEmail(user.getEmail());
                         SweetAlertDialog sweetAlertDialog =
                                 new SweetAlertDialog(ForgotPasswordActivity.this, SweetAlertDialog.SUCCESS_TYPE)
-                                .setContentText(getString(R.string.information_emailed));
+                                        .setContentText(getString(R.string.password_reset_link_sent, user.getEmail()));
                         sweetAlertDialog.show();
                         sweetAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                             @Override
@@ -86,18 +89,19 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
                         showErrorToast(R.string.email_password_not_found);
                     }
                 } catch (final Exception e) {
-                    MLog.e(TAG, "forgotPassword() ", e);
-                    showErrorToast(R.string.email_password_not_found);
+                    MLog.e(TAG, e);
+                    showErrorToast(R.string.general_api_error);
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(final VolleyError error) {
-                MLog.e(TAG, "forgotPassword() failed: " + error);
-                showErrorToast(R.string.email_password_not_found);
+                MLog.e(TAG, "failed: " + error);
+                showErrorToast(R.string.general_api_error);
             }
         });
+
     }
 
     @Override

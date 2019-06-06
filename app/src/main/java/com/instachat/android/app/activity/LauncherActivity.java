@@ -1,7 +1,9 @@
 package com.instachat.android.app.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
@@ -33,17 +35,22 @@ public final class LauncherActivity extends AppCompatActivity {
       findViewById(R.id.login_button).setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
-            startActivity(new Intent(LauncherActivity.this, SignInActivity.class));
-            finish();
+            startActivityForResult(new Intent(LauncherActivity.this, SignInActivity.class), 10);
          }
       });
       findViewById(R.id.sign_up_button).setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
-            startActivity(new Intent(LauncherActivity.this, SignUpActivity.class));
-            finish();
+            startActivityForResult(new Intent(LauncherActivity.this, SignUpActivity.class), 10);
          }
       });
    }
 
+   @Override
+   protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+      super.onActivityResult(requestCode, resultCode, data);
+      if (requestCode == 10 && resultCode == Activity.RESULT_OK) {
+         finish();
+      }
+   }
 }
