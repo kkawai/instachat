@@ -40,15 +40,15 @@ ext {
     googlePlayServicesGcmVersion = '16.0.0'
     googlePlayServicesPlusVersion = '16.0.0'
 
-    firebaseCoreVersion = '16.0.6'
-    firebaseDatabaseVersion = '16.0.5'
-    firebaseAuthVersion = '16.1.0'
-    firebaseStorageVersion = '16.0.5'
-    firebaseConfigVersion = '16.1.2'
-    firebaseMessagingVersion = '17.3.4'
+    firebaseCoreVersion = '16.0.9'
+    firebaseDatabaseVersion = '17.0.0'
+    firebaseAuthVersion = '17.0.0'
+    firebaseStorageVersion = '17.0.0'
+    firebaseConfigVersion = '17.0.0'
+    firebaseMessagingVersion = '18.0.0'
     firebaseCrashVersion = '16.2.1'
-    firebaseAnalyticsVersion = '16.0.6'
-    firebaseInvitesVersion = '16.0.6'
+    firebaseAnalyticsVersion = '16.5.0'
+    firebaseInvitesVersion = '17.0.0'
 
 
     dexMakerVersion = '1.2'

@@ -64,8 +64,8 @@ public class RequestsFragment extends BaseFragment {
     private void acceptUserPrompt(final int userid, final String username, final String dpid, final View transitionImageView) {
 
         new SweetAlertDialog(getActivity(), SweetAlertDialog.CUSTOM_IMAGE_TYPE)
-                .setTitleText(getActivity().getString(R.string.accept_request_title, username))
-                .setContentText(getActivity().getString(R.string.accept_request_question, username))
+                .setTitleText(getActivity().getString(R.string.accept_request_title) + " " + username + "?")
+                .setContentText(username + " " + getActivity().getString(R.string.accept_request_question))
                 .setCancelText(getActivity().getString(R.string.no))
                 .setConfirmText(getActivity().getString(R.string.yes))
                 .showCancelButton(true)

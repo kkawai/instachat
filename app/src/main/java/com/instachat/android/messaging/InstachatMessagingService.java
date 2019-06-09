@@ -31,7 +31,10 @@ import com.instachat.android.R;
 import com.instachat.android.app.activity.LauncherActivity;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.PrivateChatSummary;
+import com.instachat.android.gcm.GCMHelper;
+import com.instachat.android.gcm.GCMRegistrationManager;
 import com.instachat.android.util.MLog;
+import com.instachat.android.util.SimpleRxWrapper;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.view.CircleTransform;
 
@@ -41,6 +44,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -48,7 +53,10 @@ import io.reactivex.schedulers.Schedulers;
 
 public class InstachatMessagingService extends FirebaseMessagingService {
 
-    private static final String TAG = "FCMService";
+    private static final String TAG = "InstachatMessagingService";
+
+    @Inject
+    protected GCMHelper gcmHelper;
 
     //all pending request notifications will have the same id
     //2 will not conflict with any user id
@@ -187,7 +195,7 @@ public class InstachatMessagingService extends FirebaseMessagingService {
         // Use NotificationCompat.Builder to set up our notification.
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, Constants.CHANNEL_ID_NEW_MSGS);
         builder.addAction(replyAction)
-                .setContentTitle(getString(R.string.said, friendlyMessage.getName()))
+                .setContentTitle(friendlyMessage.getName() + " " + getString(R.string.said))
                 .setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp)
                 .setLargeIcon(bitmap == null ? BitmapFactory.decodeResource(getResources(), R.drawable
                         .ic_anon_person_36dp) : bitmap)
@@ -321,7 +329,7 @@ public class InstachatMessagingService extends FirebaseMessagingService {
                 .setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp)
                 .setContentIntent(pendingIntent)
                 .setSound(customSound)
-                .setSubText(getString(R.string.sent_via, getString(R.string.app_name)));
+                .setSubText(getString(R.string.sent_via) + " " + getString(R.string.app_name));
 
         final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFICATION_ID_FRIEND_JUMPED_IN, builder.build());
@@ -350,9 +358,20 @@ public class InstachatMessagingService extends FirebaseMessagingService {
                 .setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp)
                 .setContentIntent(pendingIntent)
                 .setSound(customSound)
-                .setSubText(getString(R.string.sent_via, getString(R.string.app_name)));
+                .setSubText(getString(R.string.sent_via) + " " + getString(R.string.app_name));
         final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFICATION_ID_PENDING_REQUESTS, builder.build());
         FirebaseAnalytics.getInstance(this).logEvent(Events.PENDING_REQUEST_ISSUED, null);
+    }
+
+    @Override
+    public void onNewToken(final String token) {
+        MLog.d(TAG, "kevinFirbaseMessaging. onNewToken: " + token);
+        SimpleRxWrapper.executeInWorkerThread(new Runnable() {
+            @Override
+            public void run() {
+                GCMRegistrationManager.saveRegistrationId(InstachatMessagingService.this, token);
+            }
+        });
     }
 }

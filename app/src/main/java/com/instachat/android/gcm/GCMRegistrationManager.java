@@ -6,17 +6,21 @@ import android.content.pm.PackageInfo;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.iid.InstanceID;
-import com.instachat.android.Constants;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.instachat.android.TheApp;
 import com.instachat.android.data.DataManager;
 import com.instachat.android.data.api.BasicResponse;
-import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.util.DeviceUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.SimpleRxWrapper;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.rx.SchedulerProvider;
+
+import java.io.IOException;
 
 import javax.inject.Inject;
 
@@ -30,11 +34,10 @@ import io.reactivex.functions.Consumer;
  */
 public final class GCMRegistrationManager {
 
-    private static final String TAG = GCMRegistrationManager.class.getSimpleName();
+    private static final String TAG = "GCMRegistrationManager";
 
     private static final String PROPERTY_APP_VERSION = "appVersion";
     public static final String PROPERTY_REG_ID = "registration_id";
-    private GoogleCloudMessaging gcm;
     private String regId;
     private final Context context;
     private final DataManager dataManager;
@@ -51,12 +54,18 @@ public final class GCMRegistrationManager {
 
     public void registerGCM() {
 
-        gcm = GoogleCloudMessaging.getInstance(context);
         regId = getRegistrationId(context);
+        MLog.d(TAG,"kevinFirbaseMessaging registerGCM regId: " + regId);
 
-        if (regId.isEmpty()) {
-            registerInBackground();
-        }
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+            @Override
+            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                MLog.d(TAG,"kevinFirbaseMessaging registerGCM getInstanceId.getToken(): " + task.getResult().getToken());
+                regId = task.getResult().getToken();
+                registerInBackground();
+            }
+        });
+
     }
 
     /**
@@ -72,12 +81,9 @@ public final class GCMRegistrationManager {
             @Override
             public void run() {
                 try {
-                    if (gcm == null) {
-                        gcm = GoogleCloudMessaging.getInstance(context);
-                    }
-                    regId = InstanceID.getInstance(context).getToken(Constants.GCM_SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE);
 
-                    MLog.i(TAG, "debugx Device registered, registration ID=" + regId);
+
+                    MLog.i(TAG, "Device registered, registration ID=" + regId);
 
                     // You should send the registration ID to your server over
                     // HTTP,
@@ -100,20 +106,7 @@ public final class GCMRegistrationManager {
                         }
                     });
 
-                    // For this demo: we don't need to send it because the
-                    // device
-                    // will send upstream messages to a server that echo back
-                    // the
-                    // message using the 'from' address in the message.
-
-                    // Persist the regID - no need to registerIfNecessary again.
-                    final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                    final int appVersion = getAppVersion(context);
-                    MLog.i(TAG, "debugx Saving regId on app version " + appVersion);
-                    final SharedPreferences.Editor editor = prefs.edit();
-                    editor.putString(PROPERTY_REG_ID, regId);
-                    editor.putInt(PROPERTY_APP_VERSION, appVersion);
-                    editor.commit();
+                    saveRegistrationId(TheApp.getInstance(), regId);
 
                 } catch (final Exception e) {
                     MLog.e(TAG, "debugx", e);
@@ -121,6 +114,16 @@ public final class GCMRegistrationManager {
             }
 
         });
+    }
+
+    public static void saveRegistrationId(Context context, final String regId) {
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        final int appVersion = getAppVersion(context);
+        MLog.i(TAG, "Saving regId on app version " + appVersion);
+        final SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(PROPERTY_REG_ID, regId);
+        editor.putInt(PROPERTY_APP_VERSION, appVersion);
+        editor.apply();
     }
 
     /**
@@ -157,7 +160,16 @@ public final class GCMRegistrationManager {
         final SharedPreferences.Editor editor = prefs.edit();
         editor.remove(PROPERTY_REG_ID);
         editor.remove(PROPERTY_APP_VERSION);
-        editor.commit();
+        editor.apply();
+
+        /*
+        try {
+            FirebaseInstanceId.getInstance().deleteInstanceId();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        FirebaseAuth.getInstance().signOut();
+        */
     }
 
     private static int getAppVersion(final Context context) {

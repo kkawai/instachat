@@ -18,8 +18,8 @@ android {
         applicationId "com.instachat.android"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.compileSdkVersion
-        versionCode 97
-        versionName "2.2.7"
+        versionCode 98
+        versionName "2.2.8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -70,7 +70,7 @@ dependencies {
 
     // Google
     implementation "com.google.android.gms:play-services-auth:$rootProject.ext.googlePlayServicesAuthVersion"
-    implementation "com.google.android.gms:play-services-gcm:$rootProject.ext.googlePlayServicesGcmVersion"
+    //implementation "com.google.android.gms:play-services-gcm:$rootProject.ext.googlePlayServicesGcmVersion"
     implementation "com.google.android.gms:play-services-plus:$rootProject.ext.googlePlayServicesPlusVersion"
 
     // Firebase

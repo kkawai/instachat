@@ -77,7 +77,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
                         FirebaseAuth.getInstance().sendPasswordResetEmail(user.getEmail());
                         SweetAlertDialog sweetAlertDialog =
                                 new SweetAlertDialog(ForgotPasswordActivity.this, SweetAlertDialog.SUCCESS_TYPE)
-                                        .setContentText(getString(R.string.password_reset_link_sent, user.getEmail()));
+                                        .setContentText(getString(R.string.password_reset_link_sent) + " " + user.getEmail());
                         sweetAlertDialog.show();
                         sweetAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                             @Override

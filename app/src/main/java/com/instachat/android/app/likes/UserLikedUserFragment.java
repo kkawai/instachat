@@ -53,7 +53,7 @@ public class UserLikedUserFragment extends BaseFragment {
    @Override
    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
       super.onActivityCreated(savedInstanceState);
-      binding.customFragmentToolbarTitle.setText(getString(R.string.likes_plural, getArguments().getString(Constants.KEY_USERNAME)));
+      binding.customFragmentToolbarTitle.setText(getArguments().getString(Constants.KEY_USERNAME) + " " + getString(R.string.likes_plural));
       mUserClickedListener = new UserClickedListener() {
          @Override
          public void onUserClicked(final int userid, final String username, final String dpid, View transitionImageView) {

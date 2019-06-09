@@ -99,7 +99,7 @@ public final class TimeUtil {
 
         if (duration < hour) {
             int n = (int) Math.floor(duration / minute);
-            return TheApp.getInstance().getString(R.string.some_minutes_ago, "" + n);
+            return  "" + n + " " + TheApp.getInstance().getString(R.string.some_minutes_ago);
             //return n + " minutes ago";
         }
 
@@ -111,7 +111,7 @@ public final class TimeUtil {
         if (duration < day) {
             int n = (int) Math.floor(duration / hour);
             //return n + " hours ago";
-            return TheApp.getInstance().getString(R.string.some_hours_ago, "" + n);
+            return "" + n + " " + TheApp.getInstance().getString(R.string.some_hours_ago);
         }
         if (duration > day && duration < (day * 2)) {
             //return "1 day ago";
@@ -122,10 +122,10 @@ public final class TimeUtil {
         if (n < 365) {
             if (n > 30)
                 //return (n / 30) + " month(s) ago";
-                return TheApp.getInstance().getString(R.string.some_minutes_ago, "" + n);
+                return "" + n + " " + TheApp.getInstance().getString(R.string.some_minutes_ago);
             else
                 //return n + " days ago";
-                return TheApp.getInstance().getString(R.string.some_days_ago, "" + n);
+                return "" + n + " " + TheApp.getInstance().getString(R.string.some_days_ago);
         } else {
             //return ">1y";
             return TheApp.getInstance().getString(R.string.more_than_one_year_ago);

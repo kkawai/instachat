@@ -138,7 +138,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             if (!response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                                 showErrorToast("1");
                             } else if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK) && response.getJSONObject(NetworkApi.RESPONSE_DATA).getBoolean(NetworkApi.KEY_EXISTS)) {
-                                emailLayout.setError(errorMessage(R.string.email_exists, email));
+                                emailLayout.setError(getString(R.string.email_exists) + " " + email);
                             } else {
                                 remotelyValidateUsername();
                             }
@@ -166,7 +166,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             if (!response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                                 showErrorToast("1");
                             } else if (response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK) && response.getJSONObject(NetworkApi.RESPONSE_DATA).getBoolean(NetworkApi.KEY_EXISTS)) {
-                                usernameLayout.setError(errorMessage(R.string.username_exists, username));
+                                usernameLayout.setError(getString(R.string.username_exists) + " " +username);
                             } else {
                                 createAccount();
                             }
@@ -183,13 +183,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 });
     }
 
-    private String errorMessage(final int stringResId, final String str) {
-        return getString(stringResId, str);
-    }
-
     private void showErrorToast(final String distinctScreenCode) {
         try {
-            Toast.makeText(this, getString(R.string.general_api_error, distinctScreenCode), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.general_api_error) + " " + distinctScreenCode, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             MLog.e(TAG, "", e);
         }
@@ -241,7 +237,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
 
                     mFirebaseAuth.getCurrentUser().sendEmailVerification();
-                    SweetAlertDialog dialog = new SweetAlertDialog(SignUpActivity.this, SweetAlertDialog.NORMAL_TYPE).setContentText(getString(R.string.email_verification_sent, user.getEmail()));
+                    SweetAlertDialog dialog = new SweetAlertDialog(SignUpActivity.this, SweetAlertDialog.NORMAL_TYPE).setContentText(getString(R.string.email_verification_sent) + " " + user.getEmail());
                     dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
                         public void onDismiss(DialogInterface dialog) {

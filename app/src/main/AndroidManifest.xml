@@ -16,9 +16,6 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
     <!-- end permissions for video chat -->
 
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-
     <!--
     This permission is not required for Firebase Storage and is only used to read
     files from the camera and upload them to Firebase Storage as a demonstration. -->
@@ -34,12 +31,6 @@
         android:protectionLevel="signature"/>
 
     <uses-permission android:name="com.instachat.android.permission.RECEIVE_ADM_MESSAGE"/>
-
-    <permission
-        android:name="com.instachat.android.permission.C2D_MESSAGE"
-        android:protectionLevel="signature"/>
-    <uses-permission android:name="com.instachat.android.permission.C2D_MESSAGE"/>
-
 
     <!-- This permission allows your app access to receive push notifications from ADM. -->
     <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE"/>
@@ -147,11 +138,6 @@
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
-        </service>
-
-        <service
-            android:name=".app.MyFirebaseInstanceIdService"
-            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>

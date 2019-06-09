@@ -50,8 +50,8 @@ public class BlockUserDialogHelper {
         }
 
         new SweetAlertDialog(activity, SweetAlertDialog.WARNING_TYPE)
-                .setTitleText(activity.getString(R.string.block_person_title, username))
-                .setContentText(activity.getString(R.string.block_person_question, username))
+                .setTitleText(activity.getString(R.string.block_person_title) + " " + username + "?")
+                .setContentText(activity.getString(R.string.block_person_question))
                 .setCancelText(activity.getString(android.R.string.no))
                 .setConfirmText(activity.getString(android.R.string.yes))
                 .showCancelButton(true)
@@ -80,7 +80,7 @@ public class BlockUserDialogHelper {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(activity, activity.getString(R.string.block_person_success, username), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity, username + " " + activity.getString(R.string.block_person_success), Toast.LENGTH_SHORT).show();
                             listener.onUserBlocked(userid);
                             firebaseDatabase.getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF())
                                     .child(userid + "")
@@ -88,7 +88,7 @@ public class BlockUserDialogHelper {
                         } else {
                             new SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
                                     .setTitleText(activity.getString(R.string.oops_exclamation))
-                                    .setContentText(activity.getString(R.string.block_person_failed, username))
+                                    .setContentText(activity.getString(R.string.block_person_failed))
                                     .show();
                         }
                     }

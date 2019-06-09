@@ -178,7 +178,7 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
                   finallyGoChat();
                } else {
                   firebaseAuth.getCurrentUser().sendEmailVerification();
-                  new SweetAlertDialog(SignInActivity.this, SweetAlertDialog.NORMAL_TYPE).setContentText(getString(R.string.email_verification_sent, user.getEmail())).show();
+                  new SweetAlertDialog(SignInActivity.this, SweetAlertDialog.NORMAL_TYPE).setContentText(getString(R.string.email_verification_sent) + " " + user.getEmail()).show();
                }
             }
          }
@@ -266,7 +266,7 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
    private void showErrorToast(final String distinctScreenCode) {
       hideProgressDialog();
       try {
-         Toast.makeText(this, getString(R.string.general_api_error, distinctScreenCode), Toast.LENGTH_SHORT).show();
+         Toast.makeText(this, getString(R.string.general_api_error) + " " +distinctScreenCode, Toast.LENGTH_SHORT).show();
       } catch (Exception e) {
          MLog.e(TAG, "", e);
       }

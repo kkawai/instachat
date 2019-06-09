@@ -8,7 +8,6 @@ import com.amazon.device.messaging.ADM;
 import com.amazon.device.messaging.development.ADMManifest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.iid.InstanceID;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.instachat.android.Constants;
 import com.instachat.android.TheApp;
@@ -32,7 +31,7 @@ import javax.inject.Inject;
 
 public class GCMHelper {
 
-    private static final String TAG = GCMHelper.class.getSimpleName();
+    private static final String TAG = "GCMHelper";
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     private final NetworkApi networkApi;
@@ -165,15 +164,13 @@ public class GCMHelper {
                                     MLog.e(TAG, "gcm failed to unregister", e);
                                 }
                             }
-                            try {
-                                InstanceID.getInstance(TheApp.getInstance()).deleteInstanceID();
-                            } catch (Exception e) {
-                                MLog.e(TAG, "gcm failed to unregister. failed to delete instance id", e);
-                            }
+
                         }
                     }
                 }
         );
     }
+
+
 
 }

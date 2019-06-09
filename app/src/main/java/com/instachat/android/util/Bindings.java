@@ -59,7 +59,7 @@ public class Bindings {
         if (likes <= 1)
             textView.setText(textView.getContext().getString(R.string.gave_like_singular));
         else
-            textView.setText(textView.getContext().getString(R.string.gave_likes_plural,(""+likes)));
+            textView.setText(textView.getContext().getString(R.string.gave_likes_plural) + " " + likes);
     }
 
     @BindingAdapter("likes")
@@ -67,7 +67,7 @@ public class Bindings {
         if (likes <= 1)
             textView.setText(textView.getContext().getString(R.string.like_singular));
         else
-            textView.setText(textView.getContext().getString(R.string.likes_plural,(""+likes)));
+            textView.setText(likes + " " + textView.getContext().getString(R.string.likes_plural));
     }
 
     @BindingAdapter("pendingRequests")
@@ -75,7 +75,7 @@ public class Bindings {
         if (pendingRequsts == 1) {
             textView.setText(R.string.left_drawer_pending_request_singular);
         } else if (pendingRequsts > 1) {
-            textView.setText(textView.getContext().getString(R.string.left_drawer_pending_requests_plural, "" + pendingRequsts));
+            textView.setText(pendingRequsts + " " + textView.getContext().getString(R.string.left_drawer_pending_requests_plural));
         }
     }
 

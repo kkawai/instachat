@@ -16,15 +16,15 @@
     <string name="delete_message_question">Delete Message?</string>
     <string name="block">Block</string>
     <string name="report">Report</string>
-    <string name="block_person_title">Block %s?</string>
-    <string name="block_person_question">Are you sure you want this?  %s will not be able to send you direct messages and you will not see any more of his or her posts in any of the chat rooms.  If you wish, you can unblock later.</string>
-    <string name="block_person_failed">Error!  We could not block %s.  Please try again.</string>
-    <string name="block_person_success">You have blocked %s</string>
+    <string name="block_person_title">Block</string>
+    <string name="block_person_question">Are you sure you want this?  This person will not be able to send you direct messages and you will not see any more of his or her posts in any of the chat rooms.  If you wish, you can unblock later.</string>
+    <string name="block_person_failed">Could not block.  Please try again.</string>
+    <string name="block_person_success">was blocked.</string>
 
-    <string name="unblock_person_title">Unblock %s?</string>
-    <string name="unblock_person_question">Are you sure you want this?  %s will be able to send you direct messages and you can start seeing his or her posts in any of the chat rooms.  If you wish, you can block again.</string>
-    <string name="unblock_person_failed">Error!  We could not unblock %s.  Please try again.</string>
-    <string name="unblock_person_success">You have unblocked %s</string>
+    <string name="unblock_person_title">Unblock </string>
+    <string name="unblock_person_question">Are you sure?  This person will be able to send you direct messages and you can see his or her posts in the rooms.</string>
+    <string name="unblock_person_failed">Error.  Please try again.</string>
+    <string name="unblock_person_success">Unblocked!</string>
 
     <string name="block_cannot_block_yourself">You cannot block yourself silly!</string>
     <string name="message_delete_title">Delete Message?</string>
@@ -45,21 +45,20 @@
     <string name="create_account">Create Account</string>
     <string name="fresh_config">Fresh Config</string>
     <string name="cause_crash">Cause Crash</string>
-    <string name="general_api_error">Could not do it.  Please try again.  %s</string>
-    <string name="email_exists">Please choose a different email.  %s is already registered.</string>
-    <string name="username_exists">Please choose a different username name.  %s is already taken.</string>
+    <string name="general_api_error">Error. Please try again.</string>
+    <string name="email_exists">This email is already taken: </string>
+    <string name="username_exists">This username is already taken: </string>
     <string name="email_password_not_found">Account not found.  Try again.</string>
     <string name="wrong_password">Wrong password.  Try again.</string>
     <string name="menu_choose_photo">Choose Photo</string>
     <string name="menu_take_photo">Take Photo</string>
     <string name="message_hint">Send a friendly message…</string>
     <string name="error_send_photo">Sorry, could not upload photo. Please try again.</string>
-    <string name="is_your_new_username">%s is your new username</string>
     <string name="username_changed_dialog_title">Username Changed!</string>
     <string name="your_profile_has_been_updated_title">Saved!</string>
     <string name="your_profile_has_been_updated_msg">Your profile has been saved</string>
     <string name="title_update_my_pic">Update My Photo</string>
-    <string name="sent_via">Sent via %s</string>
+    <string name="sent_via">Sent via </string>
 
     <string name="preview_area">Preview Area</string>
     <string name="post_area">Post Area</string>
@@ -98,21 +97,20 @@
     <string name="message_copied_to_clipboard">Message copied to clipboard</string>
     <string name="manage_blocks">Manage Blocks</string>
     <string name="message_options_title">Message Options</string>
-    <string name="cannot_chat_you_blocked_them">You blocked %s on a previous occasion.  Just letting you know.</string>
+    <string name="cannot_chat_you_blocked_them">You blocked this person on a previous occasion: </string>
 
     <!-- time ago -->
     <string name="online_now">online now</string>
     <string name="just_now">just now</string>
     <string name="less_than_one_minute_ago">less than 1 minute ago</string>
-    <string name="some_minutes_ago">%s minutes ago</string>
+    <string name="some_minutes_ago">minutes ago</string>
     <string name="one_hour_ago">1 hour ago</string>
-    <string name="some_hours_ago">%s hours ago</string>
+    <string name="some_hours_ago">hours ago</string>
     <string name="one_day_ago">1 day ago</string>
-    <string name="some_days_ago">%s days ago</string>
-    <string name="some_months_ago">%s month(s) ago</string>
+    <string name="some_days_ago">days ago</string>
+    <string name="some_months_ago">month(s) ago</string>
     <string name="more_than_one_year_ago">more than 1 year ago</string>
 
-    <string name="send_photo_to_group_or_person">Send photo to %s</string>
     <string name="anonymous_user">user</string>
 
     <string name="reply">Reply</string>
@@ -137,17 +135,16 @@
 
     <string name="logout_title">Sign Out</string>
     <string name="logout_question">Do you want to sign out now?</string>
-    <string name="user_active_in_group">Active in %s</string>
+    <string name="user_active_in_group">Currently in</string>
     <string name="web_clipping">Web Clipping:</string>
     <string name="fetching_web_clipping">Fetching web clipping ...</string>
 
-    <string name="default_bio">Hey there!  I am using %s  Send me a message on here!</string>
+    <string name="default_bio">Hey there!  I am using Instachat   Send me a message on here!</string>
     <string name="like_singular">1 like</string>
-    <string name="likes_plural">%s likes</string>
-    <string name="liked_my_posts_x_times">liked your posts %s times</string>
+    <string name="likes_plural">likes</string>
     <string name="received_likes_title">Your Likes</string>
     <string name="possible_explicit_content_warning">Warning: this photo may contain inappropriate or explicit content</string>
-    <string name="one_time_message_has_been_read_already">You have already opened this disappearing Message, so it cannot be opened again :D</string>
+    <string name="one_time_message_has_been_read_already">You have already opened this disappearing message.</string>
     <string name="one_time_message_notification_title">Disappearing Message</string>
     <string name="one_time_photo_notification_title">Disappearing Photo</string>
     <string name="send_option_protips">Long-press for more options!</string>
@@ -156,18 +153,18 @@
 
     <string name="menu_option_pending_requests">New Pending Requests!</string>
     <string name="left_drawer_pending_request_singular">1 new pending request!</string>
-    <string name="left_drawer_pending_requests_plural">%s new pending requests!</string>
+    <string name="left_drawer_pending_requests_plural">new pending requests!</string>
     <string name="pending_requests_title">Pending Requests</string>
 
-    <string name="accept_request_title">Accept %s?</string>
-    <string name="accept_request_question">%s would like to have a fun and friendly chat with you!</string>
+    <string name="accept_request_title">Accept</string>
+    <string name="accept_request_question">would like to chat</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
-    <string name="report_person_title">Report %s?</string>
+    <string name="report_person_title">Report</string>
     <string name="report_person_question">Are you reporting this person for internet chat abuse?  We take these things seriously.  We will investigate this person and if found to be truly abusive, we will take action.  Thank you.</string>
-    <string name="report_person_failed">Error!  You could not report %s.  Please try again.</string>
-    <string name="report_person_success">You have reported %s</string>
+    <string name="report_person_failed">Error.  Could not report.  Please try again.</string>
+    <string name="report_person_success">Reported: </string>
 
     <string name="photo_not_available">Disappearing Photo is not available anymore</string>
 
@@ -180,13 +177,13 @@
     <string name="pending_requests_text">People want to chat with you now!</string>
 
     <!-- added after 11/28/2016 -->
-    <string name="enter_first_comment">Hi %s!  Share what is on your mind right now</string>
+    <string name="enter_first_comment">Hi!  Share what is on your mind right now</string>
     <string name="gave_like_singular">gave 1 like</string>
-    <string name="gave_likes_plural">gave %s likes</string>
+    <string name="gave_likes_plural">Likes given: </string>
 
     <string name="name_your_room">Name Your Room</string>
     <string name="room_name">ROOM NAME</string>
-    <string name="every_gets_own_room">In %s, everybody gets their own personal chat room!</string>
+    <string name="every_gets_own_room">Everybody gets their own personal chat room!</string>
     <string name="next">NEXT</string>
     <string name="no_thanks_dont_need_room_skip">No thanks, I do not need my own room.  Skip.</string>
     <string name="nice_room_name">Awesome room name!  We will notify you when it is ready!</string>
@@ -200,14 +197,14 @@
     <!-- On or after 9/18/2017 -->
     <string name="channel_new_messages">New messages</string>
     <string name="channel_activity">Activity</string>
-    <string name="said">%s said:</string>
+    <string name="said">said:</string>
     <string name="you_have_been_banned">You have been temporarily banned</string>
     <string name="title_banned_users">Banned Users</string>
     <string name="title_bans">Bans</string>
-    <string name="email_verification_sent">Please verify your email address before using Instachat.  Please check your email: %s</string>
+    <string name="email_verification_sent">Please verify your email address before using Instachat.  Please check your email: </string>
     <string name="add_friend">Add Friend</string>
     <string name="slow_down">Slow down</string>
-    <string name="password_reset_link_sent">Password reset link sent to email: %s</string>
+    <string name="password_reset_link_sent">Password reset link sent to email: </string>
 
     <string name="terms_of_use">TERMS OF USE: You agree not to post abusive, threatening, racist, bullying comments or photos or any objectionable content.  You also agree not to post sexually aggressive or degrading comments towards any other community member or participant regardless of their age, gender, race, or sexual orientation.  If you violate these terms, you will be permanently banned from using this app and any objectionable content you post can be used against you.</string>
 </resources>

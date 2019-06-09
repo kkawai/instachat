@@ -1162,7 +1162,7 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     @Override
     public void showErrorToast(@NonNull String extra) {
         try {
-            Toast.makeText(this, getString(R.string.general_api_error, extra), Toast
+            Toast.makeText(this, getString(R.string.general_api_error) + " " + extra, Toast
                     .LENGTH_SHORT).show();
         } catch (Exception e) {
             MLog.e(TAG, "", e);

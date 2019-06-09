@@ -32,7 +32,7 @@ public class ReportUserDialogHelper {
         }
 
         new SweetAlertDialog(activity, SweetAlertDialog.WARNING_TYPE)
-                .setTitleText(activity.getString(R.string.report_person_title, username))
+                .setTitleText(activity.getString(R.string.report_person_title) + " " + username + "?")
                 .setContentText(activity.getString(R.string.report_person_question))
                 .setCancelText(activity.getString(android.R.string.no))
                 .setConfirmText(activity.getString(android.R.string.yes))
@@ -58,7 +58,7 @@ public class ReportUserDialogHelper {
                         if (task.isSuccessful()) {
                             new SweetAlertDialog(activity, SweetAlertDialog.SUCCESS_TYPE)
                                     .setTitleText(activity.getString(R.string.success_exclamation))
-                                    .setContentText(activity.getString(R.string.report_person_success, username))
+                                    .setContentText(activity.getString(R.string.report_person_success) + " " + username)
                                     .show();
                             Map<String, Object> reporterMap = new HashMap<>(2);
                             reporterMap.put("name", UserPreferences.getInstance().getUsername());
@@ -71,7 +71,7 @@ public class ReportUserDialogHelper {
                         } else {
                             new SweetAlertDialog(activity, SweetAlertDialog.ERROR_TYPE)
                                     .setTitleText(activity.getString(R.string.oops_exclamation))
-                                    .setContentText(activity.getString(R.string.report_person_failed, username))
+                                    .setContentText(activity.getString(R.string.report_person_failed))
                                     .show();
                         }
                     }

@@ -51,8 +51,8 @@ public class BlocksFragment extends BaseFragment {
             public void onUserClicked(final int userid, final String username, final String dpid, final View transitionImageView) {
 
                 new SweetAlertDialog(getActivity(), SweetAlertDialog.WARNING_TYPE)
-                        .setTitleText(getActivity().getString(R.string.unblock_person_title, username))
-                        .setContentText(getActivity().getString(R.string.unblock_person_question, username))
+                        .setTitleText(getActivity().getString(R.string.unblock_person_title) + " " + username + "?")
+                        .setContentText(getActivity().getString(R.string.unblock_person_question))
                         .setCancelText(getActivity().getString(android.R.string.no))
                         .setConfirmText(getActivity().getString(android.R.string.yes))
                         .showCancelButton(true)
@@ -76,12 +76,12 @@ public class BlocksFragment extends BaseFragment {
                                         createPrivateChatSummary(userid, username, dpid);
                                         new SweetAlertDialog(getActivity(), SweetAlertDialog.SUCCESS_TYPE)
                                                 .setTitleText(getActivity().getString(R.string.success_exclamation))
-                                                .setContentText(getActivity().getString(R.string.unblock_person_success, username))
+                                                .setContentText(getActivity().getString(R.string.unblock_person_success))
                                                 .show();
                                     } else {
                                         new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
                                                 .setTitleText(getActivity().getString(R.string.oops_exclamation))
-                                                .setContentText(getActivity().getString(R.string.unblock_person_failed, username))
+                                                .setContentText(getActivity().getString(R.string.unblock_person_failed))
                                                 .show();
                                     }
                                 }catch (Exception e) {

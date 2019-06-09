@@ -305,7 +305,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         getViewModel().partnerBio.set(bioStr);
         try {
             if (StringUtil.isNotEmpty(toUser.getCurrentGroupName()) && !toUser.getCurrentGroupName().equals("null")) {
-                getViewModel().partnerCurrentGroup.set(getString(R.string.user_active_in_group, toUser.getCurrentGroupName()+""));
+                getViewModel().partnerCurrentGroup.set(getString(R.string.user_active_in_group) + " " + toUser.getCurrentGroupName());
             }
         } catch (Exception e) {
             getViewModel().partnerCurrentGroup.set("");
@@ -563,8 +563,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
     @Override
     public void showCannotChatWithBlockedUser(String username) {
         Toast.makeText(PrivateChatActivity.this,
-                getString(R.string.cannot_chat_you_blocked_them,
-                        sUsername), Toast.LENGTH_LONG).show();
+                getString(R.string.cannot_chat_you_blocked_them) + " " +sUsername, Toast.LENGTH_LONG).show();
     }
 
     @Override
