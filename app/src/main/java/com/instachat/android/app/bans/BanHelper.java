@@ -10,7 +10,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.instachat.android.Constants;
-import com.instachat.android.TheApp;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.util.DeviceUtil;
 import com.instachat.android.util.MLog;
@@ -156,7 +155,7 @@ public class BanHelper {
     private void checkBan() {
         //getDeviceId(UserPreferences.getInstance().getUserId());
         if (bannedRef == null) {
-            bannedRef = firebaseDatabase.getReference(Constants.BANS + DeviceUtil.getAndroidId(TheApp.getInstance()));
+            bannedRef = firebaseDatabase.getReference(Constants.BANS + DeviceUtil.getFirebaseUid());
         }
         bannedRef.addListenerForSingleValueEvent(singleValueEventListener);
     }

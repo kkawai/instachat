@@ -3,6 +3,8 @@ package com.instachat.android.util;
 import android.content.Context;
 import android.provider.Settings.Secure;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,9 +24,13 @@ public final class DeviceUtil {
 //		}
     }
 
+    public static String getFirebaseUid() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
+
     public static Map<String, Object> getAndroidIdMap(final Context context) {
         Map<String, Object> map = new HashMap<>(1);
-        map.put("d", getAndroidId(context));
+        map.put("d", getFirebaseUid());
         return map;
     }
 

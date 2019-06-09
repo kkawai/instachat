@@ -60,10 +60,14 @@ public final class GCMRegistrationManager {
         FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
             @Override
             public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                MLog.d(TAG,"kevinFirbaseMessaging registerGCM getInstanceId.getToken(): " + task.getResult().getToken());
-                regId = task.getResult().getToken();
-                registerInBackground();
+
+                if (task.isSuccessful()) {
+                    MLog.d(TAG, "kevinFirbaseMessaging registerGCM getInstanceId.getToken(): " + task.getResult().getToken());
+                    regId = task.getResult().getToken();
+                    registerInBackground();
+                }
             }
+
         });
 
     }
