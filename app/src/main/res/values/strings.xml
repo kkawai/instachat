@@ -5,7 +5,6 @@
     <string name="invitation_message">Please join me for a friendly chat</string>
     <string name="welcome_msg">Welcome!</string>
     <string name="sign_out">Sign Out</string>
-    <string name="contacts_permission_rationale">Access to account information is required to sign in.</string>
     <string name="invite_menu_label">Invite Friends</string>
     <string name="sign_in">Log In</string>
     <string name="forgot_your_password">Forgot your password?</string>
@@ -19,12 +18,12 @@
     <string name="report">Report</string>
     <string name="block_person_title">Block %s?</string>
     <string name="block_person_question">Are you sure you want this?  %s will not be able to send you direct messages and you will not see any more of his or her posts in any of the chat rooms.  If you wish, you can unblock later.</string>
-    <string name="block_person_failed">Oops!  We could not block %s.  Please try again.</string>
+    <string name="block_person_failed">Error!  We could not block %s.  Please try again.</string>
     <string name="block_person_success">You have blocked %s</string>
 
     <string name="unblock_person_title">Unblock %s?</string>
     <string name="unblock_person_question">Are you sure you want this?  %s will be able to send you direct messages and you can start seeing his or her posts in any of the chat rooms.  If you wish, you can block again.</string>
-    <string name="unblock_person_failed">Oops!  We could not unblock %s.  Please try again.</string>
+    <string name="unblock_person_failed">Error!  We could not unblock %s.  Please try again.</string>
     <string name="unblock_person_success">You have unblocked %s</string>
 
     <string name="block_cannot_block_yourself">You cannot block yourself silly!</string>
@@ -35,7 +34,7 @@
     <string name="sign_in_with_google">Sign In with Google</string>
     <string name="sign_up">Sign Up</string>
     <string name="success_exclamation">Success!</string>
-    <string name="oops_exclamation">Oops!</string>
+    <string name="oops_exclamation">Error!</string>
     <string name="rationale_storage">This app reads photos from your camera so you can upload the photos that you choose to upload.</string>
     <string name="hint_username">Username</string>
     <string name="hint_email">Email</string>
@@ -78,15 +77,15 @@
 
     <!-- sweet alert dialog -->
     <string name="sweet_alert_dialog_default_title"> </string>
-    <string name="sweet_alert_dialog_ok">@android:string/ok</string>
-    <string name="sweet_alert_dialog_cancel">@android:string/cancel</string>
-    <string name="sweet_alert_loading_message">Loading…</string>
+    <string name="sweet_alert_dialog_ok">Ok</string>
+    <string name="sweet_alert_dialog_cancel">Cancel</string>
+    <string name="sweet_alert_loading_message">Loading ...</string>
 
     <string name="save_username">Save</string>
     <string name="share_message">Share Message</string>
     <string name="share_photo">Share Photo</string>
     <string name="please_choose_person_or_group">Please choose person or group</string>
-    <string name="people_in_group">See Who\'s Online</string>
+    <string name="people_in_group">Who is online</string>
     <string name="view_profile">View Profile</string>
     <string name="options">Options</string>
     <string name="display_photo">Before you can post messages, please add a display photo of yourself</string>
@@ -117,13 +116,13 @@
     <string name="anonymous_user">user</string>
 
     <string name="reply">Reply</string>
-    <string name="type_your_reply_here">Type your reply here...</string>
+    <string name="type_your_reply_here">Type your reply here</string>
 
     <!-- do not change the following hard-coded message options ordering! -->
-    <string name="send_normal">Send as Normal Message</string>
-    <string name="send_one_time">Send as DISAPPEARING Message</string>
-    <string name="what_is_one_time">What is DISAPPEARING?</string>
-    <string name="one_time_definition">A DISAPPEARING Message is a message that appears blurry and can only be opened once by tapping on it.  After that, it cannot be opened again.  However, the sender may open it again, others cannot.</string>
+    <string name="send_normal">Send as normal Message</string>
+    <string name="send_one_time">Send as disappearing Message</string>
+    <string name="what_is_one_time">What is disappearing?</string>
+    <string name="one_time_definition">A disappearing message is a message that appears blurry and can only be opened once by tapping on it.  After that, it cannot be opened again.  However, the sender may open it again, others cannot.</string>
     <string name="copy_text">Copy Text</string>
     <string name="delete_message">Delete Message</string>
     <string name="delete_photo">Delete Photo</string>
@@ -136,11 +135,11 @@
         <item>Report</item>
     </string-array> -->
 
-    <string name="logout_title">Log Out</string>
-    <string name="logout_question">Sure you want to log out now?  It does not consume your phone battery or other resources to stay logged in.</string>
+    <string name="logout_title">Sign Out</string>
+    <string name="logout_question">Do you want to sign out now?</string>
     <string name="user_active_in_group">Active in %s</string>
     <string name="web_clipping">Web Clipping:</string>
-    <string name="fetching_web_clipping">Fetching web clipping...</string>
+    <string name="fetching_web_clipping">Fetching web clipping ...</string>
 
     <string name="default_bio">Hey there!  I am using %s  Send me a message on here!</string>
     <string name="like_singular">1 like</string>
@@ -148,7 +147,7 @@
     <string name="liked_my_posts_x_times">liked your posts %s times</string>
     <string name="received_likes_title">Your Likes</string>
     <string name="possible_explicit_content_warning">Warning: this photo may contain inappropriate or explicit content</string>
-    <string name="one_time_message_has_been_read_already">You have already opened this Disappearing Message, so it cannot be opened again :D</string>
+    <string name="one_time_message_has_been_read_already">You have already opened this disappearing Message, so it cannot be opened again :D</string>
     <string name="one_time_message_notification_title">Disappearing Message</string>
     <string name="one_time_photo_notification_title">Disappearing Photo</string>
     <string name="send_option_protips">Long-press for more options!</string>
@@ -167,21 +166,21 @@
 
     <string name="report_person_title">Report %s?</string>
     <string name="report_person_question">Are you reporting this person for internet chat abuse?  We take these things seriously.  We will investigate this person and if found to be truly abusive, we will take action.  Thank you.</string>
-    <string name="report_person_failed">Oops!  You could not report %s.  Please try again.</string>
+    <string name="report_person_failed">Error!  You could not report %s.  Please try again.</string>
     <string name="report_person_success">You have reported %s</string>
 
     <string name="photo_not_available">Disappearing Photo is not available anymore</string>
 
     <string name="welcome_back_old_user">Welcome back and very happy to see you again!  Please enter your email address to complete your account!  Thank you!</string>
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading ...</string>
     <string name="hint_password">Password (6-20 characters)</string>
 
     <!-- after 11/22/2016 -->
-    <string name="friend_just_jumped_in">Jumped in!  Tap to see what\'s going on!</string>
+    <string name="friend_just_jumped_in">Jumped in!  Tap to see what is going on!</string>
     <string name="pending_requests_text">People want to chat with you now!</string>
 
     <!-- added after 11/28/2016 -->
-    <string name="enter_first_comment">Hi %s!  Share what is on your mind right now...</string>
+    <string name="enter_first_comment">Hi %s!  Share what is on your mind right now</string>
     <string name="gave_like_singular">gave 1 like</string>
     <string name="gave_likes_plural">gave %s likes</string>
 
@@ -192,7 +191,7 @@
     <string name="no_thanks_dont_need_room_skip">No thanks, I do not need my own room.  Skip.</string>
     <string name="nice_room_name">Awesome room name!  We will notify you when it is ready!</string>
 
-    <string name="invalid_roomname">Oops... invalid Room Name.  Please try a different name</string>
+    <string name="invalid_roomname">Error.  Invalid Room Name.  Please try a different name.</string>
     <string name="get_started">Get Started!</string>
 
     <string name="could_not_open_url">Sorry!  Could not open.  Try copying comment and open in browser</string>
@@ -210,5 +209,5 @@
     <string name="slow_down">Slow down</string>
     <string name="password_reset_link_sent">Password reset link sent to email: %s</string>
 
-    <string name="terms_of_use">TERMS OF USE: You agree to NOT post abusive, threatening, racist, bullying comments or photos or any objectionable content.  You also agree NOT to post sexually aggressive or degrading comments towards any other community member or participant regardless of their age, gender, race, or sexual orientation.  If you violate these terms, you will be permanently banned from using this app and any objectionable content you post can be used against you.</string>
+    <string name="terms_of_use">TERMS OF USE: You agree not to post abusive, threatening, racist, bullying comments or photos or any objectionable content.  You also agree not to post sexually aggressive or degrading comments towards any other community member or participant regardless of their age, gender, race, or sexual orientation.  If you violate these terms, you will be permanently banned from using this app and any objectionable content you post can be used against you.</string>
 </resources>

@@ -21,11 +21,11 @@
 	<string name="report">отчет</string>
 	<string name="block_person_title">Блок% s?</string>
 	<string name="block_person_question">Вы уверены, что хотите этого? % s не сможет отправлять вам прямые сообщения, и вы больше не увидите его сообщений в чатах. Если вы хотите, вы можете разблокировать позже.</string>
-	<string name="block_person_failed">К сожалению! Мы не смогли заблокировать% s. Пожалуйста, попробуйте еще раз.</string>
+	<string name="block_person_failed">Ошибка! Мы не смогли заблокировать% s. Пожалуйста, попробуйте еще раз.</string>
 	<string name="block_person_success">Вы заблокировали% s</string>
 	<string name="unblock_person_title">Разблокировать% s?</string>
 	<string name="unblock_person_question">Вы уверены, что хотите этого? % s сможет отправлять вам прямые сообщения, и вы сможете просматривать его сообщения в любой из комнат чата. Если вы хотите, вы можете заблокировать снова.</string>
-	<string name="unblock_person_failed">К сожалению! Мы не смогли разблокировать% s. Пожалуйста, попробуйте еще раз.</string>
+	<string name="unblock_person_failed">Ошибка! Мы не смогли разблокировать% s. Пожалуйста, попробуйте еще раз.</string>
 	<string name="unblock_person_success">Вы разблокировали% s</string>
 	<string name="block_cannot_block_yourself">Вы не можете заблокировать себя глупо!</string>
 	<string name="message_delete_title">Удалить сообщение?</string>
@@ -35,7 +35,7 @@
 	<string name="sign_in_with_google">Войти через Google</string>
 	<string name="sign_up">Подписаться</string>
 	<string name="success_exclamation">Успех!</string>
-	<string name="oops_exclamation">К сожалению!</string>
+	<string name="oops_exclamation">Ошибка!</string>
 	<string name="rationale_storage">Это приложение читает фотографии с вашей камеры, чтобы вы могли загружать фотографии, которые вы решили загрузить.</string>
 	<string name="hint_username">имя пользователя</string>
 	<string name="hint_email">Эл. адрес</string>
@@ -81,7 +81,7 @@
 	<string name="share_message">Поделиться сообщением</string>
 	<string name="share_photo">Делиться фотографией</string>
 	<string name="please_choose_person_or_group">Пожалуйста, выберите человека или группу</string>
-	<string name="people_in_group">Посмотрите, кто в сети</string>
+	<string name="people_in_group">Кто в сети</string>
 	<string name="view_profile">Просмотреть профиль</string>
 	<string name="options">Опции</string>
 	<string name="display_photo">Прежде чем вы сможете отправлять сообщения, пожалуйста, добавьте отображаемую фотографию себя</string>
@@ -111,13 +111,13 @@
 	<string name="type_your_reply_here">Введите свой ответ здесь ...</string>
 	<string name="send_normal">Отправить как обычное сообщение</string>
 	<string name="send_one_time">Отправить как исчезающее сообщение</string>
-	<string name="what_is_one_time">Что такое исчезновение?</string>
-	<string name="one_time_definition">Сообщение об исчезновении - это сообщение, которое выглядит размытым и может быть открыто только один раз, нажав на него. После этого его нельзя открыть снова. Тем не менее, отправитель может открыть его снова, другие не могут.</string>
+	<string name="what_is_one_time">Что исчезает?</string>
+	<string name="one_time_definition">Исчезающее сообщение - это сообщение, которое выглядит размытым и может быть открыто только один раз, нажав на него. После этого его нельзя открыть снова. Тем не менее, отправитель может открыть его снова, другие не могут.</string>
 	<string name="copy_text">Копировать текст</string>
 	<string name="delete_message">Удалить сообщение</string>
 	<string name="delete_photo">Удалить фото</string>
 	<string name="logout_title">Выйти</string>
-	<string name="logout_question">Вы уверены, что хотите выйти сейчас? Он не расходует заряд батареи вашего телефона или другие ресурсы, чтобы оставаться в системе.</string>
+	<string name="logout_question">Вы хотите выйти сейчас?</string>
 	<string name="user_active_in_group">Активен в% s</string>
 	<string name="web_clipping">Веб-отсечение:</string>
 	<string name="fetching_web_clipping">Выборка веб-отсечения ...</string>
@@ -142,8 +142,8 @@
 	<string name="yes">да</string>
 	<string name="no">нет</string>
 	<string name="report_person_title">Сообщить% s?</string>
-	<string name="report_person_question">Вы сообщаете об этом человеке за злоупотребление интернет-чатом? Мы относимся к этим вещам серьезно. Мы проведем расследование этого человека и, если будет установлено, что он действительно оскорбил нас, мы примем меры Спасибо.</string>
-	<string name="report_person_failed">К сожалению! Вы не могли сообщить о% s. Пожалуйста, попробуйте еще раз.</string>
+	<string name="report_person_question">Вы сообщаете об этом человеке за злоупотребление интернет-чатом? Мы относимся к этим вещам серьезно. Мы проведем расследование этого человека и, если будет установлено, что он действительно оскорбил нас, мы примем меры. Спасибо.</string>
+	<string name="report_person_failed">Ошибка! Вы не могли сообщить о% s. Пожалуйста, попробуйте еще раз.</string>
 	<string name="report_person_success">Вы сообщили о% s</string>
 	<string name="photo_not_available">Исчезающая фотография больше не доступна</string>
 	<string name="welcome_back_old_user">С возвращением и очень рад видеть вас снова! Пожалуйста, введите адрес электронной почты, чтобы завершить учетную запись! Спасибо!</string>
@@ -160,7 +160,7 @@
 	<string name="next">СЛЕДУЮЩИЙ</string>
 	<string name="no_thanks_dont_need_room_skip">Нет, спасибо, мне не нужна своя комната. Пропускать.</string>
 	<string name="nice_room_name">Потрясающее название комнаты! Мы сообщим вам, когда он будет готов!</string>
-	<string name="invalid_roomname">К сожалению ... неверное имя комнаты. Пожалуйста, попробуйте другое имя</string>
+	<string name="invalid_roomname">Ошибка. Неверное название комнаты. Пожалуйста, попробуйте другое имя.</string>
 	<string name="get_started">Начать!</string>
 	<string name="could_not_open_url">Сожалею! Не смог открыть. Попробуйте скопировать комментарий и откройте в браузере</string>
 	<string name="camera_permission_rationale">Требуется разрешение камеры и запись звука для видеочата в реальном времени</string>
@@ -173,7 +173,7 @@
 	<string name="email_verification_sent">Пожалуйста, подтвердите свой адрес электронной почты перед использованием Instachat. Пожалуйста, проверьте вашу электронную почту:% s</string>
 	<string name="add_friend">Добавить в друзья</string>
 	<string name="slow_down">Помедленнее</string>
-	<string name="password_reset_link_sent">Ссылка для сброса пароля отправлена на электронную почту:% s</string>
+	<string name="password_reset_link_sent">Ссылка для сброса пароля отправлена на почту:% s</string>
 	<string name="terms_of_use">УСЛОВИЯ ИСПОЛЬЗОВАНИЯ: Вы соглашаетесь НЕ публиковать оскорбительные, угрожающие, расистские, запугивающие комментарии или фотографии или любое нежелательное содержание. Вы также соглашаетесь НЕ публиковать сексуально агрессивные или унижающие достоинство комментарии по отношению к любому другому члену сообщества или участнику независимо от их возраста, пола, расы или сексуальной ориентации. Если вы нарушите эти условия, вам будет навсегда запрещено использовать это приложение, и любой нежелательный контент, который вы публикуете, может быть использован против вас.</string>
 
 </resources>

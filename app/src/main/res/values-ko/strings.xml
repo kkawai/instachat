@@ -21,11 +21,11 @@
 	<string name="report">보고서</string>
 	<string name="block_person_title">% s 님을 차단 하시겠습니까?</string>
 	<string name="block_person_question">이거 정말 틀어? % s 님이 직접 메시지를 보낼 수 없으며 대화방에서 자신의 게시물을 더 이상 볼 수 없습니다. 원하는 경우 나중에 차단 해제 할 수 있습니다.</string>
-	<string name="block_person_failed">죄송합니다. % s을 (를) 차단할 수 없습니다. 다시 시도하십시오.</string>
+	<string name="block_person_failed">오류! % s을 (를) 차단할 수 없습니다. 다시 시도하십시오.</string>
 	<string name="block_person_success">% s 님을 차단했습니다.</string>
 	<string name="unblock_person_title">% s의 차단을 해제 하시겠습니까?</string>
 	<string name="unblock_person_question">이거 정말 틀어? % s 님이 직접 메시지를 보낼 수 있으며 모든 대화방에서 자신의 게시물을 볼 수 있습니다. 원한다면 다시 차단할 수 있습니다.</string>
-	<string name="unblock_person_failed">죄송합니다. % s의 차단을 해제 할 수 없습니다. 다시 시도하십시오.</string>
+	<string name="unblock_person_failed">오류! % s의 차단을 해제 할 수 없습니다. 다시 시도하십시오.</string>
 	<string name="unblock_person_success">% s 님을 차단 해제했습니다.</string>
 	<string name="block_cannot_block_yourself">어리석은 사람을 막을 수는 없습니다!</string>
 	<string name="message_delete_title">메시지 삭제 하시겠습니까?</string>
@@ -35,7 +35,7 @@
 	<string name="sign_in_with_google">Google로 로그인</string>
 	<string name="sign_up">가입</string>
 	<string name="success_exclamation">성공!</string>
-	<string name="oops_exclamation">죄송합니다.</string>
+	<string name="oops_exclamation">오류!</string>
 	<string name="rationale_storage">이 앱은 카메라에서 사진을 읽으면 업로드하도록 선택한 사진을 업로드 할 수 있습니다.</string>
 	<string name="hint_username">사용자 이름</string>
 	<string name="hint_email">이메일</string>
@@ -81,7 +81,7 @@
 	<string name="share_message">메시지 공유</string>
 	<string name="share_photo">사진을 공유하다</string>
 	<string name="please_choose_person_or_group">사람 또는 그룹을 선택하십시오.</string>
-	<string name="people_in_group">Who &#39;s Online보기</string>
+	<string name="people_in_group">누가 온라인 상태인가?</string>
 	<string name="view_profile">프로필보기</string>
 	<string name="options">옵션</string>
 	<string name="display_photo">메시지를 게시하려면 먼저 자신의 사진을 추가하십시오.</string>
@@ -109,15 +109,15 @@
 	<string name="anonymous_user">사용자</string>
 	<string name="reply">댓글</string>
 	<string name="type_your_reply_here">답장을 여기에 입력하십시오 ...</string>
-	<string name="send_normal">일반 메시지로 보내기</string>
-	<string name="send_one_time">DISAPPEARING 메시지로 보내기</string>
-	<string name="what_is_one_time">DISAPPEARING이란 무엇입니까?</string>
-	<string name="one_time_definition">DISAPPEARING 메시지는 흐리게 나타나고 한 번만 열 수 있습니다. 그 후에는 다시 열 수 없습니다. 그러나 보낸 사람이 다시 열 수 있으며 다른 사람은 열 수 없습니다.</string>
+	<string name="send_normal">정상적인 메시지로 보내기</string>
+	<string name="send_one_time">사라짐으로 보내기 메시지</string>
+	<string name="what_is_one_time">사라지는 것은 무엇입니까?</string>
+	<string name="one_time_definition">사라지는 메시지는 흐리게 나타나고 한 번만 열 수 있습니다. 그 후에는 다시 열 수 없습니다. 그러나 보낸 사람이 다시 열 수 있으며 다른 사람은 열 수 없습니다.</string>
 	<string name="copy_text">텍스트 복사</string>
 	<string name="delete_message">메시지 삭제</string>
 	<string name="delete_photo">사진 삭제</string>
 	<string name="logout_title">로그 아웃</string>
-	<string name="logout_question">로그 아웃 하시겠습니까? 로그인 상태를 유지하기 위해 휴대 전화 배터리 또는 기타 리소스를 소모하지 않습니다.</string>
+	<string name="logout_question">지금 로그 아웃 하시겠습니까?</string>
 	<string name="user_active_in_group">% s에서 활성화</string>
 	<string name="web_clipping">웹 클리핑 :</string>
 	<string name="fetching_web_clipping">웹 클리핑을 가져 오는 중 ...</string>
@@ -143,13 +143,13 @@
 	<string name="no">아니</string>
 	<string name="report_person_title">% s 리포트?</string>
 	<string name="report_person_question">이 사람에게 인터넷 채팅 악용 사례를 신고 하시겠습니까? 우리는 이러한 것들을 진지하게 생각합니다. 우리는이 사람을 조사 할 것이며 진실로 학대받는 것으로 판명되면 조치를 취할 것입니다. 고맙습니다.</string>
-	<string name="report_person_failed">죄송합니다. % s을 (를)보고 할 수 없습니다. 다시 시도하십시오.</string>
+	<string name="report_person_failed">오류! % s을 (를)보고 할 수 없습니다. 다시 시도하십시오.</string>
 	<string name="report_person_success">% s 님을 신고했습니다.</string>
 	<string name="photo_not_available">사라지는 사진은 더 이상 사용할 수 없습니다.</string>
 	<string name="welcome_back_old_user">다시 만나서 반갑습니다. 다시 만나서 반갑습니다! 귀하의 계정을 완성 하시려면 이메일 주소를 입력하십시오! 고맙습니다!</string>
 	<string name="loading">로드 중 ...</string>
 	<string name="hint_password">비밀번호 (6 ~ 20 자)</string>
-	<string name="friend_just_jumped_in">뛰어 들었어! 무슨 일이 일어나고 있는지 보려면 탭하세요!</string>
+	<string name="friend_just_jumped_in">뛰어 들었어! 무슨 일이 일어나고 있는지 살짝 눌러보십시오!</string>
 	<string name="pending_requests_text">사람들은 지금 당신과 채팅하고 싶습니다!</string>
 	<string name="enter_first_comment">안녕하세요 % s! 지금 당신의 마음에있는 것을 공유하십시오 ...</string>
 	<string name="gave_like_singular">1을 줬다.</string>
@@ -160,7 +160,7 @@
 	<string name="next">다음 것</string>
 	<string name="no_thanks_dont_need_room_skip">아니, 고맙다. 나는 자기 방이 필요 없다. 버킷.</string>
 	<string name="nice_room_name">멋진 방 이름! 준비가되면 알려 드리겠습니다.</string>
-	<string name="invalid_roomname">죄송합니다 ... 방 이름이 잘못되었습니다. 다른 이름을 사용해보십시오.</string>
+	<string name="invalid_roomname">오류. 잘못된 객실 이름입니다. 다른 이름을 사용해보십시오.</string>
 	<string name="get_started">시작하다!</string>
 	<string name="could_not_open_url">죄송합니다! 열 수 없습니다. 주석을 복사하고 브라우저에서여십시오.</string>
 	<string name="camera_permission_rationale">실시간 영상 채팅을위한 카메라 및 녹음 - 오디오 권한 필요</string>
@@ -174,6 +174,6 @@
 	<string name="add_friend">친구 추가</string>
 	<string name="slow_down">천천히 해</string>
 	<string name="password_reset_link_sent">이메일로 보낸 비밀번호 재설정 링크 : % s</string>
-	<string name="terms_of_use">이용 약관 : 귀하는 학대, 위협, 인종 차별적 인 집단 괴롭힘, 사진 또는 불쾌한 내용을 게시하는 데 동의합니다. 또한 귀하는 연령, 성별, 인종 또는 성적 취향에 상관없이 다른 커뮤니티 회원 또는 참가자에 대해 성적으로 공격적이거나 격렬한 의견을 게시하지 않을 것에 동의합니다. 이 약관을 위반하면이 앱을 영구적으로 사용하실 수 없으며 귀하가 올린 불쾌한 콘텐츠는 귀하에게 사용 될 수 있습니다.</string>
+	<string name="terms_of_use">이용 약관 : 귀하는 학대, 위협, 인종 차별적 인 집단 괴롭힘, 사진 또는 불쾌한 내용을 게시하는 데 동의합니다. 또한 귀하는 연령, 성별, 인종 또는 성적 취향에 상관없이 다른 지역 사회 구성원이나 참가자에게 성적으로 공격적이거나 타락한 의견을 게시하지 않을 것에 동의합니다. 이 약관을 위반하면이 앱을 영구적으로 사용하실 수 없으며 귀하가 올린 불쾌한 콘텐츠는 귀하에게 사용 될 수 있습니다.</string>
 
 </resources>

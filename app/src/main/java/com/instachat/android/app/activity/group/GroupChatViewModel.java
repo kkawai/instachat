@@ -26,6 +26,7 @@ import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.data.model.User;
 import com.instachat.android.util.AdminUtil;
 import com.instachat.android.util.MLog;
+import com.instachat.android.util.TermOfServiceUtil;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.rx.SchedulerProvider;
 
@@ -294,6 +295,10 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
 
     public int getRoomCommentCount() {
         return roomCommentCount;
+    }
+
+    public void checkTermsOfService() {
+        add(TermOfServiceUtil.getTermsOfServiceDisposable(getNavigator()));
     }
 
 }

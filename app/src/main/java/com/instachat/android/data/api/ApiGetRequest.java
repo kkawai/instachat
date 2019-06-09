@@ -44,8 +44,8 @@ public class ApiGetRequest extends JsonObjectRequest {
 
         serverEtag = headers.get("ETag");
 
-        final long cacheHitButRefreshed = 3 * 60 * 1000; // in 3 minutes cache will be hit, but also refreshed on background
-        final long cacheExpired = 24 * 60 * 60 * 1000; // in 24 hours this cache entry expires completely
+        final long cacheHitButRefreshed = 3 * 60 * 1000L; // in 3 minutes cache will be hit, but also refreshed on background
+        final long cacheExpired = 24 * 60 * 60 * 1000L; // in 24 hours this cache entry expires completely
         final long softExpire = now + cacheHitButRefreshed;
         final long ttl = now + cacheExpired;
 

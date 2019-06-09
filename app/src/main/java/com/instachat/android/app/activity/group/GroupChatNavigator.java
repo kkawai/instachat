@@ -10,4 +10,5 @@ public interface GroupChatNavigator extends AbstractChatNavigator {
     void toggleGroupChatAppBar();
     void showBannedUsers();
     void enterChat(); //this name is deceiving on purpose
+    void showTermsOfService();
 }

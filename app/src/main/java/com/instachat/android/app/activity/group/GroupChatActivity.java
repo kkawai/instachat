@@ -34,7 +34,6 @@ import com.instachat.android.app.adapter.GroupChatUsersRecyclerAdapter;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.bans.BannedUsersFragment;
 import com.instachat.android.app.blocks.BlocksFragment;
-import com.instachat.android.app.login.SignInActivity;
 import com.instachat.android.data.api.UploadListener;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
@@ -109,15 +108,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
                     .getReference(Constants.USER_INFO_REF(UserPreferences.getInstance().getUserId()))
                     .updateChildren(DeviceUtil.getAndroidIdMap(this));
         }
-
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isActivityDestroyed())
-                    return;
-                showWarningDialog();
-            }
-        }, 3000);
+        groupChatViewModel.checkTermsOfService();
     }
 
     private String getCount(int count) {
@@ -465,7 +456,8 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         _signout();
     }
 
-    private void showWarningDialog() {
+    @Override
+    public void showTermsOfService() {
         new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE).
                 setTitleText(this.getString(R.string.warning)).
                 setContentText(getString(R.string.terms_of_use)).
