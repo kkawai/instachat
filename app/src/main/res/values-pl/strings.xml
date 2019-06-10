@@ -170,6 +170,8 @@
 	<string name="add_friend">Dodaj znajomego</string>
 	<string name="slow_down">Zwolnij</string>
 	<string name="password_reset_link_sent">Link do resetowania hasła wysłany na e-mail:</string>
+	<string name="agree">ZGADZAM SIĘ</string>
+	<string name="terms_of_use_title">WARUNKI KORZYSTANIA</string>
 	<string name="terms_of_use">WARUNKI KORZYSTANIA: Zgadzasz się nie zamieszczać obraźliwych, groźnych, rasistowskich, zastraszających komentarzy ani zdjęć ani żadnych niepożądanych treści. Zgadzasz się również nie publikować agresywnych seksualnie lub poniżających komentarzy w stosunku do innych członków społeczności lub uczestników, niezależnie od ich wieku, płci, rasy lub orientacji seksualnej. Jeśli naruszysz te warunki, zostaniesz na stałe zablokowany do korzystania z tej aplikacji, a wszelkie obraźliwe treści, które publikujesz, mogą zostać użyte przeciwko tobie.</string>
 
 </resources>

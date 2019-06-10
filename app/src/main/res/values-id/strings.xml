@@ -170,6 +170,8 @@
 	<string name="add_friend">Tambah teman</string>
 	<string name="slow_down">Pelan - pelan</string>
 	<string name="password_reset_link_sent">Tautan pengaturan ulang kata sandi dikirim ke email:</string>
+	<string name="agree">SAYA SETUJU</string>
+	<string name="terms_of_use_title">SYARAT PENGGUNAAN</string>
 	<string name="terms_of_use">SYARAT PENGGUNAAN: Anda setuju untuk tidak memposting komentar atau foto yang melecehkan, mengancam, rasis, intimidasi atau foto atau konten yang tidak menyenangkan. Anda juga setuju untuk tidak memposting komentar yang agresif secara seksual atau merendahkan martabat terhadap anggota atau peserta komunitas lain tanpa memandang usia, jenis kelamin, ras, atau orientasi seksual mereka. Jika Anda melanggar ketentuan ini, Anda akan secara permanen dilarang menggunakan aplikasi ini dan konten apa pun yang Anda posting dapat digunakan untuk melawan Anda.</string>
 
 </resources>

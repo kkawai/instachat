@@ -170,6 +170,8 @@
 	<string name="add_friend">Ajouter un ami</string>
 	<string name="slow_down">Ralentissez</string>
 	<string name="password_reset_link_sent">Lien de réinitialisation du mot de passe envoyé au courrier électronique:</string>
+	<string name="agree">JE SUIS D\'ACCORD</string>
+	<string name="terms_of_use_title">CONDITIONS D\'UTILISATION</string>
 	<string name="terms_of_use">CONDITIONS D\'UTILISATION: Vous acceptez de ne pas publier de commentaires ou de photos abusifs, menaçants, racistes ou intimidants, ni de contenu répréhensible. Vous acceptez également de ne pas publier de commentaires sexuellement agressifs ou dégradants à l\'égard d\'un autre membre de la communauté ou d\'un participant, indépendamment de leur âge, de leur sexe, de leur race ou de leur orientation sexuelle. Si vous ne respectez pas ces conditions, il vous sera définitivement interdit d\'utiliser cette application et tout contenu répréhensible que vous publiez peut être utilisé à votre encontre.</string>
 
 </resources>

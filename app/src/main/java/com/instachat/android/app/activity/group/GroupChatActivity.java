@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -458,17 +459,34 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
 
     @Override
     public void showTermsOfService() {
-        new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE).
-                setTitleText(this.getString(R.string.warning)).
-                setContentText(getString(R.string.terms_of_use)).
-                setConfirmText(getString(android.R.string.ok)).
-                showCancelButton(false).
-                setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-                        sweetAlertDialog.dismiss();
-                    }
-                }).show();
+
+        /**
+         * MAKE SURE THEY READ THE TERMS FOR A MINIMUM OF 7 SECONDS!
+         * AFTER 7 SECONDS, RE-SHOW THE TERMS DIALOG WITH THE AGREE/DISMISS BUTTON!
+         */
+        final AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.terms_of_use_title).setMessage(R.string.terms_of_use)
+                .setCancelable(false)
+                .create();
+        alertDialog.show();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                alertDialog.dismiss();
+
+                new AlertDialog.Builder(GroupChatActivity.this)
+                        .setTitle(R.string.terms_of_use_title).setMessage(R.string.terms_of_use)
+                        .setCancelable(false)
+                        .setPositiveButton(R.string.agree, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+            }
+        }, 7000);
     }
 
     @Override

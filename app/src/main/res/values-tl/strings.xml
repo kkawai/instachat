@@ -170,6 +170,8 @@
 	<string name="add_friend">Magdagdag ng Kaibigan</string>
 	<string name="slow_down">Magdahan-dahan</string>
 	<string name="password_reset_link_sent">Ipinadala ang pag-reset ng password sa email:</string>
+	<string name="agree">SUMASANG-AYON AKO</string>
+	<string name="terms_of_use_title">MGA TUNTUNIN NG PAGGAMIT</string>
 	<string name="terms_of_use">MGA TUNTUNIN SA PAGGAMIT: Sumasang-ayon ka na huwag mag-post ng mga mapang-abuso, pagbabanta, rasista, mga pang-aapi ng mga komento o mga larawan o anumang hindi kanais-nais na nilalaman. Sumasang-ayon ka rin na huwag mag-post ng mga sekswal na agresibo o nanghihiya na mga komento sa anumang ibang miyembro ng komunidad o kalahok kahit anuman ang kanilang edad, kasarian, lahi, o oryentasyong sekswal. Kung lumalabag ka sa mga tuntuning ito, permanenteng bawal ka sa paggamit ng app na ito at anumang hindi kanais-nais na nilalaman na iyong nai-post ay maaaring gamitin laban sa iyo.</string>
 
 </resources>

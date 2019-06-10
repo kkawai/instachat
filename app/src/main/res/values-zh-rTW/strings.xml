@@ -170,6 +170,8 @@
 	<string name="add_friend">添加好友</string>
 	<string name="slow_down">慢一點</string>
 	<string name="password_reset_link_sent">密碼重置鏈接發送到電子郵件：</string>
+	<string name="agree">我同意</string>
+	<string name="terms_of_use_title">使用條款</string>
 	<string name="terms_of_use">使用條款：您同意不發布侮辱性，威脅性，種族主義，欺凌性評論或照片或任何令人反感的內容。您還同意不對任何其他社區成員或參與者發布性侵犯或有辱人格的評論，無論其年齡，性別，種族或性取向如何。如果您違反這些條款，您將被永久禁止使用此應用程序，並且您發布的任何令人反感的內容都可能被用來對付您。</string>
 
 </resources>

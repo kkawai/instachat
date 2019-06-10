@@ -170,6 +170,8 @@
 	<string name="add_friend">Vriend toevoegen</string>
 	<string name="slow_down">Vertragen</string>
 	<string name="password_reset_link_sent">Wachtwoord reset link verzonden naar e-mail:</string>
+	<string name="agree">DAAR BEN IK HET MEE EENS</string>
+	<string name="terms_of_use_title">GEBRUIKSVOORWAARDEN</string>
 	<string name="terms_of_use">GEBRUIKSVOORWAARDEN: U gaat ermee akkoord geen beledigende, bedreigende, racistische, pestende opmerkingen of foto\'s of aanstootgevende inhoud te plaatsen. Je gaat er ook mee akkoord om geen seksueel agressieve of vernederende opmerkingen te plaatsen tegenover een ander lid of deelnemer van de community, ongeacht hun leeftijd, geslacht, ras of seksuele geaardheid. Als je deze voorwaarden schendt, word je permanent verbannen van het gebruik van deze app en kan je aanstootgevende inhoud die je plaatst tegen je gebruiken.</string>
 
 </resources>

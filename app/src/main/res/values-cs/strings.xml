@@ -170,6 +170,8 @@
 	<string name="add_friend">Přidat přítele</string>
 	<string name="slow_down">Zpomal</string>
 	<string name="password_reset_link_sent">Odkaz na obnovení hesla odeslaný na e-mail:</string>
+	<string name="agree">SOUHLASÍM</string>
+	<string name="terms_of_use_title">PODMÍNKY POUŽITÍ</string>
 	<string name="terms_of_use">PODMÍNKY POUŽÍVÁNÍ: Souhlasíte s tím, že nebudete posílat urážlivé, výhružné, rasistické, šikanovací komentáře ani fotografie nebo jakýkoli nevhodný obsah. Souhlasíte také s tím, že nebudete psát sexuálně agresivní nebo ponižující komentáře k žádnému jinému členu komunity nebo účastníkovi bez ohledu na jejich věk, pohlaví, rasu nebo sexuální orientaci. Pokud tyto podmínky porušíte, budete trvale zakázáni používat tuto aplikaci a proti vám můžete použít jakýkoli nevhodný obsah, který budete zveřejňovat.</string>
 
 </resources>

@@ -170,6 +170,8 @@
 	<string name="add_friend">友人を追加する</string>
 	<string name="slow_down">徐行</string>
 	<string name="password_reset_link_sent">メールに送信されたパスワードリセットリンク：</string>
+	<string name="agree">同意する</string>
+	<string name="terms_of_use_title">利用規約</string>
 	<string name="terms_of_use">利用規約：あなたは、虐待的、脅迫的、人種差別的、コメント、写真、または不適切な内容を投稿しないことに同意します。また、年齢、性別、人種、性的指向を問わず、他のコミュニティメンバーまたは参加者に対して性的に攻撃的または侮辱的なコメントを投稿しないことに同意します。あなたがこれらの条件に違反した場合、あなたは永久にこのアプリの使用を禁止され、あなたが投稿したいかなる不快なコンテンツもあなたに対して使用される可能性があります。</string>
 
 </resources>

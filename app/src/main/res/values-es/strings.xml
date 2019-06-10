@@ -170,6 +170,8 @@
 	<string name="add_friend">Añadir amigo</string>
 	<string name="slow_down">Ve más despacio</string>
 	<string name="password_reset_link_sent">Enlace de restablecimiento de contraseña enviado al correo electrónico:</string>
+	<string name="agree">ESTOY DE ACUERDO</string>
+	<string name="terms_of_use_title">TÉRMINOS DE USO</string>
 	<string name="terms_of_use">TÉRMINOS DE USO: Usted acepta no publicar comentarios o fotos abusivas, amenazantes, racistas, de acoso escolar o cualquier contenido objetable. También acepta no publicar comentarios sexualmente agresivos o degradantes hacia ningún otro miembro de la comunidad o participante, independientemente de su edad, género, raza u orientación sexual. Si viola estos términos, se le prohibirá de forma permanente el uso de esta aplicación y cualquier contenido objetable que publique se puede usar en su contra.</string>
 
 </resources>
