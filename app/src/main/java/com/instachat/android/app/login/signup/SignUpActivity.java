@@ -2,11 +2,11 @@ package com.instachat.android.app.login.signup;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
 import android.view.View;
 import android.widget.Toast;
 
@@ -15,9 +15,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.FirebaseException;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthProvider;
 import com.instachat.android.R;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.login.SignInActivity;
@@ -31,6 +35,8 @@ import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.UserPreferences;
 
 import org.json.JSONObject;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -259,4 +265,5 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         requestQueue.cancelAll(this);
         super.onDestroy();
     }
+
 }

@@ -28,12 +28,12 @@
             android:layout_gravity="center"
             android:orientation="vertical">
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_room_name_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <android.support.design.widget.TextInputEditText
+                <com.google.android.material.textfield.TextInputEditText
 
                     android:id="@+id/input_room_name"
                     android:layout_width="match_parent"
@@ -42,7 +42,7 @@
                     android:inputType="textNoSuggestions"
                     android:maxLength="@integer/max_username_length"/>
 
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:id="@+id/everybody_gets_own_room"

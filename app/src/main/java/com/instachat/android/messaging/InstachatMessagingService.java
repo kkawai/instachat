@@ -8,9 +8,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.RemoteInput;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.bumptech.glide.Glide;
@@ -46,6 +44,8 @@ import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.RemoteInput;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -201,7 +201,7 @@ public class InstachatMessagingService extends FirebaseMessagingService {
                         .ic_anon_person_36dp) : bitmap)
                 .setContentIntent(pendingIntent)
                 .setSound(customSound)
-                .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle().bigText(contentText))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(contentText))
                 .setContentText(contentText)
                 .setSubText(friendlyMessage.getName());
 
@@ -323,7 +323,7 @@ public class InstachatMessagingService extends FirebaseMessagingService {
         // Use NotificationCompat.Builder to set up our notification.
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, Constants.CHANNEL_ID_ACTIVITY);
         builder
-                .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle())
+                .setStyle(new NotificationCompat.BigTextStyle())
                 .setContentTitle(username)
                 .setContentText(getString(R.string.friend_just_jumped_in))
                 .setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp)
@@ -352,7 +352,7 @@ public class InstachatMessagingService extends FirebaseMessagingService {
 
         // Use NotificationCompat.Builder to set up our notification.
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, Constants.CHANNEL_ID_ACTIVITY);
-        builder.setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle())
+        builder.setStyle(new NotificationCompat.BigTextStyle())
                 .setContentTitle(getString(R.string.pending_requests_title))
                 .setContentText(getString(R.string.pending_requests_text))
                 .setSmallIcon(R.drawable.ic_stat_ic_message_white_18dp)

@@ -1,11 +1,11 @@
 package com.instachat.android.app.activity;
 
-import android.databinding.ObservableField;
+//import android.databinding.ObservableField;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v13.view.inputmethod.InputConnectionCompat;
-import android.support.v13.view.inputmethod.InputContentInfoCompat;
+//import androidx.annotation.NonNull;
+//import android.support.v13.view.inputmethod.InputConnectionCompat;
+//import android.support.v13.view.inputmethod.InputContentInfoCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -39,6 +39,10 @@ import com.instachat.android.util.rx.SchedulerProvider;
 
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
+import androidx.core.view.inputmethod.InputConnectionCompat;
+import androidx.core.view.inputmethod.InputContentInfoCompat;
+import androidx.databinding.ObservableField;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;

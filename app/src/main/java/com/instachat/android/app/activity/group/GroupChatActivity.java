@@ -1,18 +1,18 @@
 package com.instachat.android.app.activity.group;
 
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
+//import androidx.lifecycle.ViewModelProvider;
+//import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.GravityCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
+//import androidx.annotation.NonNull;
+//import androidx.fragment.app.Fragment;
+//import android.support.v4.view.GravityCompat;
+//import androidx.appcompat.app.AlertDialog;
+//import androidx.recyclerview.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -54,6 +54,13 @@ import com.smaato.soma.exception.AdReceiveFailed;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.view.GravityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding, GroupChatViewModel>

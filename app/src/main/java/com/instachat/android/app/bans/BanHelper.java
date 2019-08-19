@@ -1,6 +1,6 @@
 package com.instachat.android.app.bans;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,37 +39,41 @@ public class BanHelper {
         }
     }
 
+    public static void ban(final FriendlyMessage friendlyMessage) {
+        FirebaseDatabase.getInstance()
+                .getReference(Constants.USER_INFO_REF(friendlyMessage.getUserid())+"/d")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            String deviceId = (String)dataSnapshot.getValue();
+                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.BANS+deviceId);
+                            Map<String, Object> map = new HashMap<>(10);
+                            map.put("username", friendlyMessage.getName());
+                            map.put("id", friendlyMessage.getUserid());
+                            map.put("dpid", friendlyMessage.getDpid());
+                            //map.put("banExpiration", System.currentTimeMillis() + (1000L*60*minutes));
+                            map.put("admin", UserPreferences.getInstance().getUsername());
+                            map.put("adminId", UserPreferences.getInstance().getUserId());
+                            ref.updateChildren(map);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
     public void ban(final FriendlyMessage friendlyMessage, int minutes) {
 
         if (!FirebaseAuth.getInstance().getCurrentUser().getEmail().equals(UserPreferences.getInstance().getEmail())) {
             return;
         }
 
-        firebaseDatabase
-                .getReference(Constants.USER_INFO_REF(friendlyMessage.getUserid())+"/d")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    String deviceId = (String)dataSnapshot.getValue();
-                    DatabaseReference ref = firebaseDatabase.getReference(Constants.BANS+deviceId);
-                    Map<String, Object> map = new HashMap<>(10);
-                    map.put("username", friendlyMessage.getName());
-                    map.put("id", friendlyMessage.getUserid());
-                    map.put("dpid", friendlyMessage.getDpid());
-                    //map.put("banExpiration", System.currentTimeMillis() + (1000L*60*minutes));
-                    map.put("admin", UserPreferences.getInstance().getUsername());
-                    map.put("adminId", UserPreferences.getInstance().getUserId());
-                    ref.updateChildren(map);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        ban(friendlyMessage);
     }
 
     public static void unban(int userid, final OnCompleteListener onCompleteListener) {

@@ -5,9 +5,7 @@ package com.instachat.android.util;
  */
 
 import android.app.Activity;
-import android.databinding.BindingAdapter;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,9 +15,10 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.instachat.android.R;
 import com.instachat.android.app.activity.pm.PrivateChatViewModel;
-import com.instachat.android.app.adapter.PrivateChatSummaryViewHolder;
 import com.instachat.android.app.bans.BannedUser;
 import com.instachat.android.data.model.PrivateChatSummary;
+
+import androidx.databinding.BindingAdapter;
 
 /**
  * Custom bindings for XML attributes using data binding.

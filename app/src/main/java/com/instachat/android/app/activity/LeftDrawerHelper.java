@@ -1,10 +1,10 @@
 package com.instachat.android.app.activity;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.NonNull;
+//import android.support.v4.view.GravityCompat;
+//import android.support.v4.widget.DrawerLayout;
+import androidx.appcompat.app.AlertDialog;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
@@ -36,6 +36,8 @@ import com.tooltip.Tooltip;
 import java.util.Hashtable;
 import java.util.Map;
 
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**

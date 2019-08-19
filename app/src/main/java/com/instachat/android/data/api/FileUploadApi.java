@@ -1,7 +1,5 @@
 package com.instachat.android.data.api;
 
-import android.support.v4.util.Pair;
-
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.event.ProgressEvent;
 import com.amazonaws.event.ProgressListener;
@@ -20,6 +18,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
+
+import androidx.core.util.Pair;
 
 public final class FileUploadApi {
 

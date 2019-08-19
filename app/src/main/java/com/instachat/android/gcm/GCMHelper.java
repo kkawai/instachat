@@ -2,7 +2,7 @@ package com.instachat.android.gcm;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.amazon.device.messaging.ADM;
 import com.amazon.device.messaging.development.ADMManifest;

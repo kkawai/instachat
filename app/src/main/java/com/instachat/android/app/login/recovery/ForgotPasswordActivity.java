@@ -1,15 +1,16 @@
 package com.instachat.android.app.login.recovery;
 
 import android.content.DialogInterface;
-import android.databinding.DataBindingUtil;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.instachat.android.R;
 import com.instachat.android.data.api.NetworkApi;

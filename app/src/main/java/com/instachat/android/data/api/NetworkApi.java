@@ -1,9 +1,8 @@
 package com.instachat.android.data.api;
 
 import android.content.Context;
-import android.support.v4.util.Pair;
 import android.text.TextUtils;
-
+import androidx.core.util.Pair;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;

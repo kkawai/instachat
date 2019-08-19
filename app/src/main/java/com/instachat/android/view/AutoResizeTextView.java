@@ -10,13 +10,15 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.RectF;
 import android.graphics.Typeface;
-import android.support.v7.widget.AppCompatTextView;
+
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.method.TransformationMethod;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+
+import androidx.appcompat.widget.AppCompatTextView;
 
 public class AutoResizeTextView extends AppCompatTextView {
     private static final int NO_LINE_LIMIT = -1;

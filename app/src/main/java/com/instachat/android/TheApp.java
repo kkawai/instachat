@@ -1,7 +1,6 @@
 package com.instachat.android;
 
 import android.app.Activity;
-import android.support.multidex.MultiDexApplication;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -11,6 +10,7 @@ import com.instachat.android.util.MLog;
 
 import javax.inject.Inject;
 
+import androidx.multidex.MultiDexApplication;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;
 

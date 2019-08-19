@@ -1,7 +1,7 @@
 package com.instachat.android.app.adapter;
 
 import android.content.res.Resources;
-import android.support.v7.widget.RecyclerView;
+//import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +35,8 @@ import java.util.Map;
 import java.util.Vector;
 
 import javax.inject.Inject;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by kevin on 9/26/2016.

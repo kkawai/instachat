@@ -1,12 +1,12 @@
 package com.instachat.android.app.activity;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialog;
+import androidx.databinding.DataBindingUtil;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.instachat.android.R;
 import com.instachat.android.databinding.ViewPhotoOptionsBinding;
 

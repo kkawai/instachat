@@ -1,6 +1,7 @@
 package com.instachat.android.view.gif;
 
-import android.support.v4.util.LruCache;
+
+import androidx.collection.LruCache;
 
 public final class GifLruCache implements GifImageLoader.GifImageCache {
 

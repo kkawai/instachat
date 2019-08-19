@@ -14,7 +14,7 @@
 
     </data>
 
-    <android.support.v4.widget.DrawerLayout
+    <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -40,7 +40,7 @@
                 ads:adUnitId="@string/banner_ad_unit_id">
             </com.google.android.gms.ads.AdView> -->
 
-            <android.support.design.widget.CoordinatorLayout
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_above="@+id/linearLayout">
@@ -48,7 +48,7 @@
                 <include layout="@layout/merge_main_appbar"
                          bind:viewModel="@{viewModel}" />
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/messageRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -90,7 +90,7 @@
 
                 </LinearLayout>
 
-            </android.support.design.widget.CoordinatorLayout>
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
             <LinearLayout
                 android:id="@+id/linearLayout"
@@ -176,7 +176,7 @@
         <!--
             app:headerLayout="@layout/nav_header"
             app:menu="@menu/drawer_view" -->
-        <android.support.design.widget.NavigationView
+        <com.google.android.material.navigation.NavigationView
             android:id="@+id/nav_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -184,7 +184,7 @@
             android:background="@color/colorPrimaryDark"
             android:fitsSystemWindows="true"/>
 
-        <android.support.design.widget.NavigationView
+        <com.google.android.material.navigation.NavigationView
             android:id="@+id/right_nav_view"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -192,6 +192,6 @@
             android:background="@color/error_stroke_color"
             android:fitsSystemWindows="true"/>
 
-    </android.support.v4.widget.DrawerLayout>
+    </androidx.drawerlayout.widget.DrawerLayout>
 
 </layout>

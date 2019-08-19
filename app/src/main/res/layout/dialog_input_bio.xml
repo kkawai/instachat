@@ -20,13 +20,13 @@
             android:textStyle="bold"
             android:fontFamily="@font/lato_bold"/>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/input_boi_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp">
 
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/input_bio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -36,6 +36,6 @@
                 android:maxLength="@integer/max_bio"
                 android:maxLines="3"/>
 
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 </layout>

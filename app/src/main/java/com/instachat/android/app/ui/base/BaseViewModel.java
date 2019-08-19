@@ -1,11 +1,10 @@
 package com.instachat.android.app.ui.base;
 
-import android.arch.lifecycle.ViewModel;
-import android.databinding.ObservableBoolean;
-
 import com.instachat.android.data.DataManager;
 import com.instachat.android.util.rx.SchedulerProvider;
 
+import androidx.databinding.ObservableBoolean;
+import androidx.lifecycle.ViewModel;
 import io.reactivex.disposables.CompositeDisposable;
 
 public abstract class BaseViewModel<N> extends ViewModel {

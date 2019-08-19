@@ -11,8 +11,8 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.content.FileProvider;
+import androidx.annotation.NonNull;
+//import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import androidx.core.content.FileProvider;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 

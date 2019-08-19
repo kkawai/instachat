@@ -1,8 +1,7 @@
 package com.instachat.android.app.activity.group;
 
-import android.databinding.ObservableField;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -34,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import androidx.databinding.ObservableField;
 import io.reactivex.Observable;
 import io.reactivex.functions.Action;
 

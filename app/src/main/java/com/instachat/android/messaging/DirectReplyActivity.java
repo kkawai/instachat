@@ -4,9 +4,10 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.RemoteInput;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.RemoteInput;
+
 import android.text.TextUtils;
 
 import com.google.android.gms.tasks.OnCompleteListener;

@@ -1,8 +1,7 @@
 package com.instachat.android.app;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.PopupMenu;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +13,7 @@ import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.util.AdminUtil;
 import com.instachat.android.util.UserPreferences;
 
+import androidx.appcompat.widget.PopupMenu;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**

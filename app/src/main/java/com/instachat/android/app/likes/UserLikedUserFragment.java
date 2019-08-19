@@ -1,25 +1,23 @@
 package com.instachat.android.app.likes;
 
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.instachat.android.app.BaseFragment;
 import com.instachat.android.Constants;
-import com.instachat.android.app.activity.pm.PrivateChatActivity;
 import com.instachat.android.R;
+import com.instachat.android.app.BaseFragment;
+import com.instachat.android.app.activity.pm.PrivateChatActivity;
 import com.instachat.android.app.adapter.UserClickedListener;
-import com.instachat.android.data.model.User;
 import com.instachat.android.databinding.FragmentGenericUsersBinding;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by kevin on 10/12/2016.

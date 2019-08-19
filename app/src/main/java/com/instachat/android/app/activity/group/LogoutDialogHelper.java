@@ -1,7 +1,7 @@
 package com.instachat.android.app.activity.group;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.instachat.android.R;
 

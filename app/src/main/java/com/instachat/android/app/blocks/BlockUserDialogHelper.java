@@ -1,7 +1,7 @@
 package com.instachat.android.app.blocks;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 import android.widget.Toast;
 

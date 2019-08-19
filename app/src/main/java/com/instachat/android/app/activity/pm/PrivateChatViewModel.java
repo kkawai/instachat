@@ -1,6 +1,5 @@
 package com.instachat.android.app.activity.pm;
 
-import android.databinding.ObservableField;
 import android.os.Bundle;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,6 +27,7 @@ import com.instachat.android.util.rx.SchedulerProvider;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import androidx.databinding.ObservableField;
 import io.reactivex.Observable;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Action;
@@ -215,7 +215,7 @@ public class PrivateChatViewModel extends AbstractChatViewModel<PrivateChatNavig
                 child("" + user.getId()).child(Constants.CHILD_TYPING);
         mTypingReference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onComplete(@android.support.annotation.NonNull Task<Void> task) {
+            public void onComplete(@NonNull Task<Void> task) {
                 mTypingValueEventListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {

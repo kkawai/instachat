@@ -2,17 +2,16 @@ package com.instachat.android.app.activity.pm;
 
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
+
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.view.GestureDetectorCompat;
+import androidx.lifecycle.ViewModelProvider;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.AppBarLayout;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.GestureDetectorCompat;
+import androidx.fragment.app.Fragment;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,8 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.instachat.android.BR;
 import com.instachat.android.Constants;
@@ -67,6 +65,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import androidx.lifecycle.ViewModelProviders;
 import io.reactivex.Observable;
 import io.reactivex.functions.Action;
 
@@ -79,7 +78,7 @@ import io.reactivex.functions.Action;
  * Private messages result in partner devices receiving notifications
  * Private needs to fetch partner user from network api
  */
-public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateChatBinding, PrivateChatViewModel> implements GoogleApiClient.OnConnectionFailedListener,
+public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateChatBinding, PrivateChatViewModel> implements
         FriendlyMessageContainer, UploadListener, UserClickedListener,
         FriendlyMessageListener, AttachPhotoOptionsDialogHelper.PhotoOptionsListener,
         AdListenerInterface, PrivateChatNavigator {
@@ -491,11 +490,6 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
     @Override
     public int getLayoutId() {
         return R.layout.activity_private_chat;
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        MLog.d(TAG, "onConnectionFailed:" + connectionResult);
     }
 
     @Override

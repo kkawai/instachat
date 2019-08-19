@@ -1,7 +1,7 @@
 package com.instachat.android.app.activity;
 
 import android.net.Uri;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.instachat.android.data.model.FriendlyMessage;
 

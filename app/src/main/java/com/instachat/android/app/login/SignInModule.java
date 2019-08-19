@@ -1,6 +1,6 @@
 package com.instachat.android.app.login;
 
-import android.arch.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.instachat.android.data.DataManager;
 import com.instachat.android.di.ViewModelProviderFactory;

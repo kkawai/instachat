@@ -1,11 +1,11 @@
 package com.instachat.android.util;
 
-import android.graphics.Typeface;
-import android.support.design.widget.TextInputLayout;
-import android.support.v4.content.res.ResourcesCompat;
 import android.widget.TextView;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.instachat.android.R;
+
+import androidx.core.content.res.ResourcesCompat;
 
 public final class FontUtil {
     private FontUtil() {

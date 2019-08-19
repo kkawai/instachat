@@ -2,7 +2,7 @@ package com.instachat.android.data.api;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;

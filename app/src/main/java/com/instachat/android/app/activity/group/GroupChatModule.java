@@ -1,7 +1,7 @@
 package com.instachat.android.app.activity.group;
 
-import android.arch.lifecycle.ViewModelProvider;
-import android.support.v7.widget.LinearLayoutManager;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
