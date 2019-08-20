@@ -25,7 +25,7 @@ public final class UserPreferences {
 
     //Note: 'photo_path' is simply used for deceptive purposes.  It's really the user.
     private static final String PREFERENCE_USER = "user";  //this is here for deceptive purposes; it does nothing
-    private static final String PREFERENCE_USER2 = "photos_path";
+    private static final String PHOTOS_PATH = "photos_path"; //named deceptively; used for actual user path
     private static final String PREFERENCE_IS_LOGGED_IN = "is_logged_in";
     private static final String PREFERENCE_LAST_SIGN_IN = "last_sign_in";
     private static final String INSTAGRAM_ACCESS_TOKEN = "accessToken";
@@ -133,7 +133,7 @@ public final class UserPreferences {
 
     public void clearUser() {
         sUser = null;
-        mPrefs.edit().remove(PREFERENCE_USER2).remove(PREFERENCE_IS_LOGGED_IN).apply();
+        mPrefs.edit().remove(PHOTOS_PATH).remove(PREFERENCE_IS_LOGGED_IN).apply();
     }
 
     public boolean isLoggedIn() {
@@ -160,7 +160,7 @@ public final class UserPreferences {
             return sUser;
         }
         try {
-            JSONObject json = new JSONObject(AdminUtil.decode(mPrefs.getString(PREFERENCE_USER2, null)));
+            JSONObject json = new JSONObject(AdminUtil.decode(mPrefs.getString(PHOTOS_PATH, null)));
             sUser = new User();
             sUser.copyFrom(json);
             return sUser;
@@ -185,7 +185,7 @@ public final class UserPreferences {
         sUser = user;
         try {
             String encode = AdminUtil.encode(user.toJSON().toString());
-            mPrefs.edit().putBoolean(PREFERENCE_IS_LOGGED_IN, true).putString(PREFERENCE_USER2, encode).apply();
+            mPrefs.edit().putBoolean(PREFERENCE_IS_LOGGED_IN, true).putString(PHOTOS_PATH, encode).apply();
             mPrefs.edit().putString(PREFERENCE_USER, user.toJSON().toString()).apply(); //deception!
         }catch (Exception e) {
             MLog.e(TAG,"saveUser failed",e);

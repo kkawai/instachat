@@ -33,6 +33,8 @@ public class User {
     @SerializedName("bio")
     private String bio;
 
+    private String phone;
+
     private long lastOnline;
     private String currentGroupName;
     private long currentGroupId;
@@ -113,6 +115,14 @@ public class User {
         this.email = email;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     public String getBio() {
         return bio + "";
     }
@@ -153,6 +163,8 @@ public class User {
                 object.put("username", username);
             if (password != null)
                 object.put("password", password);
+            if (phone != null)
+                object.put("phone", phone);
             if (email != null)
                 object.put("email", email);
             if (profilePicUrl != null)

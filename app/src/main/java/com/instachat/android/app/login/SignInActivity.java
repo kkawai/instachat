@@ -1,10 +1,8 @@
 package com.instachat.android.app.login;
 
 import android.app.ProgressDialog;
-import androidx.lifecycle.ViewModelProvider;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
 import android.view.View;
 import android.widget.Toast;
 
@@ -14,13 +12,9 @@ import com.android.volley.VolleyError;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.FirebaseException;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.PhoneAuthCredential;
-import com.google.firebase.auth.PhoneAuthProvider;
 import com.instachat.android.BR;
 import com.instachat.android.R;
 import com.instachat.android.app.activity.group.GroupChatActivity;
@@ -39,10 +33,10 @@ import com.instachat.android.util.UserPreferences;
 
 import org.json.JSONObject;
 
-import java.util.concurrent.TimeUnit;
-
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 

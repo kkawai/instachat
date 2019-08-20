@@ -2,16 +2,11 @@ package com.instachat.android.data.api;
 
 import android.content.Context;
 import android.text.TextUtils;
-import androidx.core.util.Pair;
+
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.extensions.android.json.AndroidJsonFactory;
-import com.google.api.services.urlshortener.Urlshortener;
-import com.google.api.services.urlshortener.model.Url;
 import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
@@ -22,18 +17,19 @@ import com.instachat.android.util.Base64;
 import com.instachat.android.util.DeviceUtil;
 import com.instachat.android.util.HttpMessage;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.SimpleRxWrapper;
 import com.instachat.android.util.StringUtil;
+import com.instachat.android.util.UserPreferences;
 
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.StringTokenizer;
 
 import javax.inject.Inject;
+
+import androidx.core.util.Pair;
 
 public class NetworkApi {
 
@@ -102,6 +98,24 @@ public class NetworkApi {
         requestQueue.add(request);
     }
 
+    public void isExistsPhone(final Object cancelTag, final int userid, final String phone, final Response.Listener<JSONObject>
+            listener, final Response.ErrorListener errorListener) {
+
+        final String url = Constants.API_BASE_URL + "/ih/exists?pn=" + phone+"&i="+userid;
+        final Request request = new ApiGetRequest(url, listener, errorListener);
+        request.setShouldCache(false).setRetryPolicy(DEFAULT_RETRY_POLICY).setTag(cancelTag);
+        requestQueue.add(request);
+    }
+
+    public void isExistsPhone(final Object cancelTag, final String phone, final Response.Listener<JSONObject>
+            listener, final Response.ErrorListener errorListener) {
+
+        final String url = Constants.API_BASE_URL + "/ih/exists?pn=" + phone;
+        final Request request = new ApiGetRequest(url, listener, errorListener);
+        request.setShouldCache(false).setRetryPolicy(DEFAULT_RETRY_POLICY).setTag(cancelTag);
+        requestQueue.add(request);
+    }
+
     public void isExistsEmail(final Object cancelTag, final String email, final Response.Listener<JSONObject>
             listener, final Response.ErrorListener errorListener) {
 
@@ -149,46 +163,6 @@ public class NetworkApi {
                 errorListener);
         request.setTag(tag);
         requestQueue.add(request);
-    }
-
-    public void saveThirdPartyPhoto(final String thirdPartyProfilePicUrl) {
-
-        SimpleRxWrapper.executeInWorkerThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Urlshortener.Builder builder = new Urlshortener.Builder(AndroidHttp.newCompatibleTransport(),
-                            AndroidJsonFactory.getDefaultInstance(), null);
-                    Urlshortener urlshortener = builder.build();
-
-                    com.google.api.services.urlshortener.model.Url url = new Url();
-                    url.setLongUrl(thirdPartyProfilePicUrl);
-                    try {
-                        url = urlshortener.url().insert(url).setKey(Constants.GOOGLE_API_KEY).execute();
-                    } catch (Exception e) {
-                        MLog.e(TAG, "", e);
-                    }
-                    final String newUrl = url != null && url.getId() != null ? url.getId() : thirdPartyProfilePicUrl;
-
-                    final User user = UserPreferences.getInstance().getUser();
-                    user.setProfilePicUrl(newUrl);
-                    saveUser(null, user, new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            UserPreferences.getInstance().saveUser(user);
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            MLog.e(TAG, "NetworkApi.saveUser() failed inside saveThirdPartyPhoto()", error);
-                        }
-                    });
-                } catch (Exception e) {
-                    MLog.e(TAG, "", e);
-                }
-            }
-        });
-
     }
 
     /*public static int gcmcount(final int userid) throws Exception {

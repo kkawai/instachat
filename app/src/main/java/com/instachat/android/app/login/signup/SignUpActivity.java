@@ -2,11 +2,7 @@ package com.instachat.android.app.login.signup;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
 import android.view.View;
 import android.widget.Toast;
 
@@ -16,12 +12,9 @@ import com.android.volley.VolleyError;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.FirebaseException;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.PhoneAuthCredential;
-import com.google.firebase.auth.PhoneAuthProvider;
 import com.instachat.android.R;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.login.SignInActivity;
@@ -36,10 +29,11 @@ import com.instachat.android.util.UserPreferences;
 
 import org.json.JSONObject;
 
-import java.util.concurrent.TimeUnit;
-
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import dagger.android.AndroidInjection;
 
@@ -53,7 +47,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     private TextInputLayout usernameLayout;
     private String email, username, password;
     private FirebaseAuth mFirebaseAuth;
-    private String thirdPartyProfilePicUrl;
 
     @Inject
     NetworkApi networkApi;
@@ -72,15 +65,10 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         passwordLayout = findViewById(R.id.input_password_layout);
         usernameLayout = findViewById(R.id.input_username_layout);
         mFirebaseAuth = FirebaseAuth.getInstance();
-        thirdPartyProfilePicUrl = getIntent() != null ? getIntent().getStringExtra("photo") : null;
-        final String emailFromGoogle = getIntent() != null ? getIntent().getStringExtra("email") : null;
-        if (emailFromGoogle != null)
-            emailLayout.getEditText().setText(emailFromGoogle);
 
         FontUtil.setTextViewFont(emailLayout);
         FontUtil.setTextViewFont(passwordLayout);
         FontUtil.setTextViewFont(usernameLayout);
-        MLog.i(TAG, "thirdPartyProfilePicUrl: " + thirdPartyProfilePicUrl);
     }
 
     @Override
@@ -202,8 +190,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         user.setEmail(email);
         user.setPassword(password);
         user.setUsername(username);
-        if (thirdPartyProfilePicUrl != null)
-            user.setProfilePicUrl(thirdPartyProfilePicUrl);
+
         networkApi.saveUser(this, user, new Response.Listener<String>() {
             @Override
             public void onResponse(final String string) {
