@@ -346,6 +346,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     }
 
     private void _signout() {
+        TheApp.isSavedDeviceId = false;
         firebaseAuth.signOut();
         groupChatViewModel.removeUserPresenceFromGroup();
         gcmHelper.unregister(UserPreferences.getInstance().getUserId() + "");
