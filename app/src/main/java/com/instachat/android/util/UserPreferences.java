@@ -161,11 +161,16 @@ public final class UserPreferences {
         }
         try {
             JSONObject json = new JSONObject(AdminUtil.decode(mPrefs.getString(PHOTOS_PATH, null)));
-            sUser = new User();
-            sUser.copyFrom(json);
-            return sUser;
+            User user = new User();
+            user.copyFrom(json);
+            if (user.getId() > 0 && user.getUsername().length() > 1) { //minor validation
+                sUser = user;
+                return sUser;
+            } else {
+                return null;
+            }
         } catch (Exception e) {
-            MLog.e(TAG,"",e);
+            MLog.e(TAG,"getUser()",e);
         }
         return null;
     }

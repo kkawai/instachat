@@ -209,4 +209,8 @@
     <string name="agree">I AGREE</string>
     <string name="terms_of_use_title">TERMS OF USE</string>
     <string name="terms_of_use">PLEASE READ CAREFULLY: You agree not to post abusive, threatening, racist, bullying comments or photos or any objectionable content.  You also agree not to post any derogatory, sexually aggressive, or degrading comments towards any other community member or participant regardless of their age, gender, race, or sexual orientation.  If you violate these terms, you will be permanently banned from using this app and any objectionable content you post can be used against you.  You also agree not to hold this app accountable for any self-inflicted wounds and/or suicide.  If using this app causes you to harm yourself or be harmed in any way, shape, or form, then you should not and cannot use this app any further and you agree not to hold this app liable for your own actions or the actions of others.  Use this app is at your own risk.  If you experience any form of harassment, use the Block feature.  If you disagree with any of these terms, you must uninstall immediately.</string>
+
+    <!-- On or after 8/21/2019 -->
+    <string name="verify_phone">Verify Phone Number</string>
+    <string name="hint_phone">Phone with Country Code</string>
 </resources>

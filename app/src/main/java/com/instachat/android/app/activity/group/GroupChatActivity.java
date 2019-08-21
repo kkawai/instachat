@@ -1,25 +1,15 @@
 package com.instachat.android.app.activity.group;
 
-//import androidx.lifecycle.ViewModelProvider;
-//import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-//import androidx.annotation.NonNull;
-//import androidx.fragment.app.Fragment;
-//import android.support.v4.view.GravityCompat;
-//import androidx.appcompat.app.AlertDialog;
-//import androidx.recyclerview.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.database.FirebaseDatabase;
 import com.instachat.android.BR;
 import com.instachat.android.Constants;
@@ -61,15 +51,16 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import cn.pedant.SweetAlert.SweetAlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
 
-public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding, GroupChatViewModel>
-        implements GoogleApiClient.OnConnectionFailedListener,
+public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding, GroupChatViewModel> implements
         UploadListener, FriendlyMessageListener,
         AttachPhotoOptionsDialogHelper.PhotoOptionsListener,
         AdListenerInterface, GroupChatNavigator {
 
     private static final String TAG = "GroupChatActivity";
+
+    private RightDrawerLayoutBinding rightDrawerLayoutBinding;
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
@@ -274,11 +265,6 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        MLog.d(TAG, "onConnectionFailed:" + connectionResult);
-    }
-
-    @Override
     public void listenForUsersInGroup() {
         UsersInGroupListener usersInGroupListener = new UsersInGroupListener() {
             @Override
@@ -290,7 +276,6 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         chatSummariesRecyclerAdapter.setUsersInGroupListener(usersInGroupListener);
     }
 
-    private RightDrawerLayoutBinding rightDrawerLayoutBinding;
     @Override
     public void setupRightDrawerContent() {
 
@@ -299,7 +284,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         binding.rightNavView.addView(rightDrawerLayoutBinding.getRoot());
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         rightDrawerLayoutBinding.drawerRecyclerView.setLayoutManager(linearLayoutManager);
 
         mGroupChatUsersRecyclerAdapter = new GroupChatUsersRecyclerAdapter(this, groupChatViewModel.getGroupId());

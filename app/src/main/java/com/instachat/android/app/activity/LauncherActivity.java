@@ -3,14 +3,27 @@ package com.instachat.android.app.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.app.activity.group.GroupChatActivity;
+import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.login.SignInActivity;
+import com.instachat.android.app.login.VerifyPhoneActivity;
 import com.instachat.android.app.login.signup.SignUpActivity;
 import com.instachat.android.util.ActivityUtil;
 import com.instachat.android.util.UserPreferences;
@@ -20,13 +33,16 @@ import com.instachat.android.util.UserPreferences;
  */
 public final class LauncherActivity extends AppCompatActivity {
 
+   final private int REQ_CODE = 10;
+
    @Override
    public void onCreate(Bundle savedInstanceState) {
       setTheme(R.style.Theme_App);
       super.onCreate(savedInstanceState);
-      if (UserPreferences.getInstance().getUser() != null) {
-         startActivity(new Intent(this, GroupChatActivity.class));
-         finish();
+
+      FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+      if (UserPreferences.getInstance().getUser() != null && firebaseUser != null && firebaseUser.isEmailVerified()) {
+         checkPhoneNumber();
          return;
       }
 
@@ -36,13 +52,13 @@ public final class LauncherActivity extends AppCompatActivity {
       findViewById(R.id.login_button).setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
-            startActivityForResult(new Intent(LauncherActivity.this, SignInActivity.class), 10);
+            startActivityForResult(new Intent(LauncherActivity.this, SignInActivity.class), REQ_CODE);
          }
       });
       findViewById(R.id.sign_up_button).setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
-            startActivityForResult(new Intent(LauncherActivity.this, SignUpActivity.class), 10);
+            startActivityForResult(new Intent(LauncherActivity.this, SignUpActivity.class), REQ_CODE);
          }
       });
    }
@@ -50,8 +66,40 @@ public final class LauncherActivity extends AppCompatActivity {
    @Override
    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
       super.onActivityResult(requestCode, resultCode, data);
-      if (requestCode == 10 && resultCode == Activity.RESULT_OK) {
+      if (requestCode == REQ_CODE && resultCode == Activity.RESULT_OK) {
          finish();
       }
+   }
+
+   /**
+    * Called after user has successfully signed in.  However, there is
+    * a final step before user can chat:  Verify phone number!
+    */
+   private void checkPhoneNumber() {
+      final DatabaseReference phoneNumberRef = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(UserPreferences.getInstance().getUserId()) + "/ph");
+      phoneNumberRef.addListenerForSingleValueEvent(new ValueEventListener() {
+         @Override
+         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            phoneNumberRef.removeEventListener(this);
+            if (dataSnapshot.exists()) {
+               phoneNumberRef.removeEventListener(this);
+               startActivity(new Intent(LauncherActivity.this, GroupChatActivity.class));
+               finish();
+            } else {
+               goToVerifyPhoneActivity();
+            }
+         }
+
+         @Override
+         public void onCancelled(@NonNull DatabaseError databaseError) {
+            phoneNumberRef.removeEventListener(this);
+         }
+      });
+   }
+
+   private void goToVerifyPhoneActivity() {
+      startActivity(new Intent(this, VerifyPhoneActivity.class));
+      FirebaseAnalytics.getInstance(this).logEvent(Events.GO_VERIFY_PHONE, null);
+      finish();
    }
 }

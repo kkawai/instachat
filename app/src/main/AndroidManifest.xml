@@ -79,27 +79,6 @@
         </activity>
 
         <activity
-            android:name=".app.activity.group.GroupChatActivity2"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.SEND"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="image/*"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="text/plain"/>
-            </intent-filter>
-            <!-- think about supporting consumption of multiple images later
-            <intent-filter>
-                <action android:name="android.intent.action.SEND_MULTIPLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="image/*" />
-            </intent-filter> -->
-        </activity>
-
-        <activity
             android:name=".app.activity.pm.PrivateChatActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Launcher">
@@ -122,6 +101,10 @@
 
         <activity
             android:name=".app.login.SignInActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".app.login.VerifyPhoneActivity"
             android:screenOrientation="portrait"/>
 
         <activity
