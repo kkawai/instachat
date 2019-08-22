@@ -173,5 +173,17 @@
 	<string name="agree">أنا موافق</string>
 	<string name="terms_of_use_title">تعليمات الاستخدام</string>
 	<string name="terms_of_use">شروط الاستخدام: أنت توافق على عدم نشر التعليقات أو الصور المسيئة أو التهديدية أو العنصرية أو البلطجة أو أي محتوى مرفوض. أنت توافق أيضًا على عدم نشر تعليقات عدوانية أو مهينة جنسيًا تجاه أي فرد آخر من المجتمع أو مشارك بغض النظر عن العمر أو الجنس أو العرق أو الميول الجنسية. إذا انتهكت هذه الشروط ، فسيتم منعك نهائيًا من استخدام هذا التطبيق ويمكن استخدام أي محتوى مرفوض تنشره ضدك.</string>
+	<string name="verify_phone">تحقق من رقم الهاتف</string>
+	<string name="verify_phone_hint">الهاتف (مثال +16505551212)</string>
+	<string name="request_sms_code">طلب رمز الرسائل القصيرة</string>
+	<string name="sms_code">رمز الرسائل القصيرة</string>
+	<string name="validate_sms_code">التحقق من صحة رمز SMS</string>
+	<string name="sms_code_sent">تم إرسال رمز SMS إلى هاتفك. عندما تتلقى ، يرجى إدخال للمتابعة. لديك دقيقتان.</string>
+	<string name="invalid_phone_number">رقم الهاتف الذي أدخلته غير صالح. يرجى إدخال الهاتف بشكل صحيح.</string>
+	<string name="invalid_sms_code">رمز SMS غير صالح. حاول مرة اخرى.</string>
+	<string name="phone_already_exists">رقم الهاتف الذي أدخلته موجود بالفعل ضمن حساب مختلف. حاول رقم آخر.</string>
+	<string name="fix_phone">يجب أن يبدأ الهاتف بـ + متبوعًا برمز البلد ورقم الهاتف (مثال +16505551212)</string>
+	<string name="sms_error">خطأ في الرسائل القصيرة:</string>
+	<string name="checking_number">التحقق من الرقم ...</string>
 
 </resources>

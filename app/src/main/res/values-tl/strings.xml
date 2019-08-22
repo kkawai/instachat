@@ -173,5 +173,17 @@
 	<string name="agree">SUMASANG-AYON AKO</string>
 	<string name="terms_of_use_title">MGA TUNTUNIN NG PAGGAMIT</string>
 	<string name="terms_of_use">MGA TUNTUNIN SA PAGGAMIT: Sumasang-ayon ka na huwag mag-post ng mga mapang-abuso, pagbabanta, rasista, mga pang-aapi ng mga komento o mga larawan o anumang hindi kanais-nais na nilalaman. Sumasang-ayon ka rin na huwag mag-post ng mga sekswal na agresibo o nanghihiya na mga komento sa anumang ibang miyembro ng komunidad o kalahok kahit anuman ang kanilang edad, kasarian, lahi, o oryentasyong sekswal. Kung lumalabag ka sa mga tuntuning ito, permanenteng bawal ka sa paggamit ng app na ito at anumang hindi kanais-nais na nilalaman na iyong nai-post ay maaaring gamitin laban sa iyo.</string>
+	<string name="verify_phone">Patunayan ang Numero ng Telepono</string>
+	<string name="verify_phone_hint">Telepono (halimbawa +16505551212)</string>
+	<string name="request_sms_code">Humiling ng SMS Code</string>
+	<string name="sms_code">SMS CODE</string>
+	<string name="validate_sms_code">Patunayan ang Kodigo ng SMS</string>
+	<string name="sms_code_sent">Naipadala ang SMS code sa iyong telepono. Kapag natanggap mo, mangyaring magpasok upang magpatuloy. Mayroon kang 2 minuto.</string>
+	<string name="invalid_phone_number">Hindi wasto ang numero ng telepono na iyong ipinasok. Mangyaring ipasok nang tama ang telepono.</string>
+	<string name="invalid_sms_code">Hindi wastong SMS code. Ulitin mo ulit.</string>
+	<string name="phone_already_exists">Ang numero ng telepono na iyong naipasok ay mayroon nang ilalim ng ibang account. Subukan ang isa pang numero.</string>
+	<string name="fix_phone">Dapat magsimula ang telepono sa + Sinusundan ng code ng bansa at numero ng telepono (halimbawa +16505551212)</string>
+	<string name="sms_error">Error sa SMS:</string>
+	<string name="checking_number">Sinusuri ang numero ...</string>
 
 </resources>

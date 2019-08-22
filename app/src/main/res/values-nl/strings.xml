@@ -173,5 +173,17 @@
 	<string name="agree">DAAR BEN IK HET MEE EENS</string>
 	<string name="terms_of_use_title">GEBRUIKSVOORWAARDEN</string>
 	<string name="terms_of_use">GEBRUIKSVOORWAARDEN: U gaat ermee akkoord geen beledigende, bedreigende, racistische, pestende opmerkingen of foto\'s of aanstootgevende inhoud te plaatsen. Je gaat er ook mee akkoord om geen seksueel agressieve of vernederende opmerkingen te plaatsen tegenover een ander lid of deelnemer van de community, ongeacht hun leeftijd, geslacht, ras of seksuele geaardheid. Als je deze voorwaarden schendt, word je permanent verbannen van het gebruik van deze app en kan je aanstootgevende inhoud die je plaatst tegen je gebruiken.</string>
+	<string name="verify_phone">Controleer telefoonnummer</string>
+	<string name="verify_phone_hint">Telefoon (voorbeeld +16505551212)</string>
+	<string name="request_sms_code">Vraag sms-code aan</string>
+	<string name="sms_code">SMS CODE</string>
+	<string name="validate_sms_code">Valideer SMS-code</string>
+	<string name="sms_code_sent">SMS-code is naar uw telefoon verzonden. Wanneer je ontvangt, voer je in om door te gaan. Je hebt 2 minuten.</string>
+	<string name="invalid_phone_number">Het telefoonnummer dat je hebt ingevoerd is ongeldig. Voer de telefoon correct in.</string>
+	<string name="invalid_sms_code">Ongeldige sms-code. Probeer het opnieuw.</string>
+	<string name="phone_already_exists">Het telefoonnummer dat u heeft ingevoerd, bestaat al onder een ander account. Probeer een ander nummer.</string>
+	<string name="fix_phone">Telefoon moet beginnen met + Gevolgd door landcode en telefoonnummer (voorbeeld +16505551212)</string>
+	<string name="sms_error">SMS-fout:</string>
+	<string name="checking_number">Nummer controleren ...</string>
 
 </resources>

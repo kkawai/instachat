@@ -173,5 +173,17 @@
 	<string name="agree">GENAU</string>
 	<string name="terms_of_use_title">NUTZUNGSBEDINGUNGEN</string>
 	<string name="terms_of_use">NUTZUNGSBEDINGUNGEN: Sie stimmen zu, keine beleidigenden, bedrohlichen, rassistischen, mobbenden Kommentare, Fotos oder anstößigen Inhalte zu veröffentlichen. Sie stimmen auch zu, keine sexuell aggressiven oder erniedrigenden Kommentare gegenüber anderen Community-Mitgliedern oder Teilnehmern zu veröffentlichen, unabhängig von deren Alter, Geschlecht, Rasse oder sexueller Ausrichtung. Wenn Sie gegen diese Bedingungen verstoßen, wird Ihnen die Nutzung dieser App dauerhaft untersagt, und alle unerwünschten Inhalte, die Sie veröffentlichen, können gegen Sie verwendet werden.</string>
+	<string name="verify_phone">Überprüfen Sie die Telefonnummer</string>
+	<string name="verify_phone_hint">Telefon (Beispiel +16505551212)</string>
+	<string name="request_sms_code">SMS Code anfordern</string>
+	<string name="sms_code">SMS-CODE</string>
+	<string name="validate_sms_code">SMS-Code validieren</string>
+	<string name="sms_code_sent">Der SMS-Code wurde an Ihr Telefon gesendet. Wenn Sie erhalten, geben Sie bitte ein, um fortzufahren. Sie haben 2 Minuten.</string>
+	<string name="invalid_phone_number">Die eingegebene Telefonnummer war ungültig. Bitte geben Sie das Telefon korrekt ein.</string>
+	<string name="invalid_sms_code">Ungültiger SMS-Code. Bitte versuche es erneut.</string>
+	<string name="phone_already_exists">Die eingegebene Telefonnummer existiert bereits unter einem anderen Konto. Versuchen Sie es mit einer anderen Nummer.</string>
+	<string name="fix_phone">Telefon muss mit + beginnen, gefolgt von Landesvorwahl und Telefonnummer (Beispiel +16505551212)</string>
+	<string name="sms_error">SMS-Fehler:</string>
+	<string name="checking_number">Nummer wird überprüft ...</string>
 
 </resources>

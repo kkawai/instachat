@@ -173,5 +173,17 @@
 	<string name="agree">ZGADZAM SIĘ</string>
 	<string name="terms_of_use_title">WARUNKI KORZYSTANIA</string>
 	<string name="terms_of_use">WARUNKI KORZYSTANIA: Zgadzasz się nie zamieszczać obraźliwych, groźnych, rasistowskich, zastraszających komentarzy ani zdjęć ani żadnych niepożądanych treści. Zgadzasz się również nie publikować agresywnych seksualnie lub poniżających komentarzy w stosunku do innych członków społeczności lub uczestników, niezależnie od ich wieku, płci, rasy lub orientacji seksualnej. Jeśli naruszysz te warunki, zostaniesz na stałe zablokowany do korzystania z tej aplikacji, a wszelkie obraźliwe treści, które publikujesz, mogą zostać użyte przeciwko tobie.</string>
+	<string name="verify_phone">Zweryfikuj numer telefonu</string>
+	<string name="verify_phone_hint">Telefon (przykład +16505551212)</string>
+	<string name="request_sms_code">Poproś o kod SMS</string>
+	<string name="sms_code">KOD SMS</string>
+	<string name="validate_sms_code">Sprawdź poprawność kodu SMS</string>
+	<string name="sms_code_sent">Kod SMS został wysłany na Twój telefon. Po otrzymaniu wprowadź, aby kontynuować. Masz 2 minuty.</string>
+	<string name="invalid_phone_number">Podany numer telefonu jest nieprawidłowy. Proszę wprowadzić telefon poprawnie.</string>
+	<string name="invalid_sms_code">Niepoprawny kod SMS. Proszę spróbuj ponownie.</string>
+	<string name="phone_already_exists">Podany numer telefonu już istnieje na innym koncie. Wypróbuj inny numer.</string>
+	<string name="fix_phone">Telefon musi zaczynać się od + Następuje kod kraju i numer telefonu (przykład +16505551212)</string>
+	<string name="sms_error">Błąd SMS:</string>
+	<string name="checking_number">Sprawdzam numer ...</string>
 
 </resources>

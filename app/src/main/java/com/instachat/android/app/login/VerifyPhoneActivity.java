@@ -109,13 +109,13 @@ public class VerifyPhoneActivity extends BaseActivity<ActivityVerifyPhoneBinding
             public void onResponse(final JSONObject response) {
                 try {
                     MLog.i(TAG, "isValidPhone() : " + response);
+                    hideProgressDialog();
                     //status:OK
                     //exists:true|false
                     try {
                         if (!response.getString(NetworkApi.KEY_RESPONSE_STATUS).equalsIgnoreCase(NetworkApi.RESPONSE_OK)) {
                             showErrorToast("1");
                         } else if (response.getJSONObject(NetworkApi.RESPONSE_DATA).getBoolean(NetworkApi.KEY_EXISTS)) {
-                            hideProgressDialog();
                             verifyPhoneNumber(phone);
                         } else {
                             new SweetAlertDialog(VerifyPhoneActivity.this, SweetAlertDialog.ERROR_TYPE).setContentText(getString(R.string.phone_already_exists)).show();
@@ -133,6 +133,7 @@ public class VerifyPhoneActivity extends BaseActivity<ActivityVerifyPhoneBinding
             @Override
             public void onErrorResponse(final VolleyError error) {
                 MLog.e(TAG, "checkPhoneNumber() failed: " + error);
+                hideProgressDialog();
                 showErrorToast("network 1");
             }
         });
@@ -167,7 +168,7 @@ public class VerifyPhoneActivity extends BaseActivity<ActivityVerifyPhoneBinding
     }
 
     public void onSendSmsCode(View view) {
-        phone = ((TextInputEditText)findViewById(R.id.input_phone)).toString();
+        phone = ((TextInputEditText)findViewById(R.id.input_phone)).getText().toString();
         phone = StringUtil.onlyPhone(phone);
         if (StringUtil.isValidPhone(phone)) {
             checkPhoneNumber(UserPreferences.getInstance().getUserId(), phone);
@@ -182,7 +183,7 @@ public class VerifyPhoneActivity extends BaseActivity<ActivityVerifyPhoneBinding
             return;
         }
 
-        String smsCode = findViewById(R.id.input_sms_code).toString().trim();
+        String smsCode = ((TextInputEditText)findViewById(R.id.input_sms_code)).getText().toString().trim();
         if (StringUtil.isEmpty(smsCode)) {
             return;
         }

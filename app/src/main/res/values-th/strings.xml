@@ -173,5 +173,17 @@
 	<string name="agree">ฉันเห็นด้วย</string>
 	<string name="terms_of_use_title">ข้อตกลงในการใช้งาน</string>
 	<string name="terms_of_use">ข้อกำหนดการใช้งาน: คุณตกลงที่จะไม่โพสต์ข้อความแสดงความไม่พอใจข่มขู่เหยียดผิวข่มขู่หรือภาพถ่ายหรือเนื้อหาที่ไม่เหมาะสม คุณตกลงที่จะไม่โพสต์ความคิดเห็นเชิงรุกหรือเสื่อมเสียต่อสมาชิกชุมชนหรือผู้เข้าร่วมคนอื่น ๆ โดยไม่คำนึงถึงอายุเพศเชื้อชาติหรือรสนิยมทางเพศของพวกเขา หากคุณละเมิดข้อกำหนดเหล่านี้คุณจะถูกแบนจากการใช้แอพนี้อย่างถาวรและเนื้อหาใด ๆ ที่ไม่เหมาะสมที่คุณโพสต์สามารถนำมาใช้กับคุณได้</string>
+	<string name="verify_phone">ยืนยันหมายเลขโทรศัพท์</string>
+	<string name="verify_phone_hint">โทรศัพท์ (ตัวอย่าง +16505551212)</string>
+	<string name="request_sms_code">ขอรหัส SMS</string>
+	<string name="sms_code">รหัส SMS</string>
+	<string name="validate_sms_code">ตรวจสอบรหัส SMS</string>
+	<string name="sms_code_sent">ส่งรหัส SMS ไปยังโทรศัพท์ของคุณแล้ว เมื่อคุณได้รับโปรดป้อนเพื่อดำเนินการต่อ คุณมี 2 นาที</string>
+	<string name="invalid_phone_number">หมายเลขโทรศัพท์ที่คุณป้อนไม่ถูกต้อง กรุณาใส่โทรศัพท์อย่างถูกต้อง</string>
+	<string name="invalid_sms_code">รหัส SMS ไม่ถูกต้อง กรุณาลองอีกครั้ง.</string>
+	<string name="phone_already_exists">หมายเลขโทรศัพท์ที่คุณป้อนมีอยู่แล้วในบัญชีอื่น ลองหมายเลขอื่น</string>
+	<string name="fix_phone">โทรศัพท์จะต้องเริ่มต้นด้วย + ตามด้วยรหัสประเทศและหมายเลขโทรศัพท์ (ตัวอย่าง +16505551212)</string>
+	<string name="sms_error">ข้อผิดพลาดทาง SMS:</string>
+	<string name="checking_number">กำลังตรวจสอบหมายเลข ...</string>
 
 </resources>

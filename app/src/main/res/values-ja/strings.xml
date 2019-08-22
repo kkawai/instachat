@@ -173,5 +173,17 @@
 	<string name="agree">同意する</string>
 	<string name="terms_of_use_title">利用規約</string>
 	<string name="terms_of_use">利用規約：あなたは、虐待的、脅迫的、人種差別的、コメント、写真、または不適切な内容を投稿しないことに同意します。また、年齢、性別、人種、性的指向を問わず、他のコミュニティメンバーまたは参加者に対して性的に攻撃的または侮辱的なコメントを投稿しないことに同意します。あなたがこれらの条件に違反した場合、あなたは永久にこのアプリの使用を禁止され、あなたが投稿したいかなる不快なコンテンツもあなたに対して使用される可能性があります。</string>
+	<string name="verify_phone">電話番号を確認</string>
+	<string name="verify_phone_hint">電話（例+16505551212）</string>
+	<string name="request_sms_code">SMSコードをリクエスト</string>
+	<string name="sms_code">SMSコード</string>
+	<string name="validate_sms_code">SMSコードを検証する</string>
+	<string name="sms_code_sent">SMSコードが電話に送信されました。受け取ったら、入力して続行してください。 2分あります。</string>
+	<string name="invalid_phone_number">入力した電話番号は無効です。電話番号を正しく入力してください。</string>
+	<string name="invalid_sms_code">無効なSMSコード。もう一度試してください。</string>
+	<string name="phone_already_exists">入力した電話番号は別のアカウントに既に存在します。別の番号を試してください。</string>
+	<string name="fix_phone">電話番号は+で始まり、国コードと電話番号が続く必要があります（例：+16505551212）</string>
+	<string name="sms_error">SMSエラー：</string>
+	<string name="checking_number">番号を確認しています...</string>
 
 </resources>
