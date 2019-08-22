@@ -6,6 +6,8 @@ import com.instachat.android.app.activity.pm.PrivateChatActivity;
 import com.instachat.android.app.activity.pm.PrivateChatModule;
 import com.instachat.android.app.login.SignInActivity;
 import com.instachat.android.app.login.SignInModule;
+import com.instachat.android.app.login.VerifyPhoneActivity;
+import com.instachat.android.app.login.VerifyPhoneModule;
 import com.instachat.android.app.login.signup.SignUpActivity;
 
 import dagger.Module;
@@ -22,6 +24,9 @@ public abstract class ActivityBuilder {
 
     @ContributesAndroidInjector(modules = { SignInModule.class})
     abstract SignInActivity bindSignInActivity();
+
+    @ContributesAndroidInjector(modules = { VerifyPhoneModule.class})
+    abstract VerifyPhoneActivity bindVerifyPhoneActivity();
 
     @ContributesAndroidInjector
     abstract SignUpActivity bindSignUpActivity();

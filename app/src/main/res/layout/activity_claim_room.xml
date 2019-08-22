@@ -12,14 +12,12 @@
         tools:context="com.instachat.login.ClaimRoomActivity">
 
         <TextView
+            style="@style/ScreenTitleStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="40dp"
             android:text="@string/name_your_room"
-            android:textSize="45sp"
-            android:textStyle="bold"
-            android:fontFamily="@font/signpainter_housescript"
             />
 
         <LinearLayout
@@ -61,8 +59,6 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="18dp"
                 android:text="@string/next"
-                android:textAllCaps="true"
-                android:textSize="24sp"
                 />
 
             <TextView

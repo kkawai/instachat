@@ -1,11 +1,7 @@
 package com.instachat.android.app.activity;
 
-//import android.databinding.ObservableField;
 import android.net.Uri;
 import android.os.Bundle;
-//import androidx.annotation.NonNull;
-//import android.support.v13.view.inputmethod.InputConnectionCompat;
-//import android.support.v13.view.inputmethod.InputContentInfoCompat;
 import android.text.TextUtils;
 import android.util.Log;
 

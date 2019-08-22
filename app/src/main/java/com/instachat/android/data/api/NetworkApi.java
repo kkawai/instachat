@@ -98,19 +98,10 @@ public class NetworkApi {
         requestQueue.add(request);
     }
 
-    public void isExistsPhone(final Object cancelTag, final int userid, final String phone, final Response.Listener<JSONObject>
+    public void isValidPhone(final Object cancelTag, final int userid, final String phone, final Response.Listener<JSONObject>
             listener, final Response.ErrorListener errorListener) {
 
         final String url = Constants.API_BASE_URL + "/ih/exists?pn=" + phone+"&i="+userid;
-        final Request request = new ApiGetRequest(url, listener, errorListener);
-        request.setShouldCache(false).setRetryPolicy(DEFAULT_RETRY_POLICY).setTag(cancelTag);
-        requestQueue.add(request);
-    }
-
-    public void isExistsPhone(final Object cancelTag, final String phone, final Response.Listener<JSONObject>
-            listener, final Response.ErrorListener errorListener) {
-
-        final String url = Constants.API_BASE_URL + "/ih/exists?pn=" + phone;
         final Request request = new ApiGetRequest(url, listener, errorListener);
         request.setShouldCache(false).setRetryPolicy(DEFAULT_RETRY_POLICY).setTag(cancelTag);
         requestQueue.add(request);

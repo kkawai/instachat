@@ -14,6 +14,7 @@ public class Events {
     public static final String PENDING_REQUEST_ACCEPTED = "pending_request_accepted";
     public static final String LOGIN_SUCCESS = "login_success";
     public static final String GO_VERIFY_PHONE = "go_verify_phone";
+    public static final String PHONE_VERIFY_SUCCESS = "verify_phone_success";
     public static final String PHONE_VERIFIED = "phone_verified";
     public static final String ROOM_NAME_CHOSEN = "room_name_chosen";
     public static final String ROOM_NAME_SKIPPED = "room_name_skipped";

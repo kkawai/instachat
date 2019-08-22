@@ -8,7 +8,7 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical"
-        tools:context="com.instachat.login.LauncherActivity">
+        tools:context="com.instachat.android.app.activity.LauncherActivity">
 
         <ImageView
             android:layout_width="match_parent"

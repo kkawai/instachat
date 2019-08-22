@@ -147,6 +147,23 @@ public class StringUtil {
         return sb.toString();
     }
 
+    public static String onlyPhone(String s) {
+        s = s.trim();
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            if ( (i==0 && s.charAt(i) == '+') || Character.isDigit(s.charAt(i))) {
+                sb.append(s.charAt(i));
+            }
+        }
+        return sb.toString();
+    }
+
+    public static boolean isValidPhone(String phone) {
+        if (isEmpty(phone))
+            return false;
+        return phone.matches("^\\+(?:\\d){7,}") && phone.length() > 6 && phone.length() < 20;
+    }
+
     public static boolean isValidEmail(final CharSequence target) {
         if (target.length() < Constants.MIN_EMAIL_LENGTH || target.length() > Constants.MAX_EMAIL_LENGTH) {
             return false;

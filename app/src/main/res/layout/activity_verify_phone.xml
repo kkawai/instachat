@@ -5,15 +5,15 @@
         xmlns:tools="http://schemas.android.com/tools"
         tools:context="com.instachat.android.app.login.VerifyPhoneActivity">
 
-    <!--<data>-->
+    <data>
 
-        <!--<import type="android.view.View"/>-->
+        <import type="android.view.View"/>
 
-        <!--<variable-->
-            <!--name="viewModel"-->
-            <!--type="com.instachat.android.app.login.SignInViewModel" />-->
+        <variable
+            name="viewModel"
+            type="com.instachat.android.app.login.VerifyPhoneViewModel" />
 
-    <!--</data>-->
+    </data>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -22,14 +22,12 @@
         >
 
         <TextView
+            style="@style/ScreenTitleStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="40dp"
             android:text="@string/verify_phone"
-            android:textSize="45sp"
-            android:textStyle="bold"
-            android:fontFamily="@font/signpainter_housescript"
             />
 
         <LinearLayout
@@ -48,21 +46,20 @@
                     android:id="@+id/input_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Phone Number"
+                    android:hint="@string/verify_phone_hint"
                     android:inputType="phone"
                     android:maxLength="20"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button
+                android:onClick="onSendSmsCode"
                 android:id="@+id/send_sms_code"
                 android:layout_width="280dp"
                 android:layout_height="75dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="18dp"
-                android:text="Request SMS Code"
-                android:textAllCaps="true"
-                android:textSize="24sp"
+                android:text="@string/request_sms_code"
                 />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -74,21 +71,20 @@
                     android:id="@+id/input_sms_code"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="SMS CODE"
+                    android:hint="@string/sms_code"
                     android:inputType="number"
                     android:maxLength="8"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button
+                android:onClick="onVerifySmsCode"
                 android:id="@+id/verify_sms_code"
                 android:layout_width="280dp"
                 android:layout_height="75dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="18dp"
-                android:text="Validate SMS Code"
-                android:textAllCaps="true"
-                android:textSize="24sp"
+                android:text="@string/validate_sms_code"
                 />
 
         </LinearLayout>

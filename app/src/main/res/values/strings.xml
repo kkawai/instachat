@@ -46,8 +46,8 @@
     <string name="fresh_config">Fresh Config</string>
     <string name="cause_crash">Cause Crash</string>
     <string name="general_api_error">Error. Please try again.</string>
-    <string name="email_exists">This email is already taken: </string>
-    <string name="username_exists">This username is already taken: </string>
+    <string name="email_exists">This email is already taken : </string>
+    <string name="username_exists">This username is already taken : </string>
     <string name="email_password_not_found">Account not found.  Try again.</string>
     <string name="wrong_password">Wrong password.  Try again.</string>
     <string name="menu_choose_photo">Choose Photo</string>
@@ -72,7 +72,7 @@
     <string name="could_not_send_message">Sorry!  Could not send message.  Please try again.</string>
     <string name="please_upload_photo">Please upload a display photo to start chatting</string>
     <string name="bio">Bio</string>
-    <string name="hint_write_something_about_yourself">Write something about yourself…</string>
+    <string name="hint_write_something_about_yourself">Write something about yourself ...</string>
 
     <!-- sweet alert dialog -->
     <string name="sweet_alert_dialog_default_title"> </string>
@@ -97,7 +97,7 @@
     <string name="message_copied_to_clipboard">Message copied to clipboard</string>
     <string name="manage_blocks">Manage Blocks</string>
     <string name="message_options_title">Message Options</string>
-    <string name="cannot_chat_you_blocked_them">You blocked this person on a previous occasion: </string>
+    <string name="cannot_chat_you_blocked_them">You blocked this person on a previous occasion : </string>
 
     <!-- time ago -->
     <string name="online_now">online now</string>
@@ -136,19 +136,19 @@
     <string name="logout_title">Sign Out</string>
     <string name="logout_question">Do you want to sign out now?</string>
     <string name="user_active_in_group">Currently in</string>
-    <string name="web_clipping">Web Clipping:</string>
+    <string name="web_clipping">Web Clipping :</string>
     <string name="fetching_web_clipping">Fetching web clipping ...</string>
 
     <string name="default_bio">Hey there!  I am using Instachat   Send me a message on here!</string>
     <string name="like_singular">1 like</string>
     <string name="likes_plural">likes</string>
     <string name="received_likes_title">Your Likes</string>
-    <string name="possible_explicit_content_warning">Warning: this photo may contain inappropriate or explicit content</string>
+    <string name="possible_explicit_content_warning">Warning : this photo may contain inappropriate or explicit content</string>
     <string name="one_time_message_has_been_read_already">You have already opened this disappearing message.</string>
     <string name="one_time_message_notification_title">Disappearing Message</string>
     <string name="one_time_photo_notification_title">Disappearing Photo</string>
     <string name="send_option_protips">Long-press for more options!</string>
-    <string name="possible_explicit_content_warning_pls_choose_another">Warning: this photo may contain inappropriate or explicit content.  Please choose another photo.</string>
+    <string name="possible_explicit_content_warning_pls_choose_another">Warning : this photo may contain inappropriate or explicit content.  Please choose another photo.</string>
     <string name="warning">Warning</string>
 
     <string name="menu_option_pending_requests">New Pending Requests!</string>
@@ -164,7 +164,7 @@
     <string name="report_person_title">Report</string>
     <string name="report_person_question">Are you reporting this person for internet chat abuse?  We take these things seriously.  We will investigate this person and if found to be truly abusive, we will take action.  Thank you.</string>
     <string name="report_person_failed">Error.  Could not report.  Please try again.</string>
-    <string name="report_person_success">Reported: </string>
+    <string name="report_person_success">Reported : </string>
 
     <string name="photo_not_available">Disappearing Photo is not available anymore</string>
 
@@ -179,7 +179,7 @@
     <!-- added after 11/28/2016 -->
     <string name="enter_first_comment">Hi!  Share what is on your mind right now</string>
     <string name="gave_like_singular">gave 1 like</string>
-    <string name="gave_likes_plural">Likes given: </string>
+    <string name="gave_likes_plural">Likes given : </string>
 
     <string name="name_your_room">Name Your Room</string>
     <string name="room_name">ROOM NAME</string>
@@ -197,20 +197,30 @@
     <!-- On or after 9/18/2017 -->
     <string name="channel_new_messages">New messages</string>
     <string name="channel_activity">Activity</string>
-    <string name="said">said:</string>
+    <string name="said">said :</string>
     <string name="you_have_been_banned">You have been temporarily banned</string>
     <string name="title_banned_users">Banned Users</string>
     <string name="title_bans">Bans</string>
-    <string name="email_verification_sent">Please verify your email address before using Instachat.  Please check your email: </string>
+    <string name="email_verification_sent">Please verify your email address before using Instachat.  Please check your email : </string>
     <string name="add_friend">Add Friend</string>
     <string name="slow_down">Slow down</string>
-    <string name="password_reset_link_sent">Password reset link sent to email: </string>
+    <string name="password_reset_link_sent">Password reset link sent to email : </string>
 
     <string name="agree">I AGREE</string>
     <string name="terms_of_use_title">TERMS OF USE</string>
-    <string name="terms_of_use">PLEASE READ CAREFULLY: You agree not to post abusive, threatening, racist, bullying comments or photos or any objectionable content.  You also agree not to post any derogatory, sexually aggressive, or degrading comments towards any other community member or participant regardless of their age, gender, race, or sexual orientation.  If you violate these terms, you will be permanently banned from using this app and any objectionable content you post can be used against you.  You also agree not to hold this app accountable for any self-inflicted wounds and/or suicide.  If using this app causes you to harm yourself or be harmed in any way, shape, or form, then you should not and cannot use this app any further and you agree not to hold this app liable for your own actions or the actions of others.  Use this app is at your own risk.  If you experience any form of harassment, use the Block feature.  If you disagree with any of these terms, you must uninstall immediately.</string>
+    <string name="terms_of_use">PLEASE READ CAREFULLY : You agree not to post abusive, threatening, racist, bullying comments or photos or any objectionable content.  You also agree not to post any derogatory, sexually aggressive, or degrading comments towards any other community member or participant regardless of their age, gender, race, or sexual orientation.  If you violate these terms, you will be permanently banned from using this app and any objectionable content you post can be used against you.  You also agree not to hold this app accountable for any self-inflicted wounds and/or suicide.  If using this app causes you to harm yourself or be harmed in any way, shape, or form, then you should not and cannot use this app any further and you agree not to hold this app liable for your own actions or the actions of others.  Use this app is at your own risk.  If you experience any form of harassment, use the Block feature.  If you disagree with any of these terms, you must uninstall immediately.</string>
 
     <!-- On or after 8/21/2019 -->
     <string name="verify_phone">Verify Phone Number</string>
-    <string name="hint_phone">Phone with Country Code</string>
+    <string name="verify_phone_hint">Phone (example +16505551212)</string>
+    <string name="request_sms_code">Request SMS Code</string>
+    <string name="sms_code">SMS CODE</string>
+    <string name="validate_sms_code">Validate SMS Code</string>
+    <string name="sms_code_sent">SMS code has been sent to your phone.  When you receive, please enter to continue.  You have 2 minutes.</string>
+    <string name="invalid_phone_number">The phone number you entered was invalid.  Please enter phone correctly.</string>
+    <string name="invalid_sms_code">Invalid SMS code.  Please try again.</string>
+    <string name="phone_already_exists">The phone number you entered already exists under a different account.  Try another number.</string>
+    <string name="fix_phone">Phone must begin with +  Followed by country code and phone number (example +16505551212)</string>
+    <string name="sms_error">SMS Error : </string>
+    <string name="checking_number">Checking number ...</string>
 </resources>
