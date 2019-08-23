@@ -186,5 +186,6 @@
 	<string name="sms_error">SMSエラー：</string>
 	<string name="checking_number">番号を確認しています...</string>
 	<string name="sms_verify_success">SMS認証済み！セキュリティ上の理由から、もう一度サインインする必要があります。楽しんでくれてありがとう。</string>
+	<string name="starting_chat">チャットを開始しています。振舞ってください。</string>
 
 </resources>

@@ -186,5 +186,6 @@
 	<string name="sms_error">Errore SMS:</string>
 	<string name="checking_number">Verifica numero in corso ...</string>
 	<string name="sms_verify_success">SMS verificato! Per motivi di sicurezza, dovrai accedere di nuovo. Divertiti e grazie.</string>
+	<string name="starting_chat">Avvio della chat. Per favore comportati bene.</string>
 
 </resources>

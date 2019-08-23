@@ -186,5 +186,6 @@
 	<string name="sms_error">Ralat SMS:</string>
 	<string name="checking_number">Memeriksa nombor ...</string>
 	<string name="sms_verify_success">SMS Disahkan! Atas alasan keselamatan, anda perlu melog masuk sekali lagi. Bersenang-senang dan terima kasih.</string>
+	<string name="starting_chat">Memulakan sembang. Sila berkelakuan.</string>
 
 </resources>

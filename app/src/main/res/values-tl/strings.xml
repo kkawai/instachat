@@ -186,5 +186,6 @@
 	<string name="sms_error">Error sa SMS:</string>
 	<string name="checking_number">Sinusuri ang numero ...</string>
 	<string name="sms_verify_success">Na-verify ang SMS! Para sa mga kadahilanang pangseguridad, kakailanganin mong mag-sign in muli. Masaya at salamat.</string>
+	<string name="starting_chat">Simula ng chat. Mangyaring kumilos.</string>
 
 </resources>

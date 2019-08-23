@@ -186,5 +186,6 @@
 	<string name="sms_error">Erreur SMS:</string>
 	<string name="checking_number">Vérification du numéro ...</string>
 	<string name="sms_verify_success">SMS vérifié! Pour des raisons de sécurité, vous devrez vous connecter à nouveau. Amusez-vous et merci.</string>
+	<string name="starting_chat">Démarrer le chat. S\'il te plait calme toi.</string>
 
 </resources>

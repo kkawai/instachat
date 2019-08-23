@@ -186,5 +186,6 @@
 	<string name="sms_error">SMS 오류 :</string>
 	<string name="checking_number">번호 확인 중 ...</string>
 	<string name="sms_verify_success">SMS 확인 됨! 보안상의 이유로 한 번 더 로그인해야합니다. 재미 있고 감사합니다.</string>
+	<string name="starting_chat">채팅을 시작합니다. 행동하십시오.</string>
 
 </resources>

@@ -228,8 +228,9 @@ public class VerifyPhoneActivity extends BaseActivity<ActivityVerifyPhoneBinding
                             signout(); //we must re-sign in via username and password again
                             //somehow signInWithCredentials kills the current firebase user
                             //who was originally signed in via username and password
-                            new SweetAlertDialog(VerifyPhoneActivity.this, SweetAlertDialog.SUCCESS_TYPE)
-                                    .setContentText(getString(R.string.sms_verify_success))
+                            SweetAlertDialog dialog = new SweetAlertDialog(VerifyPhoneActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+                                    .setContentText(getString(R.string.sms_verify_success));
+                            dialog
                                     .setOnDismissListener(new DialogInterface.OnDismissListener() {
                                         @Override
                                         public void onDismiss(DialogInterface dialog) {
@@ -240,6 +241,7 @@ public class VerifyPhoneActivity extends BaseActivity<ActivityVerifyPhoneBinding
                                             finish();
                                         }
                                     });
+                            dialog.show();
                         }
                     }, new Response.ErrorListener() {
                         @Override

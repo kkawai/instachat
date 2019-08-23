@@ -186,5 +186,6 @@
 	<string name="sms_error">SMS-fout:</string>
 	<string name="checking_number">Nummer controleren ...</string>
 	<string name="sms_verify_success">SMS geverifieerd! Om veiligheidsredenen moet u zich opnieuw aanmelden. Veel plezier en bedankt.</string>
+	<string name="starting_chat">Chat starten. Gedraag je alstublieft.</string>
 
 </resources>

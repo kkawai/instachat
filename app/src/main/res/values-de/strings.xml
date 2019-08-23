@@ -186,5 +186,6 @@
 	<string name="sms_error">SMS-Fehler:</string>
 	<string name="checking_number">Nummer wird überprüft ...</string>
 	<string name="sms_verify_success">SMS verifiziert! Aus Sicherheitsgründen müssen Sie sich erneut anmelden. Viel Spaß und Danke.</string>
+	<string name="starting_chat">Chat starten. Benimm dich bitte.</string>
 
 </resources>

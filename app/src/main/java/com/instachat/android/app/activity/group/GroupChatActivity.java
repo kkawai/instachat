@@ -132,7 +132,9 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     @Override
     public void onPause() {
         super.onPause();
-        groupChatViewModel.removeUserPresenceFromGroup();
+        if (UserPreferences.getInstance().getUser() != null) {
+            groupChatViewModel.removeUserPresenceFromGroup();
+        }
     }
 
     @Override

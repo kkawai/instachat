@@ -186,5 +186,6 @@
 	<string name="sms_error">Error de SMS:</string>
 	<string name="checking_number">Número de cuenta corriente ...</string>
 	<string name="sms_verify_success">SMS verificado! Por razones de seguridad, deberá iniciar sesión una vez más. Diviértete y gracias.</string>
+	<string name="starting_chat">Iniciando chat. Por favor, comportarse.</string>
 
 </resources>

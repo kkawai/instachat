@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,6 +27,8 @@ import com.instachat.android.app.login.SignInActivity;
 import com.instachat.android.app.login.VerifyPhoneActivity;
 import com.instachat.android.app.login.signup.SignUpActivity;
 import com.instachat.android.util.ActivityUtil;
+import com.instachat.android.util.MLog;
+import com.instachat.android.util.SimpleRxWrapper;
 import com.instachat.android.util.UserPreferences;
 
 /**
@@ -34,17 +37,31 @@ import com.instachat.android.util.UserPreferences;
 public final class LauncherActivity extends AppCompatActivity {
 
    final private int REQ_CODE = 10;
+   private boolean userAlreadyClicked;
 
    @Override
    public void onCreate(Bundle savedInstanceState) {
       setTheme(R.style.Theme_App);
       super.onCreate(savedInstanceState);
 
-      FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-      if (UserPreferences.getInstance().getUser() != null && firebaseUser != null && firebaseUser.isEmailVerified()) {
-         checkPhoneNumber();
-         return;
-      }
+      SimpleRxWrapper.executeInWorkerThread(new Runnable() {
+         @Override
+         public void run() {
+            try {
+               FirebaseApp.initializeApp(LauncherActivity.this);
+            }catch (Throwable t){
+               MLog.e("LauncherActivity","",t);
+            }
+            try {
+               FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+               if (UserPreferences.getInstance().getUser() != null && firebaseUser != null && firebaseUser.isEmailVerified()) {
+                  checkPhoneNumber(); //start new activity before this screen can render
+               }
+            }catch (Throwable t) {
+               MLog.e("LauncherActivity","",t);
+            }
+         }
+      });
 
       ActivityUtil.hideStatusBar(getWindow());
 
@@ -52,12 +69,14 @@ public final class LauncherActivity extends AppCompatActivity {
       findViewById(R.id.login_button).setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
+            userAlreadyClicked = true;
             startActivityForResult(new Intent(LauncherActivity.this, SignInActivity.class), REQ_CODE);
          }
       });
       findViewById(R.id.sign_up_button).setOnClickListener(new View.OnClickListener() {
          @Override
          public void onClick(View view) {
+            userAlreadyClicked = true;
             startActivityForResult(new Intent(LauncherActivity.this, SignUpActivity.class), REQ_CODE);
          }
       });
@@ -76,6 +95,11 @@ public final class LauncherActivity extends AppCompatActivity {
     * a final step before user can chat:  Verify phone number!
     */
    private void checkPhoneNumber() {
+
+      if (userAlreadyClicked) {
+         return;
+      }
+
       final DatabaseReference phoneNumberRef = FirebaseDatabase.getInstance()
               .getReference(Constants.USER_INFO_REF(UserPreferences.getInstance().getUserId()) + "/" + Constants.PHONE_REF);
       phoneNumberRef.addListenerForSingleValueEvent(new ValueEventListener() {

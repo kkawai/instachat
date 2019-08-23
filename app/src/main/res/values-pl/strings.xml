@@ -186,5 +186,6 @@
 	<string name="sms_error">Błąd SMS:</string>
 	<string name="checking_number">Sprawdzam numer ...</string>
 	<string name="sms_verify_success">SMS zweryfikowany! Ze względów bezpieczeństwa konieczne będzie ponowne zalogowanie się. Miłej zabawy i dziękuję.</string>
+	<string name="starting_chat">Rozpoczęcie czatu. Proszę zachowuj się.</string>
 
 </resources>

@@ -186,5 +186,6 @@
 	<string name="sms_error">خطای پیام کوتاه:</string>
 	<string name="checking_number">در حال بررسی شماره ...</string>
 	<string name="sms_verify_success">پیامک تأیید شد! به دلایل امنیتی ، باید یک بار دیگر وارد سیستم شوید. از آن لذت ببرید و از شما سپاسگزارم.</string>
+	<string name="starting_chat">شروع گپ. لطفاً رفتار کنید</string>
 
 </resources>

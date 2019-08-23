@@ -48,7 +48,7 @@
     <string name="general_api_error">Error. Please try again.</string>
     <string name="email_exists">This email is already taken : </string>
     <string name="username_exists">This username is already taken : </string>
-    <string name="email_password_not_found">Account not found.  Try again.</string>
+    <string name="email_password_not_found">Account not found or wrong password.  Please try again.</string>
     <string name="wrong_password">Wrong password.  Try again.</string>
     <string name="menu_choose_photo">Choose Photo</string>
     <string name="menu_take_photo">Take Photo</string>
@@ -224,5 +224,6 @@
     <string name="sms_error">SMS Error : </string>
     <string name="checking_number">Checking number ...</string>
     <string name="sms_verify_success">SMS Verified!  For security reasons, you will need to sign in once more.  Have fun and thank you.</string>
+    <string name="starting_chat">Starting chat.  Please behave.</string>
 
 </resources>

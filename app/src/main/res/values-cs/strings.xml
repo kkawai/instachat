@@ -186,5 +186,6 @@
 	<string name="sms_error">Chyba SMS:</string>
 	<string name="checking_number">Kontroluje se číslo ...</string>
 	<string name="sms_verify_success">SMS byla ověřena! Z bezpečnostních důvodů se budete muset znovu přihlásit. Bavte se a děkuji.</string>
+	<string name="starting_chat">Zahájení chatu. Prosím, chovej se.</string>
 
 </resources>

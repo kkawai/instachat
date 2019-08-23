@@ -186,5 +186,6 @@
 	<string name="sms_error">Kesalahan SMS:</string>
 	<string name="checking_number">Memeriksa nomor ...</string>
 	<string name="sms_verify_success">SMS Diverifikasi! Untuk alasan keamanan, Anda harus masuk sekali lagi. Selamat bersenang-senang dan terima kasih.</string>
+	<string name="starting_chat">Mulai mengobrol. Tolong bertingkah.</string>
 
 </resources>

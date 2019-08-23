@@ -150,7 +150,6 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
                     MLog.w(TAG, "firebaseAuth.signInWithEmailAndPassword(): ", task.getException());
                     showErrorToast(R.string.email_password_not_found);
                 } else {
-                    hideProgressDialog();
                     if (firebaseAuth.getCurrentUser().isEmailVerified()) {
                         UserPreferences.getInstance().saveUser(user);
                         UserPreferences.getInstance().saveLastSignIn(user.getUsername());
@@ -161,6 +160,7 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
                             checkPhoneNumber();
                         }
                     } else {
+                        hideProgressDialog();
                         firebaseAuth.getCurrentUser().sendEmailVerification();
                         new SweetAlertDialog(SignInActivity.this, SweetAlertDialog.NORMAL_TYPE).setContentText(getString(R.string.email_verification_sent) + " " + user.getEmail()).show();
                     }
@@ -205,6 +205,9 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
 
     private void finallyGoChat() {
         hideProgressDialog();
+        try {
+            Toast.makeText(this, R.string.starting_chat, Toast.LENGTH_SHORT).show();
+        }catch (Throwable t){}
         startActivity(new Intent(this, GroupChatActivity.class));
         FirebaseAnalytics.getInstance(this).logEvent(Events.LOGIN_SUCCESS, null);
         setResult(RESULT_OK);

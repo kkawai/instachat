@@ -186,5 +186,6 @@
 	<string name="sms_error">Σφάλμα SMS:</string>
 	<string name="checking_number">Έλεγχος αριθμού ...</string>
 	<string name="sms_verify_success">SMS επιβεβαιωμένο! Για λόγους ασφαλείας, θα πρέπει να συνδεθείτε ξανά. Διασκεδάστε και ευχαριστήστε.</string>
+	<string name="starting_chat">Ξεκινώντας τη συζήτηση. Παρακαλούμε συμπεριφέρεστε.</string>
 
 </resources>
