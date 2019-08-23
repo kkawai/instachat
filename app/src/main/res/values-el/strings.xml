@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<string name="app_name">Instachat</string>
 	<string name="invitation_title">Ομαδική πρόσκληση σε συνομιλία</string>
 	<string name="invitation_cta">Πρόσκληση σε δράση</string>
 	<string name="invitation_message">Παρακαλώ μαζί μου για μια φιλική συνομιλία</string>
@@ -118,7 +117,7 @@
 	<string name="user_active_in_group">Επί του παρόντος</string>
 	<string name="web_clipping">Αποκοπή ιστού:</string>
 	<string name="fetching_web_clipping">Λήψη αποκοπής ιστού ...</string>
-	<string name="default_bio">Γεια σου! Χρησιμοποιώ Instachat Στείλτε μου ένα μήνυμα εδώ!</string>
+	<string name="default_bio2">Γειά σου! Στείλε μου ένα μήνυμα!</string>
 	<string name="like_singular">1 όπως</string>
 	<string name="likes_plural">αρέσει</string>
 	<string name="received_likes_title">Τους αρέσει</string>

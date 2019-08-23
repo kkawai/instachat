@@ -2,6 +2,7 @@ package com.instachat.android.data.api;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -33,7 +34,9 @@ import androidx.core.util.Pair;
 
 public class NetworkApi {
 
-    private static Pair<String, String> sPair = null;
+    private static Pair<String, String> sPair;
+    private static String G_API_KEY;
+    private static boolean isInitialized;
 
     private static final String TAG = "NetworkApi";
 
@@ -54,22 +57,51 @@ public class NetworkApi {
         this.requestQueue = requestQueue;
     }
 
-    public Pair pair() {
+    public static void init() {
+        if (!isInitialized) {
+            SimpleRxWrapper.executeInWorkerThread(new Runnable() {
+                @Override
+                public void run() {
+                    getRemoteSettings();
+                }
+            });
+        }
+    }
+
+    public static String GKEY() {
+        if (G_API_KEY == null) {
+            SimpleRxWrapper.executeInWorkerThread(new Runnable() {
+                @Override
+                public void run() {
+                    init();
+                }
+            });
+            return "not_available";
+        }
+        return G_API_KEY;
+    }
+
+    public static Pair amazonPair() {
         if (sPair == null) {
-            getRemoteSettings();
+            SimpleRxWrapper.executeInWorkerThread(new Runnable() {
+                @Override
+                public void run() {
+                    init();
+                }
+            });
         }
         return sPair;
     }
 
-    public JSONObject getRemoteSettings() {
+    private static void getRemoteSettings() {
         try {
             final JSONObject r = new JSONObject(new HttpMessage(Constants.API_BASE_URL + "/ih/settings").getString())
                     .getJSONObject(NetworkApi.RESPONSE_DATA);
             sPair = new Pair<>(r.getString("a"), r.getString("s"));
-            return r;
+            G_API_KEY = r.getString("gkey");
+            isInitialized = true;
         } catch (final Exception e) {
             MLog.e(TAG, "remote settings failed", e);
-            return null;
         }
     }
 
@@ -130,7 +162,7 @@ public class NetworkApi {
 
         String appName = TheApp.getInstance().getString(R.string.app_name);
         if (TextUtils.isEmpty(user.getBio())) {
-            user.setBio(TheApp.getInstance().getString(R.string.default_bio, appName));
+            user.setBio(TheApp.getInstance().getString(R.string.default_bio2));
         }
 
         final HashMap<String, String> params = new HashMap<>();

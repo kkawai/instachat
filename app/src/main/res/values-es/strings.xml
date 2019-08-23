@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<string name="app_name">Instachat</string>
 	<string name="invitation_title">Invitación de chat grupal</string>
 	<string name="invitation_cta">Llamada a la acción</string>
 	<string name="invitation_message">Por favor únete a mí para una charla amistosa</string>
@@ -118,7 +117,7 @@
 	<string name="user_active_in_group">Actualmente en</string>
 	<string name="web_clipping">Recorte de Web:</string>
 	<string name="fetching_web_clipping">Recuperando web clipping ...</string>
-	<string name="default_bio">¡Hola! Estoy usando Instachat ¡Envíame un mensaje aquí!</string>
+	<string name="default_bio2">¡Hola! ¡Envíeme un mensaje!</string>
 	<string name="like_singular">1 Me gusta</string>
 	<string name="likes_plural">gustos</string>
 	<string name="received_likes_title">Tus gustos</string>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<string name="app_name">Instachat</string>
 	<string name="invitation_title">Mời trò chuyện nhóm</string>
 	<string name="invitation_cta">Kêu gọi hành động</string>
 	<string name="invitation_message">Hãy tham gia với tôi để trò chuyện thân thiện</string>
@@ -118,7 +117,7 @@
 	<string name="user_active_in_group">Hiện tại</string>
 	<string name="web_clipping">Cắt web:</string>
 	<string name="fetching_web_clipping">Đang tải trang web cắt ...</string>
-	<string name="default_bio">Này đó! Tôi đang sử dụng Instachat Gửi cho tôi một tin nhắn ở đây!</string>
+	<string name="default_bio2">Xin chào! Gửi tin nhắn cho tôi!</string>
 	<string name="like_singular">1 lượt thích</string>
 	<string name="likes_plural">thích</string>
 	<string name="received_likes_title">Sở thích của bạn</string>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<string name="app_name">Instachat</string>
 	<string name="invitation_title">دعوت از گروه چت</string>
 	<string name="invitation_cta">فراخوانی برای اقدام</string>
 	<string name="invitation_message">لطفا برای یک چت دوستانه به من بپیوندید</string>
@@ -118,7 +117,7 @@
 	<string name="user_active_in_group">در حال حاضر در</string>
 	<string name="web_clipping">کلیپ تصویری:</string>
 	<string name="fetching_web_clipping">فریز کردن کلیدهای وب ...</string>
-	<string name="default_bio">هی اونجا! من از Instachat استفاده می کنم یک پیام به من ارسال کن!</string>
+	<string name="default_bio2">سلام! برایم پیام بفرست!</string>
 	<string name="like_singular">1 دوست</string>
 	<string name="likes_plural">دوست دارد</string>
 	<string name="received_likes_title">دوستت دارم</string>

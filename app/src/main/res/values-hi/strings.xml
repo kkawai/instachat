@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<string name="app_name">Instachat</string>
 	<string name="invitation_title">ग्रुप चैट आमंत्रण</string>
 	<string name="invitation_cta">कार्यवाई के लिए बुलावा</string>
 	<string name="invitation_message">कृपया एक अनुकूल चैट के लिए मुझसे जुड़ें</string>
@@ -118,7 +117,7 @@
 	<string name="user_active_in_group">वर्तमान में</string>
 	<string name="web_clipping">वेब क्लिपिंग:</string>
 	<string name="fetching_web_clipping">वेब क्लिपिंग ला रहा है ...</string>
-	<string name="default_bio">सुनो! मैं इंस्टाचैट का उपयोग कर रहा हूं मुझे यहां एक संदेश भेजें!</string>
+	<string name="default_bio2">नमस्ते! मुझे एक संदेश भेजो!</string>
 	<string name="like_singular">1 पसंद</string>
 	<string name="likes_plural">को यह पसंद है</string>
 	<string name="received_likes_title">आपके लाइक</string>

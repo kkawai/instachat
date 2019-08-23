@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<string name="app_name">Instachat</string>
 	<string name="invitation_title">Групповой чат Пригласить</string>
 	<string name="invitation_cta">Призыв к действию</string>
 	<string name="invitation_message">Пожалуйста, присоединяйтесь ко мне для дружеского чата</string>
@@ -118,7 +117,7 @@
 	<string name="user_active_in_group">В настоящее время в</string>
 	<string name="web_clipping">Веб-отсечение:</string>
 	<string name="fetching_web_clipping">Выборка веб-отсечения ...</string>
-	<string name="default_bio">Привет всем! Я использую Instachat. Отправьте мне сообщение здесь!</string>
+	<string name="default_bio2">Здравствуйте! Отправить мне сообщение!</string>
 	<string name="like_singular">1 лайк</string>
 	<string name="likes_plural">нравится</string>
 	<string name="received_likes_title">Ваши лайки</string>

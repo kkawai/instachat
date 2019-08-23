@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<string name="app_name">Instachat</string>
 	<string name="invitation_title">Jemput Sembang Kumpulan</string>
 	<string name="invitation_cta">Panggilan untuk bertindak</string>
 	<string name="invitation_message">Sila sertai saya untuk bersembang mesra</string>
@@ -118,7 +117,7 @@
 	<string name="user_active_in_group">Pada masa ini</string>
 	<string name="web_clipping">Keratan Web:</string>
 	<string name="fetching_web_clipping">Mengambil klip web ...</string>
-	<string name="default_bio">Hei ada! Saya menggunakan Instachat Hantar saya mesej di sini!</string>
+	<string name="default_bio2">Hello! Hantar mesej kepada saya!</string>
 	<string name="like_singular">1 suka</string>
 	<string name="likes_plural">suka</string>
 	<string name="received_likes_title">Suka anda</string>

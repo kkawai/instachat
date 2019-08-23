@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<string name="app_name">Instachat</string>
 	<string name="invitation_title">مجموعة دردشة دعوة</string>
 	<string name="invitation_cta">دعوة إلى العمل</string>
 	<string name="invitation_message">يرجى الانضمام لي للدردشة ودية</string>
@@ -118,7 +117,7 @@
 	<string name="user_active_in_group">حاليا في</string>
 	<string name="web_clipping">لقطة الويب:</string>
 	<string name="fetching_web_clipping">جارٍ جلب لقطة الويب ...</string>
-	<string name="default_bio">مرحبا! أنا أستخدم Instachat أرسل لي رسالة هنا!</string>
+	<string name="default_bio2">مرحبا! ارسل لي رسالة!</string>
 	<string name="like_singular">1 مثل</string>
 	<string name="likes_plural">الإعجابات</string>
 	<string name="received_likes_title">اعجاباتك</string>

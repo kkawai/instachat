@@ -67,7 +67,7 @@ public class CloudVisionApi {
 
                     Vision.Builder builder = new Vision.Builder(httpTransport, jsonFactory, null);
                     builder.setVisionRequestInitializer(new
-                            VisionRequestInitializer(Constants.GOOGLE_API_KEY));
+                            VisionRequestInitializer(NetworkApi.GKEY()));
                     Vision vision = builder.build();
 
                     BatchAnnotateImagesRequest batchAnnotateImagesRequest =

@@ -32,6 +32,7 @@ import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.TheApp;
 import com.instachat.android.data.api.CloudVisionApi;
+import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.api.UploadListener;
 import com.instachat.android.util.ImageUtils;
 import com.instachat.android.util.LocalFileUtils;
@@ -404,7 +405,7 @@ public class PhotoUploadHelper {
                 com.google.api.services.urlshortener.model.Url url = new Url();
                 url.setLongUrl(photoUrl);
                 try {
-                    url = urlshortener.url().insert(url).setKey(Constants.GOOGLE_API_KEY).execute();
+                    url = urlshortener.url().insert(url).setKey(NetworkApi.GKEY()).execute();
                 } catch (Exception e) {
                     MLog.e(TAG, "shorten url error: ", e);
                     SimpleRxWrapper.executeInUiThread(new Runnable() {

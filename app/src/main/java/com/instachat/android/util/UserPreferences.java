@@ -131,13 +131,13 @@ public final class UserPreferences {
         //TODO
     }
 
-    public void clearUser() {
+    public void signOut() {
         sUser = null;
         mPrefs.edit().remove(PHOTOS_PATH).remove(PREFERENCE_IS_LOGGED_IN).apply();
     }
 
     public boolean isLoggedIn() {
-        if (getUser() == null || getUsername() == null)
+        if (getUser() == null || getUser().getUsername() == null)
             return false;
         return mPrefs.getBoolean(PREFERENCE_IS_LOGGED_IN, false);
     }
@@ -160,6 +160,9 @@ public final class UserPreferences {
             return sUser;
         }
         try {
+            if (mPrefs.getBoolean(PREFERENCE_IS_LOGGED_IN, false) == false) {
+                return null;
+            }
             JSONObject json = new JSONObject(AdminUtil.decode(mPrefs.getString(PHOTOS_PATH, null)));
             User user = new User();
             user.copyFrom(json);

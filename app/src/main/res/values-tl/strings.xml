@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<string name="app_name">Instachat</string>
 	<string name="invitation_title">Mag-imbita ng Group Chat</string>
 	<string name="invitation_cta">Tumawag sa aksyon</string>
 	<string name="invitation_message">Mangyaring sumali sa akin para sa isang friendly na chat</string>
@@ -118,7 +117,7 @@
 	<string name="user_active_in_group">Kasalukuyang nasa</string>
 	<string name="web_clipping">Pag-clipping sa Web:</string>
 	<string name="fetching_web_clipping">Ang pagkuha ng web clipping ...</string>
-	<string name="default_bio">Hoy, ikaw! Gumagamit ako ng Instachat Padalhan ako ng isang mensahe dito!</string>
+	<string name="default_bio2">Kamusta! Magpadala ka ng isang mensahe!</string>
 	<string name="like_singular">1 tulad ng</string>
 	<string name="likes_plural">gusto</string>
 	<string name="received_likes_title">Ang Iyong Mga Gusto</string>

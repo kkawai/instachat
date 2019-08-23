@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<string name="app_name">Instatat</string>
 	<string name="invitation_title">그룹 채팅 초대</string>
 	<string name="invitation_cta">행동을 요구하다</string>
 	<string name="invitation_message">친절한 채팅을 위해 나와 함께하십시오.</string>
@@ -118,7 +117,7 @@
 	<string name="user_active_in_group">현재</string>
 	<string name="web_clipping">웹 클리핑 :</string>
 	<string name="fetching_web_clipping">웹 클리핑을 가져 오는 중 ...</string>
-	<string name="default_bio">이봐! 나는 Instachat를 사용하고있다. 나에게 메시지를 보내라!</string>
+	<string name="default_bio2">여보세요! 나에게 메세지를 보내!</string>
 	<string name="like_singular">1 좋아요</string>
 	<string name="likes_plural">좋아하는 사람</string>
 	<string name="received_likes_title">당신의 좋아하는</string>

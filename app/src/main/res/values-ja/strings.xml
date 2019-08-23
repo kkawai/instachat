@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<string name="app_name">インスタキャット</string>
 	<string name="invitation_title">グループチャット招待</string>
 	<string name="invitation_cta">アクションの呼び出し</string>
 	<string name="invitation_message">フレンドリーなチャットに参加してください</string>
@@ -118,7 +117,7 @@
 	<string name="user_active_in_group">現在</string>
 	<string name="web_clipping">ウェブクリッピング：</string>
 	<string name="fetching_web_clipping">ウェブクリッピングを取得しています...</string>
-	<string name="default_bio">ちょっと、そこ！私はInstachatを使用しています。ここにメッセージを送ってください！</string>
+	<string name="default_bio2">こんにちは！メッセージを送ってください！</string>
 	<string name="like_singular">1好き</string>
 	<string name="likes_plural">好き</string>
 	<string name="received_likes_title">あなたの好きなもの</string>

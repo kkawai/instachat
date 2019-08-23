@@ -259,7 +259,7 @@ public class VerifyPhoneActivity extends BaseActivity<ActivityVerifyPhoneBinding
     private void signout() {
         TheApp.isSavedDeviceId = false;
         firebaseAuth.signOut();
-        UserPreferences.getInstance().clearUser();
+        UserPreferences.getInstance().signOut();
     }
 
     @Override

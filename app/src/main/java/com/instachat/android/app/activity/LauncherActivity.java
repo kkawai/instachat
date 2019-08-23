@@ -54,7 +54,7 @@ public final class LauncherActivity extends AppCompatActivity {
             }
             try {
                FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-               if (UserPreferences.getInstance().getUser() != null && firebaseUser != null && firebaseUser.isEmailVerified()) {
+               if (UserPreferences.getInstance().isLoggedIn() && firebaseUser != null && firebaseUser.isEmailVerified()) {
                   checkPhoneNumber(); //start new activity before this screen can render
                }
             }catch (Throwable t) {

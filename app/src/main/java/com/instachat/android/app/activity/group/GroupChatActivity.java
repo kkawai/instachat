@@ -25,6 +25,7 @@ import com.instachat.android.app.adapter.GroupChatUsersRecyclerAdapter;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.bans.BannedUsersFragment;
 import com.instachat.android.app.blocks.BlocksFragment;
+import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.api.UploadListener;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
@@ -120,6 +121,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     public void onResume() {
         super.onResume();
         if (UserPreferences.getInstance().isLoggedIn()) {
+            NetworkApi.init();
             gcmHelper.onResume(this);
             showFirstMessageDialog(GroupChatActivity.this);
             groupChatViewModel.addUserPresenceToGroup();
@@ -132,7 +134,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     @Override
     public void onPause() {
         super.onPause();
-        if (UserPreferences.getInstance().getUser() != null) {
+        if (UserPreferences.getInstance().isLoggedIn()) {
             groupChatViewModel.removeUserPresenceFromGroup();
         }
     }
@@ -327,17 +329,17 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         logoutDialogHelper.showLogoutDialog(this, new LogoutDialogHelper.LogoutListener() {
             @Override
             public void onConfirmLogout() {
-                _signout();
+                signoutAndFinish();
             }
         });
     }
 
-    private void _signout() {
+    private void signoutAndFinish() {
         TheApp.isSavedDeviceId = false;
-        firebaseAuth.signOut();
         groupChatViewModel.removeUserPresenceFromGroup();
         gcmHelper.unregister(UserPreferences.getInstance().getUserId() + "");
-        UserPreferences.getInstance().clearUser();
+        UserPreferences.getInstance().signOut();
+        firebaseAuth.signOut();
         startActivity(new Intent(GroupChatActivity.this, LauncherActivity.class));
         finish();
     }
@@ -447,9 +449,11 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
                 BannedUsersFragment.TAG).addToBackStack(null).commit();
     }
 
+    //Don't be fooled by 'enterChat'
+    //this is really signing out
     @Override
     public void enterChat() {
-        _signout();
+        signoutAndFinish();
     }
 
     @Override

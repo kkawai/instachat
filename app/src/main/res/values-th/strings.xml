@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<string name="app_name">Instachat</string>
 	<string name="invitation_title">เชิญกลุ่มสนทนา</string>
 	<string name="invitation_cta">คำกระตุ้นการตัดสินใจ</string>
 	<string name="invitation_message">กรุณาเข้าร่วมฉันสำหรับการแชทที่เป็นมิตร</string>
@@ -118,7 +117,7 @@
 	<string name="user_active_in_group">กำลังเข้าชม</string>
 	<string name="web_clipping">Web Clipping:</string>
 	<string name="fetching_web_clipping">กำลังดึงเว็บคลิป ...</string>
-	<string name="default_bio">สวัสดี! ฉันกำลังใช้ Instachat ส่งข้อความมาหาฉันที่นี่!</string>
+	<string name="default_bio2">สวัสดี! ส่งข้อความ!</string>
 	<string name="like_singular">1 ไลค์</string>
 	<string name="likes_plural">ชอบ</string>
 	<string name="received_likes_title">สิ่งที่คุณชอบ</string>

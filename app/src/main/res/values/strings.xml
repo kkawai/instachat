@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Instachat</string>
+
     <string name="invitation_title">Group Chat Invite</string>
     <string name="invitation_cta">Call to action</string>
     <string name="invitation_message">Please join me for a friendly chat</string>
@@ -139,7 +139,7 @@
     <string name="web_clipping">Web Clipping :</string>
     <string name="fetching_web_clipping">Fetching web clipping ...</string>
 
-    <string name="default_bio">Hey there!  I am using Instachat   Send me a message on here!</string>
+    <string name="default_bio2">Hello!  Send me a message!</string>
     <string name="like_singular">1 like</string>
     <string name="likes_plural">likes</string>
     <string name="received_likes_title">Your Likes</string>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<string name="app_name">Instachat</string>
 	<string name="invitation_title">群聊邀请</string>
 	<string name="invitation_cta">呼吁采取行动</string>
 	<string name="invitation_message">请和我一起进行友好的聊天</string>
@@ -118,7 +117,7 @@
 	<string name="user_active_in_group">目前在</string>
 	<string name="web_clipping">网页剪辑：</string>
 	<string name="fetching_web_clipping">获取网络剪辑...</string>
-	<string name="default_bio">嘿！我正在使用Instachat在这里给我发消息！</string>
+	<string name="default_bio2">你好！给我发一条信息！</string>
 	<string name="like_singular">1喜欢</string>
 	<string name="likes_plural">喜欢</string>
 	<string name="received_likes_title">你的喜欢</string>

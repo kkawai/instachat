@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<string name="app_name">Instachat</string>
 	<string name="invitation_title">Pozvánka skupinového rozhovoru</string>
 	<string name="invitation_cta">Výzva k akci</string>
 	<string name="invitation_message">Připojte se ke mně na přátelský chat</string>
@@ -118,7 +117,7 @@
 	<string name="user_active_in_group">V současné době</string>
 	<string name="web_clipping">Oříznutí webu:</string>
 	<string name="fetching_web_clipping">Načítání webového výstřižku ...</string>
-	<string name="default_bio">Zdravím! Používám Instachat Pošlete mi zprávu!</string>
+	<string name="default_bio2">Ahoj! Pošli mi zprávu!</string>
 	<string name="like_singular">1</string>
 	<string name="likes_plural">rád</string>
 	<string name="received_likes_title">Vaše záliby</string>

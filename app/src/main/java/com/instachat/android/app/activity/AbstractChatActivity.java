@@ -1172,7 +1172,7 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
 
     @Override
     public void showUsernameExistsDialog(@NonNull String badUsername) {
-        new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE).setContentText(getString(R.string.username_exists, badUsername)).show();
+        new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE).setContentText(getString(R.string.username_exists) + " " + badUsername).show();
     }
 
     @Override
