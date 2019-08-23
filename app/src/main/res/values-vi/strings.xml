@@ -174,7 +174,7 @@
 	<string name="terms_of_use_title">ĐIỀU KHOẢN SỬ DỤNG</string>
 	<string name="terms_of_use">XIN VUI LÒNG ĐỌC KỸ Bạn cũng đồng ý không đăng bất kỳ bình luận xúc phạm, xúc phạm tình dục hoặc hạ thấp đối với bất kỳ thành viên cộng đồng hoặc người tham gia nào khác bất kể tuổi tác, giới tính, chủng tộc hoặc khuynh hướng tình dục của họ. Nếu bạn vi phạm các điều khoản này, bạn sẽ bị cấm sử dụng ứng dụng này vĩnh viễn và mọi nội dung phản cảm mà bạn đăng có thể được sử dụng chống lại bạn. Bạn cũng đồng ý không giữ ứng dụng này chịu trách nhiệm cho bất kỳ vết thương tự gây ra và / hoặc tự tử. Nếu việc sử dụng ứng dụng này khiến bạn tự làm hại bản thân hoặc bị tổn hại dưới bất kỳ hình thức, hình dạng hoặc hình thức nào, thì bạn không nên và không thể sử dụng ứng dụng này thêm nữa và bạn đồng ý không chịu trách nhiệm cho ứng dụng này hoặc hành động của người khác . Sử dụng ứng dụng này là nguy cơ của riêng bạn. Nếu bạn gặp bất kỳ hình thức quấy rối nào, hãy sử dụng tính năng Chặn. Nếu bạn không đồng ý với bất kỳ điều khoản nào trong số này, bạn phải gỡ cài đặt ngay lập tức.</string>
 	<string name="verify_phone">Xác nhận số điện thoại</string>
-	<string name="verify_phone_hint">Điện thoại (ví dụ +16505551212)</string>
+	<string name="verify_phone_hint2">Điện thoại (ví dụ 16505551212)</string>
 	<string name="request_sms_code">Yêu cầu mã SMS</string>
 	<string name="sms_code">MÃ SỐ SMS</string>
 	<string name="validate_sms_code">Xác thực mã SMS</string>
@@ -182,8 +182,9 @@
 	<string name="invalid_phone_number">Số điện thoại bạn nhập không hợp lệ. Vui lòng nhập điện thoại chính xác.</string>
 	<string name="invalid_sms_code">Mã SMS không hợp lệ. Vui lòng thử lại.</string>
 	<string name="phone_already_exists">Số điện thoại bạn đã nhập đã tồn tại dưới một tài khoản khác. Hãy thử một số khác.</string>
-	<string name="fix_phone">Điện thoại phải bắt đầu bằng + Được theo dõi bởi mã quốc gia và số điện thoại (ví dụ +16505551212)</string>
+	<string name="fix_phone2">Điện thoại phải bắt đầu bằng mã quốc gia theo sau là số điện thoại (ví dụ 16505551212)</string>
 	<string name="sms_error">Lỗi SMS:</string>
 	<string name="checking_number">Kiểm tra số ...</string>
+	<string name="sms_verify_success">Đã xác minh SMS! Vì lý do bảo mật, bạn sẽ cần phải đăng nhập một lần nữa. Hãy vui vẻ và cảm ơn bạn.</string>
 
 </resources>

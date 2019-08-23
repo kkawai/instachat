@@ -174,7 +174,7 @@
 	<string name="terms_of_use_title">TERMA PENGGUNAAN</string>
 	<string name="terms_of_use">SYARAT-SYARAT PENGGUNAAN: Anda bersetuju untuk tidak memposting komen atau gambar yang membenci, mengancam, rasis, membuli atau kandungan yang tidak menyenangkan. Anda juga bersetuju untuk tidak menghantar komen agresif atau merendahkan seks ke arah mana-mana ahli komuniti atau peserta lain tanpa mengira usia, jantina, bangsa atau orientasi seksual mereka. Jika anda melanggar syarat ini, anda akan diharamkan secara kekal daripada menggunakan aplikasi ini dan apa-apa kandungan yang disukai yang anda siarkan boleh digunakan terhadap anda.</string>
 	<string name="verify_phone">Sahkan Nombor Telefon</string>
-	<string name="verify_phone_hint">Telefon (contoh +16505551212)</string>
+	<string name="verify_phone_hint2">Telefon (contoh 16505551212)</string>
 	<string name="request_sms_code">Minta Kod SMS</string>
 	<string name="sms_code">CODE SMS</string>
 	<string name="validate_sms_code">Validate Code SMS</string>
@@ -182,8 +182,9 @@
 	<string name="invalid_phone_number">Nombor telefon yang anda masukkan tidak sah. Sila masukkan telefon dengan betul.</string>
 	<string name="invalid_sms_code">Kod SMS tidak sah. Sila cuba lagi.</string>
 	<string name="phone_already_exists">Nombor telefon yang anda masukkan telah wujud di bawah akaun yang berbeza. Cuba nombor lain.</string>
-	<string name="fix_phone">Telefon mesti bermula dengan + Diikuti oleh kod negara dan nombor telefon (contoh +16505551212)</string>
+	<string name="fix_phone2">Telefon mesti bermula dengan kod negara diikuti dengan nombor telefon (contoh 16505551212)</string>
 	<string name="sms_error">Ralat SMS:</string>
 	<string name="checking_number">Memeriksa nombor ...</string>
+	<string name="sms_verify_success">SMS Disahkan! Atas alasan keselamatan, anda perlu melog masuk sekali lagi. Bersenang-senang dan terima kasih.</string>
 
 </resources>

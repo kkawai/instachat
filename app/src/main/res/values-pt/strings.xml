@@ -174,7 +174,7 @@
 	<string name="terms_of_use_title">TERMOS DE USO</string>
 	<string name="terms_of_use">TERMOS DE USO: Você concorda em não postar comentários ou fotos abusivos, ameaçadores, racistas, intimidadores ou qualquer conteúdo censurável. Você também concorda em não postar comentários sexualmente agressivos ou degradantes para qualquer outro membro da comunidade ou participante, independentemente de sua idade, sexo, raça ou orientação sexual. Se você violar estes termos, você será permanentemente banido do uso deste aplicativo e qualquer conteúdo censurável postado poderá ser usado contra você.</string>
 	<string name="verify_phone">Verificar o número de telefone</string>
-	<string name="verify_phone_hint">Telefone (exemplo +16505551212)</string>
+	<string name="verify_phone_hint2">Telefone (exemplo 16505551212)</string>
 	<string name="request_sms_code">Solicitar código SMS</string>
 	<string name="sms_code">CÓDIGO SMS</string>
 	<string name="validate_sms_code">Validar Código SMS</string>
@@ -182,8 +182,9 @@
 	<string name="invalid_phone_number">O número de telefone que você digitou era inválido. Por favor, digite o telefone corretamente.</string>
 	<string name="invalid_sms_code">Código SMS inválido. Por favor, tente novamente.</string>
 	<string name="phone_already_exists">O número de telefone que você inseriu já existe em uma conta diferente. Tente outro número.</string>
-	<string name="fix_phone">O telefone deve começar com + seguido pelo código do país e pelo número de telefone (por exemplo, +16505551212)</string>
+	<string name="fix_phone2">O telefone deve começar com o código do país seguido pelo número de telefone (por exemplo, 16505551212)</string>
 	<string name="sms_error">Erro SMS:</string>
 	<string name="checking_number">Número de verificação ...</string>
+	<string name="sms_verify_success">SMS verificado! Por motivos de segurança, você precisará fazer login novamente. Divirta-se e obrigado.</string>
 
 </resources>

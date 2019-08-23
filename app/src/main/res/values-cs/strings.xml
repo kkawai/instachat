@@ -174,7 +174,7 @@
 	<string name="terms_of_use_title">PODMÍNKY POUŽITÍ</string>
 	<string name="terms_of_use">PODMÍNKY POUŽÍVÁNÍ: Souhlasíte s tím, že nebudete posílat urážlivé, výhružné, rasistické, šikanovací komentáře ani fotografie nebo jakýkoli nevhodný obsah. Souhlasíte také s tím, že nebudete psát sexuálně agresivní nebo ponižující komentáře k žádnému jinému členu komunity nebo účastníkovi bez ohledu na jejich věk, pohlaví, rasu nebo sexuální orientaci. Pokud tyto podmínky porušíte, budete trvale zakázáni používat tuto aplikaci a proti vám můžete použít jakýkoli nevhodný obsah, který budete zveřejňovat.</string>
 	<string name="verify_phone">Ověřte telefonní číslo</string>
-	<string name="verify_phone_hint">Telefon (příklad +16505551212)</string>
+	<string name="verify_phone_hint2">Telefon (příklad 16505551212)</string>
 	<string name="request_sms_code">Vyžádejte si SMS kód</string>
 	<string name="sms_code">SMS KÓD</string>
 	<string name="validate_sms_code">Ověřte kód SMS</string>
@@ -182,8 +182,9 @@
 	<string name="invalid_phone_number">Zadané telefonní číslo bylo neplatné. Zadejte prosím telefon správně.</string>
 	<string name="invalid_sms_code">Neplatný kód SMS. Prosím zkuste to znovu.</string>
 	<string name="phone_already_exists">Zadané telefonní číslo již existuje pod jiným účtem. Zkuste jiné číslo.</string>
-	<string name="fix_phone">Telefon musí začínat + následuje kód země a telefonní číslo (příklad +16505551212)</string>
+	<string name="fix_phone2">Telefon musí začínat kódem země následovaným telefonním číslem (příklad 16505551212)</string>
 	<string name="sms_error">Chyba SMS:</string>
 	<string name="checking_number">Kontroluje se číslo ...</string>
+	<string name="sms_verify_success">SMS byla ověřena! Z bezpečnostních důvodů se budete muset znovu přihlásit. Bavte se a děkuji.</string>
 
 </resources>

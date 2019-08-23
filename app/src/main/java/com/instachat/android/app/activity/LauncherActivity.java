@@ -72,17 +72,17 @@ public final class LauncherActivity extends AppCompatActivity {
    }
 
    /**
-    * Called after user has successfully signed in.  However, there is
+    * Called if user is already signed in.  However, there is
     * a final step before user can chat:  Verify phone number!
     */
    private void checkPhoneNumber() {
-      final DatabaseReference phoneNumberRef = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(UserPreferences.getInstance().getUserId()) + "/ph");
+      final DatabaseReference phoneNumberRef = FirebaseDatabase.getInstance()
+              .getReference(Constants.USER_INFO_REF(UserPreferences.getInstance().getUserId()) + "/" + Constants.PHONE_REF);
       phoneNumberRef.addListenerForSingleValueEvent(new ValueEventListener() {
          @Override
          public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
             phoneNumberRef.removeEventListener(this);
             if (dataSnapshot.exists()) {
-               phoneNumberRef.removeEventListener(this);
                startActivity(new Intent(LauncherActivity.this, GroupChatActivity.class));
                finish();
             } else {

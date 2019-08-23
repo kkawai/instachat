@@ -148,14 +148,18 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
                 MLog.d(TAG, "firebaseAuth.signInWithEmailAndPassword(): " + task.isSuccessful(), " ", email, " ", password);
                 if (!task.isSuccessful()) {
                     MLog.w(TAG, "firebaseAuth.signInWithEmailAndPassword(): ", task.getException());
-                    //showErrorToast("VERIFY EMAIL");
                     showErrorToast(R.string.email_password_not_found);
                 } else {
                     hideProgressDialog();
                     if (firebaseAuth.getCurrentUser().isEmailVerified()) {
                         UserPreferences.getInstance().saveUser(user);
                         UserPreferences.getInstance().saveLastSignIn(user.getUsername());
-                        checkPhoneNumber();
+                        Intent intent = getIntent();
+                        if (intent != null && intent.getAction() != null && intent.getAction().equals(Constants.ACTION_SKIP_PHONE_VERIFY)) {
+                            finallyGoChat();
+                        } else {
+                            checkPhoneNumber();
+                        }
                     } else {
                         firebaseAuth.getCurrentUser().sendEmailVerification();
                         new SweetAlertDialog(SignInActivity.this, SweetAlertDialog.NORMAL_TYPE).setContentText(getString(R.string.email_verification_sent) + " " + user.getEmail()).show();
@@ -170,13 +174,13 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
      * a final step before user can chat:  Verify phone number!
      */
     private void checkPhoneNumber() {
-        final DatabaseReference phoneNumberRef = FirebaseDatabase.getInstance().getReference(Constants.USER_INFO_REF(UserPreferences.getInstance().getUserId()) + "/ph");
+        final DatabaseReference phoneNumberRef = FirebaseDatabase.getInstance()
+                .getReference(Constants.USER_INFO_REF(UserPreferences.getInstance().getUserId()) + "/" + Constants.PHONE_REF);
         phoneNumberRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 phoneNumberRef.removeEventListener(this);
                 if (dataSnapshot.exists()) {
-                    phoneNumberRef.removeEventListener(this);
                     finallyGoChat();
                 } else {
                     goToVerifyPhoneActivity();

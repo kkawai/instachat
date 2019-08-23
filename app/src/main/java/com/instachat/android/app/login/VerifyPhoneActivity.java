@@ -1,6 +1,7 @@
 package com.instachat.android.app.login;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -23,7 +24,6 @@ import com.instachat.android.BR;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.TheApp;
-import com.instachat.android.app.activity.group.GroupChatActivity;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.app.ui.base.BaseActivity;
 import com.instachat.android.data.api.NetworkApi;
@@ -125,7 +125,7 @@ public class VerifyPhoneActivity extends BaseActivity<ActivityVerifyPhoneBinding
                     }
                 } catch (final Exception e) {
                     MLog.e(TAG, e);
-                    showErrorToast("1");
+                    showErrorToast("3");
                 }
 
             }
@@ -142,7 +142,7 @@ public class VerifyPhoneActivity extends BaseActivity<ActivityVerifyPhoneBinding
     private void verifyPhoneNumber(String phoneNum) {
 
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                phoneNum, 120L /*timeout*/, TimeUnit.SECONDS,
+                '+'+phoneNum, 120L /*timeout*/, TimeUnit.SECONDS,
                 this, new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
                     @Override
@@ -169,11 +169,11 @@ public class VerifyPhoneActivity extends BaseActivity<ActivityVerifyPhoneBinding
 
     public void onSendSmsCode(View view) {
         phone = ((TextInputEditText)findViewById(R.id.input_phone)).getText().toString();
-        phone = StringUtil.onlyPhone(phone);
+        phone = StringUtil.onlyDigits(phone);
         if (StringUtil.isValidPhone(phone)) {
             checkPhoneNumber(UserPreferences.getInstance().getUserId(), phone);
         } else {
-            new SweetAlertDialog(VerifyPhoneActivity.this, SweetAlertDialog.ERROR_TYPE).setContentText(getString(R.string.fix_phone)).show();
+            new SweetAlertDialog(VerifyPhoneActivity.this, SweetAlertDialog.ERROR_TYPE).setContentText(getString(R.string.fix_phone2)).show();
         }
     }
 
@@ -188,41 +188,70 @@ public class VerifyPhoneActivity extends BaseActivity<ActivityVerifyPhoneBinding
             return;
         }
 
+        showProgressDialog();
         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, smsCode);
         FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     isInProgress = false;
-                    markFirebase(phone);
-                    UserPreferences.getInstance().getUser().setPhone(phone);
-                    networkApi.saveUser(VerifyPhoneActivity.this, UserPreferences.getInstance().getUser(), new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            MLog.i(TAG,"saveUser response: " + response);
-                            startActivity(new Intent(VerifyPhoneActivity.this, GroupChatActivity.class));
-                            FirebaseAnalytics.getInstance(VerifyPhoneActivity.this).logEvent(Events.PHONE_VERIFY_SUCCESS, null);
-                            finish();
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            showErrorToast("");
-                        }
-                    });
+                    savePhoneNumber(phone);
                 } else {
+                    hideProgressDialog();
                     new SweetAlertDialog(VerifyPhoneActivity.this, SweetAlertDialog.ERROR_TYPE).setContentText(getString(R.string.invalid_sms_code)).show();
                 }
             }
         });
     }
 
-    private void markFirebase(String phoneNum) {
+    /**
+     * save phone number to firebase for user
+     * save phone number to ic database for user
+     * @param phoneNum
+     */
+    private void savePhoneNumber(String phoneNum) {
         Map<String, Object> map = new HashMap<>(1);
-        map.put("ph", phoneNum);
+        map.put(Constants.PHONE_REF, phoneNum);
         FirebaseDatabase.getInstance()
                 .getReference(Constants.USER_INFO_REF(UserPreferences.getInstance().getUserId()))
-                .updateChildren(map);
+                .updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    UserPreferences.getInstance().getUser().setPhone(phone);
+                    networkApi.saveUser(VerifyPhoneActivity.this, UserPreferences.getInstance().getUser(), new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            MLog.i(TAG,"saveUser response: " + response);
+                            hideProgressDialog();
+                            FirebaseAnalytics.getInstance(VerifyPhoneActivity.this).logEvent(Events.PHONE_VERIFY_SUCCESS, null);
+                            signout(); //we must re-sign in via username and password again
+                            //somehow signInWithCredentials kills the current firebase user
+                            //who was originally signed in via username and password
+                            new SweetAlertDialog(VerifyPhoneActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+                                    .setContentText(getString(R.string.sms_verify_success))
+                                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                        @Override
+                                        public void onDismiss(DialogInterface dialog) {
+                                            Intent intent = new Intent(VerifyPhoneActivity.this, SignInActivity.class);
+                                            intent.setAction(Constants.ACTION_SKIP_PHONE_VERIFY);
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            startActivity(intent);
+                                            finish();
+                                        }
+                                    });
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            showErrorToast("6");
+                        }
+                    });
+                } else {
+                    showErrorToast("7");
+                }
+            }
+        });
     }
 
     private void signout() {
@@ -271,6 +300,7 @@ public class VerifyPhoneActivity extends BaseActivity<ActivityVerifyPhoneBinding
 
     private void showErrorToast(final String distinctScreenCode) {
         try {
+            hideProgressDialog();
             Toast.makeText(this, getString(R.string.general_api_error) + " " + distinctScreenCode, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             MLog.e(TAG, "", e);

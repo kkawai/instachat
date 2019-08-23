@@ -212,15 +212,17 @@
 
     <!-- On or after 8/21/2019 -->
     <string name="verify_phone">Verify Phone Number</string>
-    <string name="verify_phone_hint">Phone (example +16505551212)</string>
+    <string name="verify_phone_hint2">Phone (example 16505551212)</string>
     <string name="request_sms_code">Request SMS Code</string>
     <string name="sms_code">SMS CODE</string>
     <string name="validate_sms_code">Validate SMS Code</string>
     <string name="sms_code_sent">SMS code has been sent to your phone.  When you receive, please enter to continue.  You have 2 minutes.</string>
     <string name="invalid_phone_number">The phone number you entered was invalid.  Please enter phone correctly.</string>
     <string name="invalid_sms_code">Invalid SMS code.  Please try again.</string>
-    <string name="phone_already_exists">The phone number you entered already exists under a different account.  Try another number.</string>
-    <string name="fix_phone">Phone must begin with +  Followed by country code and phone number (example +16505551212)</string>
+    <string name="phone_already_exists">Your account is already associated to a different number OR this number is not valid.  Did you include country code?  If you live in United States, country code is 1</string>
+    <string name="fix_phone2">Phone must begin with country code followed by phone number (example 16505551212)</string>
     <string name="sms_error">SMS Error : </string>
     <string name="checking_number">Checking number ...</string>
+    <string name="sms_verify_success">SMS Verified!  For security reasons, you will need to sign in once more.  Have fun and thank you.</string>
+
 </resources>

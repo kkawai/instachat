@@ -174,7 +174,7 @@
 	<string name="terms_of_use_title">CONDITIONS D\'UTILISATION</string>
 	<string name="terms_of_use">CONDITIONS D\'UTILISATION: Vous acceptez de ne pas publier de commentaires ou de photos abusifs, menaçants, racistes ou intimidants, ni de contenu répréhensible. Vous acceptez également de ne pas publier de commentaires sexuellement agressifs ou dégradants à l\'égard d\'un autre membre de la communauté ou d\'un participant, indépendamment de leur âge, de leur sexe, de leur race ou de leur orientation sexuelle. Si vous ne respectez pas ces conditions, il vous sera définitivement interdit d\'utiliser cette application et tout contenu répréhensible que vous publiez peut être utilisé à votre encontre.</string>
 	<string name="verify_phone">Vérifier le numéro de téléphone</string>
-	<string name="verify_phone_hint">Téléphone (exemple +16505551212)</string>
+	<string name="verify_phone_hint2">Téléphone (exemple 16505551212)</string>
 	<string name="request_sms_code">Demander un code SMS</string>
 	<string name="sms_code">CODE SMS</string>
 	<string name="validate_sms_code">Valider le code SMS</string>
@@ -182,8 +182,9 @@
 	<string name="invalid_phone_number">Le numéro de téléphone que vous avez entré était invalide. S \'il vous plaît entrer le téléphone correctement.</string>
 	<string name="invalid_sms_code">Code SMS invalide. Veuillez réessayer.</string>
 	<string name="phone_already_exists">Le numéro de téléphone que vous avez entré existe déjà sous un autre compte. Essayez un autre numéro.</string>
-	<string name="fix_phone">Le téléphone doit commencer par + suivi par le code du pays et le numéro de téléphone (exemple +16505551212)</string>
+	<string name="fix_phone2">Le téléphone doit commencer par le code du pays suivi du numéro de téléphone (exemple 16505551212)</string>
 	<string name="sms_error">Erreur SMS:</string>
 	<string name="checking_number">Vérification du numéro ...</string>
+	<string name="sms_verify_success">SMS vérifié! Pour des raisons de sécurité, vous devrez vous connecter à nouveau. Amusez-vous et merci.</string>
 
 </resources>

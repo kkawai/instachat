@@ -83,7 +83,7 @@
             <Button
                 android:id="@+id/sign_in_username_email"
                 android:layout_width="280dp"
-                android:layout_height="75dp"
+                android:layout_height="@dimen/button_height"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="18dp"
                 android:text="@string/sign_in"

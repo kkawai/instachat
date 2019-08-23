@@ -10,7 +10,7 @@ public final class Constants {
    /*
     * CHANGE THESE WHEN MAKING PRODUCTION BUILDS
     */
-   public static final boolean IS_LOGGING_ENABLED = true;
+   public static final boolean IS_LOGGING_ENABLED = false;
    public static final boolean IS_FOR_AMAZON_ONLY = false;//CHANGE PER AMAZON BUILD!!!
    public static final boolean IS_AMAZON_ADS_ENABLED = false;//CHANGE PER AMAZON BUILD!!!
    public static final boolean IS_AMAZON_DEBUG_AD = false; //CHANGE PER AMAZON BUILD!!!
@@ -79,6 +79,8 @@ public final class Constants {
 
    public static final String ACTION_EXIT = "com.instachat.android.ACTION_EXIT";
    public static final String ACTION_OFFLINE_MESSAGE_UPDATE = "com.instachat.android.ACTION_OFFLINE_MESSAGE_UPDATE";
+
+   public static final String ACTION_SKIP_PHONE_VERIFY = "com.instachat.android.ACTION_XYZ";
 
    /*
     * number of messages to display before fetching from database
@@ -192,7 +194,7 @@ public final class Constants {
    }
 
    public static String GROUP_CHAT_REF(long groupid) {
-      return "/public_group_messages_8/" + groupid;
+      return "/public_group_messages_9/" + groupid;
    }
 
    public static String GROUP_CHAT_USERS_REF(long groupid) {
@@ -289,6 +291,8 @@ public final class Constants {
    public static final String CHILD_ACCEPTED = "accepted";
    public static final String CHILD_LAST_ONLINE = "lastOnline";
    public static final String CHILD_BAN_EXPIRATION = "banExpiration";
+   public static final String PHONE_REF = "ph";
+
 
    /**
     * Any message received by a user whose last message

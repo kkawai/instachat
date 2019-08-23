@@ -174,7 +174,7 @@
 	<string name="terms_of_use_title">شرایط استفاده</string>
 	<string name="terms_of_use">TERMS OF USE: شما موافقت نکردید که نظرات یا عکس های مورد سوءاستفاده، تهدید، نژادپرستانه، و یا هرگونه محتوای اعتراضی را بنویسید. شما همچنین موافقت نکنید که نظر خود را نسبت به هر عضو یا شرکت کننده در اجتماع بدون توجه به سن، جنس، نژاد و یا گرایش جنسی خود ارسال کنید. اگر این شرایط را نقض کنید، به طور دائم از استفاده از این برنامه ممنوع خواهید شد و هرگونه محتوای اعتراضی که پست میکنید میتواند در برابر شما استفاده شود.</string>
 	<string name="verify_phone">شماره تلفن را تأیید کنید</string>
-	<string name="verify_phone_hint">تلفن (مثال +16505551212)</string>
+	<string name="verify_phone_hint2">تلفن (مثال 16505551212)</string>
 	<string name="request_sms_code">درخواست کد پیام کوتاه شوید</string>
 	<string name="sms_code">کد پیامک</string>
 	<string name="validate_sms_code">اعتبار کد پیام کوتاه</string>
@@ -182,8 +182,9 @@
 	<string name="invalid_phone_number">شماره تلفنی که وارد کردید نامعتبر است. لطفاً تلفن را درست وارد کنید.</string>
 	<string name="invalid_sms_code">کد پیامک نامعتبر است. لطفا دوباره تلاش کنید.</string>
 	<string name="phone_already_exists">شماره تلفنی که قبلاً وارد کردید ، تحت یک حساب متفاوت وجود دارد. شماره دیگری را امتحان کنید.</string>
-	<string name="fix_phone">تلفن باید از + شروع شود و با دنبال کردن کد کشور و شماره تلفن (به عنوان مثال +16505551212)</string>
+	<string name="fix_phone2">تلفن باید با کد کشور و به دنبال آن شماره تلفن شروع شود (مثال 16505551212)</string>
 	<string name="sms_error">خطای پیام کوتاه:</string>
 	<string name="checking_number">در حال بررسی شماره ...</string>
+	<string name="sms_verify_success">پیامک تأیید شد! به دلایل امنیتی ، باید یک بار دیگر وارد سیستم شوید. از آن لذت ببرید و از شما سپاسگزارم.</string>
 
 </resources>

@@ -147,11 +147,11 @@ public class StringUtil {
         return sb.toString();
     }
 
-    public static String onlyPhone(String s) {
+    public static String onlyDigits(String s) {
         s = s.trim();
         final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
-            if ( (i==0 && s.charAt(i) == '+') || Character.isDigit(s.charAt(i))) {
+            if ( Character.isDigit(s.charAt(i))) {
                 sb.append(s.charAt(i));
             }
         }
@@ -159,9 +159,9 @@ public class StringUtil {
     }
 
     public static boolean isValidPhone(String phone) {
-        if (isEmpty(phone))
+        if (phone == null || phone == "")
             return false;
-        return phone.matches("^\\+(?:\\d){7,}") && phone.length() > 6 && phone.length() < 20;
+        return phone.matches("^(?:\\d){7,}") && phone.length() > 6 && phone.length() < 20;
     }
 
     public static boolean isValidEmail(final CharSequence target) {
