@@ -318,8 +318,11 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
                 return false;
             }
         }
+        inputContentInfo.getContentUri();
         Uri linkUri = inputContentInfo.getLinkUri();
-        if (inputContentInfo != null && inputContentInfo.getDescription() != null) {
+        if (linkUri == null)
+            linkUri = inputContentInfo.getContentUri();
+        if (linkUri != null && inputContentInfo != null && inputContentInfo.getDescription() != null) {
             if (inputContentInfo.getDescription().toString().contains("image/gif")) {
                 final FriendlyMessage friendlyMessage = new FriendlyMessage("",
                         myUsername(),
