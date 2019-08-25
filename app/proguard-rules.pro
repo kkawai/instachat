@@ -62,6 +62,7 @@
 -keep class org.jivesoftware.** { *; }
 -keep class org.xbill.** { *; }
 -keep class com.instachat.android.data.model.** { *; }
+-keep class com.instachat.android.app.bans.BannedUser** { *; }
 -keep class com.google.firebase.codelab.friendlychat.model.** { *; }
 -keep class com.bumptech.** { *; }
 -keep class com.nineoldandroids.** { *; }

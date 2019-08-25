@@ -19,6 +19,7 @@ import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.databinding.FragmentGenericUsersBinding;
 import com.instachat.android.util.AdminUtil;
 
+import androidx.recyclerview.widget.RecyclerView;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class BannedUsersFragment extends BaseFragment {
@@ -86,62 +87,10 @@ public class BannedUsersFragment extends BaseFragment {
         bannedUsersAdapter = new BannedUsersAdapter(BannedUser.class, FirebaseDatabase.getInstance().getReference(Constants.BANS));
         bannedUsersAdapter.setUserClickedListener(userClickedListener);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         binding.recyclerView.setLayoutManager(linearLayoutManager);
         binding.recyclerView.setAdapter(bannedUsersAdapter);
-
-        /* kkawai, let's not remove bans in the client anymore!
-        disposable = Observable.timer(350, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnComplete(new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        removeExpiredBans();
-                    }
-                })
-                .subscribe();
-                */
-
     }
-
-    /*
-    private void removeExpiredBans() {
-        databaseReference = FirebaseDatabase.getInstance().getReference(Constants.BANS);
-        childEventListener = databaseReference.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                BannedUser bannedUser = dataSnapshot.getValue(BannedUser.class);
-                bannedUser.id = Integer.parseInt(dataSnapshot.getKey());
-                MLog.i(TAG, "Found banned user.  Check if expired.");
-                if (System.currentTimeMillis() > bannedUser.banExpiration) {
-                    removeBan(bannedUser.id);
-                    MLog.i(TAG, bannedUser.username + " is no longer banned. Remove from bans");
-                }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                //not implemented
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                //not implemented
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                //not implemented
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                //not implemented
-            }
-        });
-    }
-    */
 
     @Override
     public void onDestroy() {
