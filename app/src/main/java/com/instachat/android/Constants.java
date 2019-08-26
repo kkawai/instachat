@@ -10,7 +10,7 @@ public final class Constants {
    /*
     * CHANGE THESE WHEN MAKING PRODUCTION BUILDS
     */
-   public static final boolean IS_LOGGING_ENABLED = true;
+   public static boolean IS_LOGGING_ENABLED = false;
    public static final boolean IS_FOR_AMAZON_ONLY = false;//CHANGE PER AMAZON BUILD!!!
    public static final boolean IS_AMAZON_ADS_ENABLED = false;//CHANGE PER AMAZON BUILD!!!
    public static final boolean IS_AMAZON_DEBUG_AD = false; //CHANGE PER AMAZON BUILD!!!
@@ -217,6 +217,8 @@ public final class Constants {
    public static String GROUP_CHAT_ROOMS = "/public_group_summaries/";
 
    public static final String BANS = "/bans_5/"; ///   /bans/
+
+   public static final String BAN_DEVICE_REF = "d";
 
    /**
     * use-case: list of users that liked the given message

@@ -41,7 +41,7 @@ public class BanHelper {
 
     public static void ban(final FriendlyMessage friendlyMessage) {
         FirebaseDatabase.getInstance()
-                .getReference(Constants.USER_INFO_REF(friendlyMessage.getUserid())+"/d")
+                .getReference(Constants.USER_INFO_REF(friendlyMessage.getUserid())+ "/" +Constants.BAN_DEVICE_REF)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
 
                     @Override
@@ -79,25 +79,29 @@ public class BanHelper {
     public static void unban(int userid, final OnCompleteListener onCompleteListener) {
 
         if (!FirebaseAuth.getInstance().getCurrentUser().getEmail().equals(UserPreferences.getInstance().getEmail())) {
+            MLog.w(TAG,"findhack unban 1");
             return;
         }
 
         FirebaseDatabase.getInstance()
-                .getReference(Constants.USER_INFO_REF(userid)+"/d")
+                .getReference(Constants.USER_INFO_REF(userid)+"/" + Constants.BAN_DEVICE_REF)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
 
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
+                            MLog.w(TAG,"findhack unban 2");
                             String deviceId = (String)dataSnapshot.getValue();
                             DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.BANS+deviceId);
                             ref.removeValue().addOnCompleteListener(onCompleteListener);
+                        } else {
+                            MLog.w(TAG,"findhack unban 3");
                         }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                        MLog.w(TAG,"findhack unban 4 error: " + databaseError);
                     }
                 });
     }

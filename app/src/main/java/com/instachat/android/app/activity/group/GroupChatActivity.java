@@ -109,6 +109,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
                     .updateChildren(DeviceUtil.getAndroidIdMap(this));
         }
         groupChatViewModel.checkTermsOfService();
+
     }
 
     private String getCount(int count) {

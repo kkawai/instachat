@@ -4,6 +4,7 @@ import android.content.Context;
 import android.provider.Settings.Secure;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.instachat.android.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +31,7 @@ public final class DeviceUtil {
 
     public static Map<String, Object> getAndroidIdMap(final Context context) {
         Map<String, Object> map = new HashMap<>(1);
-        map.put("d", getFirebaseUid());
+        map.put(Constants.BAN_DEVICE_REF, getFirebaseUid());
         return map;
     }
 
