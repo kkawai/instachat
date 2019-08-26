@@ -9,6 +9,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.instachat.android.BuildConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.util.DeviceUtil;
@@ -128,7 +129,11 @@ public class BanHelper {
      * check database every 6 inquires, not every every time.
      * @return
      */
-    public boolean isBanned() {
+    public boolean amIBanned() {
+
+        if (BuildConfig.DEBUG)
+            return false;
+
         if (isBanned == false) {
             checkBan(); //check every time because I can get banned at any time
         }
@@ -141,8 +146,8 @@ public class BanHelper {
             bannedRef.removeEventListener(this);
             if (dataSnapshot.exists()) {
 //                    long banExpiration = (Long)dataSnapshot.child("banExpiration").getValue();
-//                    isBanned = banExpiration > System.currentTimeMillis();
-//                    if (!isBanned) {
+//                    amIBanned = banExpiration > System.currentTimeMillis();
+//                    if (!amIBanned) {
 //                        bannedRef.removeValue();
 //                    }
                 isBanned = true;
@@ -161,6 +166,10 @@ public class BanHelper {
      * Check if I am banned
      */
     private void checkBan() {
+
+        if (BuildConfig.DEBUG)  //debug versions, I cannot be banned
+            return;
+
         //getDeviceId(UserPreferences.getInstance().getUserId());
         if (bannedRef == null) {
             bannedRef = firebaseDatabase.getReference(Constants.BANS + DeviceUtil.getFirebaseUid());

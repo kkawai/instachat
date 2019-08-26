@@ -458,7 +458,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     }
 
     public boolean isBanned() {
-        boolean isBanned = banHelper.isBanned();
+        boolean isBanned = banHelper.amIBanned();
         if (isBanned) {
             MLog.w(TAG, "You are banned. Cannot post anything.");
         }
