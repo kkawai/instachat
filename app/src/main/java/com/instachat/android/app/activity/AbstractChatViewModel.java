@@ -12,6 +12,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.instachat.android.BuildConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.TheApp;
@@ -234,20 +235,22 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
 
     private boolean canSendText(final String text, final String imageUrl) {
 
-        if (System.currentTimeMillis() - lastMessageSentTime < Constants.SPAM_BURST_DURATION) {
-            if (messageCount >= Constants.SPAM_MAX_BURST_COMMENTS) {
-                getNavigator().showSlowDown();
-                if (stupidSpamAttempts > 2) {
-                    lastMessageSentTime = System.currentTimeMillis();
-                } else {
-                    stupidSpamAttempts++;
+        if (!BuildConfig.DEBUG) {
+            if (System.currentTimeMillis() - lastMessageSentTime < Constants.SPAM_BURST_DURATION) {
+                if (messageCount >= Constants.SPAM_MAX_BURST_COMMENTS) {
+                    getNavigator().showSlowDown();
+                    if (stupidSpamAttempts > 2) {
+                        lastMessageSentTime = System.currentTimeMillis();
+                    } else {
+                        stupidSpamAttempts++;
+                    }
+                    return false;
                 }
-                return false;
+            } else {
+                //reset counter since it's been more than SPAM_BURST_DURATION since last sent
+                messageCount = 0;
+                stupidSpamAttempts = 0;
             }
-        } else {
-            //reset counter since it's been more than SPAM_BURST_DURATION since last sent
-            messageCount = 0;
-            stupidSpamAttempts = 0;
         }
 
         if (imageUrl == null && StringUtil.isEmpty(text)) {
