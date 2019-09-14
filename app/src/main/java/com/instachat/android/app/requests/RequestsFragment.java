@@ -1,8 +1,6 @@
 package com.instachat.android.app.requests;
 
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +19,9 @@ import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.databinding.FragmentGenericUsersBinding;
 import com.instachat.android.util.UserPreferences;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
@@ -56,7 +57,7 @@ public class RequestsFragment extends BaseFragment {
         mRequestsAdapter = new RequestsAdapter(PrivateChatSummary.class, ref);
         mRequestsAdapter.setUserClickedListener(mUserClickedListener);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         binding.recyclerView.setLayoutManager(linearLayoutManager);
         binding.recyclerView.setAdapter(mRequestsAdapter);
     }
