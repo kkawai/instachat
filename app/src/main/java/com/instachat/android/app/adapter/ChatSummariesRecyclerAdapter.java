@@ -12,6 +12,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
@@ -56,7 +57,8 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
 
     private List<Object> data = new ArrayList<>(128);
     private ChildEventListener privateChatsSummaryListener, publicGroupChatsSummaryListener;
-    private DatabaseReference privateChatsSummaryReference, publicGroupChatsSummaryReference;
+    private DatabaseReference publicGroupChatsSummaryReference;
+    private Query privateChatsSummaryReference;
     private ChatsItemClickedListener chatsItemClickedListener;
     private Map<Long, Map.Entry<DatabaseReference, ChildEventListener>> publicGroupChatPresenceReferences = new HashMap<>();
     private ActivityState activityState;
@@ -83,7 +85,7 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
 
         data.add(new GroupChatHeader(TheApp.getInstance().getString(R.string.group_chat_header)));
         data.add(new PrivateChatHeader(TheApp.getInstance().getString(R.string.private_chat_header)));
-        privateChatsSummaryReference = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_CHATS_SUMMARY_PARENT_REF());
         privateChatsSummaryListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -186,10 +188,10 @@ public class ChatSummariesRecyclerAdapter extends RecyclerView.Adapter implement
             }
         };
         publicGroupChatsSummaryReference.addChildEventListener(publicGroupChatsSummaryListener);
-        privateChatsSummaryReference
-                .orderByChild(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP)
+        privateChatsSummaryReference = reference
                 .limitToLast((int)FirebaseRemoteConfig.getInstance().getLong(Constants.KEY_MAX_PRIVATE_CHATS))
-                .addChildEventListener(privateChatsSummaryListener);
+                .orderByChild(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP);
+        privateChatsSummaryReference.addChildEventListener(privateChatsSummaryListener);
     }
 
     private PrivateChatSummary privateChatSummaryFrom(DataSnapshot dataSnapshot) {

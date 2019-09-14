@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
@@ -51,10 +52,11 @@ public class RequestsFragment extends BaseFragment {
                 acceptUserPrompt(userid, username, dpid, transitionImageView);
             }
         };
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_REQUESTS_REF())
-                .orderByChild(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP)
-                .limitToLast((int) FirebaseRemoteConfig.getInstance().getLong(Constants.KEY_MAX_PRIVATE_CHATS)).getRef();
-        mRequestsAdapter = new RequestsAdapter(PrivateChatSummary.class, ref);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_REQUESTS_REF());
+        Query query = ref
+                //.orderByChild(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP)
+                .limitToLast((int) FirebaseRemoteConfig.getInstance().getLong(Constants.KEY_MAX_PRIVATE_CHATS));
+        mRequestsAdapter = new RequestsAdapter(PrivateChatSummary.class, query);
         mRequestsAdapter.setUserClickedListener(mUserClickedListener);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);

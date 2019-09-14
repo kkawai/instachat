@@ -1,17 +1,18 @@
 package com.instachat.android.app.requests;
 
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.instachat.android.R;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.data.model.PrivateChatSummary;
 import com.instachat.android.databinding.ItemRequestBinding;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public final class RequestsAdapter<T, VH extends RecyclerView.ViewHolder> extends FirebaseRecyclerAdapter<PrivateChatSummary, RequestsAdapter.RequestsViewHolder> {
 
@@ -19,7 +20,7 @@ public final class RequestsAdapter<T, VH extends RecyclerView.ViewHolder> extend
 
     private UserClickedListener mUserClickedListener;
 
-    public RequestsAdapter(Class<PrivateChatSummary> modelClass, DatabaseReference ref) {
+    public RequestsAdapter(Class<PrivateChatSummary> modelClass, Query ref) {
         super(modelClass, R.layout.item_request, RequestsViewHolder.class, ref);
     }
 
