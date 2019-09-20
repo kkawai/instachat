@@ -82,15 +82,14 @@ public final class TimeUtil {
 
     public static String getTimeAgo(final long timeMillis) {
         // today
-        Date today = new Date();
 
         // how much time since (ms)
-        long duration = today.getTime() - timeMillis;
+        long duration = System.currentTimeMillis() - timeMillis;
 
-        int second = 1000;
-        int minute = second * 60;
-        int hour = minute * 60;
-        int day = hour * 24;
+        long second = 1000;
+        long minute = second * 60;
+        long hour = minute * 60;
+        long day = hour * 24;
 
         if (duration < (minute * 2)) {
             return TheApp.getInstance().getString(R.string.just_now);
@@ -118,14 +117,14 @@ public final class TimeUtil {
             return TheApp.getInstance().getString(R.string.one_day_ago);
         }
 
-        int n = (int) Math.floor(duration / day);
-        if (n < 365) {
-            if (n > 30)
+        int days = (int) Math.floor(duration / day);
+        if (days < 365) {
+            if (days > 30)
                 //return (n / 30) + " month(s) ago";
-                return "" + n + " " + TheApp.getInstance().getString(R.string.some_minutes_ago);
+                return "" + (days / 30) + " " + TheApp.getInstance().getString(R.string.some_months_ago);
             else
                 //return n + " days ago";
-                return "" + n + " " + TheApp.getInstance().getString(R.string.some_days_ago);
+                return "" + days + " " + TheApp.getInstance().getString(R.string.some_days_ago);
         } else {
             //return ">1y";
             return TheApp.getInstance().getString(R.string.more_than_one_year_ago);

@@ -54,7 +54,7 @@ public class RequestsFragment extends BaseFragment {
         };
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.MY_PRIVATE_REQUESTS_REF());
         Query query = ref
-                //.orderByChild(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP)
+                .orderByChild(Constants.FIELD_LAST_MESSAGE_SENT_TIMESTAMP)
                 .limitToLast((int) FirebaseRemoteConfig.getInstance().getLong(Constants.KEY_MAX_PRIVATE_CHATS));
         mRequestsAdapter = new RequestsAdapter(PrivateChatSummary.class, query);
         mRequestsAdapter.setUserClickedListener(mUserClickedListener);

@@ -170,7 +170,7 @@ public final class Constants {
 
    public static String PRIVATE_CHAT_REF(int toUserid) {
       final int myUserid = UserPreferences.getInstance().getUserId();
-      return "/directs_2/" + (toUserid > myUserid ? (myUserid + "_" + toUserid) : (toUserid + "_" + myUserid));
+      return "/directs/" + (toUserid > myUserid ? (myUserid + "_" + toUserid) : (toUserid + "_" + myUserid));
    }
 
    public static String PRIVATE_CHAT_TYPING_REF(int toUserid) {
