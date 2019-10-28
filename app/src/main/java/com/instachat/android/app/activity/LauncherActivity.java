@@ -15,6 +15,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.app.activity.group.GroupChatActivity;
@@ -90,8 +91,7 @@ public final class LauncherActivity extends AppCompatActivity {
                   disableButtons();
                   phoneNumberRef.removeEventListener(this);
                   if (dataSnapshot.exists()) {
-                     startActivity(new Intent(LauncherActivity.this, GroupChatActivity.class));
-                     finish();
+                     goChat();
                   } else {
                      goToVerifyPhoneActivity();
                   }
@@ -138,8 +138,17 @@ public final class LauncherActivity extends AppCompatActivity {
    }
 
    private void goToVerifyPhoneActivity() {
-      startActivity(new Intent(this, VerifyPhoneActivity.class));
-      FirebaseAnalytics.getInstance(this).logEvent(Events.GO_VERIFY_PHONE, null);
+      if (FirebaseRemoteConfig.getInstance().getBoolean(Constants.KEY_ENABLE_PHONE_VERIFY)) {
+         startActivity(new Intent(this, VerifyPhoneActivity.class));
+         FirebaseAnalytics.getInstance(this).logEvent(Events.GO_VERIFY_PHONE, null);
+         finish();
+      } else {
+         goChat();
+      }
+   }
+
+   private void goChat() {
+      startActivity(new Intent(LauncherActivity.this, GroupChatActivity.class));
       finish();
    }
 }

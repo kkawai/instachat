@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.BR;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
@@ -157,7 +158,11 @@ public class SignInActivity extends BaseActivity<ActivitySignInBinding, SignInVi
                         if (intent != null && intent.getAction() != null && intent.getAction().equals(Constants.ACTION_SKIP_PHONE_VERIFY)) {
                             finallyGoChat();
                         } else {
-                            checkPhoneNumber();
+                            if (FirebaseRemoteConfig.getInstance().getBoolean(Constants.KEY_ENABLE_PHONE_VERIFY)) {
+                                checkPhoneNumber();
+                            } else {
+                                finallyGoChat();
+                            }
                         }
                     } else {
                         hideProgressDialog();

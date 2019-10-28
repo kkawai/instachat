@@ -14,8 +14,7 @@ public class RemoteConfigHelper {
         FirebaseRemoteConfig firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
 
         // Define Firebase Remote Config Settings.
-        FirebaseRemoteConfigSettings firebaseRemoteConfigSettings = new FirebaseRemoteConfigSettings.Builder()
-                .setDeveloperModeEnabled(false).build();
+        FirebaseRemoteConfigSettings firebaseRemoteConfigSettings = new FirebaseRemoteConfigSettings.Builder().build();
 
         // Define default config values. Defaults are used when fetched config values are not
         // available. Eg: if an error occurred fetching values from the server.
@@ -37,13 +36,14 @@ public class RemoteConfigHelper {
         defaultConfigMap.put(Constants.KEY_DO_SHORTEN_IMAGE_URLS, Constants.DEFAULT_DO_SHORTEN_IMAGE_URLS);
         defaultConfigMap.put(Constants.KEY_DO_SHOW_SIGNOUT_BUTTON, Constants.DEFAULT_DO_SHOW_SIGNOUT_BUTTON);
         defaultConfigMap.put(Constants.KEY_DO_SHOW_ADS, Constants.DEFAULT_DO_SHOW_ADS);
+        defaultConfigMap.put(Constants.KEY_ENABLE_PHONE_VERIFY, Constants.DEFAULT_ENABLE_PHONE_VERIFY);
         defaultConfigMap.put(Constants.KEY_ADMIN_USERS, Constants.DEFAULT_ADMIN_USERS);
         defaultConfigMap.put(Constants.KEY_USERS_ALLOWED_TO_SCREENSHOT, Constants.DEFAULT_USERS_ALLOWED_TO_SCREENSHOT);
         defaultConfigMap.put(Constants.KEY_DO_SCAN_PHOTOS_BEFORE_POST, Constants.DEFAULT_DO_SCAN_PHOTOS_BEFORE_POST);
 
         // Apply config settings and default values.
-        firebaseRemoteConfig.setConfigSettings(firebaseRemoteConfigSettings);
-        firebaseRemoteConfig.setDefaults(defaultConfigMap);
+        firebaseRemoteConfig.setConfigSettingsAsync(firebaseRemoteConfigSettings);
+        firebaseRemoteConfig.setDefaultsAsync(defaultConfigMap);
         return firebaseRemoteConfig;
     }
 }
