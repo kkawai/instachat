@@ -197,7 +197,7 @@ public final class Constants {
    }
 
    public static String GROUP_CHAT_REF(long groupid) {
-      return "/public_group_messages_9/" + groupid;
+      return "/public_group_messages_10/" + groupid;
    }
 
    public static String GROUP_CHAT_USERS_REF(long groupid) {

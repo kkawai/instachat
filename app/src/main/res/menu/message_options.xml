@@ -19,14 +19,6 @@
 
     <item
         android:id="@+id/admin_menu_ban_5"
-        android:title="Ban 5 min."/>
-
-    <item
-        android:id="@+id/admin_menu_ban_15"
-        android:title="Ban 15 min."/>
-
-    <item
-        android:id="@+id/admin_menu_ban_2_days"
-        android:title="Ban 2 Days"/>
+        android:title="Ban"/>
 
 </menu>

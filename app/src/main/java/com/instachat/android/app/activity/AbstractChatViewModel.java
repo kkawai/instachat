@@ -5,6 +5,10 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.safetynet.SafetyNet;
+import com.google.android.gms.safetynet.SafetyNetApi;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -30,10 +34,12 @@ import com.instachat.android.data.api.UserResponse;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.User;
 import com.instachat.android.util.MLog;
+import com.instachat.android.util.SimpleRxWrapper;
 import com.instachat.android.util.StringUtil;
 import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.rx.SchedulerProvider;
 
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
@@ -46,7 +52,7 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
 
-public abstract class AbstractChatViewModel<Navigator extends AbstractChatNavigator> extends BaseViewModel<Navigator> {
+public abstract class AbstractChatViewModel<Navigator extends AbstractChatNavigator> extends BaseViewModel<Navigator> implements Executor{
 
     private static final String TAG = "AbstractChatViewModel";
 
@@ -64,6 +70,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     private String databaseRoot;
     private DatabaseReference databaseReference;
     private MessagesRecyclerAdapter messagesAdapter;
+    private boolean isCaptchaVerified;
 
     public AbstractChatViewModel(DataManager dataManager,
                                  SchedulerProvider schedulerProvider,
@@ -267,15 +274,67 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
         return true;
     }
 
+    @Override
+    public void execute(Runnable command) {
+        SimpleRxWrapper.executeInUiThread(command);
+    }
+
+    private void _sendText(FriendlyMessage friendlyMessage) {
+        lastMessageSentTime = System.currentTimeMillis();
+        messageCount++;
+        messagesAdapter.sendFriendlyMessage(friendlyMessage);
+        getNavigator().clearTextField();
+    }
+
     public void sendText(FriendlyMessage friendlyMessage) {
 
         if (!canSendText(friendlyMessage.getText(), friendlyMessage.getImageUrl())) {
             return;
         }
-        lastMessageSentTime = System.currentTimeMillis();
-        messageCount++;
-        messagesAdapter.sendFriendlyMessage(friendlyMessage);
-        getNavigator().clearTextField();
+
+        if (isCaptchaVerified) {
+            _sendText(friendlyMessage);
+            return;
+        }
+
+        SafetyNet.getClient(TheApp.getInstance()).verifyWithRecaptcha("6LdO48cUAAAAAMKvpGgmjSlY7zzFaTZpuLFnl-Ab")
+                .addOnSuccessListener((Executor) this,
+                        new OnSuccessListener<SafetyNetApi.RecaptchaTokenResponse>() {
+                            @Override
+                            public void onSuccess(SafetyNetApi.RecaptchaTokenResponse response) {
+                                // Indicates communication with reCAPTCHA service was
+                                // successful.
+                                String userResponseToken = response.getTokenResult();
+                                if (!userResponseToken.isEmpty()) {
+                                    // Validate the user response token using the
+                                    // reCAPTCHA siteverify API.
+                                    MLog.w(TAG,"safety token: " +userResponseToken);
+                                    _sendText(friendlyMessage);
+                                    isCaptchaVerified = true;
+                                } else {
+                                    getNavigator().showErrorToast("");
+                                }
+                            }
+                        })
+                .addOnFailureListener((Executor) this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        getNavigator().showErrorToast("");
+                        if (e instanceof ApiException) {
+                            // An error occurred when communicating with the
+                            // reCAPTCHA service. Refer to the status code to
+                            // handle the error appropriately.
+                            ApiException apiException = (ApiException) e;
+                            int statusCode = apiException.getStatusCode();
+                            MLog.w(TAG, "Error: " + CommonStatusCodes
+                                    .getStatusCodeString(statusCode));
+                        } else {
+                            // A different, unknown type of error occurred.
+                            MLog.w(TAG, "Error: " + e.getMessage());
+                        }
+                    }
+                });
+
     }
 
     private long lastMessageSentTime;

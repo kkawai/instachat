@@ -111,8 +111,6 @@ public class MessageOptionsDialogHelper {
         if (!AdminUtil.isMeAdmin()) {
             popupMenu.getMenu().removeItem(R.id.admin_menu_remove_comments);
             popupMenu.getMenu().removeItem(R.id.admin_menu_ban_5);
-            popupMenu.getMenu().removeItem(R.id.admin_menu_ban_15);
-            popupMenu.getMenu().removeItem(R.id.admin_menu_ban_2_days);
         }
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
@@ -133,14 +131,9 @@ public class MessageOptionsDialogHelper {
                     case R.id.admin_menu_remove_comments:
                         listener.onRemoveCommentsClicked(friendlyMessage);
                         break;
-                    case R.id.admin_menu_ban_2_days:
-                        listener.onBan2Days(friendlyMessage);
-                        break;
                     case R.id.admin_menu_ban_5:
                         listener.onBan5Minutes(friendlyMessage);
-                        break;
-                    case R.id.admin_menu_ban_15:
-                        listener.onBan15Minutes(friendlyMessage);
+                        listener.onRemoveCommentsClicked(friendlyMessage);
                         break;
                     default:
                         break;

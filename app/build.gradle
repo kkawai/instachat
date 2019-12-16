@@ -18,8 +18,8 @@ android {
         applicationId "com.instachat.android"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.compileSdkVersion
-        versionCode 104
-        versionName "2.3.3"
+        versionCode 105
+        versionName "2.3.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -170,6 +170,8 @@ dependencies {
 
     //Viewmodel
     implementation "androidx.lifecycle:lifecycle-extensions:2.1.0"
+
+    implementation 'com.google.android.gms:play-services-safetynet:17.0.0'
 
 }
 
