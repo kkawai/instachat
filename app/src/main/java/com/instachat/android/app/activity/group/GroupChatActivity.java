@@ -16,6 +16,7 @@ import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.TheApp;
 import com.instachat.android.app.activity.AbstractChatActivity;
+import com.instachat.android.app.activity.AbstractChatViewModel;
 import com.instachat.android.app.activity.AttachPhotoOptionsDialogHelper;
 import com.instachat.android.app.activity.LauncherActivity;
 import com.instachat.android.app.activity.PhotoUploadHelper;
@@ -336,6 +337,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     }
 
     private void signoutAndFinish() {
+        AbstractChatViewModel.isCaptchaVerified = false;
         TheApp.isSavedDeviceId = false;
         groupChatViewModel.removeUserPresenceFromGroup();
         gcmHelper.unregister(UserPreferences.getInstance().getUserId() + "");

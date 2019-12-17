@@ -70,7 +70,7 @@ public abstract class AbstractChatViewModel<Navigator extends AbstractChatNaviga
     private String databaseRoot;
     private DatabaseReference databaseReference;
     private MessagesRecyclerAdapter messagesAdapter;
-    private boolean isCaptchaVerified;
+    public static boolean isCaptchaVerified;
 
     public AbstractChatViewModel(DataManager dataManager,
                                  SchedulerProvider schedulerProvider,
