@@ -186,5 +186,7 @@
 	<string name="checking_number">Verifica numero in corso ...</string>
 	<string name="sms_verify_success">SMS verificato! Per motivi di sicurezza, dovrai accedere di nuovo. Divertiti e grazie.</string>
 	<string name="starting_chat">Avvio della chat. Per favore comportati bene.</string>
+	<string name="delete_account">Eliminare l\'account</string>
+	<string name="delete_account_are_you_sure">Sei sicuro? Il tuo account verrà eliminato!</string>
 
 </resources>

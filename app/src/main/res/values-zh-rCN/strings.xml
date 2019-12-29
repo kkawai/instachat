@@ -186,5 +186,7 @@
 	<string name="checking_number">检查号码......</string>
 	<string name="sms_verify_success">短信验证！出于安全原因，您需要再次登录。玩得开心，谢谢你。</string>
 	<string name="starting_chat">开始聊天。请表现出来。</string>
+	<string name="delete_account">删除帐户</string>
+	<string name="delete_account_are_you_sure">你确定吗？您的帐户将被删除！</string>
 
 </resources>

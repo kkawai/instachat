@@ -29,6 +29,7 @@ import com.instachat.android.app.blocks.BlockedUserListener;
 import com.instachat.android.app.ui.base.BaseViewModel;
 import com.instachat.android.data.DataManager;
 import com.instachat.android.data.api.BasicExistenceResult;
+import com.instachat.android.data.api.BasicResponse;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.api.UserResponse;
 import com.instachat.android.data.model.FriendlyMessage;

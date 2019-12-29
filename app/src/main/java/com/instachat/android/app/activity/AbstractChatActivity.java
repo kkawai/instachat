@@ -37,6 +37,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.instachat.android.Constants;
 import com.instachat.android.R;
 import com.instachat.android.app.MessageOptionsDialogHelper;
+import com.instachat.android.app.activity.group.DeleteAccountDialogHelper;
 import com.instachat.android.app.activity.group.GroupChatActivity;
 import com.instachat.android.app.activity.group.LogoutDialogHelper;
 import com.instachat.android.app.activity.pm.PrivateChatActivity;
@@ -139,6 +140,9 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
 
     @Inject
     protected LogoutDialogHelper logoutDialogHelper;
+
+    @Inject
+    protected DeleteAccountDialogHelper deleteAccountDialogHelper;
 
     protected ChatSummariesRecyclerAdapter chatSummariesRecyclerAdapter;
 

@@ -8,6 +8,8 @@ public class Events {
     public static final String SAVED_PROFILE = "saved_profile";
     public static final String SAVED_PROFILE_FAILED = "saved_profile_failed";
     public static final String USER_BLOCKED = "user_blocked";
+    public static final String ACCOUNT_DELETED = "account_deleted";
+    public static final String ACCOUNT_DELETED_FAILED = "account_deleted_failed";
     public static final String USER_UNBLOCKED = "user_unblocked";
     public static final String PENDING_REQUEST_ISSUED = "pending_request_issued";
     public static final String PENDING_REQUEST_DENIED = "pending_request_denied";

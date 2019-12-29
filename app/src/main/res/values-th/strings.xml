@@ -186,5 +186,7 @@
 	<string name="checking_number">กำลังตรวจสอบหมายเลข ...</string>
 	<string name="sms_verify_success">ตรวจสอบ SMS แล้ว! เพื่อเหตุผลด้านความปลอดภัยคุณจะต้องลงชื่อเข้าใช้อีกครั้ง ขอให้สนุกและขอบคุณ</string>
 	<string name="starting_chat">เริ่มแชท กรุณาทำตัว</string>
+	<string name="delete_account">ลบบัญชี</string>
+	<string name="delete_account_are_you_sure">คุณแน่ใจไหม? บัญชีของคุณจะถูกลบ!</string>
 
 </resources>

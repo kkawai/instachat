@@ -259,6 +259,9 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
             case R.id.menu_sign_out:
                 signout();
                 return true;
+            case R.id.menu_delete_account:
+                deleteAccount();
+                return true;
             case R.id.menu_pending_requests:
                 showPendingRequests();
                 return true;
@@ -334,6 +337,22 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
                 signoutAndFinish();
             }
         });
+    }
+
+    private void deleteAccount() {
+
+        deleteAccountDialogHelper.showDeleteAccountDialog(this, new DeleteAccountDialogHelper.DeleteAccountListener() {
+            @Override
+            public void onConfirmDeleteAccount() {
+                getViewModel().deleteAccount(UserPreferences.getInstance().getUserId());
+            }
+        });
+    }
+
+    @Override
+    public void showAccountDeleted() {
+        UserPreferences.getInstance().removeLastSignIn();
+        signoutAndFinish();
     }
 
     private void signoutAndFinish() {

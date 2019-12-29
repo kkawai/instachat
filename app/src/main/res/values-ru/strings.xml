@@ -186,5 +186,7 @@
 	<string name="checking_number">Проверка номера ...</string>
 	<string name="sms_verify_success">СМС проверено! По соображениям безопасности вам нужно будет войти еще раз. Веселитесь и спасибо.</string>
 	<string name="starting_chat">Начать чат. Пожалуйста, веди себя хорошо.</string>
+	<string name="delete_account">Удалить аккаунт</string>
+	<string name="delete_account_are_you_sure">Вы уверены? Ваш аккаунт будет удален!</string>
 
 </resources>

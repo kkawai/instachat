@@ -11,6 +11,8 @@ import retrofit2.http.Query;
 
 public interface DataManager {
 
+    Observable<BasicResponse> deleteAccount(Long id);
+
     Observable<UserResponse> saveUser3(Long id,
                                  String username,
                                  String password,

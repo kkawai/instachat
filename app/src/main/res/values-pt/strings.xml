@@ -186,5 +186,7 @@
 	<string name="checking_number">Número de verificação ...</string>
 	<string name="sms_verify_success">SMS verificado! Por motivos de segurança, você precisará fazer login novamente. Divirta-se e obrigado.</string>
 	<string name="starting_chat">Iniciando o bate-papo. Por favor, se comporte.</string>
+	<string name="delete_account">Deletar conta</string>
+	<string name="delete_account_are_you_sure">Você tem certeza? Sua conta será excluída!</string>
 
 </resources>

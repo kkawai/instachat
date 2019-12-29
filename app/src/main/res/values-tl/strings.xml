@@ -186,5 +186,7 @@
 	<string name="checking_number">Sinusuri ang numero ...</string>
 	<string name="sms_verify_success">Na-verify ang SMS! Para sa mga kadahilanang pangseguridad, kakailanganin mong mag-sign in muli. Masaya at salamat.</string>
 	<string name="starting_chat">Simula ng chat. Mangyaring kumilos.</string>
+	<string name="delete_account">Tanggalin ang Account</string>
+	<string name="delete_account_are_you_sure">Sigurado ka ba? Tatanggalin ang iyong account!</string>
 
 </resources>

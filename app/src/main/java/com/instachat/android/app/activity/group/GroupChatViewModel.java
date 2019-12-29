@@ -20,6 +20,7 @@ import com.instachat.android.app.activity.AbstractChatViewModel;
 import com.instachat.android.app.bans.BanHelper;
 import com.instachat.android.app.analytics.Events;
 import com.instachat.android.data.DataManager;
+import com.instachat.android.data.api.BasicResponse;
 import com.instachat.android.data.model.FriendlyMessage;
 import com.instachat.android.data.model.GroupChatSummary;
 import com.instachat.android.data.model.User;
@@ -36,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 import androidx.databinding.ObservableField;
 import io.reactivex.Observable;
 import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 
 public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator> {
 
@@ -209,6 +211,29 @@ public class GroupChatViewModel extends AbstractChatViewModel<GroupChatNavigator
 
             }
         });
+    }
+
+    public void deleteAccount(final long id) {
+        add(getDataManager().deleteAccount(id)
+                .subscribe(new Consumer<BasicResponse>() {
+                    @Override
+                    public void accept(BasicResponse basicResponse) throws Exception {
+                        Bundle payload = new Bundle();
+                        payload.putString("username", UserPreferences.getInstance().getUsername() + "");
+                        firebaseAnalytics.logEvent(Events.ACCOUNT_DELETED, payload);
+                        getNavigator().showAccountDeleted();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        getNavigator().showErrorToast("");
+                        Bundle payload = new Bundle();
+                        payload.putString("why", throwable.toString());
+                        payload.putString("username", UserPreferences.getInstance().getUsername() + "");
+                        firebaseAnalytics.logEvent(Events.ACCOUNT_DELETED_FAILED, payload);
+                    }
+                }));
+
     }
 
     public void removeUserPresenceFromGroup() {

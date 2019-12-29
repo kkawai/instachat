@@ -136,7 +136,7 @@ public class CloudVisionApi {
                     return;
                 }
                 if (result.equals("SKIP_SCAN")) {
-                    mListener.onImageInspectionCompleted(false, false, false);
+                    mListener.onImageInspectionCompleted(false, true, true);
                     return;
                 }
                 boolean possibleAdult = result.startsWith("POSSIBLE ") || result.startsWith("VERY_LIKELY ");

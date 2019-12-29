@@ -186,5 +186,7 @@
 	<string name="checking_number">التحقق من الرقم ...</string>
 	<string name="sms_verify_success">تم التحقق من الرسائل القصيرة! لأسباب أمنية ، ستحتاج إلى تسجيل الدخول مرة أخرى. المتعة وشكرا لك.</string>
 	<string name="starting_chat">بدء الدردشة. ارجوك تهذب.</string>
+	<string name="delete_account">حذف الحساب</string>
+	<string name="delete_account_are_you_sure">هل أنت واثق؟ سيتم حذف حسابك!</string>
 
 </resources>

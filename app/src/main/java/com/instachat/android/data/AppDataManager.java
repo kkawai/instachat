@@ -25,6 +25,13 @@ public class AppDataManager implements DataManager {
     }
 
     @Override
+    public Observable<BasicResponse> deleteAccount(Long id) {
+        return apiInterface.deleteAccount(id)
+                .observeOn(schedulerProvider.ui())
+                .subscribeOn(schedulerProvider.io());
+    }
+
+    @Override
     public Observable<UserResponse> saveUser3(Long id, String username, String password, String email, String profilePicUrl, String bio) {
         return apiInterface.saveUser3(id, username, password, email, profilePicUrl, bio)
                 .observeOn(schedulerProvider.ui())

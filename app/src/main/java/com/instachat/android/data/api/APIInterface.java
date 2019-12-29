@@ -13,6 +13,10 @@ import retrofit2.http.Query;
 public interface APIInterface {
 
     @FormUrlEncoded
+    @POST("/ih/delusr")
+    Observable<BasicResponse> deleteAccount(@Field("id") Long id);
+
+    @FormUrlEncoded
     @POST("/ih/saveuser3")
     Observable<UserResponse> saveUser3(@Field("id") Long id,
                                  @Field("username") String username,

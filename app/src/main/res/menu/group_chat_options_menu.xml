@@ -23,6 +23,11 @@
         android:title="@string/manage_blocks"/>
 
     <item
+        android:id="@+id/menu_delete_account"
+        android:title="@string/delete_account"
+        app:showAsAction="never"/>
+
+    <item
         android:id="@+id/menu_sign_out"
         android:title="@string/sign_out"
         app:showAsAction="never"/>

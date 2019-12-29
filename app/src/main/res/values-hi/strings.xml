@@ -186,5 +186,7 @@
 	<string name="checking_number">नंबर जाँच रहा है ...</string>
 	<string name="sms_verify_success">एसएमएस सत्यापित! सुरक्षा कारणों से, आपको एक बार और साइन इन करना होगा। मज़े करो और धन्यवाद।</string>
 	<string name="starting_chat">चैट शुरू करना। कृपया अच्छा व्यवहार करें।</string>
+	<string name="delete_account">खाता हटा दो</string>
+	<string name="delete_account_are_you_sure">क्या आपको यकीन है? आपका अकाउंट डिलीट हो जाएगा!</string>
 
 </resources>

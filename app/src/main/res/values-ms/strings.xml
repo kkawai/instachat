@@ -186,5 +186,7 @@
 	<string name="checking_number">Memeriksa nombor ...</string>
 	<string name="sms_verify_success">SMS Disahkan! Atas alasan keselamatan, anda perlu melog masuk sekali lagi. Bersenang-senang dan terima kasih.</string>
 	<string name="starting_chat">Memulakan sembang. Sila berkelakuan.</string>
+	<string name="delete_account">Padam Akaun</string>
+	<string name="delete_account_are_you_sure">Adakah anda pasti? Akaun anda akan dipadam!</string>
 
 </resources>

@@ -187,6 +187,10 @@ public final class UserPreferences {
         return mPrefs.getString(PREFERENCE_LAST_SIGN_IN, null);
     }
 
+    public void removeLastSignIn() {
+        mPrefs.edit().remove(PREFERENCE_LAST_SIGN_IN).apply();
+    }
+
     public void saveUser(@NonNull User user) {
         if (user == null)
             throw new IllegalArgumentException("cannot pass null user to saveUser(..)");

@@ -186,5 +186,7 @@
 	<string name="checking_number">Número de cuenta corriente ...</string>
 	<string name="sms_verify_success">SMS verificado! Por razones de seguridad, deberá iniciar sesión una vez más. Diviértete y gracias.</string>
 	<string name="starting_chat">Iniciando chat. Por favor, comportarse.</string>
+	<string name="delete_account">Borrar cuenta</string>
+	<string name="delete_account_are_you_sure">¿Estás seguro? Su cuenta será eliminada!</string>
 
 </resources>

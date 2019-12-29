@@ -186,5 +186,7 @@
 	<string name="checking_number">Kontroluje se číslo ...</string>
 	<string name="sms_verify_success">SMS byla ověřena! Z bezpečnostních důvodů se budete muset znovu přihlásit. Bavte se a děkuji.</string>
 	<string name="starting_chat">Zahájení chatu. Prosím, chovej se.</string>
+	<string name="delete_account">Smazat účet</string>
+	<string name="delete_account_are_you_sure">Jsi si jistá? Váš účet bude smazán!</string>
 
 </resources>

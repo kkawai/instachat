@@ -226,4 +226,6 @@
     <string name="sms_verify_success">SMS Verified!  For security reasons, you will need to sign in once more.  Have fun and thank you.</string>
     <string name="starting_chat">Starting chat.  Please behave.</string>
 
+    <string name="delete_account">Delete Account</string>
+    <string name="delete_account_are_you_sure">Are you sure?  Your account will be deleted!</string>
 </resources>

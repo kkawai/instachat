@@ -186,5 +186,7 @@
 	<string name="checking_number">Kiểm tra số ...</string>
 	<string name="sms_verify_success">Đã xác minh SMS! Vì lý do bảo mật, bạn sẽ cần phải đăng nhập một lần nữa. Hãy vui vẻ và cảm ơn bạn.</string>
 	<string name="starting_chat">Bắt đầu trò chuyện. Xin vui lòng cư xử.</string>
+	<string name="delete_account">Xóa tài khoản</string>
+	<string name="delete_account_are_you_sure">Bạn có chắc không? Tài khoản của bạn sẽ bị xóa!</string>
 
 </resources>
