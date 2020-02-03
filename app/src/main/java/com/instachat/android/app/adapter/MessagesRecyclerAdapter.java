@@ -338,20 +338,23 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
                 if (friendlyMessage.getMT() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
                     Glide.with(mActivity.get()).
                             load(friendlyMessage.getImageUrl()).
+                            optionalTransform(new BlurTransformation(mActivity.get(), 75)).
+                            optionalTransform(new RoundedCornersTransformation(mActivity.get(), 30, 0, RoundedCornersTransformation.CornerType.ALL)).
+                            /*
                             bitmapTransform(
                                     //no need to center crop, image will be blurred anyways!
                                     //new CenterCrop(mActivity.get()),
                                     new BlurTransformation(mActivity.get(), 75),
                                     new RoundedCornersTransformation(mActivity.get(), 30, 0, RoundedCornersTransformation.CornerType.ALL)).
-                            crossFade().
+                             */
+
                             into(viewHolder.messagePhotoView);
                 } else {
                     Glide.with(mActivity.get()).
                             load(friendlyMessage.getImageUrl()).
-                            bitmapTransform(
-                                    new CenterCrop(mActivity.get()),
+                            centerCrop().
+                            optionalTransform(
                                     new RoundedCornersTransformation(mActivity.get(), 30, 0, RoundedCornersTransformation.CornerType.ALL)).
-                            crossFade().
                             into(viewHolder.messagePhotoView);
                 }
                 if (payloads != null && payloads.contains(PAYLOAD_IMAGE_REVEAL)) {

@@ -52,10 +52,9 @@ public class WebLinkHelper {
                     try {
                         Glide.with(viewHolder.webLinkImageView.getContext()).
                                 load(sourceContent.getImages().get(0)).
-                                bitmapTransform(
-                                        new CenterCrop(c),
+                                optionalCenterCrop().
+                                optionalTransform(
                                         new RoundedCornersTransformation(c, 30, 0, RoundedCornersTransformation.CornerType.ALL)).
-                                crossFade().
                                 into(viewHolder.webLinkImageView);
                     } catch (Exception e) {
                         //activity probably destroyed and processing web link took too long

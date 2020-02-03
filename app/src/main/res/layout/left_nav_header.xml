@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="5dp"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="45dp"
             android:background="@android:color/transparent"
             android:inputType="none"
             android:maxLength="@integer/max_username_length"
@@ -50,9 +50,10 @@
                 app:imageUrlWithCrossFade="@{viewModel.profilePicUrl}"/>
 
             <Button
+                android:padding="6dp"
                 android:id="@+id/save_username"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="bottom|right"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
                 android:background="@drawable/rounded_white_trim_red_background"

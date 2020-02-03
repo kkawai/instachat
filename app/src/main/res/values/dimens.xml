@@ -31,7 +31,7 @@
     <!-- fragment profile -->
     <dimen name="fragment_profile_pic_size">220dp</dimen>
 
-    <dimen name="left_drawer_header_height">285dp</dimen>
+    <dimen name="left_drawer_header_height">310dp</dimen>
 
     <!-- private chat activity profile -->
     <dimen name="profile_header_height">380dp</dimen>

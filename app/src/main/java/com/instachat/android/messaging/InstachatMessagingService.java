@@ -133,8 +133,8 @@ public class InstachatMessagingService extends FirebaseMessagingService {
             public Bitmap call() throws Exception {
                 return Glide.
                         with(InstachatMessagingService.this).
-                        load(friendlyMessage.getDpid()).
                         asBitmap().
+                        load(friendlyMessage.getDpid()).
                         transform(new CircleTransform(InstachatMessagingService.this)).
                         into(thumbSize(), thumbSize()). // Width and height
                         get();

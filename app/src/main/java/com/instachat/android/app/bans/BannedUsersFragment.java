@@ -84,7 +84,13 @@ public class BannedUsersFragment extends BaseFragment {
                 }).show();
             }
         };
-        bannedUsersAdapter = new BannedUsersAdapter(BannedUser.class, FirebaseDatabase.getInstance().getReference(Constants.BANS));
+
+//        bannedUsersAdapter = new BannedUsersAdapter(BannedUser.class, FirebaseDatabase.getInstance()
+//                .getReference(Constants.BANS).orderByChild("username")
+//                .startAt("kizz"));
+        bannedUsersAdapter = new BannedUsersAdapter(BannedUser.class, FirebaseDatabase.getInstance()
+                .getReference(Constants.BANS));
+
         bannedUsersAdapter.setUserClickedListener(userClickedListener);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);

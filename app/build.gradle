@@ -104,7 +104,9 @@ dependencies {
     implementation 'com.amazonaws:aws-android-sdk-s3:2.+'
     implementation 'com.amazon.android:mobile-ads:5.+'
 
-    implementation "com.github.bumptech.glide:glide:$rootProject.ext.glideVersion"
+    implementation ("com.github.bumptech.glide:glide:$rootProject.ext.glideVersion") {
+        exclude group: "com.android.support"
+    }
     implementation "de.hdodenhof:circleimageview:$rootProject.ext.circleImageViewVersion"
 
     implementation 'com.android.volley:volley:1.1.0'

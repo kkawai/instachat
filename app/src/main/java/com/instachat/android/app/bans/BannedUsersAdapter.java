@@ -1,25 +1,30 @@
 package com.instachat.android.app.bans;
 
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.instachat.android.R;
 import com.instachat.android.app.adapter.UserClickedListener;
 import com.instachat.android.databinding.ItemBannedPersonBinding;
 import com.instachat.android.util.MLog;
 
-public final class BannedUsersAdapter<T, VH extends RecyclerView.ViewHolder> extends FirebaseRecyclerAdapter<BannedUser, BannedUsersAdapter.BannedUserViewHolder> {
+import androidx.recyclerview.widget.RecyclerView;
+
+public final class BannedUsersAdapter<T, VH extends RecyclerView.ViewHolder>
+        extends FirebaseRecyclerAdapter<BannedUser, BannedUsersAdapter.BannedUserViewHolder>
+        implements Filterable {
 
     private static final String TAG = "BlocksAdapter";
 
     private UserClickedListener mUserClickedListener;
 
-    public BannedUsersAdapter(Class<BannedUser> modelClass, DatabaseReference ref) {
+    public BannedUsersAdapter(Class<BannedUser> modelClass, Query ref) {
         super(modelClass, R.layout.item_banned_person, BannedUserViewHolder.class, ref);
     }
 
@@ -69,4 +74,21 @@ public final class BannedUsersAdapter<T, VH extends RecyclerView.ViewHolder> ext
             this.binding = binding;
         }
     }
+
+    @Override
+    public Filter getFilter() {
+        return myFilter;
+    }
+
+    private Filter myFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            return null;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+
+        }
+    };
 }

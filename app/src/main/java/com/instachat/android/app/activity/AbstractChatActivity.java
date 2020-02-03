@@ -76,6 +76,7 @@ import com.instachat.android.util.FontUtil;
 import com.instachat.android.util.MLog;
 import com.instachat.android.util.ScreenUtil;
 import com.instachat.android.util.StringUtil;
+import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.rx.SchedulerProvider;
 import com.tooltip.Tooltip;
 
@@ -441,7 +442,11 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
 
                 if (length > 0) {
                     setEnableSendButton(true, sendButton);
-                    getViewModel().onMeTyping();
+                    try {
+                        if (UserPreferences.getInstance().getUserId() != 7) {
+                            getViewModel().onMeTyping();
+                        }
+                    }catch (Throwable t){}
                     showSendOptionsTooltip(sendButton);
                 } else {
                     setEnableSendButton(false, sendButton);

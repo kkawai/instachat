@@ -122,9 +122,11 @@ public final class LauncherActivity extends AppCompatActivity {
       SimpleRxWrapper.executeInUiThread(new Runnable() {
          @Override
          public void run() {
-            if (progressDialog != null) {
-               progressDialog.dismiss();
-            }
+            try {
+               if (progressDialog != null) {
+                  progressDialog.dismiss();
+               }
+            }catch (Throwable t){}
          }
       });
    }
