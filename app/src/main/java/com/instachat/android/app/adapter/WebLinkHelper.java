@@ -50,11 +50,11 @@ public class WebLinkHelper {
                 if (sourceContent.getImages().size() > 0) {
                     final Context c = viewHolder.webLinkImageView.getContext();
                     try {
-                        Glide.with(viewHolder.webLinkImageView.getContext()).
+                        Glide.with(viewHolder.webLinkImageView).
                                 load(sourceContent.getImages().get(0)).
-                                optionalCenterCrop().
-                                optionalTransform(
-                                        new RoundedCornersTransformation(c, 30, 0, RoundedCornersTransformation.CornerType.ALL)).
+                                //optionalCenterCrop().
+                                //optionalTransform(
+                                //       new RoundedCornersTransformation(c, 30, 0, RoundedCornersTransformation.CornerType.ALL)).
                                 into(viewHolder.webLinkImageView);
                     } catch (Exception e) {
                         //activity probably destroyed and processing web link took too long

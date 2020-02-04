@@ -336,10 +336,11 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
             if (friendlyMessage.getImageUrl() != null) {
                 viewHolder.messagePhotoViewParent.setVisibility(View.VISIBLE);
                 if (friendlyMessage.getMT() == FriendlyMessage.MESSAGE_TYPE_ONE_TIME) {
-                    Glide.with(mActivity.get()).
+                    Glide.with(viewHolder.messagePhotoView).
                             load(friendlyMessage.getImageUrl()).
-                            optionalTransform(new BlurTransformation(mActivity.get(), 75)).
-                            optionalTransform(new RoundedCornersTransformation(mActivity.get(), 30, 0, RoundedCornersTransformation.CornerType.ALL)).
+
+                            //optionalTransform(new BlurTransformation(mActivity.get(), 75)).
+                            //optionalTransform(new RoundedCornersTransformation(mActivity.get(), 30, 0, RoundedCornersTransformation.CornerType.ALL)).
                             /*
                             bitmapTransform(
                                     //no need to center crop, image will be blurred anyways!
@@ -350,11 +351,11 @@ public class MessagesRecyclerAdapter<T, VH extends RecyclerView.ViewHolder> exte
 
                             into(viewHolder.messagePhotoView);
                 } else {
-                    Glide.with(mActivity.get()).
+                    Glide.with(viewHolder.messagePhotoView).
                             load(friendlyMessage.getImageUrl()).
-                            centerCrop().
-                            optionalTransform(
-                                    new RoundedCornersTransformation(mActivity.get(), 30, 0, RoundedCornersTransformation.CornerType.ALL)).
+                            //centerCrop().
+                            //optionalTransform(
+                            //        new RoundedCornersTransformation(mActivity.get(), 30, 0, RoundedCornersTransformation.CornerType.ALL)).
                             into(viewHolder.messagePhotoView);
                 }
                 if (payloads != null && payloads.contains(PAYLOAD_IMAGE_REVEAL)) {

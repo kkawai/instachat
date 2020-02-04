@@ -114,7 +114,7 @@ public class Bindings {
 
     @BindingAdapter("bannedUser")
     public static void setBannedUser(TextView textView, BannedUser bannedUser) {
-        textView.setText(bannedUser.username + " " + TimeUtil.timeLeft(bannedUser.banExpiration));
+        textView.setText(bannedUser.username + " is Banned");
     }
 
     @BindingAdapter("bannedByAdmin")

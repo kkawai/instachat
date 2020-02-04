@@ -81,14 +81,14 @@ dependencies {
     //implementation "com.google.android.gms:play-services-plus:$rootProject.ext.googlePlayServicesPlusVersion"
 
     // Firebase
-    implementation "com.google.firebase:firebase-core:17.2.0"
-    implementation "com.google.firebase:firebase-database:19.1.0"
+    implementation "com.google.firebase:firebase-core:17.2.2"
+    implementation "com.google.firebase:firebase-database:19.2.1"
     implementation ("com.google.firebase:firebase-auth:19.0.0")
-    implementation "com.google.firebase:firebase-storage:19.0.1"
-    implementation "com.google.firebase:firebase-config:19.0.1"
-    implementation "com.google.firebase:firebase-messaging:20.0.0"
+    implementation "com.google.firebase:firebase-storage:19.1.1"
+    implementation "com.google.firebase:firebase-config:19.1.1"
+    implementation "com.google.firebase:firebase-messaging:20.1.0"
     implementation "com.google.firebase:firebase-crash:$rootProject.ext.firebaseCrashVersion"
-    implementation "com.google.firebase:firebase-analytics:17.2.0"
+    implementation "com.google.firebase:firebase-analytics:17.2.2"
     implementation "com.google.firebase:firebase-invites:$rootProject.ext.firebaseInvitesVersion"
     // Firebase UI
     implementation 'com.firebaseui:firebase-ui-database:0.4.0'
@@ -171,7 +171,7 @@ dependencies {
     implementation 'com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0'
 
     //Viewmodel
-    implementation "androidx.lifecycle:lifecycle-extensions:2.1.0"
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
 
     implementation 'com.google.android.gms:play-services-safetynet:17.0.0'
 
