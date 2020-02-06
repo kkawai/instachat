@@ -36,7 +36,7 @@ public class Bindings {
         if (TextUtils.isEmpty(url)) {
             imageView.setImageResource(R.drawable.ic_anon_person_36dp);
         } else {
-            Glide.with((Activity) imageView.getContext())
+            Glide.with(imageView)
                     .load(url)
                     .error(R.drawable.ic_anon_person_36dp)
                     .into(imageView);
@@ -48,7 +48,7 @@ public class Bindings {
         if (TextUtils.isEmpty(url)) {
             imageView.setImageResource(R.drawable.ic_anon_person_36dp);
         } else {
-            Glide.with(imageView.getContext())
+            Glide.with(imageView)
                     .load(url)
                     .error(R.drawable.ic_anon_person_36dp)
                     .into(imageView);
@@ -94,7 +94,7 @@ public class Bindings {
     }
 
     public static void setPartnerProfilePic(ImageView imageView, final PrivateChatViewModel viewModel) {
-        Glide.with(imageView.getContext()).load(viewModel.getPartner().getProfilePicUrl()).error(R.drawable
+        Glide.with(imageView).load(viewModel.getPartner().getProfilePicUrl()).error(R.drawable
                 .ic_anon_person_36dp)
                 //.crossFade()
                 .listener(new RequestListener<Drawable>() {

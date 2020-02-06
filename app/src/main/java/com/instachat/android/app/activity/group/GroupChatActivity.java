@@ -88,7 +88,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         binding.messageRecyclerView.setLayoutManager(linearLayoutManager);
         binding.messageRecyclerView.setAdapter(messagesAdapter);
 
-        adsHelper.loadAd(this, firebaseRemoteConfig);
+        adsHelper.loadBannerAd(this, firebaseRemoteConfig);
 
         initMessageEditText(binding.sendButton, binding.messageEditTextParent);
         groupChatViewModel.fetchConfig(firebaseRemoteConfig);
@@ -403,7 +403,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     @Override
     public void onReceiveAd(AdDownloaderInterface adDownloaderInterface, ReceivedBannerInterface receivedBanner) throws AdReceiveFailed {
         if (receivedBanner.getErrorCode() != ErrorCode.NO_ERROR) {
-            adsHelper.loadAd(this, firebaseRemoteConfig);
+            adsHelper.loadBannerAd(this, firebaseRemoteConfig);
         }
     }
 
@@ -515,4 +515,11 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
         return PhotoUploadHelper.PhotoType.groupChatRoomPhoto;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Constants.PRIVATE_CHAT_REQUEST_CODE) {
+            adsHelper.loadBannerAd(this, firebaseRemoteConfig);
+        }
+    }
 }

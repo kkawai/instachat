@@ -113,7 +113,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         binding.messageRecyclerView.setLayoutManager(linearLayoutManager);
         binding.messageRecyclerView.setAdapter(messagesAdapter);
 
-        adsHelper.loadAd(this, firebaseRemoteConfig);
+        adsHelper.loadBannerAd(this, firebaseRemoteConfig);
 
         initMessageEditText(binding.sendButton, binding.messageEditTextParent);
         privateChatViewModel.fetchConfig(firebaseRemoteConfig);
@@ -124,6 +124,16 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
         privateChatViewModel.smallProgressCheck();
         onNewIntent(getIntent());
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+
+        add(Observable.timer(2000, TimeUnit.MILLISECONDS)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        adsHelper.loadRewardedAd(PrivateChatActivity.this);
+                    }
+                }).subscribe());
 
     }
 
@@ -271,8 +281,9 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity,
                     transitionImageView, "profilePic" + userid);
             activity.startActivity(intent, options.toBundle());
+            activity.startActivityForResult(intent, Constants.PRIVATE_CHAT_REQUEST_CODE, options.toBundle());
         } else {
-            activity.startActivity(intent);
+            activity.startActivityForResult(intent, Constants.PRIVATE_CHAT_REQUEST_CODE);
         }
     }
 
@@ -495,7 +506,7 @@ public class PrivateChatActivity extends AbstractChatActivity<ActivityPrivateCha
     @Override
     public void onReceiveAd(AdDownloaderInterface adDownloaderInterface, ReceivedBannerInterface receivedBanner) throws AdReceiveFailed {
         if (receivedBanner.getErrorCode() != ErrorCode.NO_ERROR) {
-            adsHelper.loadAd(this, firebaseRemoteConfig);
+            adsHelper.loadBannerAd(this, firebaseRemoteConfig);
         }
     }
 

@@ -182,6 +182,7 @@ public abstract class AbstractChatActivity<T extends ViewDataBinding, V extends 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AdsHelper.init(this);
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         NotificationHelper.createNotificationChannels(this);
         linearLayoutManager.setStackFromEnd(true);

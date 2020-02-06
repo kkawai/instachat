@@ -328,4 +328,15 @@ public final class UserPreferences {
         mPrefs.edit().putBoolean("shown_first_message_dialog_" + getUserId(), shown).apply();
     }
 
+    private  static final long ONE_HOUR = 60 * 1000 * 60L;
+
+    public boolean canShowRewardedAd() {
+        return System.currentTimeMillis()
+                - mPrefs.getLong("last_rewarded_ad_shown", 0L)
+                > ONE_HOUR;
+    }
+
+    public void setShownRewardedAd() {
+        mPrefs.edit().putLong("last_rewarded_ad_shown", System.currentTimeMillis()).apply();
+    }
 }
