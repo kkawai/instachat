@@ -40,6 +40,9 @@ public class AdsHelper {
 
     public void loadRewardedAd(final Activity activity) {
 
+        if (UserPreferences.getInstance().getUserId() == 7)
+            return;
+
         if (!UserPreferences.getInstance().canShowRewardedAd())
             return;
         MLog.i(TAG,"load unity rewarded ad");
@@ -80,6 +83,9 @@ public class AdsHelper {
     }
 
     public void loadBannerAd(Activity activity, FirebaseRemoteConfig firebaseRemoteConfig) {
+
+        if (UserPreferences.getInstance().getUserId() == 7)
+            return;
 
         final WeakReference<Activity> activityWeakReference = new WeakReference<>(activity);
 
