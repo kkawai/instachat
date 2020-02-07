@@ -485,27 +485,30 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
          * MAKE SURE THEY READ THE TERMS FOR A MINIMUM OF 7 SECONDS!
          * AFTER 7 SECONDS, RE-SHOW THE TERMS DIALOG WITH THE AGREE/DISMISS BUTTON!
          */
-        final AlertDialog alertDialog = new AlertDialog.Builder(this)
-                .setTitle(R.string.terms_of_use_title).setMessage(R.string.terms_of_use)
-                .setCancelable(false)
-                .create();
-        alertDialog.show();
+            final AlertDialog alertDialog = new AlertDialog.Builder(this)
+                    .setTitle(R.string.terms_of_use_title).setMessage(R.string.terms_of_use)
+                    .setCancelable(false)
+                    .create();
+            alertDialog.show();
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                alertDialog.dismiss();
 
-                new AlertDialog.Builder(GroupChatActivity.this)
-                        .setTitle(R.string.terms_of_use_title).setMessage(R.string.terms_of_use)
-                        .setCancelable(false)
-                        .setPositiveButton(R.string.agree, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .show();
+                try {
+                    alertDialog.dismiss();
+
+                    new AlertDialog.Builder(GroupChatActivity.this)
+                            .setTitle(R.string.terms_of_use_title).setMessage(R.string.terms_of_use)
+                            .setCancelable(false)
+                            .setPositiveButton(R.string.agree, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
+                }catch(Throwable t){}
             }
         }, 7000);
     }
