@@ -18,8 +18,8 @@ android {
         applicationId "com.instachat.android"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.compileSdkVersion
-        versionCode 108
-        versionName "2.3.7"
+        versionCode 109
+        versionName "2.3.8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }

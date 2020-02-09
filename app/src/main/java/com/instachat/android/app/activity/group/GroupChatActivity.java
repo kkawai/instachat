@@ -44,6 +44,8 @@ import com.smaato.soma.ErrorCode;
 import com.smaato.soma.ReceivedBannerInterface;
 import com.smaato.soma.exception.AdReceiveFailed;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
@@ -54,6 +56,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import io.reactivex.Observable;
+import io.reactivex.functions.Action;
 
 public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding, GroupChatViewModel> implements
         UploadListener, FriendlyMessageListener,
@@ -84,7 +88,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
 
         gcmHelper.onCreate(this);
 
-        initFirebaseAdapter(binding.fragmentContent, binding.messageRecyclerView,this, linearLayoutManager);
+        initFirebaseAdapter(binding.fragmentContent, binding.messageRecyclerView, this, linearLayoutManager);
         binding.messageRecyclerView.setLayoutManager(linearLayoutManager);
         binding.messageRecyclerView.setAdapter(messagesAdapter);
 
@@ -227,7 +231,7 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
                 menu.removeItem(R.id.menu_clear_room);
         } else {
             if (menu.findItem(R.id.menu_clear_room) != null) {
-                menu.findItem(R.id.menu_clear_room).setTitle("Clear comments: "+getViewModel().getRoomCommentCount());
+                menu.findItem(R.id.menu_clear_room).setTitle("Clear Posts: " + getViewModel().getRoomCommentCount());
             }
         }
         return super.onMenuOpened(featureId, menu);
@@ -482,35 +486,44 @@ public class GroupChatActivity extends AbstractChatActivity<ActivityMainBinding,
     public void showTermsOfService() {
 
         /**
-         * MAKE SURE THEY READ THE TERMS FOR A MINIMUM OF 7 SECONDS!
-         * AFTER 7 SECONDS, RE-SHOW THE TERMS DIALOG WITH THE AGREE/DISMISS BUTTON!
+         * MAKE SURE THEY READ THE TERMS FOR A MINIMUM OF SOME SECONDS!
+         * AFTER SOME SECONDS, RE-SHOW THE TERMS DIALOG WITH THE AGREE/DISMISS BUTTON!
          */
-            final AlertDialog alertDialog = new AlertDialog.Builder(this)
-                    .setTitle(R.string.terms_of_use_title).setMessage(R.string.terms_of_use)
-                    .setCancelable(false)
-                    .create();
+        final AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.terms_of_use_title).setMessage(R.string.terms_of_use)
+                .setCancelable(false)
+                .create();
+        try {
             alertDialog.show();
+        } catch (Throwable t) {}
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-                try {
-                    alertDialog.dismiss();
-
-                    new AlertDialog.Builder(GroupChatActivity.this)
-                            .setTitle(R.string.terms_of_use_title).setMessage(R.string.terms_of_use)
-                            .setCancelable(false)
-                            .setPositiveButton(R.string.agree, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            })
-                            .show();
-                }catch(Throwable t){}
-            }
-        }, 7000);
+        add(Observable.timer(3500, TimeUnit.MILLISECONDS)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        try {
+                            alertDialog.dismiss();
+                        } catch (Throwable t) {
+                        }
+                        try {
+                            new AlertDialog.Builder(GroupChatActivity.this)
+                                    .setTitle(R.string.terms_of_use_title).setMessage(R.string.terms_of_use)
+                                    .setCancelable(false)
+                                    .setPositiveButton(R.string.agree, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            try {
+                                                dialog.dismiss();
+                                            }catch (Throwable t){}
+                                        }
+                                    })
+                                    .show();
+                        } catch (Throwable t) {
+                        }
+                    }
+                }).subscribe());
     }
 
     @Override
