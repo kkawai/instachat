@@ -2,7 +2,6 @@ package com.instachat.android.data.api;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;

@@ -1,33 +1,32 @@
 package com.instachat.android.app.login.recovery;
 
 import android.content.DialogInterface;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.view.View;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.instachat.android.R;
 import com.instachat.android.data.api.NetworkApi;
 import com.instachat.android.data.model.User;
+import com.instachat.android.databinding.ActivityForgotPasswordBinding;
 import com.instachat.android.di.component.DaggerAppComponent;
 import com.instachat.android.util.ActivityUtil;
 import com.instachat.android.util.MLog;
-import com.instachat.android.util.UserPreferences;
 import com.instachat.android.util.StringUtil;
+import com.instachat.android.util.UserPreferences;
 
 import org.json.JSONObject;
 
 import javax.inject.Inject;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class ForgotPasswordActivity extends AppCompatActivity implements View.OnClickListener {
+public class ForgotPasswordActivity extends AppCompatActivity {
 
     private static final String TAG = "ForgotPasswordActivity";
 
@@ -37,29 +36,26 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
     @Inject
     RequestQueue requestQueue;
 
-    private TextInputLayout emailLayout;
+    private ActivityForgotPasswordBinding activityForgotPasswordBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         inject();
         ActivityUtil.hideStatusBar(getWindow());
-        DataBindingUtil.setContentView(this, R.layout.activity_forgot_password);
-        emailLayout = findViewById(R.id.input_email_layout);
-        findViewById(R.id.input_username_or_email).setOnClickListener(this);
+        activityForgotPasswordBinding = DataBindingUtil.setContentView(this, R.layout.activity_forgot_password);
 
-        // Set click listeners
-        findViewById(R.id.find_account_button).setOnClickListener(this);
 
         String lastSignIn = UserPreferences.getInstance().getLastSignIn();
         MLog.i(TAG, "lastSignIn ", lastSignIn);
         if (lastSignIn != null) {
-            emailLayout.getEditText().setText(lastSignIn);
+            activityForgotPasswordBinding.inputEmailLayout.getEditText().setText(lastSignIn);
+
         }
     }
 
     private void find() {
-        final String emailOrUsername = emailLayout.getEditText().getText().toString();
+        final String emailOrUsername = activityForgotPasswordBinding.inputEmailLayout.getEditText().getText().toString();
         if (StringUtil.isEmpty(emailOrUsername)) {
             new SweetAlertDialog(ForgotPasswordActivity.this, SweetAlertDialog.NORMAL_TYPE)
                     .setContentText(getString(R.string.please_enter_username_or_email))
@@ -105,8 +101,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
 
     }
 
-    @Override
-    public void onClick(final View v) {
+    public void onFindAccount(View v) {
         switch (v.getId()) {
             case R.id.find_account_button:
                 find();
