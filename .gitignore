@@ -5,3 +5,5 @@ local.properties
 build
 backup
 app/google-services.json
+my.keystore
+private-data

@@ -111,8 +111,7 @@ public final class Constants {
    public static final boolean IS_CHATROOMS_ENABLED = true;
    public static final boolean IS_ANIMATED_EMO_ENABLED = false;
 
-   public static final String AMAZON_APP_KEY_PROD = "asdfasdfasdfasdfasdfasdfas";//this is fake!, the real is below
-   //public static final String AMAZON_APP_KEY_PROD = "30551ba1743442cdb3ad7b6d3276531e";
+   public static final String AMAZON_APP_KEY_PROD = "fake-fake-fake-fake-fake";//this is fake!
    public static final String AMAZON_APP_KEY_TEST = "sample-app-v1_pub-2";
 
    public static final int MAX_SECONDS_TO_DISPLAY_IND_PROGRESS = 7500;
@@ -314,9 +313,6 @@ public final class Constants {
    public static String FIELD_LAST_MESSAGE_SENT_TIMESTAMP = "lastMessageSentTimestamp";
    public static String FIELD_CURRENT_GROUP_ID = "currentGroupId";
    public static String FIELD_CURRENT_GROUP_NAME = "currentGroupName";
-
-   //public static final String GOOGLE_API_KEY = "asdfasdfasdfasdfasdfasdfasdf"; //fake, now stored in Remote Settings
-   //public static final String GOOGLE_API_KEY = "AIzaSyAHnphNjr0gqXkxps262WCzNmyG_P6OE24";
 
    public static final String CHANNEL_ID_NEW_MSGS = "com.instachat.android.directs";
    public static final String CHANNEL_ID_ACTIVITY = "com.instachat.android.activity";
